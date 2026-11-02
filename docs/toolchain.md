@@ -55,8 +55,10 @@ registered, bound method returned the expected value, signal present, and
 - **Consistency by construction:** our env is a `Clone()` of godot-cpp's, so
   every other flag is identical: runtime library (`use_static_cpp`), debug and
   optimisation settings, defines. Only the `-std` flag differs.
-- **Still to validate on MSVC (M1):** debug and release builds, the exact `cl`
-  version logged, and runtime extension loading in Godot on Windows.
+- **Validated on MSVC 19.44.35229 in CI (run `41408640443`):** debug and release builds,
+  `/MT` on both sides, extension loading in the Windows editor (debug library), and in the
+  exported game (release library). Accepted for this project, pending review; not a
+  general ABI/ODR guarantee.
 - A `static_assert(__cplusplus >= 202002L)` in one source file catches a
   silent fallback. MSVC needs `/Zc:__cplusplus`, which godot-cpp already adds.
 
@@ -172,13 +174,12 @@ the results again, re-run on the real project.
   `exclude_filter` plus the options we set is accepted, and Godot uses defaults
   for the rest. `exclude_filter="tests/*"` keeps tests out, and
   `tools/export_check.sh` checks the `.pck` for that.
-- Exporting Windows from Linux works without `rcedit`. The only cost is that
-  the exe icon and metadata are not set (a warning, not a failure).
-  **Unverified:** validate in M1.
-- Godot exports the GDExtension libraries listed in `.gdextension` for the
-  target platform. **Unverified:** the M1 Linux export smoke test runs the
-  exported binary with `--headless --quit-after 300`, then checks for exit 0
-  and no `ERROR:` lines.
+- CI exports each platform on its own runner, so cross-export from Linux is not
+  used or validated. `application/modify_resources=false`, so the Windows exe has
+  no custom icon or metadata yet (M7).
+- Godot bundles the GDExtension library for the target platform. Validated on both
+  OSes by `tools/export_check.sh`: the exported game runs headless and must print the
+  `build=release` proof line, exit 0, with no ERROR lines.
 - Web (stretch only): GDExtension on web needs the web build of the library
   (`*.web.template_release.wasm32.nothreads.wasm`) and extension support in
   the web export. Not evaluated. Time-boxed to half a day after M6, and only if

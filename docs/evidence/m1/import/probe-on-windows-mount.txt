@@ -1,0 +1,3 @@
+probe on /mnt/c clean-1 exit=134
+probe on /mnt/c clean-2 exit=134
+probe on /mnt/c clean-3 exit=134

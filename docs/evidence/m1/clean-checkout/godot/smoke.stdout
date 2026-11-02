@@ -1,0 +1,69 @@
+WorkerThreadPool: 12 threads, 3 max low-priority.
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+TextServer: Added interface "Dummy"
+TextServer: Added interface "ICU / HarfBuzz / Graphite (Built-in)"
+SDL: Init OK!
+Using "default" pen tablet driver...
+
+TextServer: Primary interface set to: "ICU / HarfBuzz / Graphite (Built-in)".
+dagon: extension initialized build=debug compiler=gcc 130300 __cplusplus=202002
+CORE API HASH: 2004498165
+EDITOR API HASH: 1696660745
+SceneTreeFTI: traversal method DEFAULT
+Loaded system CA certificates
+Loading resource: res://scenes/level/level.tscn remapped: res://scenes/level/level.tscn
+Loading resource: res://scenes/player/player.tscn remapped: res://scenes/player/player.tscn
+Completed load for: 'res://scenes/player/player.tscn' remapped 'res://scenes/player/player.tscn' at thread -1
+Completed load for: 'res://scenes/level/level.tscn' remapped 'res://scenes/level/level.tscn' at thread -1
+XR: Clearing primary interface
+XR: Removed interface "Native mobile"
+XR: Removed interface "OpenXR"
+Orphan StringName: InputMap (static: 0, total: 2)
+Orphan StringName: Mesh (static: 0, total: 2)
+Orphan StringName: Tween (static: 0, total: 2)
+Orphan StringName: PhysicsBody2D (static: 0, total: 2)
+Orphan StringName: Shader (static: 0, total: 2)
+Orphan StringName: MainLoop (static: 0, total: 2)
+Orphan StringName: Camera2D (static: 0, total: 2)
+Orphan StringName: TriangleMesh (static: 0, total: 2)
+Orphan StringName: InputEvent (static: 0, total: 2)
+Orphan StringName: CameraRig (static: 0, total: 2)
+Orphan StringName: ScriptBacktrace (static: 0, total: 2)
+Orphan StringName: Shape2D (static: 0, total: 2)
+Orphan StringName: Shape3D (static: 0, total: 2)
+Orphan StringName: Input (static: 0, total: 2)
+Orphan StringName: PlayerController (static: 0, total: 2)
+Orphan StringName: ScriptLanguage (static: 0, total: 2)
+Orphan StringName: Font (static: 0, total: 2)
+Orphan StringName: Image (static: 0, total: 2)
+Orphan StringName: Resource (static: 0, total: 2)
+Orphan StringName: OS (static: 0, total: 2)
+Orphan StringName: KinematicCollision2D (static: 0, total: 2)
+Orphan StringName: Viewport (static: 0, total: 2)
+Orphan StringName: MultiplayerAPI (static: 0, total: 2)
+Orphan StringName: DisplayServer (static: 0, total: 2)
+Orphan StringName: ConcavePolygonShape3D (static: 0, total: 2)
+Orphan StringName: CharacterBody2D (static: 0, total: 2)
+Orphan StringName: CanvasItem (static: 0, total: 2)
+Orphan StringName: Node2D (static: 0, total: 2)
+Orphan StringName: SceneTree (static: 0, total: 2)
+Orphan StringName: Texture (static: 0, total: 2)
+Orphan StringName: CanvasLayer (static: 0, total: 2)
+Orphan StringName: World2D (static: 0, total: 2)
+Orphan StringName: Material (static: 0, total: 2)
+Orphan StringName: Node (static: 0, total: 2)
+Orphan StringName: ProjectSettings (static: 0, total: 2)
+Orphan StringName: TextServer (static: 0, total: 2)
+Orphan StringName: RefCounted (static: 0, total: 2)
+Orphan StringName: Engine (static: 0, total: 2)
+Orphan StringName: Object (static: 0, total: 2)
+Orphan StringName: Theme (static: 0, total: 2)
+Orphan StringName: ConvexPolygonShape3D (static: 0, total: 2)
+Orphan StringName: MultiMesh (static: 0, total: 2)
+Orphan StringName: Texture2D (static: 0, total: 2)
+Orphan StringName: Window (static: 0, total: 2)
+Orphan StringName: CollisionObject2D (static: 0, total: 2)
+Orphan StringName: StyleBox (static: 0, total: 2)
+Orphan StringName: ClassDB (static: 0, total: 2)
+Orphan StringName: Logger (static: 0, total: 2)
+StringName: 48 unclaimed string names at exit.

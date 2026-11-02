@@ -1,0 +1,4 @@
+FAIL test_probe_observes_after_player_step
+RESULT passed=21 failed=1
+     probe at tick 46 did not see that tick's movement: before=232.667 after=232.667
+     probe at tick 47 did not see that tick's movement: before=233.833 after=233.833

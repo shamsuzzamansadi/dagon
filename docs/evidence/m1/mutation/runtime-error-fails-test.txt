@@ -1,0 +1,3 @@
+FAIL test_physics_tick_is_fixed
+     logged error: res://tests/test_movement.gd:45 test_physics_tick_is_fixed: Invalid call. Nonexistent function 'does_not_exist' in base 'Nil'. 
+RESULT passed=21 failed=1

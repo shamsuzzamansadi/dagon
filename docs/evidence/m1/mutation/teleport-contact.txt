@@ -1,0 +1,10 @@
+FAIL test_f_teleport_invalidates_stale_floor_contact
+     stale contact granted a jump
+     moving up after teleport: vy=-190.0
+     false landing on the first step
+     coyote or buffered jump fired in mid-air
+     false landing in mid-air
+     the expired buffer fired on landing
+     landed fired 2 times on genuine contact
+     normal jump did not work after the real landing
+RESULT passed=21 failed=1

@@ -57,12 +57,17 @@ and `toolchain.md`.
 
 ## 3. Remaining validation (open until evidence exists)
 
-| Item | Evidence so far | Validation step | When |
-|---|---|---|---|
-| D2 on MSVC | None. GCC 13.3 Linux probe only. Shared headers checked: godot-cpp's public headers have no `__cplusplus`-dependent code paths (only `static_assert(__cplusplus >= 201703L)`). The standard library headers themselves still differ by mode. | CI: MSVC debug and release builds with the `cl` version logged; our env is a clone of godot-cpp's, so runtime (`/MT` vs `/MD`) and debug flags match by construction, and the log verifies it; Windows runtime extension load (roadmap M1 #6) | M1 |
-| Desktop export with GDExtension | None | Templates downloaded and checksum-verified; Linux export runs headless; Windows export created and run natively by a human | M1 |
-| Import-crash workaround | Pre-seed prevented the crash 3/3 (probe project only) | Re-run on the real project, locally and in CI; collect a debug-symbol backtrace if time allows; file upstream and link the issue URL | M1 |
-| Headless test reliability | None | M1 integration tests run repeatedly (≥ 10 consecutive CI runs with no flake) | M1–M3 |
-| Teleport contact invalidation | Design only | M1 tests 7f and 7g | M1 |
-| Cinematic re-entrancy contract | Design only | M3 regression tests (architecture §8) | M3 |
-| Theme fit | Theme not announced | jam.md §4 | G0 (Nov 1–2) |
+Updated 2026-11-02 at the M1 gate. Evidence: [reviews/m1-review-package.md](reviews/m1-review-package.md).
+
+| Item | Status | Evidence so far | Still needed | When |
+|---|---|---|---|---|
+| D2 on MSVC | **Validated on CI, reviewer judgment pending** | MSVC 19.44.35229 with `/MT` on both sides; debug library loads in the Windows editor and passes tests; release library loads in the exported game. godot-cpp's public headers have no standard-dependent code. Not a general ABI/ODR guarantee. | Review | M1 gate |
+| Desktop export with GDExtension | **Validated headless on both OSes; windowed on Linux (software GL)** | CI run `41408640443`; local windowed run | Owner runs the Windows export on real hardware | M1 gate |
+| Import-crash workaround | **Provisional** | Crash occurs on a fresh clone of the game (134 ×4); preparation prevented it every time. Root cause unknown. | Upstream report | Open |
+| Headless test reliability | **Partly** | 20/20 local; 3 green CI runs | 10 consecutive CI runs | M1–M3 |
+| Teleport contact invalidation | **Validated** | Tests 7f and 7g; mutation check | — | Done |
+| `StepProbe` observation order | **Validated** | Test and mutation check | — | Done |
+| Movement feel, physical input | **Not done** | Synthetic events only | Owner playtest | M1 gate |
+| Cinematic re-entrancy contract | Design only | — | M3 regression tests | M3 |
+| Theme fit legibility | Design only | jam.md §4 | M3 playtest question | M3 |
+| Visual quality (GDD §8) | Not started | Greybox only | First M4 review | M4 |

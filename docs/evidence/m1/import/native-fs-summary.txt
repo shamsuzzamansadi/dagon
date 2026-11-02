@@ -1,0 +1,6 @@
+clean-unprepared-1 exit=134 stderr_bytes=22
+clean-unprepared-2 exit=134 stderr_bytes=22
+clean-unprepared-3 exit=134 stderr_bytes=22
+clean-prepared-1 exit=0 stderr_bytes=0
+clean-prepared-2 exit=0 stderr_bytes=0
+clean-prepared-3 exit=0 stderr_bytes=0
