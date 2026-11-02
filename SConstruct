@@ -16,6 +16,7 @@ customs = [os.path.abspath(path) for path in customs]
 
 opts = Variables(customs, ARGUMENTS)
 opts.Add(BoolVariable("show_flags", "Print the compiler version and effective flags", False))
+opts.Add(BoolVariable("require_msvc", "Fail instead of falling back when Windows builds would not use MSVC", False))
 opts.Update(localEnv)
 
 Help(opts.GenerateHelpText(localEnv))
@@ -30,6 +31,11 @@ Run the following command to download godot-cpp:
     sys.exit(1)
 
 env = SConscript("godot-cpp/SConstruct", {"api_version": "4.7", "env": env, "customs": customs})
+
+# godot-cpp silently falls back to MinGW when it does not detect MSVC.
+if localEnv["require_msvc"] and env["platform"] == "windows" and not env.get("is_msvc", False):
+    print_error("require_msvc=yes, but this build would not use MSVC (CXX={}).".format(env.subst("$CXX")))
+    sys.exit(1)
 
 # godot-cpp compiles as C++17. Only our own sources use C++20: every other flag
 # stays identical because this env is a clone (docs/toolchain.md §2).
@@ -64,6 +70,8 @@ if localEnv["show_flags"]:
 
 # Native unit tests: plain C++20 with no godot-cpp. Build and run with `scons unit_tests`.
 test_env = Environment(tools=["default"])
+if localEnv["show_flags"]:
+    print("dagon: unit_tests compiler: {}".format(test_env.subst("$CXX")))
 if "msvc" in test_env["TOOLS"]:
     test_env.Append(CXXFLAGS=["/std:c++20", "/Zc:__cplusplus", "/EHsc", "/W4", "/WX"])
 else:

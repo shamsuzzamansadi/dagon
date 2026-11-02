@@ -1,0 +1,42 @@
+#!/usr/bin/env sh
+# Publishes CI evidence as annotations. Usage: tools/ci_annotate.sh <build|tests> <platform>
+# Reporting only: always exits 0, so it cannot mask or cause a job failure.
+group="$1"
+platform="$2"
+
+notice() { # notice <title> <file> <pattern>
+	line="$(grep -hE "$3" "$2" 2> /dev/null | head -n 1 | tr -d '\r')"
+	echo "::notice title=$platform $1::${line:-missing}"
+}
+
+exit_of() { # exit_of <title> <file>
+	echo "::notice title=$platform $1::exit=$(cat "$2" 2> /dev/null | tr -d '\r' || true)"
+}
+
+case "$group" in
+	build)
+		notice compiler build/logs/build-debug.log '^dagon: compiler:'
+		notice unit-tests-compiler build/logs/build-debug.log '^dagon: unit_tests compiler:'
+		notice own-cxxflags-debug build/logs/build-debug.log '^dagon: own CXXFLAGS'
+		notice godot-cpp-cxxflags-debug build/logs/build-debug.log '^dagon: godot-cpp CXXFLAGS'
+		notice ccflags-debug build/logs/build-debug.log '^dagon: CCFLAGS'
+		notice ccflags-release build/logs/build-release.log '^dagon: CCFLAGS'
+		notice defines-debug build/logs/build-debug.log '^dagon: CPPDEFINES'
+		notice defines-release build/logs/build-release.log '^dagon: CPPDEFINES'
+		notice linkflags-release build/logs/build-release.log '^dagon: LINKFLAGS'
+		notice unit-tests build/logs/unit-tests.log 'test cases:'
+		;;
+	tests)
+		exit_of import build/logs/godot/import.exit
+		notice extension-load-debug-library build/logs/godot/check_classes.stdout '^CHECK_CLASSES'
+		exit_of extension-load-exit build/logs/godot/check_classes.exit
+		notice integration build/logs/godot/integration.stdout '^RESULT'
+		exit_of integration-exit build/logs/godot/integration.exit
+		notice smoke-debug-library build/logs/godot/smoke.stdout 'dagon: extension initialized'
+		exit_of smoke-exit build/logs/godot/smoke.exit
+		notice exported-release-library "build/logs/export/run-$platform.all" 'dagon: extension initialized'
+		exit_of exported-run-exit "build/logs/export/run-$platform.exit"
+		notice first-error build/logs/godot/integration.errors '.'
+		;;
+esac
+exit 0

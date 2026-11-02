@@ -18,9 +18,9 @@ starts only after M6 is green, and is time-boxed.
 | M1 Foundation | Nov 2–5 | See "M1 scope" below | M1 acceptance below |
 | M2 Interaction | Nov 6–8 | Interactable, Interactor, StoryTrigger, Hud (prompt, caption, fade), `interact` and `pause` mappings, kill plane and checkpoints, PauseMenu, `reset_global_state` | Integration tests: focus, disabled or freed focus, double press, one-shot, trigger re-arm, respawn, pause → restart |
 | M3 Complete gameplay (greybox) | Nov 9–14 | Full 4-act greybox layout, SequencePuzzle and PuzzleController, StoryProgress and GameDirector with the full cinematic contract, placeholder clips, flee timer, Title and Ending scenes | Start→end greybox playthrough. All M3 regression tests in architecture §8. |
-| M4 Atmosphere | Nov 15–19 | **Final asset-production decision before Nov 15.** Parallax, CanvasModulate, lantern, occluders, fog shader, ambience per act, footsteps, first-pass silhouette art | Readability on 2 displays; smoke test clean; frame time checked |
-| M5 Cinematic horror | Nov 20–23 | Dagon silhouette and animation, the `monolith_awaken`, `dagon_reveal` and `collapse` clips, shake, baked audio sweeps, epilogue | Full playthrough with final content; cinematic regression tests still green |
-| M6 Stabilization | Nov 24–27 | Fixes from at least 2 external playtests, timing (10–15 min), performance, release workflow, native runs on Windows and Linux | Release candidate artifacts from CI launched on real Windows and Linux |
+| M4 Atmosphere | Nov 15–19 | **Final asset-production decision before Nov 15.** **First deliverable: one short playable Shore section near final quality, shown for visual review before the treatment spreads** ([GDD §8](gdd.md)). Then parallax, CanvasModulate, lantern, occluders, fog shader, ambience per act, footsteps, silhouette art through the level | Visual review evidence and acceptance checklist in GDD §8; readability on 2 displays; smoke test clean; frame time checked |
+| M5 Cinematic horror | Nov 20–23 | Dagon silhouette and animation, the `monolith_awaken`, `dagon_reveal` and `collapse` clips, shake, baked audio sweeps, epilogue | Full playthrough with final content; GDD §8 checklist on the reveal; cinematic regression tests still green |
+| M6 Stabilization | Nov 24–27 | Fixes from at least 2 external playtests, timing (10–15 min), performance, release workflow, native runs on Windows and Linux | Release candidate artifacts from CI launched on real Windows and Linux; GDD §8 checklist on every scene |
 | M7 Publication prep | Nov 28–29 | itch page assets, README, CREDITS, licenses, release notes, AI disclosure text (jam.md §5), tag | The owner uploads and submits. **Internal target: submitted by Nov 29 21:37 UTC.** Downloaded build verified on both OSes. |
 | Buffer | Nov 30 – Dec 1 21:37 UTC | Only fixes to upload or packaging problems. No features. | — |
 
@@ -35,15 +35,14 @@ Never cut the playable loop, readable clues, the reveal, or the export checks.
 
 ## Status checklist
 
-- [x] Phase A approved (2026-10-28). No further broad architecture review.
-- [x] Repository created by the owner: https://github.com/shamsuzzamansadi/dagon
-  (2026-10-28 06:35 UTC, public, empty). Commit attribution policy:
-  jam.md §3.
-- [x] Import-crash evidence package made reproducible (`reproduce.sh`; run
-  2026-10-28: 3/3 crash, 3/3 pre-seeded OK).
-- [ ] **G0: theme announced (2026-11-01), fit assessed in jam.md §4, rules
-  re-checked.** ← current gate
-- [ ] M1 … M7 as scheduled above.
+- [x] Phase A approved (2026-10-28).
+- [x] Repository created and in use: https://github.com/shamsuzzamansadi/dagon
+- [x] G0: theme SHIFT, fit recorded in jam.md §4 (2026-11-02).
+- [ ] **M1 Foundation: implemented; at the M1 review gate. NOT accepted.** Evidence and
+  open items are in [reviews/m1-review-package.md](reviews/m1-review-package.md).
+  Outstanding before acceptance: human movement-feel and physical-gamepad check,
+  native run of the Windows export, independent review.
+- [ ] M2–M7 not started.
 
 ## Review follow-ups by milestone (Phase A final review, 2026-10-28)
 

@@ -4,8 +4,9 @@ A short 2D cinematic horror game for [GitHub Game Off 2026](https://itch.io/jam/
 (theme: SHIFT). A shipwrecked sailor wakes on a stretch of seabed that should be
 under the ocean. Godot 4.7 with gameplay in C++20 through GDExtension.
 
-**Status: M1 foundation.** A small greybox you can walk and jump in. There is no
-interaction, story, puzzle or final art yet. See [docs/roadmap.md](docs/roadmap.md).
+**Status: M1 foundation, under review.** A small greybox you can walk and jump in.
+There is no interaction, story, puzzle or final art yet, and it does not yet look like
+the intended game. See [docs/roadmap.md](docs/roadmap.md).
 
 ## Controls
 
@@ -43,6 +44,10 @@ py -m venv .venv
 .venv\Scripts\scons unit_tests
 powershell -ExecutionPolicy Bypass -File tools\prepare_project.ps1
 ```
+
+If the build prints `g++` rather than MSVC, SCons did not detect Visual Studio and
+fell back to MinGW. SCons 4.9.1 detects VS 2022 but not VS 2026. Add `require_msvc=yes`
+to make that an error.
 
 **Run the prepare script before opening the project in Godot for the first
 time.** It works around a crash seen on a clean cache (details in

@@ -14,7 +14,7 @@ have a named validation step.
 | SCons | **4.9.1** (pip) | Built the spike locally. The template CI action defaults to 4.4.0, so we override it to 4.9.1. |
 | Python | 3.x (3.13 local) | Needed only for SCons. |
 | Linux compiler | GCC 13.3 (Ubuntu 24.04, local). CI: see the M1 package | The real project builds and loads. Clang 18 is available but untested. |
-| Windows compiler | MSVC 2022, on the `windows-latest` runner | **Unverified, and not pinned:** `windows-latest` is a moving image. The M1 CI job logs the exact `cl` version, and that version is recorded here. |
+| Windows compiler | **MSVC 2022 (19.44.35229 observed), on the pinned `windows-2022` runner** | `windows-2025` was tried first: it ships MSVC 19.51 (VS 2026), which SCons up to 4.9.1 does not detect, and godot-cpp then **silently falls back to MinGW**. A CI matrix confirmed this on 2026-11-02. CI now builds with `require_msvc=yes`, which fails instead of falling back. Results are in the M1 review package. |
 | Unit-test framework | doctest **v2.5.3** (single header, vendored) | GitHub releases API. |
 | Export templates | 4.7.2 `.tpz` (1.28 GB) | **Downloaded 2026-11-02; official SHA-512 verified** (`tools/install_export_templates.sh`). Only the desktop templates are kept. |
 | Emscripten (web, stretch) | 3.1.62 (template's pin) | Not evaluated. See §6. |
@@ -72,7 +72,8 @@ python3 -m venv .venv && .venv/bin/pip install scons==4.9.1
 sh tools/prepare_project.sh           # before the first Godot launch
 ```
 
-Windows (x64 Native Tools prompt, VS 2022):
+Windows (x64 Native Tools prompt, VS 2022; with VS 2026, SCons 4.11.1 is needed for
+detection, which we have not validated end to end):
 ```bat
 py -m venv .venv && .venv\Scripts\pip install scons==4.9.1
 .venv\Scripts\scons platform=windows target=template_debug
@@ -118,18 +119,19 @@ with one `Node` subclass):
   `config/features`, main scene, export presets, all scripts and scenes removed.
 
 **Observed on the actual game project (2026-11-02,
-`docs/evidence/m1/import/`):**
-- **The crash did not reproduce:** 3 of 3 clean-cache imports **without**
-  preparation exited 0, and so did 3 of 3 with it.
+[evidence/m1/import/](evidence/m1/import/README.md)):**
+- **A fresh clone crashes the same way:** 4 of 4 clean-cache imports **without**
+  preparation exited 134. With it, 3 of 3 exited 0, and the real checks then pass.
+- The one exception is the working copy on `/mnt/c`, which exited 0 even when
+  unprepared. An early note in commit `b94e742` wrongly generalized from that.
 
 **Not established:**
-- The root cause, or why the probe crashes and the game project does not. The
-  remaining differences are the extension code and library layout. An engine-only
-  stack does not rule out earlier corruption caused by the probe's extension.
-- That the game project is immune. It may crash later as it changes, so the
-  provisional workaround stays and any non-zero exit fails the run.
-- The impact on interactive editor sessions.
-- No upstream issue has been filed; without a root cause it is not yet ready.
+- The root cause. The filesystem alone does not explain the exception, because the
+  probe crashes on `/mnt/c` too. An engine-only stack does not rule out corruption
+  caused by an extension, though the crash now occurs with two different ones.
+- Behaviour on Windows and in interactive editor sessions.
+- No upstream issue has been filed yet; the fresh-clone reproduction is a good
+  basis for one. A debug-symbol engine build would make it far more useful.
 
 **Provisional workaround, used identically for local clean checkouts and CI.**
 It is run once after cloning, before the first Godot launch.

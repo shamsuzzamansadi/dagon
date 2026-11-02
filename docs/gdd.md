@@ -141,17 +141,64 @@ about 4 s and never pauses the game.
 - Source: original synthesized or recorded sounds, plus CC0 only, all logged in
   `CREDITS.md`.
 
-## 8. Visual direction
+## 8. Visual direction and acceptance
 
-- 480×270 internal resolution, integer-scaled. Muted palette: navy, charcoal,
-  slate, sick green. The only warm colour is the lantern.
-- Silhouette-first: terrain and props are mostly dark shapes. Detail sits in
-  rim light and in the parallax depth layers.
-- 4–6 parallax layers, plus a foreground fog layer that drifts across the
-  player.
-- Dagon is never fully shown. We see an outline against fog, a fin-crest, a
-  hand-like limb on the monolith, and one reflected eye-glint. It is scaled
-  roughly 30× the player's height.
+**Quality bar (project owner, 2026-11-02):** the finished game should feel *made
+with love*: visually coherent, carefully composed, atmospheric, and pleasant to
+control. A working prototype is an intermediate milestone, not the final
+presentation. Passing automated checks says nothing about any of this.
+
+**Identity.** Cinematic coastal horror with its own look. It takes restraint and
+pacing from cinematic games, but no assets, compositions or recognizable designs.
+- 480×270 internal resolution, integer-scaled.
+- Palette: charcoal, slate, muted navy, restrained sickly teal. Warm amber lantern
+  light is the only warm colour.
+- Clear separation between foreground, playable ground and distant scenery, using
+  4–6 parallax layers and a foreground fog layer.
+- Deliberate negative space and scale contrast.
+- Organic, weathered silhouettes, not visibly repeated geometric primitives.
+- Dagon is never fully shown: an outline against fog, a fin-crest, a hand-like limb
+  on the monolith, one reflected eye-glint, roughly 30× the player's height.
+
+**In the details:**
+- *Composition:* important views have a clear focal point. Terrain, light and framing
+  guide attention. No empty stretches filled only with repeated rocks. Jumps, walkable
+  surfaces and interactables are visually understandable.
+- *Character and movement:* the sailor reads as a character at gameplay resolution.
+  Walking, stopping, jumping and landing feel intentional, with no foot sliding, jitter
+  or abrupt animation changes. Restrained secondary motion (lantern, coat) where it
+  adds character.
+- *Light and atmosphere:* keep detail and navigation instead of crushing to black. Fog
+  creates depth without hiding the screen. No excessive glow, particles, distortion or
+  constant camera shake. Sound and animation follow the same mood.
+- *UI:* consistent typography, spacing, alignment and restrained transitions. Captions
+  are readable at target window sizes. Prompts and menus feel part of the same game.
+  No debug labels or overlays in normal release gameplay.
+
+**Prove it before decorating (first M4 deliverable).** One short, playable section of
+the Shore, brought close to final quality, sets the character treatment, terrain and
+prop language, palette, light, depth, camera behaviour, ambient motion and sound, and
+caption and prompt styling. It is a polish pass on existing gameplay: no new level or
+mechanic. It goes to visual review before the treatment spreads through the level;
+independent work continues meanwhile. Prefer fewer well-composed scenes and reusable,
+consistent assets over a lot of rough content.
+
+**Visual evidence required for that review:**
+- At least three in-engine screenshots and a 20–30 s gameplay recording showing
+  movement and camera, at normal viewing size and at native resolution.
+- Debug overlays off, and a statement of what remains unfinished.
+- Concept art or generated illustrations may guide production, but are never presented
+  as proof of the rendered game's quality.
+
+**Visual acceptance checklist (before calling any scene polished):**
+1. Player, ground and important props are immediately distinguishable.
+2. Shapes, lighting and UI follow one coherent style.
+3. Camera motion is stable and intentional.
+4. No unintended seams, clipping, stretched textures or distracting repetition.
+5. Text is readable and properly aligned.
+6. The scene communicates mood without an explanatory paragraph.
+7. It looks considered both in a still screenshot and during play.
+8. Performance and gameplay regression checks still pass.
 
 ## 9. Stretch goals (only after M6 is green; time-boxed; never block release)
 
