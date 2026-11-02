@@ -1,0 +1,3 @@
+FAIL test_shore.test_camera_slides_one_way_when_turning
+     the look-ahead jumped 48 px in one frame
+RESULT passed=46 failed=1

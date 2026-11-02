@@ -69,6 +69,12 @@ Player                 PlayerController (CharacterBody2D)  layer=Player  mask=Wo
 ```
 
 ### 4.2 `scenes/level/level.tscn` (the whole game, 4 acts)
+
+*This is the plan for M3 onward. Today there are two scenes with the same collision, spawn and
+camera limits: `scenes/level/shore.tscn`, the main scene (art to x = 640, greybox beyond), and
+`scenes/level/level.tscn`, the greybox development and test scene, which is not exported. Which one
+grows into this tree is settled when M2 starts ([D20](decisions.md)).*
+
 ```
 Level                       Node2D
 ├── GameDirector            GameDirector
@@ -339,9 +345,10 @@ This is a guard plus one deferred step, not an event framework.
     `is_player_inside()`, then clears the flag.
 
 ### CameraRig : Camera2D
-- Follows a `target` Node2D with a look-ahead in the facing direction.
-  Smoothing uses Camera2D's built-in position smoothing, and the level limits
-  use Camera2D's built-in limits.
+- Follows a `target` Node2D with a look-ahead in the facing direction. `pixel_lock`, on by
+  default, keeps the camera a whole number of pixels from the target, so the two cannot round
+  apart and flicker on screen. Position smoothing would defeat it and is not used; `lock_speed`
+  slides the look-ahead ([D22](decisions.md)). The level limits use Camera2D's built-in limits.
 - `set_target(Node2D)` lets cinematic clips retarget the camera to a
   `CameraMarks` marker. Clips also key `zoom` directly.
 - Screen shake: `add_trauma(amount)` gives a decaying, noise-driven `offset`.
@@ -458,7 +465,7 @@ silently.
 | Unit | `core::step`, `SequencePuzzle`, `StoryProgress` | doctest, native binary (`scons unit_tests`) | CI Linux + Windows |
 | Extension load | All 9 classes registered, with key methods and signals bound | `godot --headless --script res://tests/check_classes.gd` | CI Linux |
 | Integration | M1: spawn and land; walk distance; jump arc; wall stop; teleport contact invalidation (roadmap M1 7f). M2: focus gained and lost; focused object disabled or freed → focus cleared, no crash; double press → 1 event; Interactable `one_shot`. M3: puzzle right, wrong, repeated press and reset; trigger re-entry → 1 beat; **outbound crossing of `collapse` → not consumed, fires later in Fleeing**; player already inside the awaited trigger at beat entry → fires; cinematic lock and unlock; **missing clip, looping clip and watchdog timeout → gate open, camera restored, correct control state, `RevealDone` raised once**; **already-overlapping next trigger during finalization → next cinematic keeps its lock and camera**; **duplicate completion/finalization → outcome applied once**; **stale completion (older generation) → no effect on the newer cinematic**; **entering the kill plane while control is locked → recovered after finalization**; flee timeout → Ended; pause → restart and pause → title → start → unpaused; reload resets state; wiring check | Hand-rolled headless SceneTree runner (~80 lines, no GUT); rules below | CI Linux |
-| Smoke | Main scene runs 600 frames with no `ERROR:` lines | `--headless --quit-after 600` piped through grep | CI Linux |
+| Smoke | Main scene and greybox scene each run 600 frames with no `ERROR:` lines | `--headless --quit-after 600` piped through grep | CI Linux and Windows |
 | Export | Linux and Windows release exports build. The Linux export runs `--quit-after 300` with exit 0 and no errors. | `--export-release` | CI Linux (export); Windows run is manual or on a Windows runner |
 | Manual | Feel, readability, pacing, audio mix, a full playthrough on Windows and Linux | Checklist per milestone | Human |
 
@@ -528,6 +535,8 @@ Reports always state which of these levels actually ran.
   are pinned by commit SHA.
 - No compiled binaries are committed. `project/bin/*/` is gitignored, and only
   `dagon.gdextension` is tracked.
+- `ci.yml` uploads the standard builds, which open the Shore, as the artifacts `dagon-windows`
+  and `dagon-linux`.
 
 ## 10. Repository layout
 
@@ -545,9 +554,9 @@ dagon/
 ├── project/
 │   ├── project.godot  export_presets.cfg
 │   ├── bin/dagon.gdextension
-│   ├── scenes/{level,player,ui}/   assets/{art,audio,fonts}/   shaders/
+│   ├── scenes/{level,player,ui}/   assets/{shore,audio,fonts}/   shaders/
 │   └── tests/              # headless GDScript tests (excluded from export)
-├── tools/                  # prepare_project.{sh,ps1} (toolchain §5); asset-generation scripts
+├── tools/                  # prepare_project.{sh,ps1} (toolchain §5); art/ asset-generation scripts
 ├── docs/                   # this documentation
 └── .github/workflows/      # ci.yml, release.yml
 ```

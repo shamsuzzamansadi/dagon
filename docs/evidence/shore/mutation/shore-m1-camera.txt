@@ -1,0 +1,6 @@
+FAIL test_shore.test_camera_holds_the_character_still_on_screen
+     move_right: the screen position varied while walking: [231, 230]
+FAIL test_shore.test_camera_slides_one_way_when_turning
+     the screen position went back on 9 frames
+     the look-ahead jumped 4 px in one frame
+RESULT passed=45 failed=2

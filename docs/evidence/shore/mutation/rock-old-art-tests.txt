@@ -1,0 +1,23 @@
+FAIL test_shore.test_feet_rest_on_the_drawn_rock
+     the rock's top at x=200 is drawn at y=-9
+     the rock's top at x=201 is drawn at y=-11
+     the rock's top at x=202 is drawn at y=-13
+     the rock's top at x=215 is drawn at y=-13
+     the rock's top at x=216 is drawn at y=-13
+     the rock's top at x=217 is drawn at y=-13
+     the rock's top at x=218 is drawn at y=-13
+     the rock's top at x=219 is drawn at y=-13
+     the rock's top at x=220 is drawn at y=-13
+     the rock's top at x=221 is drawn at y=-13
+     the rock's top at x=222 is drawn at y=-13
+     the rock's top at x=223 is drawn at y=-13
+     the rock's top at x=224 is drawn at y=-13
+     the rock's top at x=232 is drawn at y=-13
+     the rock's top at x=233 is drawn at y=-13
+     the rock's top at x=234 is drawn at y=-13
+     the rock's top at x=235 is drawn at y=-13
+     the rock's top at x=236 is drawn at y=-13
+     the rock's top at x=237 is drawn at y=-13
+     the rock's top at x=238 is drawn at y=-11
+     the rock's top at x=239 is drawn at y=-9
+RESULT passed=46 failed=1

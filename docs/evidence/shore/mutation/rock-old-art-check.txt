@@ -1,0 +1,26 @@
+palette: checked 11 images against 32 colours
+near foot heel columns in frames (1, 2, 3): [19, 15, 11], back by [4, 4] px per frame
+far foot heel columns in frames (5, 6, 7): [19, 15, 11], back by [4, 4] px per frame
+surface: compared 585 columns with the collision in shore.tscn, 6 of them beside the rock
+PROBLEM rock column 200 is drawn from row 211, but its collision top is row 206
+PROBLEM rock column 201 is drawn from row 209, but its collision top is row 206
+PROBLEM rock column 202 is drawn from row 207, but its collision top is row 206
+PROBLEM rock column 215 is drawn from row 207, but its collision top is row 206
+PROBLEM rock column 216 is drawn from row 207, but its collision top is row 206
+PROBLEM rock column 217 is drawn from row 207, but its collision top is row 206
+PROBLEM rock column 218 is drawn from row 207, but its collision top is row 206
+PROBLEM rock column 219 is drawn from row 207, but its collision top is row 206
+PROBLEM rock column 220 is drawn from row 207, but its collision top is row 206
+PROBLEM rock column 221 is drawn from row 207, but its collision top is row 206
+PROBLEM rock column 222 is drawn from row 207, but its collision top is row 206
+PROBLEM rock column 223 is drawn from row 207, but its collision top is row 206
+PROBLEM rock column 224 is drawn from row 207, but its collision top is row 206
+PROBLEM rock column 232 is drawn from row 207, but its collision top is row 206
+PROBLEM rock column 233 is drawn from row 207, but its collision top is row 206
+PROBLEM rock column 234 is drawn from row 207, but its collision top is row 206
+PROBLEM rock column 235 is drawn from row 207, but its collision top is row 206
+PROBLEM rock column 236 is drawn from row 207, but its collision top is row 206
+PROBLEM rock column 237 is drawn from row 207, but its collision top is row 206
+PROBLEM rock column 238 is drawn from row 209, but its collision top is row 206
+PROBLEM rock column 239 is drawn from row 211, but its collision top is row 206
+CHECK_ART problems=21

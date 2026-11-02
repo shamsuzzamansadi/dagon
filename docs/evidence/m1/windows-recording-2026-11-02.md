@@ -37,6 +37,9 @@ rounded to whole pixels separately, so their difference alternates.
 It is cosmetic, and movement itself is unaffected, but it conflicts with the GDD §8 requirement for
 stable camera motion. It was missed in the M1 frame inspection.
 
+**Status:** fixed in both scenes after this recording (`54c1f7e`,
+[measurements](../shore/camera-jitter.txt)). Not yet seen on the owner's display.
+
 ## Not shown or not established
 
 - **Input device.** Video cannot show whether a keyboard or gamepad was used, so no mapping is confirmed.

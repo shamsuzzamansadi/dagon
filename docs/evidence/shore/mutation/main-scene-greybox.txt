@@ -1,0 +1,3 @@
+FAIL test_shore.test_the_game_starts_in_the_shore
+     main scene is res://scenes/level/level.tscn
+RESULT passed=46 failed=1

@@ -1,0 +1,21 @@
+Camera jitter, measured on rendered frames (Movie Maker, llvmpipe software rendering, 480x270).
+Scripted walk across the scene with tests/capture_demo.gd, t = 2-13 s, commit 4436339.
+Tool: measure_jitter.py, tracking a point fixed to the character's head.
+
+After the fix
+  greybox @ 30 fps:   330 frames, 0 changes, 0 flickers back, x = 215 throughout
+  greybox @ 60 fps:   660 frames, 0 changes, 0 flickers back, x = 215 throughout
+  greybox @ 144 fps: 1584 frames, 0 changes, 0 flickers back, x = 215 throughout
+  Shore   @ 30 fps:   330 frames, 0 changes, 0 flickers back, x = 217 throughout
+  Shore   @ 60 fps:   660 frames, 0 changes, 0 flickers back, x = 217 throughout
+  Shore   @ 144 fps: 1584 frames, 0 changes, 0 flickers back, x = 217 throughout
+
+Before the fix: the M1 camera settings restored in the same scenes
+  greybox @ 60 fps:   660 frames, 113 changes, 69 flickers back, x from 220 to 229
+  Shore   @ 60 fps:   660 frames, 113 changes, 69 flickers back, x from 222 to 231
+
+This route includes the rock, the slope, the trench and the steps, so it is harder than the steady
+walking measured in the owner's recording. The character sits at different x values in the two scenes
+because the tracked point is on a different figure.
+
+Not measured: a real GPU, your display, or a real variable frame rate. --fixed-fps sets a constant rate.

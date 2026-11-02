@@ -18,7 +18,7 @@ starts only after M6 is green, and is time-boxed.
 | M1 Foundation | Nov 2–5 | See "M1 scope" below | M1 acceptance below |
 | M2 Interaction | Nov 6–8 | Interactable, Interactor, StoryTrigger, Hud (prompt, caption, fade), `interact` and `pause` mappings, kill plane and checkpoints, PauseMenu, `reset_global_state` | Integration tests: focus, disabled or freed focus, double press, one-shot, trigger re-arm, respawn, pause → restart |
 | M3 Complete gameplay (greybox) | Nov 9–14 | Full 4-act greybox layout, SequencePuzzle and PuzzleController, StoryProgress and GameDirector with the full cinematic contract, placeholder clips, flee timer, Title and Ending scenes | Start→end greybox playthrough. All M3 regression tests in architecture §8. |
-| M4 Atmosphere | Nov 15–19 | **Final asset-production decision before Nov 15.** **First deliverable: one short playable Shore section near final quality, shown for visual review before the treatment spreads** ([GDD §8](gdd.md)). Then parallax, CanvasModulate, lantern, occluders, fog shader, ambience per act, footsteps, silhouette art through the level | Visual review evidence and acceptance checklist in GDD §8; readability on 2 displays; smoke test clean; frame time checked |
+| M4 Atmosphere | Nov 15–19 | **Final asset-production decision before Nov 15.** **First deliverable: one short playable Shore section near final quality, shown for visual review before the treatment spreads** ([GDD §8](gdd.md)). Its art direction is already accepted (D19); this brings that section to final quality. Then parallax, CanvasModulate, lantern, occluders, fog shader, ambience per act, footsteps, silhouette art through the level | Visual review evidence and acceptance checklist in GDD §8; readability on 2 displays; smoke test clean; frame time checked |
 | M5 Cinematic horror | Nov 20–23 | Dagon silhouette and animation, the `monolith_awaken`, `dagon_reveal` and `collapse` clips, shake, baked audio sweeps, epilogue | Full playthrough with final content; GDD §8 checklist on the reveal; cinematic regression tests still green |
 | M6 Stabilization | Nov 24–27 | Fixes from at least 2 external playtests, timing (10–15 min), performance, release workflow, native runs on Windows and Linux | Release candidate artifacts from CI launched on real Windows and Linux; GDD §8 checklist on every scene |
 | M7 Publication prep | Nov 28–29 | itch page assets, README, CREDITS, licenses, release notes, AI disclosure text (jam.md §5), tag | The owner uploads and submits. **Internal target: submitted by Nov 29 21:37 UTC.** Downloaded build verified on both OSes. |
@@ -40,13 +40,15 @@ Never cut the playable loop, readable clues, the reveal, or the export checks.
 - [x] G0: theme SHIFT, fit recorded in jam.md §4 (2026-11-02).
 - [ ] **M1 Foundation: implemented; at the M1 review gate. NOT accepted.** Evidence and
   open items are in [reviews/m1-review-package.md](reviews/m1-review-package.md).
-  Review round 1 findings are addressed (`7a2f849`, CI green on Linux and MSVC), but the
-  reviewer has not independently reviewed that implementation or rerun its 38-test suite. The
-  owner launched the Windows build and recorded partial gameplay; the artifact's commit is not
-  yet confirmed. Outstanding before the acceptance decision: final technical review, and the
+  Review round 1 findings are addressed (`7a2f849`), the camera jitter is fixed in both scenes,
+  and the standard build now opens the illustrated Shore on the same collision (package §15). The
+  reviewer has not independently reviewed this implementation or rerun its tests. The owner launched
+  an earlier Windows build and recorded partial gameplay; that artifact's commit and the input device
+  are not confirmed. Outstanding before the acceptance decision: final technical review, and the
   movement-feel, mappings, jumping and physical-gamepad checks.
-- [ ] **Shore art preview:** one bounded screen, authorized ahead of M4, on branch `preview/shore-art`,
-  awaiting the owner's visual feedback ([shore-preview.md](shore-preview.md)). This is not M4.
+- [x] **Shore art direction accepted by the owner (2026-11-02) and integrated as the entry scene**
+  ([D19, D20](decisions.md), [shore-preview.md](shore-preview.md)). Areas beyond x = 640 remain greybox.
+  **This is not M4,** and it closes none of the M1 checks above.
 - [ ] M2–M7 not started.
 
 ## Review follow-ups by milestone (Phase A final review, 2026-10-28)
@@ -58,6 +60,34 @@ Never cut the playable loop, readable clues, the reveal, or the export checks.
 | M2 | Test Interactor delivery and consumption with `Input.parse_input_event()` and `InputEventAction`. `action_press` covers polled input only. | architecture §8 |
 | M3 | `call_deferred` does not wait for a physics frame. Overlap re-checks wait for a completed physics step (`physics_frames >= recorded + 2`). | architecture §5, GameDirector |
 | M3 | Out-of-bounds during a cinematic is kept as `recovery_pending`, then re-checked after finalization. Regression: entering the kill plane while control is locked. | architecture §5 and §8 |
+| M3–M4 | The art ends at x = 640, at a straight edge of the right cliff, and its cleft is a placeholder way through. Replace both when the layout past the Shore is decided. | [shore-preview.md](shore-preview.md) |
+| M4 | Sailor animation: stop, turn and landing frames, coat motion, and turning that mirrors the lantern to the other hand. The walk reads as brisk at 70 px/s; the speed stays unchanged unless the owner's playtest says otherwise. | [shore-preview.md](shore-preview.md) |
+| M4 | Rest of the first M4 deliverable: sound, caption and prompt styling, fog and lantern pass, readability on a second display, and the sailor's size on screen. | GDD §8, [shore-preview.md](shore-preview.md) |
+
+## Owner direction for later milestones (recorded 2026-11-02, not started)
+
+These do not delay current correctness work. Priority stays on correct gameplay, coherent visuals and
+bug fixes.
+
+| When | Requirement | Where specified |
+|---|---|---|
+| M3, M5 | At each relevant story beat, carry SHIFT through a visible event and sound, not only documents. No dimension-switching mechanic, no wider scope. | jam.md §4 |
+| M4 | Audio beds and player and object sounds, with a compact event-to-sound list and the mix shown in gameplay. Check loop seams, abrupt transitions, clipping, repeated-trigger stacking and audible cues. | GDD §7 |
+| M5 | Story cues (discovery, puzzle completion, reveal, escape), held to the same checks. | GDD §7 |
+| Usability pass | Display support and volume controls, below. | Below |
+
+**Usability pass (in M6, unless the owner moves it). Optional for now.**
+- **Displays:** ordinary players on 1280×720 and 1920×1080, windowed and fullscreen. Text stays readable
+  and nothing clips.
+- **Resolution:** keep the 480×270 canvas and the pixel-art direction unless there is a demonstrated reason
+  to change them. It scales exactly 4× to 1080p.
+- **720p:** 270 does not divide 720 evenly (2.67×). Choose and test an aspect-preserving presentation with
+  no stretching or uneven-looking pixels. The current integer scale mode would give 2× (960×540) with bars,
+  which is the first candidate to test, not a decision.
+- **Not yet checked:** the default 1440×810 window is larger than a 720p screen, and there is no fullscreen
+  option yet.
+- **Volume:** separate music and effects controls. `reset_global_state()` (architecture §7 rule 8) is
+  planned to reset bus volumes on every scene transition, so it must learn to keep the player's settings.
 
 ## M1 scope
 
@@ -124,8 +154,8 @@ Each criterion names its verification level (see architecture §8).
      press `jump`. The buffered jump fires on the genuine landing.
 
    *Gameplay test.*
-8. The greybox scene runs 600 headless frames with no `ERROR:` output. *Scene
-   load.*
+8. The greybox scene runs 600 headless frames with no `ERROR:` output, and so does the
+   entry scene (the Shore). *Scene load.*
 
 **Runtime and export**
 9. `tools/prepare_project.sh` then a single headless import exits 0 on a clean
@@ -135,7 +165,7 @@ Each criterion names its verification level (see architecture §8).
 10. The export templates are downloaded and their SHA-512 verified against
     the official `SHA512-SUMS.txt` (local and CI).
     - The Linux release export is created headless and runs
-      `--headless --quit-after 300` with exit 0 and no `ERROR:` lines.
+      `--headless --quit-after 300` with exit 0 and no `ERROR:` lines, starting in the Shore.
     - The Windows release export is created.
 
     *Desktop export.*

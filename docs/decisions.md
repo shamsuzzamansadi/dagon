@@ -80,4 +80,47 @@ Updated 2026-11-02 at the M1 gate. Evidence: [reviews/m1-review-package.md](revi
 | Movement feel, physical input | **Not done** | Synthetic events only | Owner playtest | M1 gate |
 | Cinematic re-entrancy contract | Design only | — | M3 regression tests | M3 |
 | Theme fit legibility | Design only | jam.md §4 | M3 playtest question | M3 |
-| Visual quality (GDD §8) | Not started | Greybox only | First M4 review | M4 |
+| Visual quality (GDD §8) | **Art direction accepted by the owner (D19). The GDD §8 checklist is not passed.** | Shore artwork in the standard build, reviewed from captures | Stop, turn and landing animation, sound, UI styling, second display; then the first M4 review | M4 |
+
+## 5. Decisions at the Shore integration (2026-11-02)
+
+| ID | Decision | Decided by |
+|---|---|---|
+| D19 | The Shore's art direction is accepted | Owner |
+| D20 | The standard build opens the illustrated Shore, on the whole greybox level | Owner; layout by the developer |
+| D21 | The sea stays visible, far beyond the stranded boat | Owner |
+| D22 | The camera locks to whole pixels by default, with no position smoothing | Developer, to fix a measured defect; open to the owner's feel check |
+| D23 | Direction for later milestones: SHIFT through visible events and sound, a planned audio palette, and display support. Recorded, not started. | Owner |
+
+**D19, art direction.** Accepted: the sailor, wooden boat, moonlit sky, coastal palette and
+environment. The Stardew Valley and retro-game screenshots the owner shared were examples of care,
+readability and visual consistency, not a request to imitate their artwork, palette, perspective or
+gameplay. **This acceptance does not close** physical gamepad checks, movement feel, independent code
+review, M1 acceptance or M4. Remaining animation limitations are recorded for M4
+([shore-preview.md](shore-preview.md)).
+
+**D20, entry scene.** `project/scenes/level/shore.tscn` is the main scene. It has the same collision
+polygon, spawn point, camera limits and movement tuning as the greybox, and tests compare them, so
+the playable extent stays x = 24 to 1376. Art covers x = 0 to 640; the rest remains greybox. The
+greybox `level.tscn` stays as a development and test scene and is excluded from exports. To make the
+longer level reachable, the preview's collision wall at x = 620 was removed and the right cliff gained
+a cleft. Where M2 and M3 build next (the entry scene or the greybox) is to be settled when M2 starts.
+
+**D21, the distant sea (a small story adaptation).** The GDD and `jam.md` §4 said the sailor wakes with
+no sea in sight. The accepted composition shows a thin band of sea far out past wide wet flats, and
+the owner kept it, so the documents now match the scene. The premise is unchanged: the sailor wakes on
+exposed seabed, where the tide has withdrawn unnaturally far and does not come back. Seeing how far
+off the water lies supports the physical shift. There is still no surf at the shoreline: the sea is
+heard only faintly, if at all, and thins away as the player moves on (GDD §7).
+
+**D22, camera.** The owner's recording showed the character flickering by 1 game pixel while followed:
+the character and a smoothed camera rounded to whole pixels separately. `CameraRig` now keeps a whole
+number of pixels from its target unless a scene turns `pixel_lock` off, and the greybox lost its
+position smoothing, so both scenes follow rigidly and only the look-ahead slides. Measurements:
+[evidence/shore/camera-jitter.txt](evidence/shore/camera-jitter.txt).
+
+**D23, later direction.** Correct gameplay, coherent visuals and bug fixes stay the priority. SHIFT is
+carried by the exposed seabed, the player's changing understanding and the turn from exploration to
+escape, with no dimension-switching mechanic ([jam.md](jam.md) §4). The audio palette and its checks
+are in GDD §7, and the 720p and 1080p requirements in the [roadmap](roadmap.md). This changes GDD §7's
+earlier "sea sounds are deliberately absent" to a faint, distant sea that thins away.

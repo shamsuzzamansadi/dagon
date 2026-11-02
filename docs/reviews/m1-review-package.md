@@ -3,6 +3,9 @@
 **To:** ChatGPT (independent reviewer). **Date:** 2026-11-02.
 **Status: implemented, at the M1 gate, NOT accepted.** Human checks are outstanding (§6).
 
+**Updated by the Shore integration.** The code you are asked to review is now the current `main`, and
+§15 says what changed since §1–§14 were written. Those sections describe `7a2f849`.
+
 - **Repository:** https://github.com/shamsuzzamansadi/dagon
 - **Code commit for review:** `7a2f8493f7e05f1f121a6dfcb82096ba611d7481` (includes the review
   round 1 corrections, §13).
@@ -15,8 +18,10 @@
 |---|---|
 | Native C++ tests, GCC 13.3: 29 cases, 763 assertions (the suite before §13) | **Independently reproduced by the reviewer** |
 | Native tests at `7a2f849` (38 cases), Godot integration, smoke, exports, Linux and MSVC CI | **Supplied by the developer and CI. Not independently rerun.** |
-| Windows launch and character movement | **Owner, partial** (§6); commit not yet confirmed |
+| Windows launch and character movement | **Owner, partial** (§6), on an earlier build; commit and input device not confirmed |
 | Movement feel, all mappings, jumping, physical gamepad | **Nobody yet** (§6) |
+| Shore integration: code, tests, exports (§15) | **Supplied by the developer and CI. Not independently reviewed or rerun.** |
+| Shore art direction | **Accepted by the owner** from screenshots and a recording of the preview. That is an art decision, not code review or a feel check. |
 
 ## 1. What was built
 
@@ -121,8 +126,8 @@ game running and the character moving through the greybox level.
 - **Measured from the recording** ([evidence](../evidence/m1/windows-recording-2026-11-02.md)): walking
   speed 70.4 px/s against 70 configured; correct right-wall stop; flat-ground jumps peaking at 23–27 px.
 - **New defect it exposed:** the character flickers by 1 game pixel on screen while the camera
-  follows. The M1 engine capture confirms it, and my M1 frame inspection missed it. Cosmetic; not fixed
-  in M1 builds.
+  follows. The M1 engine capture confirms it, and my M1 frame inspection missed it. Cosmetic. Fixed
+  after this package in both scenes (§15).
 
 These are **still not done**, and CI cannot do them:
 
@@ -242,4 +247,42 @@ No failures in the final runs.
 
 **Stays at the M1 gate.** M2 and M4 are not started. Remaining before the acceptance decision:
 final technical review (the reviewer has not independently reviewed the updated implementation or
-rerun the 38-test suite) and the outstanding human checks (§6).
+rerun its tests) and the outstanding human checks (§6).
+
+## 15. Shore integration (after §1–§14)
+
+The owner accepted the Shore's art direction and authorized integrating it (D19, D20). **That does not
+close any check in §6.**
+
+| Area | Change | Commit |
+|---|---|---|
+| Camera | Pixel lock on by default; greybox loses position smoothing. Fixes the §6 flicker in both scenes (D22). The camera now follows rigidly, which changes how the greybox feels from what the owner recorded. | `54c1f7e`, `4436339` |
+| Entry scene | `shore.tscn` is the main scene, on the greybox's whole collision, spawn and camera limits. Art to x = 640, greybox beyond. The greybox stays, excluded from exports. The preview builds are gone. | `c8a577b` |
+| Art | The rock's top is drawn on its collision; the right cliff has a cleft where the preview's wall was. 646 of 172,800 pixels in `terrain.png`. | `c8a577b` |
+| Documents | Story wording (D21), later direction (D23), status. | Later commits |
+
+**Playable extent is unchanged from M1:** x = 24 to 1376, including the trench and steps. A test compares
+the polygons. The former preview stopped at x = 620.
+
+**Tests:** 47 integration tests, up from 33. Every greybox test also runs on the entry scene.
+- Added: the camera holds the character still walking both ways, turning slides one way without a jump,
+  the game starts in the Shore, the Shore has the whole greybox level, the seam where the art ends, feet
+  on the rock, feet at the rock's corners.
+- Replaced by stricter versions: the preview's crossing test (x = 40 to 600, now the full level), its pixel
+  lock test (one direction in one scene, now both ways in both scenes), and its ground comparison (9 shared
+  points, now the whole polygon).
+- Unit tests are unchanged at 46 cases (38 at `7a2f849`; the preview added 8 for body pose).
+- `check_art.py` now also compares the drawn ground with the scene's collision.
+- Deliberate breakage, including a gap it found in my own tests: `docs/evidence/shore/mutation/`.
+- The greybox has its own 600-frame smoke run now that a plain run does not start it.
+
+**Measured:** 0 on-screen changes at 30, 60 and 144 fps in both scenes, against 113 changes and 69
+flickers back with the M1 camera (`docs/evidence/shore/camera-jitter.txt`). This is software rendering at
+a fixed frame rate, not a real GPU or a real variable frame rate.
+
+**For your judgment:**
+1. Removing the camera's smoothing is the one behaviour change to the M1 greybox. Nobody has judged how
+   it feels.
+2. `test_camera_slides_one_way_when_turning` allows 3 px per frame, based on a 2 px peak at `lock_speed` 2.5.
+3. The capsule can rest up to 4 px past the rock's corners, drawn up to 2 px low. I recorded this for M4
+   rather than change the capsule.
