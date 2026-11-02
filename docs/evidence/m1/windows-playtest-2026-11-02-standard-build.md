@@ -16,8 +16,9 @@ This is positive general feedback on movement and camera from the person who pla
 
 ## Who looked at what
 
-ChatGPT inspected sampled video frames and the updated documents. That is not independent code
-verification and not a full motion analysis.
+ChatGPT inspected sampled video frames and the updated documents. That is not code verification and not
+a full motion analysis. Its later technical review of the code is recorded separately
+([package §17](../../reviews/m1-review-package.md)), and did not rerun engine rendering.
 
 ## Not established
 
@@ -42,5 +43,5 @@ in the accepted Shore style. No new art redesign is requested
 
 ## Effect on M1
 
-**M1 is not accepted.** This session advances criterion 11 but does not close it. The exact remaining items
-are in [the review package, §16](../../reviews/m1-review-package.md).
+The owner later accepted M1 with documented deferrals ([the review package, §16](../../reviews/m1-review-package.md)).
+This session's positive feedback is part of that evidence, and its limits above still apply.

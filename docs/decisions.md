@@ -4,8 +4,8 @@
 reviewer (ChatGPT) on 2026-10-28, after two rounds. No further full
 architecture review is needed unless a material design change emerges. The
 round-2 corrections are applied in `architecture.md`, `roadmap.md`, `gdd.md`
-and `toolchain.md`. **D25 and D26 (§6) are such a change. D26's design is approved
-in principle, with corrections. That is not implementation certification.**
+and `toolchain.md`. **D25 and D26 (§6) are such a change, and the revised design is
+approved for implementation. No further architecture review is needed for its approved classes.**
 
 ## 1. Approved decisions
 
@@ -65,6 +65,9 @@ Each acceptance is limited as stated:
 - Platform-native export checks.
 - The prepared-import workaround with strict failure handling. The root cause stays
   unresolved, and the exceptional result stays in the evidence.
+- The M1 implementation at `3301ae0`: no new blocking findings, and the three earlier findings are resolved. The
+  native tests and art check were rerun. Godot integration tests, engine rendering and release exports rely on the
+  supplied CI evidence ([package §17](reviews/m1-review-package.md)). This is not M1 acceptance, which is the owner's.
 
 ## 4. Remaining validation (open until evidence exists)
 
@@ -73,16 +76,16 @@ Updated 2026-11-02 at the M1 gate. Evidence: [reviews/m1-review-package.md](revi
 | Item | Status | Evidence so far | Still needed | When |
 |---|---|---|---|---|
 | D2 on MSVC | **Accepted for tested configurations (§3)** | MSVC 19.44.35229 with `/MT` on both sides; debug library loads in the Windows editor and passes tests; release library loads in the exported game. godot-cpp's public headers have no standard-dependent code. Not a general ABI/ODR guarantee. | — | Done for M1 |
-| Desktop export with GDExtension | **Validated headless on both OSes; windowed on Linux (software GL); launched by the owner on Windows** | CI run `41432275970`; local windowed run; [owner's session](evidence/m1/windows-playtest-2026-11-02-standard-build.md), commit unconfirmed | Confirm which build the owner ran; a human run on Linux | M1 gate |
+| Desktop export with GDExtension | **Validated headless on both OSes. Launched by the owner on Windows, and on Linux with software rendering** | CI run `41432275970`; owner's [Windows](evidence/m1/windows-playtest-2026-11-02-standard-build.md) and [Linux](evidence/m1/linux-playtest-2026-11-02.md) sessions, commits unconfirmed | Native Linux hardware-accelerated rendering validation (deferred, D29) | M6 |
 | Import-crash workaround | **Provisional** | Crash occurs on a fresh clone of the game (134 ×6); preparation prevented it every time. Root cause unknown. | Upstream report | Open |
 | Headless test reliability | **Partly** | 20/20 local at `7a2f849`, 10/10 at `a9b262c`; 9 consecutive green CI runs with MSVC, only the latest on today's 47 tests | 10 consecutive CI runs on a stable suite | M1–M3 |
 | Teleport contact invalidation | **Validated** | Tests 7f and 7g; mutation check | — | Done |
 | `StepProbe` observation order | **Validated** | Test and mutation check | — | Done |
-| Movement feel, physical input | **Partly: positive general feedback from the owner** | [Owner's session](evidence/m1/windows-playtest-2026-11-02-standard-build.md); otherwise synthetic events only | Walk and jump by device, each mapping, and a physical gamepad ([package §16](reviews/m1-review-package.md)) | M1 gate |
+| Movement feel, physical input | **Positive general feedback from the owner; A, D, Left Arrow, Right Arrow and Space worked on Linux. Physical gamepad untested.** | [Owner's sessions](reviews/m1-review-package.md) | Physical gamepad testing (deferred, D29) | M6 |
 | Cinematic re-entrancy contract | Design only | — | M3 regression tests | M3 |
 | Theme fit legibility | Design only | jam.md §4 | M3 playtest question | M3 |
 | Visual quality (GDD §8) | **Art direction accepted by the owner (D19). The GDD §8 checklist is not passed.** | Shore artwork in the standard build, reviewed from captures and played by the owner | Stop, turn and landing animation, sound, UI styling, second display; then the first M4 review | M4 |
-| Settings, rebinding, save and restore | Design approved in principle, with corrections (D26). Not built. | Architecture §5 | Implementation, then M2 and M3 exit checks; M6 verification | M2, M3, M6 |
+| Settings, rebinding, save and restore | Design approved for implementation (D26). Not built. | Architecture §5 | Implementation, then M2 and M3 exit checks; M6 verification | M2, M3, M6 |
 
 ## 5. Decisions at the Shore integration (2026-11-02)
 
@@ -137,9 +140,10 @@ Planned only. Requesting these does not accept M1 or start M2.
 |---|---|---|
 | D24 | M2 gains a pause menu with Settings, persistent settings and keyboard rebinding | Owner |
 | D25 | **Scope change.** M3 gains a main menu and one persistent checkpoint save slot | Owner |
-| D26 | How that persists without an autoload, and what it adds to the code | Developer's design, **approved in principle with corrections. Not built, not certified.** |
+| D26 | How that persists without an autoload, and what it adds to the code | Developer's design, **approved for implementation by the reviewer. Not built.** |
 | D27 | Quitting, the final sequence and the ending | Owner |
 | D28 | What comes first if the schedule is tight | Owner |
+| D29 | M1 is accepted by the owner with documented deferrals | Owner |
 
 **D24, M2 usability.** The pause menu has Resume, Restart Checkpoint, Settings and Quit to Desktop, and
 M3 adds Quit to Main Menu (D27). This replaces the GDD's earlier "resume, restart, quit to title".
@@ -174,6 +178,13 @@ below, not implementation certification.** Nothing here is built.
 - **Engine-global state:** `InputMap` joins the list in architecture §7 rule 8, and `reset_global_state()`
   must keep the player's volumes and bindings.
 
+**Final design review (2026-11-02, relayed by the owner).** The revised design is approved for implementation. A
+scene-owned session checkpoint that survives world replacement is a reasonable scoped exception to literal scene reload
+(D5), with no singleton, and the planned 11 classes are acceptable. No further architecture review is needed for these
+approved classes. During M3, world replacement must remove the old world's active signals and callbacks and give the new
+director its checkpoint before it enters the tree, and tests must verify restart after an autosave failure, pause reset,
+and repeated restart without duplicate events.
+
 **D27, quitting and the ending.**
 - M3 adds Quit to Main Menu, once the main menu exists.
 - Quitting during the reveal or escape may resume from the preceding safe checkpoint and replay that unfinished
@@ -187,3 +198,13 @@ below, not implementation certification.** Nothing here is built.
 essential environmental and story audio come ahead of optional display features and additional decorative polish.
 If the schedule slips, the specific tradeoff is flagged early. Requested key rebinding and save support are never
 removed silently.
+
+**D29, M1 acceptance (2026-11-02).** Accepted by the owner for progression to M2, based on the independent technical
+review, the supplied CI evidence and the owner's Windows and Linux playtests. This is not a statement that every manual
+check passed ([package §16](reviews/m1-review-package.md)).
+- **Deferred to M6, before release:** physical gamepad testing, which is untested today, and native Linux
+  hardware-accelerated rendering validation. The Linux run used software rendering.
+- **Accepted limitation:** the exact provenance of the recorded builds stays unconfirmed, and is not inferred from
+  timestamps or appearance. Later milestone playtests identify the exact artifact or run.
+- **The review's limits still stand:** Godot integration tests, engine rendering and release exports rely on supplied CI
+  evidence, not independent reruns ([package §17](reviews/m1-review-package.md)).

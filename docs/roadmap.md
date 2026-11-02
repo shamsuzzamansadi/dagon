@@ -43,18 +43,21 @@ rebinding and save support are never removed silently (risk R20).
 - [x] Phase A approved (2026-10-28).
 - [x] Repository created and in use: https://github.com/shamsuzzamansadi/dagon
 - [x] G0: theme SHIFT, fit recorded in jam.md §4 (2026-11-02).
-- [ ] **M1 Foundation: implemented; at the M1 review gate. NOT accepted.** The exact remaining items
-  are in [package §16](reviews/m1-review-package.md): the final independent technical review, and the
-  parts of criterion 11 that are not yet established. The owner has run the standard Windows build and
-  reported positive general feedback on movement and camera
-  ([record](evidence/m1/windows-playtest-2026-11-02-standard-build.md)). That session's commit, input
-  device, mappings and gamepad coverage are not established, and the reviewer has inspected sampled
-  frames and documents, not the code.
+- [x] **M1 independent technical review complete (2026-11-02), with limits** ([package §17](reviews/m1-review-package.md)).
+  No new blocking findings at `3301ae0`. The reviewer reran the native tests and the art check. Godot integration
+  tests, engine rendering and release exports rely on the supplied CI evidence.
+- [x] **M1 Foundation: accepted by the owner with documented deferrals (2026-11-02),** not every manual check having
+  passed ([package §16](reviews/m1-review-package.md)). The owner reports positive general feedback on Windows movement
+  and camera ([record](evidence/m1/windows-playtest-2026-11-02-standard-build.md)), and ran Linux with software
+  rendering ([record](evidence/m1/linux-playtest-2026-11-02.md)). **Deferred to M6, before release:** physical gamepad
+  testing, and native Linux hardware-accelerated rendering validation. The exact provenance of the recorded builds stays
+  unconfirmed, which the owner accepts for M1.
 - [x] **Shore art direction accepted by the owner (2026-11-02) and integrated as the entry scene**
   ([D19, D20](decisions.md), [shore-preview.md](shore-preview.md)). The art stops at the cliff opening
   (x = 640), and everything past it is unfinished greybox: a documented boundary, not a finished
   transition. **This is not M4,** and it closes none of the M1 checks above.
-- [ ] M2–M7 not started. The usability scope below is planned only.
+- [ ] M2 next, with the scope below. M3–M7 not started.
+- **Every later playtest identifies the exact artifact or run it tested.**
 
 ## Review follow-ups by milestone (Phase A final review, 2026-10-28)
 
@@ -71,7 +74,7 @@ rebinding and save support are never removed silently (risk R20).
 
 ## Owner direction for later milestones (recorded 2026-11-02, not started)
 
-Recording these does not start them: M2 begins only after M1 is accepted. Priority stays on correct
+Priority stays on correct
 gameplay, coherent visuals and bug fixes. No new art redesign is requested. Later environments arrive
 through the planned milestones, in the accepted Shore style.
 
@@ -126,6 +129,8 @@ documents. No dimension-switching mechanic, no wider scope ([jam.md](jam.md) §4
 - New Game with a failed write stays in the menu with an error and Retry, and the old save is unchanged and unread.
 - After an autosave failure, Restart Checkpoint returns to the session checkpoint, Continue after a relaunch returns to
   the last valid disk save, and the quit text says so.
+- Replacing the world removes the old world's active signals and callbacks, and the new director has its checkpoint
+  before it enters the tree. Restart resets pause, and repeated restarts produce no duplicate events.
 - Every on-disk state an interrupted replacement can leave loads a usable save, and a corrupt primary never overwrites
   a valid backup.
 - Every scene that reads files in `_ready` uses the test directory, and the real `user://` listing is unchanged by a run.
@@ -147,6 +152,10 @@ documents. No dimension-switching mechanic, no wider scope ([jam.md](jam.md) §4
 
 Verify settings and save persistence, rebinding, menu focus, quit/relaunch/continue, and display usability.
 720p and 1080p presentation stays secondary to correctness and readable visuals.
+
+**Deferred from M1, and required before release:**
+- Physical gamepad testing: left stick, D-pad, south button, and menu navigation.
+- Native Linux hardware-accelerated rendering validation. The M1 Linux run used software rendering.
 
 - **Displays:** ordinary players on 1280×720 and 1920×1080, windowed and fullscreen. Text stays readable
   and nothing clips.
@@ -240,7 +249,8 @@ Each criterion names its verification level (see architecture §8).
     *Desktop export.*
 11. A human runs the Windows export natively and the Linux build: walk and jump
     feel responsive on keyboard and on a physical gamepad. *Manual playtest.
-    Reported separately, never assumed.*
+    Reported separately, never assumed.* **Accepted with deferrals, not fully passed:**
+    see [package §16](reviews/m1-review-package.md).
 
 **Process**
 12. CI is green on push: build matrix, unit tests, Godot tests, Windows load.

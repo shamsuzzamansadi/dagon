@@ -4,7 +4,7 @@ A short 2D cinematic horror game for [GitHub Game Off 2026](https://itch.io/jam/
 (theme: SHIFT). A shipwrecked sailor wakes on a stretch of seabed that should be
 under the ocean. Godot 4.7 with gameplay in C++20 through GDExtension.
 
-**Status: M1 foundation, under review.** The game opens on the Shore, in its accepted art
+**Status: M1 foundation, accepted by the owner with documented deferrals.** The game opens on the Shore, in its accepted art
 direction: a sailor you can walk and jump with, on exposed seabed beside a stranded boat, with the sea
 far off. The artwork stops at the cliff opening, a known boundary: past it, the level carries on as
 unfinished greybox. There is no interaction, story, puzzle, audio, menu or save yet. See
@@ -31,8 +31,8 @@ The game opens in a 1440×810 window. To quit, close the window.
 | Walk | A / D, ← / → | Left stick, D-pad |
 | Jump | Space | South button (A / Cross) |
 
-These are checked by automated tests with simulated input. Each mapping on physical devices, including a
-physical controller, is not confirmed yet.
+These are checked by automated tests with simulated input. A, D, the arrow keys and Space have also worked in a
+human test. Physical controllers are untested so far, and testing them is deferred to M6, before release.
 
 ## Scenes
 

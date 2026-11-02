@@ -1,7 +1,8 @@
 # M1 Review Package
 
 **To:** ChatGPT (independent reviewer). **Date:** 2026-11-02.
-**Status: implemented, at the M1 gate, NOT accepted.** **§16 lists exactly what remains.**
+**Status: M1 is accepted by the owner with documented deferrals (§16).** That does not mean every manual check passed.
+The independent technical review is complete, with limits (§17).
 
 **Updated by the Shore integration.** The code you are asked to review is now the current `main`, and
 §15 says what changed since §1–§14 were written. Those sections describe `7a2f849` (CI run
@@ -17,12 +18,14 @@
 | Result | Who ran it |
 |---|---|
 | Native C++ tests, GCC 13.3: 29 cases, 763 assertions (the suite before §13) | **Independently reproduced by the reviewer** |
-| Native tests at `7a2f849` (38 cases), Godot integration, smoke, exports, Linux and MSVC CI | **Supplied by the developer and CI. Not independently rerun.** |
+| Native tests at `3301ae0` (46 cases, 802 assertions), and the art check | **Independently rerun by the reviewer** (§17) |
+| Code at `3301ae0`: movement fixes, player animation, camera, scene and test wiring, build, CI and export scripts | **Reviewed by the reviewer:** no new blocking findings (§17) |
+| Godot integration tests, smoke, extension load, engine rendering, release exports, Linux and MSVC CI | **Supplied by the developer and CI. Not independently rerun,** because Godot was unavailable in the review environment (§17) |
 | Windows launch and rendered gameplay | **Owner, two sessions** (§6); commit and input device not confirmed for either |
 | General movement and camera feel | **Owner: positive, in general terms** (§6) |
-| Each mapping, walk and jump by device, physical gamepad, a human run on Linux | **Nobody yet** (§16) |
-| Sampled frames of the owner's second recording, and the updated documents | **Reviewer.** Not independent code verification and not a full motion analysis. |
-| Shore integration: code, tests, exports (§15) | **Supplied by the developer and CI. Not independently reviewed or rerun.** |
+| Human Linux run, with software rendering; A, D, Left Arrow, Right Arrow and Space worked | **Owner** (§16) |
+| Physical gamepad; native Linux hardware-accelerated rendering | **Untested. Deferred to M6, before release** (§16) |
+| Sampled frames of the owner's second recording, and the updated documents | **Reviewer.** Not code verification and not a full motion analysis. |
 | Shore art direction | **Accepted by the owner** from screenshots and a recording of the preview. That is an art decision, not code review or a feel check. |
 
 ## 1. What was built
@@ -143,15 +146,12 @@ this session."
 - **The artwork disappearing after the cliff opening** is the documented boundary between the illustrated Shore and
   the unfinished greybox, not a new defect.
 
-These are **still not done**, and CI cannot do them (exact list in §16):
+**Third session: the owner's run of the Linux executable (reported 2026-11-02).**
+[Record](../evidence/m1/linux-playtest-2026-11-02.md). A, D, Left Arrow, Right Arrow and Space worked correctly, by the
+owner's confirmation. The run used software rendering (Mesa llvmpipe, under WSL Ubuntu 24.04), with a V-Sync warning
+observed, so it is not native Linux GPU validation.
 
-| Item | Who | How |
-|---|---|---|
-| **Walk and jump by device.** General feedback is positive, but not by device. | Owner | Play a named build |
-| **Each keyboard mapping and a physical gamepad.** Tests only inject synthetic events. | Owner | Same, with a controller |
-| Confirm which run the launched Windows artifact came from | Owner | The run page it was downloaded from, or the artifact's name and date |
-| A human run of the Linux build | Owner | `dagon-linux` |
-| Second display readability | — | M4 |
+The outcome of all three sessions is in §16. Second-display readability belongs to M4.
 
 The owner has now seen the game rendered on their Windows machine. The GPU and renderer were not recorded.
 
@@ -263,9 +263,8 @@ No failures in the final runs.
 
 ## 14. Status
 
-**Stays at the M1 gate.** M2 and M4 are not started. Remaining before the acceptance decision:
-final technical review (the reviewer has not independently reviewed the updated implementation or
-rerun its tests) and the outstanding human checks. §16 has the exact list.
+**M1 is accepted by the owner with documented deferrals (§16).** The independent technical review is complete, with
+limits (§17). M2 proceeds with its defined scope.
 
 ## 15. Shore integration (after §1–§14)
 
@@ -319,10 +318,14 @@ green on both platforms in CI run
 3. The capsule can rest up to 4 px past the rock's corners, drawn up to 2 px low. I recorded this for M4
    rather than change the capsule.
 
-## 16. Exact remaining M1 acceptance items (2026-11-02)
+## 16. M1 acceptance (2026-11-02)
 
-**M1 is not accepted.** Every criterion in `roadmap.md`, with evidence at `3301ae0`. "Met" below means met on
-evidence supplied by the developer and CI. No review or rerun of this implementation is reported yet (item 1).
+**Accepted by the owner with documented deferrals,** for progression to M2, based on the independent technical review,
+the supplied CI evidence, and the owner's Windows and Linux playtests. This is not a statement that every manual check
+passed.
+
+This is every criterion in `roadmap.md`, with evidence at `3301ae0`. "Met" means met on evidence supplied by the
+developer and CI, except where §17 records an independent rerun.
 
 | # | Criterion (short) | Status | Evidence |
 |---|---|---|---|
@@ -330,39 +333,66 @@ evidence supplied by the developer and CI. No review or rerun of this implementa
 | 2 | Linux debug and release builds | Met | Same clone; CI |
 | 3 | C++20 `static_assert` on GCC and MSVC | Met | `src/register_types.cpp`; CI |
 | 4 | MSVC debug and release builds, `cl` version recorded | Met | CI: 19.44.35229 |
-| 5 | Unit tests on Linux and Windows | Met | CI: 46 cases on both |
+| 5 | Unit tests on Linux and Windows | Met | CI: 46 cases on both. The reviewer also reran the native suite (§17) |
 | 6 | Extension load, including MSVC debug and release | Met, as adapted | `check_classes.gd` on debug; release through the exported game's proof line, because official release templates cannot run `--script` (§3) |
 | 7 | Integration tests (a)–(g) | Met | CI: 47 passed on both |
 | 8 | 600 headless frames, no `ERROR:` | Met | CI: Shore and greybox on both |
 | 9 | Prepared clean import, exit 0 | Met | CI; §8. The root cause stays unknown, as accepted in §12 |
 | 10 | Export templates verified; release exports | Met | CI and local. CI verifies SHA-512 on a cache miss only (§11) |
-| **11** | **Human run on Windows and Linux: walk and jump feel responsive on keyboard and physical gamepad** | **Open, partly done** | Items 2–5 below |
+| **11** | **Human run on Windows and Linux: walk and jump feel responsive on keyboard and physical gamepad** | **Accepted with deferrals, not fully passed** | The table below |
 | 12 | CI green on push | Met | CI run 41432275970 |
 | 13 | README clean-checkout instructions | Met | `README.md`; followed on Linux by the fresh clone. There is no recorded hand run of the Windows commands; the criterion only requires them to be there |
 | 14 | Review package prepared | Met | This document |
 
-**What remains, in full:**
+**Criterion 11 and the owner's checks, as accepted:**
 
-| # | Item | Who | Done when |
-|---|---|---|---|
-| 1 | **Final independent technical review** of the code at `3301ae0`, including the §15 judgment items. The reviewer states which checks were rerun and which rely on supplied CI evidence. | Reviewer | Findings are reported and any confirmed defect is fixed |
-| 2 | **Name the build behind the human check:** the session's run or artifact, or a new session from a named run | Owner | A run ID or commit is recorded |
-| 3 | **Keyboard:** say which of A, D, ←, →, Space were used and worked, and whether walking and jumping feel responsive on the keyboard | Owner | Each is recorded as worked, failed or not tried |
-| 4 | **Physical gamepad:** left stick, D-pad and south button work, and walking and jumping feel responsive. **Untested today.** | Owner, with a controller | The same. Without a controller, this needs an explicit owner decision to defer it, recorded as a deferral and never as a pass |
-| 5 | **Linux human run** of `dagon-linux`, recording the renderer and device the run reports. **Untested today.** | Owner | Run and recorded, or explicitly deferred in the same way, never as a pass |
-| 6 | **The acceptance decision** itself, after items 1–5 | Owner, with the reviewer's findings | Recorded in `roadmap.md` |
+| Check | Outcome | Basis |
+|---|---|---|
+| Windows launch and rendered gameplay | Done, in two sessions | [Record](../evidence/m1/windows-playtest-2026-11-02-standard-build.md) |
+| Movement and camera on Windows | **Positive general feedback from the owner:** "the controls/camera generally felt fine" | Same record |
+| Human Linux run | **Done, with software rendering** (Mesa llvmpipe, LLVM 20.1.2, under WSL Ubuntu 24.04). A V-Sync warning was observed. | [Record](../evidence/m1/linux-playtest-2026-11-02.md) |
+| Keys | **A, D, Left Arrow, Right Arrow and Space worked,** in the Linux test | The owner's confirmation |
+| Physical gamepad | **Untested. Deferred to M6, before release.** | Owner's deferral |
+| Native Linux hardware-accelerated rendering | **Not validated. Deferred to M6, before release.** | Owner's deferral |
+| Exact provenance of the recorded builds | **Unconfirmed,** and not inferred from timestamps or appearance. The owner accepts this limitation for M1. Later milestone playtests identify the exact artifact or run. | Owner's acceptance |
 
-M2 does not start before item 6.
-
-**Recording the renderer.** Read it from the run, and do not infer it from the environment: a Linux run under WSL is
-not automatically software-rendered. Start the game with `--log-file playtest.log` and find the line containing
-`Using Device`. This was confirmed on a Linux release export. On Windows the same flag is expected to work, and if the
-line is missing, say so rather than guessing. The "software rendering" notes elsewhere in this package are what this
-development machine's logs reported (`llvmpipe`), and describe only those captures.
+**Recording the renderer in later runs.** Read it from the run, and do not infer it from the environment: a Linux run
+under WSL is not automatically software-rendered. Start the game with `--log-file playtest.log` and find the line
+containing `Using Device`. This was confirmed on a Linux release export. The "software rendering" notes elsewhere in this
+package are what this development machine's logs reported (`llvmpipe`), and describe only those captures.
 
 **Tracked, but not criteria for this gate:**
 - CI streak on a stable suite (M1–M3).
 - The upstream report for the import crash.
 - Second-display readability (M4).
-- The save and settings design (D25, D26) is approved in principle with corrections, and is not built. That says
-  nothing about M1's code.
+- The save and settings design (D25, D26) is approved for implementation and is not built (§17). That says nothing
+  about M1's code.
+
+## 17. Independent technical review (2026-11-02)
+
+Reported by the reviewer (ChatGPT) and relayed by the owner. Code commit
+`3301ae08edad7a143c5578e796573c042f6e7f62`, with updated documents from `54ab860`.
+
+**Verdict: no new blocking findings in the reviewed M1 implementation, and the previous three findings (§13) are
+resolved. The independent technical review item is complete, with the limits below.**
+
+| Done independently by the reviewer | Result |
+|---|---|
+| Located the exact review archive in the upload, and checked its SHA-256 against the supplied value | Verified |
+| All 286 manifest file checksums | Verified |
+| Rebuilt the code tree, including the pinned godot-cpp gitlink | Matched `8c158dbdf26e6cf8e5826b0f129678448db017b0` |
+| Compiled and ran the native suite | 46 test cases and 802 assertions passed |
+| Ran the art checker | Zero problems |
+| Reviewed the movement fixes, player animation integration, camera changes, scene and test wiring, and build, CI and export scripts | No new blocking findings |
+
+**Not rerun by the reviewer,** because Godot was unavailable in the review environment: the Godot integration tests,
+engine rendering and release exports. Those results rely on the supplied CI evidence, and are not independent reruns.
+
+This review was not M1 acceptance, which the owner gave separately (§16).
+
+**D26 and `GameSession`.** The revised design is approved for implementation. A scene-owned session checkpoint that
+survives world replacement is a reasonable scoped exception to literal scene reload, with no singleton, and the planned
+11 classes are acceptable. No further architecture review is needed for these approved classes. During M3:
+- World replacement removes the old world's active signals and callbacks.
+- The new director has its checkpoint before it enters the tree.
+- Verify restart after an autosave failure, pause reset, and repeated restart without duplicate events.
