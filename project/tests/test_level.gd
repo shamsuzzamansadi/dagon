@@ -64,16 +64,21 @@ func test_rock_requires_a_jump(h) -> void:
 
 
 func test_slope_keeps_contact_going_down(h) -> void:
+	const END_X := 535.0
+	const MAX_STEPS := 120 # About three times the walk at full speed.
 	var player: CharacterBody2D = await _setup(h)
 	await h.landed_on_floor(player)
 	player.teleport(Vector2(490, -12))
 	await h.landed_on_floor(player)
 	Input.action_press("move_right")
 	var airborne_steps := 0
-	while player.global_position.x < 535.0 and airborne_steps < 60:
+	for i in MAX_STEPS:
+		if player.global_position.x >= END_X:
+			break
 		await h.steps(1)
 		if not player.is_on_floor():
 			airborne_steps += 1
+	h.check(player.global_position.x >= END_X, "did not reach x=%.0f within %d steps; stopped at x=%.1f" % [END_X, MAX_STEPS, player.global_position.x])
 	h.check(airborne_steps <= 2, "lost floor contact for %d steps walking down the slope" % airborne_steps)
 
 

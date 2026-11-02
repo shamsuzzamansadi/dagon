@@ -37,7 +37,12 @@ StepResult step(MoveState &p_state, const MoveParams &p_params, const MoveInput 
 		}
 	}
 
-	if (p_state.buffer_timer > 0.0f && p_state.coyote_timer > 0.0f) {
+	// The timers only extend the two base conditions, so a zero duration disables
+	// that forgiveness window without affecting a press on the ground.
+	const bool jump_requested = p_input.jump_pressed || p_state.buffer_timer > 0.0f;
+	const bool can_jump = grounded || p_state.coyote_timer > 0.0f;
+
+	if (jump_requested && can_jump) {
 		p_velocity.y = -p_params.jump_velocity;
 		p_state.buffer_timer = 0.0f;
 		p_state.coyote_timer = 0.0f; // Spent; this is what prevents a double jump.

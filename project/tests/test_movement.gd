@@ -118,17 +118,23 @@ func test_c_short_press_jumps_lower_than_held(h) -> void:
 func test_d_cannot_pass_walls(h) -> void:
 	var player: CharacterBody2D = await _setup(h)
 	await h.landed_on_floor(player)
+	var body_half_width := 6.0
+	# A wall stop removes horizontal velocity. Anything near walk_speed would mean
+	# the body is still trying to move through the wall.
+	var stopped_tolerance := 0.5
+
 	player.teleport(Vector2(960, -2))
 	Input.action_press("move_right")
 	await h.steps(120)
-	var body_half_width := 6.0
 	h.check_near(player.global_position.x, 1000.0 - body_half_width, 2.0, "x against the right wall")
-	h.check_near(player.velocity.x, 0.0, player.walk_speed, "wall limits velocity")
+	h.check_near(player.velocity.x, 0.0, stopped_tolerance, "x velocity against the right wall")
 	Input.action_release("move_right")
+
 	player.teleport(Vector2(40, -2))
 	Input.action_press("move_left")
 	await h.steps(120)
 	h.check_near(player.global_position.x, body_half_width, 2.0, "x against the left wall")
+	h.check_near(player.velocity.x, 0.0, stopped_tolerance, "x velocity against the left wall")
 
 
 func test_ceiling_stops_upward_velocity(h) -> void:
@@ -243,6 +249,25 @@ func test_g_buffered_jump_survives_teleport(h) -> void:
 	h.check(jumped[0] == 1, "buffered jump fired %d times" % jumped[0])
 	h.check(landed[0] == 1, "expected the genuine landing before the jump, got %d" % landed[0])
 	h.check(player.velocity.y < 0.0, "not rising from the buffered jump")
+
+
+## The forgiveness windows are editor properties, so zero must be a safe value.
+func test_zero_forgiveness_windows_keep_grounded_jump(h) -> void:
+	var player: CharacterBody2D = await _setup(h)
+	await h.landed_on_floor(player)
+	var jumped := [0]
+	player.jumped.connect(func() -> void: jumped[0] += 1)
+	var windows := [[0.0, 0.1], [0.1, 0.0], [0.0, 0.0]]
+	for window: Array in windows:
+		player.coyote_time = window[0]
+		player.jump_buffer_time = window[1]
+		jumped[0] = 0
+		Input.action_press("jump")
+		await h.steps(2)
+		Input.action_release("jump")
+		h.check(jumped[0] == 1, "coyote=%.1f buffer=%.1f: grounded jump fired %d times" % [window[0], window[1], jumped[0]])
+		h.check(player.velocity.y < 0.0, "coyote=%.1f buffer=%.1f: not rising" % [window[0], window[1]])
+		await h.landed_on_floor(player)
 
 
 func test_teleport_clears_velocity(h) -> void:

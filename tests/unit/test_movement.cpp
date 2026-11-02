@@ -256,6 +256,106 @@ TEST_SUITE("jump") {
 	}
 }
 
+TEST_SUITE("zero forgiveness windows") {
+	// Zero disables only that forgiveness window. A fresh press on the ground always jumps.
+	MoveParams with_times(float p_coyote_time, float p_jump_buffer_time) {
+		MoveParams params;
+		params.coyote_time = p_coyote_time;
+		params.jump_buffer_time = p_jump_buffer_time;
+		return params;
+	}
+
+	TEST_CASE("grounded jump works when either or both windows are zero") {
+		const float times[][2] = { { 0.0f, 0.1f }, { 0.1f, 0.0f }, { 0.0f, 0.0f } };
+		for (const auto &pair : times) {
+			CAPTURE(pair[0]);
+			CAPTURE(pair[1]);
+			const MoveParams params = with_times(pair[0], pair[1]);
+			MoveState state = standing(params);
+			const StepResult result = step(state, params, press_jump(), Vec2{}, FloorContact::Grounded, DT);
+			CHECK(result.jumped);
+			CHECK(result.velocity.y == doctest::Approx(-params.jump_velocity));
+		}
+	}
+
+	TEST_CASE("zero coyote time rejects a jump on the first airborne step") {
+		const MoveParams params = with_times(0.0f, 0.1f);
+		MoveState state = standing(params);
+		const StepResult late = step(state, params, press_jump(), Vec2{}, FloorContact::Airborne, DT);
+		CHECK_FALSE(late.jumped);
+	}
+
+	TEST_CASE("zero coyote time keeps jump buffering") {
+		const MoveParams params = with_times(0.0f, 0.1f);
+		MoveState state;
+		step(state, params, press_jump(), Vec2{ 0.0f, 50.0f }, FloorContact::Airborne, DT);
+		const StepResult landing = step(state, params, hold_jump(), Vec2{ 0.0f, 50.0f }, FloorContact::Grounded, DT);
+		CHECK(landing.jumped);
+	}
+
+	TEST_CASE("zero buffering does not retain an airborne request") {
+		const MoveParams params = with_times(0.1f, 0.0f);
+		MoveState state;
+		const StepResult airborne = step(state, params, press_jump(), Vec2{ 0.0f, 50.0f }, FloorContact::Airborne, DT);
+		CHECK_FALSE(airborne.jumped);
+		const StepResult landing = step(state, params, hold_jump(), Vec2{ 0.0f, 50.0f }, FloorContact::Grounded, DT);
+		CHECK(landing.landed);
+		CHECK_FALSE(landing.jumped);
+	}
+
+	TEST_CASE("zero buffering keeps coyote time") {
+		const MoveParams params = with_times(0.1f, 0.0f);
+		MoveState state = standing(params);
+		step(state, params, MoveInput{}, Vec2{}, FloorContact::Airborne, DT);
+		const StepResult late = step(state, params, press_jump(), Vec2{}, FloorContact::Airborne, DT);
+		CHECK(late.jumped);
+	}
+
+	TEST_CASE("both zero: only a press on the ground jumps") {
+		const MoveParams params = with_times(0.0f, 0.0f);
+		MoveState state = standing(params);
+		CHECK_FALSE(step(state, params, press_jump(), Vec2{}, FloorContact::Airborne, DT).jumped);
+		const StepResult landing = step(state, params, hold_jump(), Vec2{ 0.0f, 50.0f }, FloorContact::Grounded, DT);
+		CHECK(landing.landed);
+		CHECK_FALSE(landing.jumped);
+		CHECK(step(state, params, press_jump(), Vec2{}, FloorContact::Grounded, DT).jumped);
+	}
+
+	TEST_CASE("no double jump with either or both windows zero") {
+		const float times[][2] = { { 0.0f, 0.1f }, { 0.1f, 0.0f }, { 0.0f, 0.0f } };
+		for (const auto &pair : times) {
+			CAPTURE(pair[0]);
+			CAPTURE(pair[1]);
+			const MoveParams params = with_times(pair[0], pair[1]);
+			MoveState state = standing(params);
+			const Vec2 velocity = step(state, params, press_jump(), Vec2{}, FloorContact::Grounded, DT).velocity;
+			CHECK_FALSE(step(state, params, press_jump(), velocity, FloorContact::Airborne, DT).jumped);
+		}
+	}
+
+	TEST_CASE("unknown contact grants no jump with either or both windows zero") {
+		const float times[][2] = { { 0.0f, 0.1f }, { 0.1f, 0.0f }, { 0.0f, 0.0f } };
+		for (const auto &pair : times) {
+			CAPTURE(pair[0]);
+			CAPTURE(pair[1]);
+			const MoveParams params = with_times(pair[0], pair[1]);
+			MoveState state; // teleport() resets to this.
+			CHECK_FALSE(step(state, params, press_jump(), Vec2{}, FloorContact::Unknown, DT).jumped);
+		}
+	}
+
+	TEST_CASE("control lock: no input means no jump with either or both windows zero") {
+		const float times[][2] = { { 0.0f, 0.1f }, { 0.1f, 0.0f }, { 0.0f, 0.0f } };
+		for (const auto &pair : times) {
+			CAPTURE(pair[0]);
+			CAPTURE(pair[1]);
+			const MoveParams params = with_times(pair[0], pair[1]);
+			MoveState state = standing(params);
+			CHECK_FALSE(step(state, params, MoveInput{}, Vec2{}, FloorContact::Grounded, DT).jumped);
+		}
+	}
+}
+
 TEST_SUITE("landing") {
 	TEST_CASE("fires once, on the first grounded step") {
 		const MoveParams params;
