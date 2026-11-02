@@ -55,16 +55,26 @@ and `toolchain.md`.
   elaborate effects and animation variety. Keep the playable loop, readable
   clues, the reveal and the export checks.
 
-## 3. Remaining validation (open until evidence exists)
+## 3. Accepted for M1 by the independent reviewer (2026-11-02)
+
+Each acceptance is limited as stated:
+- `StepProbe` ordering **in the current fixture**, with its ordering regression test.
+- C++20 for our sources with C++17 godot-cpp **for the tested compiler configurations**.
+  This is not universal ABI certification.
+- Platform-native export checks.
+- The prepared-import workaround with strict failure handling. The root cause stays
+  unresolved, and the exceptional result stays in the evidence.
+
+## 4. Remaining validation (open until evidence exists)
 
 Updated 2026-11-02 at the M1 gate. Evidence: [reviews/m1-review-package.md](reviews/m1-review-package.md).
 
 | Item | Status | Evidence so far | Still needed | When |
 |---|---|---|---|---|
-| D2 on MSVC | **Validated on CI, reviewer judgment pending** | MSVC 19.44.35229 with `/MT` on both sides; debug library loads in the Windows editor and passes tests; release library loads in the exported game. godot-cpp's public headers have no standard-dependent code. Not a general ABI/ODR guarantee. | Review | M1 gate |
-| Desktop export with GDExtension | **Validated headless on both OSes; windowed on Linux (software GL)** | CI run `41408640443`; local windowed run | Owner runs the Windows export on real hardware | M1 gate |
-| Import-crash workaround | **Provisional** | Crash occurs on a fresh clone of the game (134 ×4); preparation prevented it every time. Root cause unknown. | Upstream report | Open |
-| Headless test reliability | **Partly** | 20/20 local; 3 green CI runs | 10 consecutive CI runs | M1–M3 |
+| D2 on MSVC | **Accepted for tested configurations (§3)** | MSVC 19.44.35229 with `/MT` on both sides; debug library loads in the Windows editor and passes tests; release library loads in the exported game. godot-cpp's public headers have no standard-dependent code. Not a general ABI/ODR guarantee. | — | Done for M1 |
+| Desktop export with GDExtension | **Validated headless on both OSes; windowed on Linux (software GL)** | CI run `41412946061`; local windowed run | Owner runs the Windows export on real hardware | M1 gate |
+| Import-crash workaround | **Provisional** | Crash occurs on a fresh clone of the game (134 ×6); preparation prevented it every time. Root cause unknown. | Upstream report | Open |
+| Headless test reliability | **Partly** | 20/20 local; 4 green CI runs | 10 consecutive CI runs | M1–M3 |
 | Teleport contact invalidation | **Validated** | Tests 7f and 7g; mutation check | — | Done |
 | `StepProbe` observation order | **Validated** | Test and mutation check | — | Done |
 | Movement feel, physical input | **Not done** | Synthetic events only | Owner playtest | M1 gate |

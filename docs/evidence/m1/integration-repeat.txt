@@ -1,1 +1,1 @@
-clean runs: 20/20
+clean runs: 20/20 (23 tests each)

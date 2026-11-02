@@ -1,0 +1,16 @@
+TEST CASE:  grounded jump works when either or both windows are zero
+tests/unit/test_movement.cpp:276: ERROR: CHECK( result.jumped ) is NOT correct!
+tests/unit/test_movement.cpp:277: ERROR: CHECK( result.velocity.y == doctest::Approx(-params.jump_velocity) ) is NOT cor
+tests/unit/test_movement.cpp:276: ERROR: CHECK( result.jumped ) is NOT correct!
+tests/unit/test_movement.cpp:277: ERROR: CHECK( result.velocity.y == doctest::Approx(-params.jump_velocity) ) is NOT cor
+tests/unit/test_movement.cpp:276: ERROR: CHECK( result.jumped ) is NOT correct!
+tests/unit/test_movement.cpp:277: ERROR: CHECK( result.velocity.y == doctest::Approx(-params.jump_velocity) ) is NOT cor
+TEST CASE:  zero coyote time keeps jump buffering
+tests/unit/test_movement.cpp:293: ERROR: CHECK( landing.jumped ) is NOT correct!
+TEST CASE:  zero buffering keeps coyote time
+tests/unit/test_movement.cpp:311: ERROR: CHECK( late.jumped ) is NOT correct!
+TEST CASE:  both zero: only a press on the ground jumps
+tests/unit/test_movement.cpp:321: ERROR: CHECK( step(state, params, press_jump(), Vec2{}, FloorContact::Grounded, DT).ju
+[doctest] test cases:  38 |  34 passed | 4 failed | 0 skipped
+[doctest] assertions: 788 | 779 passed | 9 failed |
+scons: building terminated because of errors.

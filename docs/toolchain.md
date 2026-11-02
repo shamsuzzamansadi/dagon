@@ -55,10 +55,10 @@ registered, bound method returned the expected value, signal present, and
 - **Consistency by construction:** our env is a `Clone()` of godot-cpp's, so
   every other flag is identical: runtime library (`use_static_cpp`), debug and
   optimisation settings, defines. Only the `-std` flag differs.
-- **Validated on MSVC 19.44.35229 in CI (run `41408640443`):** debug and release builds,
+- **Validated on MSVC 19.44.35229 in CI (latest: run `41412946061`):** debug and release builds,
   `/MT` on both sides, extension loading in the Windows editor (debug library), and in the
-  exported game (release library). Accepted for this project, pending review; not a
-  general ABI/ODR guarantee.
+  exported game (release library). Accepted by the reviewer for the tested compiler
+  configurations; not a universal ABI guarantee.
 - A `static_assert(__cplusplus >= 202002L)` in one source file catches a
   silent fallback. MSVC needs `/Zc:__cplusplus`, which godot-cpp already adds.
 
@@ -122,7 +122,7 @@ with one `Node` subclass):
 
 **Observed on the actual game project (2026-11-02,
 [evidence/m1/import/](evidence/m1/import/README.md)):**
-- **A fresh clone crashes the same way:** 4 of 4 clean-cache imports **without**
+- **A fresh clone crashes the same way:** 6 of 6 clean-cache imports **without**
   preparation exited 134. With it, 3 of 3 exited 0, and the real checks then pass.
 - The one exception is the working copy on `/mnt/c`, which exited 0 even when
   unprepared. An early note in commit `b94e742` wrongly generalized from that.

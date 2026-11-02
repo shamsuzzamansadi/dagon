@@ -183,6 +183,11 @@ mechanic. It goes to visual review before the treatment spreads through the leve
 independent work continues meanwhile. Prefer fewer well-composed scenes and reusable,
 consistent assets over a lot of rough content.
 
+**That section must demonstrate:** cohesive composition, readable lighting, a convincing
+animated sailor, restrained effects, and consistent UI. It is judged on actual gameplay
+captures, not only a selected still. Any asset-production limitation is named, not
+treated as finished.
+
 **Visual evidence required for that review:**
 - At least three in-engine screenshots and a 20–30 s gameplay recording showing
   movement and camera, at normal viewing size and at native resolution.

@@ -6,7 +6,7 @@ trial are in the subfolders. Reproduce with `tools/import_evidence.sh`.
 
 | Project | Filesystem | Unprepared | Prepared (`tools/prepare_project.sh`) |
 |---|---|---|---|
-| **Actual game, fresh clone** | ext4 (native) | **134, 134, 134, 134** | 0, 0, 0 |
+| **Actual game, fresh clone** | ext4 (native) | **134 in all 6 trials** (4 here, then one each on clones of `e49aae3` and `7a2f849`) | 0, 0, 0 |
 | Actual game, working copy | 9p (`/mnt/c`) | 0, 0, 0, 0, 0, 0 | 0, 0, 0, 0, 0, 0 |
 | Probe (control) | ext4 | 134, 134, 134 | 0, 0, 0 |
 | Probe (control) | 9p (`/mnt/c`) | 134, 134, 134 | not run |

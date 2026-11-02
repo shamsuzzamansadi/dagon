@@ -1,0 +1,3 @@
+FAIL test_d_cannot_pass_walls
+     x velocity against the right wall: expected 0.000 ±0.500, got 70.000
+RESULT passed=22 failed=1

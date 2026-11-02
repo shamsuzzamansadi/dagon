@@ -13,6 +13,7 @@ PASS test_e_gravity_applies_while_control_disabled
 PASS test_e_buffered_jump_does_not_fire_after_lock
 PASS test_f_teleport_invalidates_stale_floor_contact
 PASS test_g_buffered_jump_survives_teleport
+PASS test_zero_forgiveness_windows_keep_grounded_jump
 PASS test_teleport_clears_velocity
 PASS test_level_loads_with_player_and_camera
 PASS test_act1_can_be_crossed_in_both_directions
@@ -22,4 +23,4 @@ PASS test_camera_follows_the_player
 PASS test_camera_stays_inside_level_limits
 PASS test_input_map_has_keyboard_and_gamepad_events
 PASS test_key_and_pad_events_drive_the_player
-RESULT passed=22 failed=0
+RESULT passed=23 failed=0
