@@ -118,6 +118,11 @@ game running and the character moving through the greybox level.
 - **Not assigned to a commit:** the exact artifact and commit tested have not been confirmed.
 - **Does not establish** that all mappings, movement feel, jumping behaviour or physical gamepad
   support pass. Those stay open below.
+- **Measured from the recording** ([evidence](../evidence/m1/windows-recording-2026-11-02.md)): walking
+  speed 70.4 px/s against 70 configured; correct right-wall stop; flat-ground jumps peaking at 23–27 px.
+- **New defect it exposed:** the character flickers by 1 game pixel on screen while the camera
+  follows. The M1 engine capture confirms it, and my M1 frame inspection missed it. Cosmetic; not fixed
+  in M1 builds.
 
 These are **still not done**, and CI cannot do them:
 
