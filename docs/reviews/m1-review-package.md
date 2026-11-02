@@ -15,7 +15,8 @@
 |---|---|
 | Native C++ tests, GCC 13.3: 29 cases, 763 assertions (the suite before §13) | **Independently reproduced by the reviewer** |
 | Native tests at `7a2f849` (38 cases), Godot integration, smoke, exports, Linux and MSVC CI | **Supplied by the developer and CI. Not independently rerun.** |
-| Windows gameplay, movement feel, physical gamepad | **Nobody yet** (§6) |
+| Windows launch and character movement | **Owner, partial** (§6); commit not yet confirmed |
+| Movement feel, all mappings, jumping, physical gamepad | **Nobody yet** (§6) |
 
 ## 1. What was built
 
@@ -109,16 +110,23 @@ GODOT=/path/to/godot sh tools/export_check.sh linux
 **M1 review follow-ups closed:** the `StepProbe` post-step point exists and is proven;
 teleport tests 7f and 7g pass.
 
-## 6. Not verified: human checks and gaps
+## 6. Human checks and gaps
 
-These are **not done**, and CI cannot do them:
+**Done so far: a user Windows launch and partial gameplay check (reported 2026-11-02).** The owner
+downloaded and launched the Windows build and gave the reviewer a gameplay recording. It shows the
+game running and the character moving through the greybox level.
+- **Not assigned to a commit:** the exact artifact and commit tested have not been confirmed.
+- **Does not establish** that all mappings, movement feel, jumping behaviour or physical gamepad
+  support pass. Those stay open below.
+
+These are **still not done**, and CI cannot do them:
 
 | Item | Who | How |
 |---|---|---|
 | **Movement feel:** walk, stop, jump, land, tuning values | Owner | Play either build |
 | **Physical gamepad and keyboard mapping.** Tests only inject synthetic events. | Owner | Same, with a controller |
-| **Windows export on real hardware.** It ran only headless on a CI runner. | Owner | Run page → sign in → download `dagon-windows` → run `dagon.exe` |
-| Rendering on a real GPU | Owner | Same |
+| Confirm which run the launched Windows artifact came from | Owner | The run page it was downloaded from, or the artifact's name and date |
+| Rendering on a real GPU: launch shown; visual correctness not checked by anyone | Owner | Same build |
 | Second display readability | — | M4 |
 
 Also open:
@@ -228,4 +236,5 @@ No failures in the final runs.
 ## 14. Status
 
 **Stays at the M1 gate.** M2 and M4 are not started. Remaining before the acceptance decision:
-the owner's Windows keyboard and gamepad playtest (§6).
+final technical review (the reviewer has not independently reviewed the updated implementation or
+rerun the 38-test suite) and the outstanding human checks (§6).

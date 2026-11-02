@@ -40,9 +40,11 @@ Never cut the playable loop, readable clues, the reveal, or the export checks.
 - [x] G0: theme SHIFT, fit recorded in jam.md §4 (2026-11-02).
 - [ ] **M1 Foundation: implemented; at the M1 review gate. NOT accepted.** Evidence and
   open items are in [reviews/m1-review-package.md](reviews/m1-review-package.md).
-  Independent review round 1 is addressed (`7a2f849`, CI green on Linux and MSVC).
-  Outstanding before the acceptance decision: the owner's Windows keyboard and gamepad
-  playtest.
+  Review round 1 findings are addressed (`7a2f849`, CI green on Linux and MSVC), but the
+  reviewer has not independently reviewed that implementation or rerun its 38-test suite. The
+  owner launched the Windows build and recorded partial gameplay; the artifact's commit is not
+  yet confirmed. Outstanding before the acceptance decision: final technical review, and the
+  movement-feel, mappings, jumping and physical-gamepad checks.
 - [ ] M2–M7 not started.
 
 ## Review follow-ups by milestone (Phase A final review, 2026-10-28)
