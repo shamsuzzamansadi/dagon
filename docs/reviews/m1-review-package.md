@@ -140,7 +140,9 @@ These are **still not done**, and CI cannot do them:
 | Second display readability | — | M4 |
 
 Also open:
-- Integration stability in CI: 4 green runs so far (3 with MSVC) against a target of 10 consecutive. 20 of 20 locally.
+- Integration stability in CI: 9 consecutive green runs with MSVC before the Shore merge (`422ff54` to
+  `a9b262c`), against a target of 10. Only the latest ran today's 47 tests, so this stays open. 20 of 20
+  locally at `7a2f849`, and 10 of 10 at `a9b262c`.
 - Green CI says nothing about visual quality, movement feel or audio.
 
 ## 7. Defects found during M1
@@ -279,6 +281,18 @@ the polygons. The former preview stopped at x = 620.
 **Measured:** 0 on-screen changes at 30, 60 and 144 fps in both scenes, against 113 changes and 69
 flickers back with the M1 camera (`docs/evidence/shore/camera-jitter.txt`). This is software rendering at
 a fixed frame rate, not a real GPU or a real variable frame rate.
+
+**Verified before merging (commit `a9b262c`):**
+
+| Check | Result | Who ran it |
+|---|---|---|
+| CI run [41431582414](https://github.com/shamsuzzamansadi/dagon/actions/runs/41431582414), Windows with MSVC 19.44.35229 | 46 unit, 47 integration, extension load, smoke on both scenes, art check, release export: all pass. The exported release library loaded and started in `shore.tscn`, headless. | CI |
+| Same run, Linux with g++ 11.4.0 | The same checks, all pass | CI |
+| Fresh clone following the README, Ubuntu 24.04, GCC 13.3.0 | The same checks, all pass; the suite repeated 10 of 10 clean; regenerating the art changes nothing | Developer |
+| Local attempt to export Windows from Linux | Fails: the MSVC library exists only on a Windows runner. Expected (§9, item 3), and the Windows export is proven by CI above. | Developer |
+
+CI reports come from public annotations, as in §3. **Not run by anyone:** this build on real Windows
+hardware, physical input, or a person judging how it feels.
 
 **For your judgment:**
 1. Removing the camera's smoothing is the one behaviour change to the M1 greybox. Nobody has judged how

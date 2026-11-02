@@ -74,7 +74,7 @@ Updated 2026-11-02 at the M1 gate. Evidence: [reviews/m1-review-package.md](revi
 | D2 on MSVC | **Accepted for tested configurations (§3)** | MSVC 19.44.35229 with `/MT` on both sides; debug library loads in the Windows editor and passes tests; release library loads in the exported game. godot-cpp's public headers have no standard-dependent code. Not a general ABI/ODR guarantee. | — | Done for M1 |
 | Desktop export with GDExtension | **Validated headless on both OSes; windowed on Linux (software GL)** | CI run `41412946061`; local windowed run | Owner runs the Windows export on real hardware | M1 gate |
 | Import-crash workaround | **Provisional** | Crash occurs on a fresh clone of the game (134 ×6); preparation prevented it every time. Root cause unknown. | Upstream report | Open |
-| Headless test reliability | **Partly** | 20/20 local; 4 green CI runs | 10 consecutive CI runs | M1–M3 |
+| Headless test reliability | **Partly** | 20/20 local at `7a2f849`, 10/10 at `a9b262c`; 9 consecutive green CI runs with MSVC, only the latest on today's 47 tests | 10 consecutive CI runs on a stable suite | M1–M3 |
 | Teleport contact invalidation | **Validated** | Tests 7f and 7g; mutation check | — | Done |
 | `StepProbe` observation order | **Validated** | Test and mutation check | — | Done |
 | Movement feel, physical input | **Not done** | Synthetic events only | Owner playtest | M1 gate |
