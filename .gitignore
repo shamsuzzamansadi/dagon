@@ -1,0 +1,22 @@
+# Godot
+.godot/
+*.translation
+
+# Compiled GDExtension libraries (built locally or by CI; never committed)
+project/bin/*/
+bin/
+*.os
+*.o
+*.obj
+*.exp
+*.lib
+*.pdb
+*.dblite
+compile_commands.json
+__pycache__/
+
+# Local tooling and build output
+.venv/
+.scons-cache/
+build/
+custom.py

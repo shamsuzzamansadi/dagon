@@ -1,0 +1,47 @@
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+[Detaching after vfork from child process 23774]
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+[   0% ] first_scan_filesystem | Started Project initialization (5 steps)
+[   0% ] first_scan_filesystem | Scanning file structure...
+[  16% ] first_scan_filesystem | Loading global class names...
+[  33% ] first_scan_filesystem | Verifying GDExtensions...
+[  50% ] first_scan_filesystem | Creating autoload scripts...
+[  66% ] first_scan_filesystem | Initializing plugins...
+[  83% ] first_scan_filesystem | Starting file scan...
+[ DONE ] first_scan_filesystem
+[   0% ] update_scripts_classes | Started Registering global classes... (2 steps)
+[   0% ] update_scripts_classes | 
+[  33% ] update_scripts_classes | 
+[ DONE ] update_scripts_classes
+[   0% ] loading_editor_layout | Started Loading editor (5 steps)
+[   0% ] loading_editor_layout | Loading editor layout...
+[  16% ] loading_editor_layout | Loading docks...
+[ DONE ] loading_editor_layout
+Thread 1 "Godot_v4.7.2-st" received signal SIGSEGV, Segmentation fault.
+0x0000000001c7ae9f in ?? ()
+#0  0x0000000001c7ae9f in ?? ()
+#1  0x0000000001c7c6f4 in ?? ()
+#2  0x0000000001c84e75 in ?? ()
+#3  0x0000000004e6c64d in ?? ()
+#4  0x0000000004963714 in ?? ()
+#5  0x000000000042d046 in ?? ()
+[Detaching after vfork from child process 23801]
+[Detaching after vfork from child process 23803]
+[Detaching after vfork from child process 23804]
+Thread 1 "Godot_v4.7.2-st" received signal SIGABRT, Aborted.
+__pthread_kill_implementation (no_tid=0, signo=6, threadid=<optimized out>) at ./nptl/pthread_kill.c:44
+warning: 44	./nptl/pthread_kill.c: No such file or directory
+#0  __pthread_kill_implementation (no_tid=0, signo=6, threadid=<optimized out>) at ./nptl/pthread_kill.c:44
+#1  __pthread_kill_internal (signo=6, threadid=<optimized out>) at ./nptl/pthread_kill.c:78
+#2  __GI___pthread_kill (threadid=<optimized out>, signo=signo@entry=6) at ./nptl/pthread_kill.c:89
+#3  0x00007ffff7c4527e in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26
+#4  0x00007ffff7c288ff in __GI_abort () at ./stdlib/abort.c:79
+#5  0x00000000004fa292 in ?? ()
+#6  <signal handler called>
+#7  0x0000000001c7ae9f in ?? ()
+#8  0x0000000001c7c6f4 in ?? ()
+#9  0x0000000001c84e75 in ?? ()
+#10 0x0000000004e6c64d in ?? ()
+#11 0x0000000004963714 in ?? ()
+Couldn't get registers: No such process.
