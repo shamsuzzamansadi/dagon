@@ -1,0 +1,3 @@
+FAIL test_pixel_lock_holds_the_sailor_still_on_screen
+     the sailor's screen position varied while walking: [231, 230]
+RESULT passed=32 failed=1

@@ -8,6 +8,8 @@ config_version=5
 config/name="DAGON: Beneath the Black Tide"
 config/description="A short cinematic horror game about a sailor on a seabed that should be under the ocean."
 run/main_scene="res://scenes/level/level.tscn"
+run/main_scene.shore_preview="res://scenes/preview/shore_preview.tscn"
+config/name.shore_preview="DAGON: Shore art preview"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 boot_splash/show_image=false
 

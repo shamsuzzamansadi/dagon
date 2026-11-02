@@ -93,6 +93,7 @@ The submission page should state this interpretation in one or two sentences
 | Architecture, documentation, C++ code, tests, CI configuration, greybox scenes | **Claude (Anthropic), via Claude Code**, working under the owner's direction | Authors most source code and documents |
 | Independent design and code review | **ChatGPT (OpenAI)**, relayed by the owner | Review only |
 | Placeholder art and audio | Silhouette polygons and shaders made in the editor or by scripts, and procedurally generated audio, produced with AI assistance | First playable |
+| Shore art preview | Pixel art drawn by Python scripts written and tuned with AI assistance (Claude), under the owner's direction. No image generators or third-party art | Preview (`docs/shore-preview.md`) |
 | Final assets | Decided before M4 | Each asset's provenance (human, AI-assisted, or third-party CC0/OFL) recorded in `CREDITS.md` |
 
 On the submission form, choose the option that most accurately matches this

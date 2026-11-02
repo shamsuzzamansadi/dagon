@@ -38,5 +38,11 @@ case "$group" in
 		exit_of exported-run-exit "build/logs/export/run-$platform.exit"
 		notice first-error build/logs/godot/integration.errors '.'
 		;;
+	preview)
+		notice check-art build/logs/check-art.log '^CHECK_ART'
+		notice preview-release-library "build/logs/export/run-$platform-preview.all" 'dagon: extension initialized'
+		notice preview-scene "build/logs/export/run-$platform-preview.all" "Completed load for: 'res://scenes/preview/shore_preview.tscn'"
+		exit_of preview-run-exit "build/logs/export/run-$platform-preview.exit"
+		;;
 esac
 exit 0

@@ -1,0 +1,122 @@
+[gd_scene load_steps=13 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/preview/sky.png" id="1_sky"]
+[ext_resource type="Texture2D" path="res://assets/preview/clouds.png" id="2_clouds"]
+[ext_resource type="Texture2D" path="res://assets/preview/far.png" id="3_far"]
+[ext_resource type="SpriteFrames" path="res://assets/preview/glints_frames.tres" id="4_glints"]
+[ext_resource type="Texture2D" path="res://assets/preview/flats.png" id="5_flats"]
+[ext_resource type="Texture2D" path="res://assets/preview/bank.png" id="6_bank"]
+[ext_resource type="Texture2D" path="res://assets/preview/terrain.png" id="7_terrain"]
+[ext_resource type="Texture2D" path="res://assets/preview/boat.png" id="8_boat"]
+[ext_resource type="Texture2D" path="res://assets/preview/fish.png" id="9_fish"]
+[ext_resource type="PackedScene" path="res://scenes/preview/sailor_player.tscn" id="10_player"]
+[ext_resource type="Texture2D" path="res://assets/preview/foreground.png" id="11_foreground"]
+
+[node name="ShorePreview" type="Node2D"]
+
+[node name="Sky" type="Parallax2D" parent="."]
+scroll_scale = Vector2(0, 1)
+
+[node name="Art" type="Sprite2D" parent="Sky"]
+light_mask = 2
+position = Vector2(0, -220)
+texture = ExtResource("1_sky")
+centered = false
+
+[node name="Clouds" type="Parallax2D" parent="."]
+scroll_scale = Vector2(0.04, 1)
+repeat_size = Vector2(640, 0)
+autoscroll = Vector2(-0.6, 0)
+repeat_times = 2
+
+[node name="Art" type="Sprite2D" parent="Clouds"]
+light_mask = 2
+position = Vector2(0, -220)
+texture = ExtResource("2_clouds")
+centered = false
+
+[node name="Far" type="Parallax2D" parent="."]
+scroll_scale = Vector2(0.1, 1)
+
+[node name="Art" type="Sprite2D" parent="Far"]
+light_mask = 2
+position = Vector2(0, -220)
+texture = ExtResource("3_far")
+centered = false
+
+[node name="MoonPath" type="Parallax2D" parent="."]
+scroll_scale = Vector2(0, 1)
+
+[node name="Glints" type="AnimatedSprite2D" parent="MoonPath"]
+light_mask = 2
+position = Vector2(0, -70)
+sprite_frames = ExtResource("4_glints")
+autoplay = "default"
+centered = false
+
+[node name="Flats" type="Parallax2D" parent="."]
+scroll_scale = Vector2(0.35, 1)
+
+[node name="Art" type="Sprite2D" parent="Flats"]
+light_mask = 2
+position = Vector2(0, -220)
+texture = ExtResource("5_flats")
+centered = false
+
+[node name="Bank" type="Parallax2D" parent="."]
+scroll_scale = Vector2(0.7, 1)
+
+[node name="Art" type="Sprite2D" parent="Bank"]
+position = Vector2(0, -220)
+texture = ExtResource("6_bank")
+centered = false
+
+[node name="Terrain" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 0
+
+[node name="Ground" type="CollisionPolygon2D" parent="Terrain"]
+polygon = PackedVector2Array(0, -300, 24, -300, 24, 0, 200, 0, 200, -14, 240, -14, 240, 0, 360, 0, 420, -10, 480, -10, 540, 0, 620, 0, 620, -300, 640, -300, 640, 60, 0, 60)
+
+[node name="Art" type="Sprite2D" parent="Terrain"]
+position = Vector2(0, -220)
+texture = ExtResource("7_terrain")
+centered = false
+
+[node name="Boat" type="Sprite2D" parent="."]
+position = Vector2(40, -43)
+texture = ExtResource("8_boat")
+centered = false
+
+[node name="FishNearRock" type="Sprite2D" parent="."]
+light_mask = 2
+position = Vector2(182, -5)
+texture = ExtResource("9_fish")
+centered = false
+
+[node name="FishOnSlope" type="Sprite2D" parent="."]
+light_mask = 2
+position = Vector2(316, -5)
+texture = ExtResource("9_fish")
+centered = false
+flip_h = true
+
+[node name="Player" parent="." instance=ExtResource("10_player")]
+position = Vector2(150, -1)
+
+[node name="CameraRig" type="CameraRig" parent="."]
+limit_left = 0
+limit_top = -220
+limit_right = 640
+limit_bottom = 50
+target_path = NodePath("../Player")
+pixel_lock = true
+
+[node name="Foreground" type="Parallax2D" parent="."]
+scroll_scale = Vector2(1.3, 1)
+
+[node name="Art" type="Sprite2D" parent="Foreground"]
+light_mask = 2
+position = Vector2(0, -220)
+texture = ExtResource("11_foreground")
+centered = false

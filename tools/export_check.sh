@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 # Creates a release export and, when the host can run it, runs it headless and
 # looks for positive proof that the release extension library loaded.
-# Usage: GODOT=/path/to/godot tools/export_check.sh <linux|windows> [log-dir]
+# Usage: GODOT=/path/to/godot tools/export_check.sh <linux|windows|linux-preview|windows-preview> [log-dir]
 # Run the import first (tools/run_godot_checks.sh).
 set -u
 
@@ -15,22 +15,34 @@ out="$root/build/export/$platform"
 rm -rf "$out"
 mkdir -p "$out"
 
+# Which preset to export, what it must contain, and the scene it must start in.
+scene="res://scenes/level/level.tscn"
+stem="dagon"
 case "$platform" in
-	linux)
+	linux | linux-preview)
 		preset="Linux"
-		binary="$out/dagon.x86_64"
-		library="$out/libdagon.linux.template_release.x86_64.so"
+		suffix=".x86_64"
+		library="libdagon.linux.template_release.x86_64.so"
 		;;
-	windows)
+	windows | windows-preview)
 		preset="Windows"
-		binary="$out/dagon.exe"
-		library="$out/dagon.windows.template_release.x86_64.dll"
+		suffix=".exe"
+		library="dagon.windows.template_release.x86_64.dll"
 		;;
 	*)
 		echo "Unknown platform: $platform" >&2
 		exit 2
 		;;
 esac
+case "$platform" in
+	*-preview)
+		preset="$preset Shore Preview"
+		scene="res://scenes/preview/shore_preview.tscn"
+		stem="dagon-shore-preview"
+		;;
+esac
+binary="$out/$stem$suffix"
+library="$out/$library"
 
 fail() {
 	echo "export-$platform: FAILED: $1"
@@ -44,17 +56,27 @@ echo "$code" > "$logs/export-$platform.exit"
 [ "$code" -eq 0 ] || fail "export exit=$code"
 [ -f "$binary" ] || fail "no binary at $binary"
 [ -f "$library" ] || fail "extension library not bundled: $library"
-[ -f "$out/dagon.pck" ] || fail "no dagon.pck"
-if grep -aq "tests/run_tests" "$out/dagon.pck"; then
-	fail "tests were exported into dagon.pck"
+pack="$out/$stem.pck"
+[ -f "$pack" ] || fail "no $stem.pck"
+if grep -aq "tests/run_tests" "$pack"; then
+	fail "tests were exported into $stem.pck"
 fi
+case "$platform" in
+	*-preview) ;;
+	*)
+		# File names, not the setting that names the preview scene for its own preset.
+		if grep -aqE "shore_preview\.tscn\.remap|assets/preview/" "$pack"; then
+			fail "the preview was exported into the normal build"
+		fi
+		;;
+esac
 echo "export-$platform: created"
 ls -la "$out"
 
 host_can_run=no
 case "$(uname -s)" in
-	Linux) [ "$platform" = "linux" ] && host_can_run=yes ;;
-	MINGW* | MSYS* | CYGWIN*) [ "$platform" = "windows" ] && host_can_run=yes ;;
+	Linux) case "$platform" in linux*) host_can_run=yes ;; esac ;;
+	MINGW* | MSYS* | CYGWIN*) case "$platform" in windows*) host_can_run=yes ;; esac ;;
 esac
 if [ "$host_can_run" = "no" ]; then
 	echo "export-$platform: NOT RUN on this host"
@@ -78,5 +100,6 @@ if grep -E "^(ERROR|SCRIPT ERROR|USER ERROR)|Cannot get class" "$logs/run-$platf
 	fail "ERROR lines in the exported game's output"
 fi
 grep -q "dagon: extension initialized build=release" "$logs/run-$platform.all" || fail "no proof that the release library loaded"
+grep -q "Completed load for: '$scene'" "$logs/run-$platform.all" || fail "it did not start in $scene"
 grep -h "dagon: extension initialized" "$logs/run-$platform.all" | sort -u
 echo "export-$platform: ran exit=0"

@@ -9,6 +9,7 @@ const Harness := preload("res://tests/harness.gd")
 const SUITES: Array[Script] = [
 	preload("res://tests/test_movement.gd"),
 	preload("res://tests/test_level.gd"),
+	preload("res://tests/test_preview.gd"),
 ]
 const REQUIRED_CLASSES: Array[String] = ["PlayerController", "CameraRig"]
 

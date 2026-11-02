@@ -45,6 +45,8 @@ Never cut the playable loop, readable clues, the reveal, or the export checks.
   owner launched the Windows build and recorded partial gameplay; the artifact's commit is not
   yet confirmed. Outstanding before the acceptance decision: final technical review, and the
   movement-feel, mappings, jumping and physical-gamepad checks.
+- [ ] **Shore art preview:** one bounded screen, authorized ahead of M4, on branch `preview/shore-art`,
+  awaiting the owner's visual feedback ([shore-preview.md](shore-preview.md)). This is not M4.
 - [ ] M2–M7 not started.
 
 ## Review follow-ups by milestone (Phase A final review, 2026-10-28)

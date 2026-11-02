@@ -1,0 +1,3 @@
+Face position on screen, measured from every rendered frame of shore-preview-in-engine.mp4's source.
+Walking right under the following camera, frames 420-504 (60 fps): x values [214, 215, 216, 217, 219, 221, 222, 223, 224], 8 changes in 81 frame transitions.
+Before pixel lock (M1 capture, 60 fps): changed on 88 of 600 frames. See docs/evidence/m1/windows-recording-2026-11-02.md.

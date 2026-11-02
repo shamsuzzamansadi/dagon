@@ -3,3 +3,4 @@
 *.ps1 eol=crlf
 *.png binary
 *.gif binary
+*.mp4 binary
