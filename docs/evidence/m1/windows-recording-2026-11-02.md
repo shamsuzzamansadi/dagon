@@ -38,7 +38,9 @@ It is cosmetic, and movement itself is unaffected, but it conflicts with the GDD
 stable camera motion. It was missed in the M1 frame inspection.
 
 **Status:** fixed in both scenes after this recording (`54c1f7e`,
-[measurements](../shore/camera-jitter.txt)). Not yet seen on the owner's display.
+[measurements](../shore/camera-jitter.txt), software rendering). In a
+[later session](windows-playtest-2026-11-02-standard-build.md) the owner reported that the camera
+generally felt fine. That session's commit is unconfirmed, and jitter was not measured on that display.
 
 ## Not shown or not established
 

@@ -6,8 +6,9 @@ under the ocean. Godot 4.7 with gameplay in C++20 through GDExtension.
 
 **Status: M1 foundation, under review.** The game opens on the Shore, in its accepted art
 direction: a sailor you can walk and jump with, on exposed seabed beside a stranded boat, with the sea
-far off. The level carries on past the illustrated part as greybox. There is no interaction, story,
-puzzle, audio or menu yet. See [docs/roadmap.md](docs/roadmap.md) and
+far off. The artwork stops at the cliff opening, a known boundary: past it, the level carries on as
+unfinished greybox. There is no interaction, story, puzzle, audio, menu or save yet. See
+[docs/roadmap.md](docs/roadmap.md) and
 [docs/shore-preview.md](docs/shore-preview.md).
 
 ## Play the current build
@@ -30,7 +31,8 @@ The game opens in a 1440×810 window. To quit, close the window.
 | Walk | A / D, ← / → | Left stick, D-pad |
 | Jump | Space | South button (A / Cross) |
 
-These are checked by automated tests with simulated input. Physical controllers have not been tested yet.
+These are checked by automated tests with simulated input. Each mapping on physical devices, including a
+physical controller, is not confirmed yet.
 
 ## Scenes
 

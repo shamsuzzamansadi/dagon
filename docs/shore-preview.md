@@ -5,7 +5,9 @@ The accepted art direction, and what the standard build opens. It began as a bou
 moonlit sky, coastal palette and environment ([D19](decisions.md)).
 
 **This is not M4, and accepting the direction closes no other check.** Physical gamepad checks, movement
-feel, independent code review, M1 acceptance and the full first M4 deliverable all remain open.
+feel by device, independent code review, M1 acceptance and the full first M4 deliverable all remain open.
+The owner has played the standard Windows build and liked it
+([record](evidence/m1/windows-playtest-2026-11-02-standard-build.md)).
 
 ## What the standard build contains
 
@@ -79,12 +81,12 @@ Only `terrain.png` changed, in 646 of its 172,800 pixels; every other image is a
 
 ## Known limitations, for M4
 
-None of these blocks the merge. Each stays open until someone decides on it.
+None of these blocks M1. Each stays open until someone decides on it.
 
 1. **The walk is brisk.** At the preserved 70 px/s, a 27 px figure covers about 2.6 body heights per
-   second, about 2.2 full gait cycles per second. Feet do not slide, but it reads as a hurried stride. If
-   you want a heavier walk, the fix is a lower `walk_speed`. That stays your decision, after you have
-   played it.
+   second, about 2.2 full gait cycles per second. Feet do not slide, but it reads as a hurried stride. The
+   owner's general feedback on the controls is positive, so the speed stays. A heavier walk would mean a
+   lower `walk_speed`, which remains the owner's decision.
 2. **Secondary motion is slight.** The lantern sways by a pixel, and the coat does not move.
 3. **The stop is abrupt:** the character goes straight from stride to idle.
 4. **Turning mirrors the whole sprite,** so the lantern changes hands and the moonlit edge changes sides.
@@ -93,11 +95,14 @@ None of these blocks the merge. Each stays open until someone decides on it.
 6. **The capsule can overhang the rock's corners.** The drawn surface now matches the collision, but the
    capsule's round bottom can rest up to 4 px past an edge, sinking by up to 1.5 px (2 px once drawn). Art
    cannot fix that without changing the capsule, so a test holds it to this limit.
-7. **The art ends abruptly.** Past x = 640 is a flat backdrop, meeting the cliff at a straight vertical
-   edge. The cleft is only a placeholder way through: the sailor is drawn in front of the rock, including
-   when jumping there.
-8. **My captures use software rendering (llvmpipe).** I have not seen this on a real GPU or your
-   display, and perceived darkness depends on the display.
+7. **The artwork disappears after the cliff opening.** Past x = 640 is unfinished greybox: a flat backdrop,
+   meeting the cliff at a straight vertical edge. The cleft is only a placeholder way through, and the sailor
+   is drawn in front of the rock, including when jumping there. This is the documented boundary, not a finished
+   transition. It stays until the later environments arrive through the planned milestones (M3 layout, then M4
+   and M5 for art and sound), in this accepted style and with no redesign.
+8. **My captures use software rendering (llvmpipe).** I have not seen this on a real GPU or the owner's
+   display, and perceived darkness depends on the display. The owner has seen it on their Windows machine;
+   the GPU and renderer were not recorded.
 
 ## If the sailor doesn't meet the bar later
 

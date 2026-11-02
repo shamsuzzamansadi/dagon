@@ -4,7 +4,8 @@
 reviewer (ChatGPT) on 2026-10-28, after two rounds. No further full
 architecture review is needed unless a material design change emerges. The
 round-2 corrections are applied in `architecture.md`, `roadmap.md`, `gdd.md`
-and `toolchain.md`.
+and `toolchain.md`. **D25 and D26 (§6) are such a change. D26's design is approved
+in principle, with corrections. That is not implementation certification.**
 
 ## 1. Approved decisions
 
@@ -12,9 +13,9 @@ and `toolchain.md`.
 |---|---|---|
 | D1 | Godot 4.7.2 + godot-cpp 10.0.0-stable (`507ed9d`), `api_version=4.7`, `compatibility_minimum="4.7"` | |
 | D2 | Our sources compile as C++20 in a cloned SCons env; godot-cpp stays C++17 | **Conditionally accepted for M1 validation; not certified ABI/ODR-safe in general.** See §3. |
-| D3 | 9 focused GDExtension classes + 3 plain-C++ core modules | Approved as not excessive. Add no further abstractions. |
+| D3 | 9 focused GDExtension classes + 3 plain-C++ core modules | Approved as not excessive. Add no further abstractions. **D26 adds a little** for the owner's usability scope. |
 | D4 | C++ for gameplay and presentation; GDScript only for headless tests | Approved. The iteration-speed cost of C++ UI and camera code is accepted. |
-| D5 | No autoloads or singletons; restart = `reload_current_scene()` | Plus explicit reset of project-modified engine-global state (architecture §7 rule 8). |
+| D5 | No autoloads or singletons; restart = `reload_current_scene()` | Plus explicit reset of project-modified engine-global state (architecture §7 rule 8). Still no singleton under D26. From M3, restart replaces the world under a small session node instead of reloading the scene, and still rebuilds all world state. |
 | D6 | Plain-C++ rules with thin Godot adapters; vendored doctest; hand-rolled headless runner | |
 | D7 | `NodeRef<T>` (an `ObjectID` wrapper) for every stored node reference; node-bound tweens; `callable_mp` | Revised in round 1. |
 | D8 | Editor-wired signals with a wiring test; the Director connects its own `story_triggers` in code | |
@@ -72,15 +73,16 @@ Updated 2026-11-02 at the M1 gate. Evidence: [reviews/m1-review-package.md](revi
 | Item | Status | Evidence so far | Still needed | When |
 |---|---|---|---|---|
 | D2 on MSVC | **Accepted for tested configurations (§3)** | MSVC 19.44.35229 with `/MT` on both sides; debug library loads in the Windows editor and passes tests; release library loads in the exported game. godot-cpp's public headers have no standard-dependent code. Not a general ABI/ODR guarantee. | — | Done for M1 |
-| Desktop export with GDExtension | **Validated headless on both OSes; windowed on Linux (software GL)** | CI run `41412946061`; local windowed run | Owner runs the Windows export on real hardware | M1 gate |
+| Desktop export with GDExtension | **Validated headless on both OSes; windowed on Linux (software GL); launched by the owner on Windows** | CI run `41432275970`; local windowed run; [owner's session](evidence/m1/windows-playtest-2026-11-02-standard-build.md), commit unconfirmed | Confirm which build the owner ran; a human run on Linux | M1 gate |
 | Import-crash workaround | **Provisional** | Crash occurs on a fresh clone of the game (134 ×6); preparation prevented it every time. Root cause unknown. | Upstream report | Open |
 | Headless test reliability | **Partly** | 20/20 local at `7a2f849`, 10/10 at `a9b262c`; 9 consecutive green CI runs with MSVC, only the latest on today's 47 tests | 10 consecutive CI runs on a stable suite | M1–M3 |
 | Teleport contact invalidation | **Validated** | Tests 7f and 7g; mutation check | — | Done |
 | `StepProbe` observation order | **Validated** | Test and mutation check | — | Done |
-| Movement feel, physical input | **Not done** | Synthetic events only | Owner playtest | M1 gate |
+| Movement feel, physical input | **Partly: positive general feedback from the owner** | [Owner's session](evidence/m1/windows-playtest-2026-11-02-standard-build.md); otherwise synthetic events only | Walk and jump by device, each mapping, and a physical gamepad ([package §16](reviews/m1-review-package.md)) | M1 gate |
 | Cinematic re-entrancy contract | Design only | — | M3 regression tests | M3 |
 | Theme fit legibility | Design only | jam.md §4 | M3 playtest question | M3 |
-| Visual quality (GDD §8) | **Art direction accepted by the owner (D19). The GDD §8 checklist is not passed.** | Shore artwork in the standard build, reviewed from captures | Stop, turn and landing animation, sound, UI styling, second display; then the first M4 review | M4 |
+| Visual quality (GDD §8) | **Art direction accepted by the owner (D19). The GDD §8 checklist is not passed.** | Shore artwork in the standard build, reviewed from captures and played by the owner | Stop, turn and landing animation, sound, UI styling, second display; then the first M4 review | M4 |
+| Settings, rebinding, save and restore | Design approved in principle, with corrections (D26). Not built. | Architecture §5 | Implementation, then M2 and M3 exit checks; M6 verification | M2, M3, M6 |
 
 ## 5. Decisions at the Shore integration (2026-11-02)
 
@@ -117,10 +119,71 @@ heard only faintly, if at all, and thins away as the player moves on (GDD §7).
 the character and a smoothed camera rounded to whole pixels separately. `CameraRig` now keeps a whole
 number of pixels from its target unless a scene turns `pixel_lock` off, and the greybox lost its
 position smoothing, so both scenes follow rigidly and only the look-ahead slides. Measurements:
-[evidence/shore/camera-jitter.txt](evidence/shore/camera-jitter.txt).
+[evidence/shore/camera-jitter.txt](evidence/shore/camera-jitter.txt). The owner later reported that the
+camera generally felt fine ([session](evidence/m1/windows-playtest-2026-11-02-standard-build.md)); that
+session's commit is unconfirmed, and jitter was not measured in it.
 
 **D23, later direction.** Correct gameplay, coherent visuals and bug fixes stay the priority. SHIFT is
 carried by the exposed seabed, the player's changing understanding and the turn from exploration to
 escape, with no dimension-switching mechanic ([jam.md](jam.md) §4). The audio palette and its checks
 are in GDD §7, and the 720p and 1080p requirements in the [roadmap](roadmap.md). This changes GDD §7's
 earlier "sea sounds are deliberately absent" to a faint, distant sea that thins away.
+
+## 6. Usability scope (2026-11-02)
+
+Planned only. Requesting these does not accept M1 or start M2.
+
+| ID | Decision | Decided by |
+|---|---|---|
+| D24 | M2 gains a pause menu with Settings, persistent settings and keyboard rebinding | Owner |
+| D25 | **Scope change.** M3 gains a main menu and one persistent checkpoint save slot | Owner |
+| D26 | How that persists without an autoload, and what it adds to the code | Developer's design, **approved in principle with corrections. Not built, not certified.** |
+| D27 | Quitting, the final sequence and the ending | Owner |
+| D28 | What comes first if the schedule is tight | Owner |
+
+**D24, M2 usability.** The pause menu has Resume, Restart Checkpoint, Settings and Quit to Desktop, and
+M3 adds Quit to Main Menu (D27). This replaces the GDD's earlier "resume, restart, quit to title".
+Requirements: [roadmap](roadmap.md).
+
+**D25, the save slot.** GDD §10 excluded saves, and this reverses that deliberately, so that Continue works
+after the application is closed and reopened. It stays small: one slot, restored at the last safe
+checkpoint, with no multiple slots and no saving at an arbitrary position. Player-facing rules: GDD §11.
+
+**D26, design (architecture §5).** Reviewed by the owner with ChatGPT on 2026-11-02, as relayed by the owner.
+The overall design is acceptable in principle: separate settings and progress, plain-C++ validation, stateless
+storage functions, a single restore path, and no singleton. **This is design approval with the corrections
+below, not implementation certification.** Nothing here is built.
+
+- **New Game (correction).** It writes the fresh save first. If that fails, the player stays in the menu with an
+  error and a Retry option. It never transitions through a path that reads the old save.
+- **Two checkpoints (correction).** The active session checkpoint is kept apart from the last successfully
+  persisted one. Restart Checkpoint restores the session checkpoint, even after an autosave failure. Continue after
+  a relaunch restores the last valid disk save. The session checkpoint is a small value owned by a scene,
+  `GameSession`. A scene reload would destroy that value, so restart replaces the world under that node instead.
+- **Backup (correction).** A usable backup survives an interrupted replacement, and recovery never overwrites a
+  valid backup with a corrupt primary file.
+- **Test storage (correction).** Isolation covers every entry point, including scenes that load settings or saves
+  in `_ready`. Each test run has a unique directory, including subprocess tests, and cleanup cannot touch real
+  player files.
+- **Failure paths (correction).** Each behaviour above gets a focused failure-path test when persistence is
+  implemented.
+- **One restore path.** `GameDirector` restores from a checkpoint value it is given. It reads no file, applies C++
+  essential outcomes and never plays a clip, which follows D12.
+- **Additions to D3:** two classes (`SettingsMenu`, `GameSession`), two plain-C++ modules (`save_data`,
+  `settings_data`) and one file of stateless functions (`storage`).
+- **Engine-global state:** `InputMap` joins the list in architecture §7 rule 8, and `reset_global_state()`
+  must keep the player's volumes and bindings.
+
+**D27, quitting and the ending.**
+- M3 adds Quit to Main Menu, once the main menu exists.
+- Quitting during the reveal or escape may resume from the preceding safe checkpoint and replay that unfinished
+  sequence.
+- The last checkpoint stays after the ending. The menu explains that Continue resumes before the final sequence,
+  and does not imply a post-ending world state.
+- Quitting or returning to the main menu makes the checkpoint behaviour clear, and never implies that unsaved
+  progress has been persisted.
+
+**D28, priority.** Gameplay progression, correctness, basic menus, safe checkpoint persistence, readable visuals, and
+essential environmental and story audio come ahead of optional display features and additional decorative polish.
+If the schedule slips, the specific tradeoff is flagged early. Requested key rebinding and save support are never
+removed silently.

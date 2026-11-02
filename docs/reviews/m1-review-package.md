@@ -1,25 +1,27 @@
 # M1 Review Package
 
 **To:** ChatGPT (independent reviewer). **Date:** 2026-11-02.
-**Status: implemented, at the M1 gate, NOT accepted.** Human checks are outstanding (§6).
+**Status: implemented, at the M1 gate, NOT accepted.** **§16 lists exactly what remains.**
 
 **Updated by the Shore integration.** The code you are asked to review is now the current `main`, and
-§15 says what changed since §1–§14 were written. Those sections describe `7a2f849`.
+§15 says what changed since §1–§14 were written. Those sections describe `7a2f849` (CI run
+[41412946061](https://github.com/shamsuzzamansadi/dagon/actions/runs/41412946061)).
 
 - **Repository:** https://github.com/shamsuzzamansadi/dagon
-- **Code commit for review:** `7a2f8493f7e05f1f121a6dfcb82096ba611d7481` (includes the review
-  round 1 corrections, §13).
+- **Code commit for review:** `3301ae08edad7a143c5578e796573c042f6e7f62`, the merge that made the Shore the
+  entry scene. Later commits change only documents.
 - **CI run for that commit, both platforms green:**
-  https://github.com/shamsuzzamansadi/dagon/actions/runs/41412946061
-- A later commit adds only this package, evidence and status documents.
+  https://github.com/shamsuzzamansadi/dagon/actions/runs/41432275970
 
 **Who has verified what:**
 | Result | Who ran it |
 |---|---|
 | Native C++ tests, GCC 13.3: 29 cases, 763 assertions (the suite before §13) | **Independently reproduced by the reviewer** |
 | Native tests at `7a2f849` (38 cases), Godot integration, smoke, exports, Linux and MSVC CI | **Supplied by the developer and CI. Not independently rerun.** |
-| Windows launch and character movement | **Owner, partial** (§6), on an earlier build; commit and input device not confirmed |
-| Movement feel, all mappings, jumping, physical gamepad | **Nobody yet** (§6) |
+| Windows launch and rendered gameplay | **Owner, two sessions** (§6); commit and input device not confirmed for either |
+| General movement and camera feel | **Owner: positive, in general terms** (§6) |
+| Each mapping, walk and jump by device, physical gamepad, a human run on Linux | **Nobody yet** (§16) |
+| Sampled frames of the owner's second recording, and the updated documents | **Reviewer.** Not independent code verification and not a full motion analysis. |
 | Shore integration: code, tests, exports (§15) | **Supplied by the developer and CI. Not independently reviewed or rerun.** |
 | Shore art direction | **Accepted by the owner** from screenshots and a recording of the preview. That is an art decision, not code review or a feel check. |
 
@@ -129,15 +131,29 @@ game running and the character moving through the greybox level.
   follows. The M1 engine capture confirms it, and my M1 frame inspection missed it. Cosmetic. Fixed
   after this package in both scenes (§15).
 
-These are **still not done**, and CI cannot do them:
+**Second session: the owner's run of the standard Windows build (reported 2026-11-02).**
+[Record](../evidence/m1/windows-playtest-2026-11-02-standard-build.md). A launch and a rendered gameplay session
+took place. The owner's words: "I like the illustrated Shore, and the controls/camera generally felt fine during
+this session."
+- **Not inferred from the recording:** the exact artifact and commit, the input device, every mapping, or physical
+  gamepad coverage.
+- **What the reviewer did:** inspected sampled video frames and the updated documents. That is not independent code
+  verification or a full motion analysis.
+- **The developer has not seen this recording,** so nothing is measured from it.
+- **The artwork disappearing after the cliff opening** is the documented boundary between the illustrated Shore and
+  the unfinished greybox, not a new defect.
+
+These are **still not done**, and CI cannot do them (exact list in §16):
 
 | Item | Who | How |
 |---|---|---|
-| **Movement feel:** walk, stop, jump, land, tuning values | Owner | Play either build |
-| **Physical gamepad and keyboard mapping.** Tests only inject synthetic events. | Owner | Same, with a controller |
+| **Walk and jump by device.** General feedback is positive, but not by device. | Owner | Play a named build |
+| **Each keyboard mapping and a physical gamepad.** Tests only inject synthetic events. | Owner | Same, with a controller |
 | Confirm which run the launched Windows artifact came from | Owner | The run page it was downloaded from, or the artifact's name and date |
-| Rendering on a real GPU: launch shown; visual correctness not checked by anyone | Owner | Same build |
+| A human run of the Linux build | Owner | `dagon-linux` |
 | Second display readability | — | M4 |
+
+The owner has now seen the game rendered on their Windows machine. The GPU and renderer were not recorded.
 
 Also open:
 - Integration stability in CI: 9 consecutive green runs with MSVC before the Shore merge (`422ff54` to
@@ -249,7 +265,7 @@ No failures in the final runs.
 
 **Stays at the M1 gate.** M2 and M4 are not started. Remaining before the acceptance decision:
 final technical review (the reviewer has not independently reviewed the updated implementation or
-rerun its tests) and the outstanding human checks (§6).
+rerun its tests) and the outstanding human checks. §16 has the exact list.
 
 ## 15. Shore integration (after §1–§14)
 
@@ -291,12 +307,62 @@ a fixed frame rate, not a real GPU or a real variable frame rate.
 | Fresh clone following the README, Ubuntu 24.04, GCC 13.3.0 | The same checks, all pass; the suite repeated 10 of 10 clean; regenerating the art changes nothing | Developer |
 | Local attempt to export Windows from Linux | Fails: the MSVC library exists only on a Windows runner. Expected (§9, item 3), and the Windows export is proven by CI above. | Developer |
 
-CI reports come from public annotations, as in §3. **Not run by anyone:** this build on real Windows
-hardware, physical input, or a person judging how it feels.
+CI reports come from public annotations, as in §3. At the time of merging, nobody had run this build on real
+Windows hardware or judged how it feels; §6 records the owner's later session. The merge itself, `3301ae0`, is
+green on both platforms in CI run
+[41432275970](https://github.com/shamsuzzamansadi/dagon/actions/runs/41432275970).
 
 **For your judgment:**
-1. Removing the camera's smoothing is the one behaviour change to the M1 greybox. Nobody has judged how
-   it feels.
+1. Removing the camera's smoothing is the one behaviour change to the M1 greybox. The owner's later feedback on the
+   camera is generally positive (§6).
 2. `test_camera_slides_one_way_when_turning` allows 3 px per frame, based on a 2 px peak at `lock_speed` 2.5.
 3. The capsule can rest up to 4 px past the rock's corners, drawn up to 2 px low. I recorded this for M4
    rather than change the capsule.
+
+## 16. Exact remaining M1 acceptance items (2026-11-02)
+
+**M1 is not accepted.** Every criterion in `roadmap.md`, with evidence at `3301ae0`. "Met" below means met on
+evidence supplied by the developer and CI. No review or rerun of this implementation is reported yet (item 1).
+
+| # | Criterion (short) | Status | Evidence |
+|---|---|---|---|
+| 1 | Clean clone, godot-cpp at `507ed9d`, `.gitignore` | Met | Fresh clone at `a9b262c`; same code as `3301ae0` |
+| 2 | Linux debug and release builds | Met | Same clone; CI |
+| 3 | C++20 `static_assert` on GCC and MSVC | Met | `src/register_types.cpp`; CI |
+| 4 | MSVC debug and release builds, `cl` version recorded | Met | CI: 19.44.35229 |
+| 5 | Unit tests on Linux and Windows | Met | CI: 46 cases on both |
+| 6 | Extension load, including MSVC debug and release | Met, as adapted | `check_classes.gd` on debug; release through the exported game's proof line, because official release templates cannot run `--script` (§3) |
+| 7 | Integration tests (a)–(g) | Met | CI: 47 passed on both |
+| 8 | 600 headless frames, no `ERROR:` | Met | CI: Shore and greybox on both |
+| 9 | Prepared clean import, exit 0 | Met | CI; §8. The root cause stays unknown, as accepted in §12 |
+| 10 | Export templates verified; release exports | Met | CI and local. CI verifies SHA-512 on a cache miss only (§11) |
+| **11** | **Human run on Windows and Linux: walk and jump feel responsive on keyboard and physical gamepad** | **Open, partly done** | Items 2–5 below |
+| 12 | CI green on push | Met | CI run 41432275970 |
+| 13 | README clean-checkout instructions | Met | `README.md`; followed on Linux by the fresh clone. There is no recorded hand run of the Windows commands; the criterion only requires them to be there |
+| 14 | Review package prepared | Met | This document |
+
+**What remains, in full:**
+
+| # | Item | Who | Done when |
+|---|---|---|---|
+| 1 | **Final independent technical review** of the code at `3301ae0`, including the §15 judgment items. The reviewer states which checks were rerun and which rely on supplied CI evidence. | Reviewer | Findings are reported and any confirmed defect is fixed |
+| 2 | **Name the build behind the human check:** the session's run or artifact, or a new session from a named run | Owner | A run ID or commit is recorded |
+| 3 | **Keyboard:** say which of A, D, ←, →, Space were used and worked, and whether walking and jumping feel responsive on the keyboard | Owner | Each is recorded as worked, failed or not tried |
+| 4 | **Physical gamepad:** left stick, D-pad and south button work, and walking and jumping feel responsive. **Untested today.** | Owner, with a controller | The same. Without a controller, this needs an explicit owner decision to defer it, recorded as a deferral and never as a pass |
+| 5 | **Linux human run** of `dagon-linux`, recording the renderer and device the run reports. **Untested today.** | Owner | Run and recorded, or explicitly deferred in the same way, never as a pass |
+| 6 | **The acceptance decision** itself, after items 1–5 | Owner, with the reviewer's findings | Recorded in `roadmap.md` |
+
+M2 does not start before item 6.
+
+**Recording the renderer.** Read it from the run, and do not infer it from the environment: a Linux run under WSL is
+not automatically software-rendered. Start the game with `--log-file playtest.log` and find the line containing
+`Using Device`. This was confirmed on a Linux release export. On Windows the same flag is expected to work, and if the
+line is missing, say so rather than guessing. The "software rendering" notes elsewhere in this package are what this
+development machine's logs reported (`llvmpipe`), and describe only those captures.
+
+**Tracked, but not criteria for this gate:**
+- CI streak on a stable suite (M1–M3).
+- The upstream report for the import crash.
+- Second-display readability (M4).
+- The save and settings design (D25, D26) is approved in principle with corrections, and is not built. That says
+  nothing about M1's code.

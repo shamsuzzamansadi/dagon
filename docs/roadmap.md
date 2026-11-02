@@ -16,11 +16,11 @@ starts only after M6 is green, and is time-boxed.
 |---|---|---|---|
 | G0 Start | Nov 1–2 | Theme read and theme-fit note (jam.md §4); owner approves any proposal | Theme fit recorded; no open blocking rule question |
 | M1 Foundation | Nov 2–5 | See "M1 scope" below | M1 acceptance below |
-| M2 Interaction | Nov 6–8 | Interactable, Interactor, StoryTrigger, Hud (prompt, caption, fade), `interact` and `pause` mappings, kill plane and checkpoints, PauseMenu, `reset_global_state` | Integration tests: focus, disabled or freed focus, double press, one-shot, trigger re-arm, respawn, pause → restart |
-| M3 Complete gameplay (greybox) | Nov 9–14 | Full 4-act greybox layout, SequencePuzzle and PuzzleController, StoryProgress and GameDirector with the full cinematic contract, placeholder clips, flee timer, Title and Ending scenes | Start→end greybox playthrough. All M3 regression tests in architecture §8. |
-| M4 Atmosphere | Nov 15–19 | **Final asset-production decision before Nov 15.** **First deliverable: one short playable Shore section near final quality, shown for visual review before the treatment spreads** ([GDD §8](gdd.md)). Its art direction is already accepted (D19); this brings that section to final quality. Then parallax, CanvasModulate, lantern, occluders, fog shader, ambience per act, footsteps, silhouette art through the level | Visual review evidence and acceptance checklist in GDD §8; readability on 2 displays; smoke test clean; frame time checked |
-| M5 Cinematic horror | Nov 20–23 | Dagon silhouette and animation, the `monolith_awaken`, `dagon_reveal` and `collapse` clips, shake, baked audio sweeps, epilogue | Full playthrough with final content; GDD §8 checklist on the reveal; cinematic regression tests still green |
-| M6 Stabilization | Nov 24–27 | Fixes from at least 2 external playtests, timing (10–15 min), performance, release workflow, native runs on Windows and Linux | Release candidate artifacts from CI launched on real Windows and Linux; GDD §8 checklist on every scene |
+| M2 Interaction and usability | Nov 6–8 | Interactable, Interactor, StoryTrigger, Hud (prompt, caption, fade), `interact` and `pause` mappings, kill plane and checkpoints, `reset_global_state`. Pause menu, persistent settings and keyboard rebinding ("M2 usability" below) | Integration tests: focus, disabled or freed focus, double press, one-shot, trigger re-arm, respawn, pause → Restart Checkpoint. M2 usability checks below. |
+| M3 Complete gameplay (greybox) | Nov 9–14 | Full 4-act greybox layout, SequencePuzzle and PuzzleController, StoryProgress and GameDirector with the full cinematic contract, placeholder clips, flee timer, Ending scene. Main menu and one persistent checkpoint save slot, a scope change ("M3 menus and save" below) | Start→end greybox playthrough. All M3 regression tests in architecture §8, including quit, relaunch and Continue. |
+| M4 Atmosphere | Nov 15–19 | **Final asset-production decision before Nov 15.** **First deliverable: one short playable Shore section near final quality, shown for visual review before the treatment spreads** ([GDD §8](gdd.md)). Its art direction is already accepted (D19); this brings that section to final quality. Then later environments in the accepted Shore style, parallax, CanvasModulate, lantern, occluders, fog shader, ambience per act, footsteps and object sounds, silhouette art through the level, and a coherent transition beyond the Shore. Volume settings connected | Visual review evidence and acceptance checklist in GDD §8; readability on 2 displays; smoke test clean; frame time checked; audio heard in gameplay before it is marked complete |
+| M5 Cinematic horror | Nov 20–23 | Dagon silhouette and animation, the `monolith_awaken`, `dagon_reveal` and `collapse` clips, shake, baked audio sweeps, story-trigger cues, epilogue | Full playthrough with final content; GDD §8 checklist on the reveal; cinematic regression tests still green; audio heard in gameplay before it is marked complete |
+| M6 Stabilization | Nov 24–27 | Fixes from at least 2 external playtests, timing (10–15 min), performance, release workflow, native runs on Windows and Linux, usability verification ("M6 verification" below) | Release candidate artifacts from CI launched on real Windows and Linux; GDD §8 checklist on every scene; M6 verification passed |
 | M7 Publication prep | Nov 28–29 | itch page assets, README, CREDITS, licenses, release notes, AI disclosure text (jam.md §5), tag | The owner uploads and submits. **Internal target: submitted by Nov 29 21:37 UTC.** Downloaded build verified on both OSes. |
 | Buffer | Nov 30 – Dec 1 21:37 UTC | Only fixes to upload or packaging problems. No features. | — |
 
@@ -33,23 +33,28 @@ starts only after M6 is green, and is time-boxed.
 
 Never cut the playable loop, readable clues, the reveal, or the export checks.
 
+**Priority (owner, [D28](decisions.md)):** gameplay progression, correctness, basic menus, safe checkpoint
+persistence, readable visuals, and essential environmental and story audio come ahead of optional display features
+and additional decorative polish. If the schedule slips, the specific tradeoff is flagged early. Requested key
+rebinding and save support are never removed silently (risk R20).
+
 ## Status checklist
 
 - [x] Phase A approved (2026-10-28).
 - [x] Repository created and in use: https://github.com/shamsuzzamansadi/dagon
 - [x] G0: theme SHIFT, fit recorded in jam.md §4 (2026-11-02).
-- [ ] **M1 Foundation: implemented; at the M1 review gate. NOT accepted.** Evidence and
-  open items are in [reviews/m1-review-package.md](reviews/m1-review-package.md).
-  Review round 1 findings are addressed (`7a2f849`), the camera jitter is fixed in both scenes,
-  and the standard build now opens the illustrated Shore on the same collision (package §15). The
-  reviewer has not independently reviewed this implementation or rerun its tests. The owner launched
-  an earlier Windows build and recorded partial gameplay; that artifact's commit and the input device
-  are not confirmed. Outstanding before the acceptance decision: final technical review, and the
-  movement-feel, mappings, jumping and physical-gamepad checks.
+- [ ] **M1 Foundation: implemented; at the M1 review gate. NOT accepted.** The exact remaining items
+  are in [package §16](reviews/m1-review-package.md): the final independent technical review, and the
+  parts of criterion 11 that are not yet established. The owner has run the standard Windows build and
+  reported positive general feedback on movement and camera
+  ([record](evidence/m1/windows-playtest-2026-11-02-standard-build.md)). That session's commit, input
+  device, mappings and gamepad coverage are not established, and the reviewer has inspected sampled
+  frames and documents, not the code.
 - [x] **Shore art direction accepted by the owner (2026-11-02) and integrated as the entry scene**
-  ([D19, D20](decisions.md), [shore-preview.md](shore-preview.md)). Areas beyond x = 640 remain greybox.
-  **This is not M4,** and it closes none of the M1 checks above.
-- [ ] M2–M7 not started.
+  ([D19, D20](decisions.md), [shore-preview.md](shore-preview.md)). The art stops at the cliff opening
+  (x = 640), and everything past it is unfinished greybox: a documented boundary, not a finished
+  transition. **This is not M4,** and it closes none of the M1 checks above.
+- [ ] M2–M7 not started. The usability scope below is planned only.
 
 ## Review follow-ups by milestone (Phase A final review, 2026-10-28)
 
@@ -60,23 +65,89 @@ Never cut the playable loop, readable clues, the reveal, or the export checks.
 | M2 | Test Interactor delivery and consumption with `Input.parse_input_event()` and `InputEventAction`. `action_press` covers polled input only. | architecture §8 |
 | M3 | `call_deferred` does not wait for a physics frame. Overlap re-checks wait for a completed physics step (`physics_frames >= recorded + 2`). | architecture §5, GameDirector |
 | M3 | Out-of-bounds during a cinematic is kept as `recovery_pending`, then re-checked after finalization. Regression: entering the kill plane while control is locked. | architecture §5 and §8 |
-| M3–M4 | The art ends at x = 640, at a straight edge of the right cliff, and its cleft is a placeholder way through. Replace both when the layout past the Shore is decided. | [shore-preview.md](shore-preview.md) |
-| M4 | Sailor animation: stop, turn and landing frames, coat motion, and turning that mirrors the lantern to the other hand. The walk reads as brisk at 70 px/s; the speed stays unchanged unless the owner's playtest says otherwise. | [shore-preview.md](shore-preview.md) |
+| M3–M4 | The art ends at x = 640, at a straight edge of the right cliff, and its cleft is a placeholder way through. Replace both as the later environments arrive, in the accepted Shore style. | [shore-preview.md](shore-preview.md) |
+| M4 | Sailor animation: stop, turn and landing frames, coat motion, and turning that mirrors the lantern to the other hand. The walk speed stays unchanged: the owner's general feedback so far is positive. | [shore-preview.md](shore-preview.md) |
 | M4 | Rest of the first M4 deliverable: sound, caption and prompt styling, fog and lantern pass, readability on a second display, and the sailor's size on screen. | GDD §8, [shore-preview.md](shore-preview.md) |
 
 ## Owner direction for later milestones (recorded 2026-11-02, not started)
 
-These do not delay current correctness work. Priority stays on correct gameplay, coherent visuals and
-bug fixes.
+Recording these does not start them: M2 begins only after M1 is accepted. Priority stays on correct
+gameplay, coherent visuals and bug fixes. No new art redesign is requested. Later environments arrive
+through the planned milestones, in the accepted Shore style.
 
-| When | Requirement | Where specified |
-|---|---|---|
-| M3, M5 | At each relevant story beat, carry SHIFT through a visible event and sound, not only documents. No dimension-switching mechanic, no wider scope. | jam.md §4 |
-| M4 | Audio beds and player and object sounds, with a compact event-to-sound list and the mix shown in gameplay. Check loop seams, abrupt transitions, clipping, repeated-trigger stacking and audible cues. | GDD §7 |
-| M5 | Story cues (discovery, puzzle completion, reveal, escape), held to the same checks. | GDD §7 |
-| Usability pass | Display support and volume controls, below. | Below |
+Decisions: [D23–D26](decisions.md). Player-facing rules: [GDD §11](gdd.md). Design: architecture §5.
 
-**Usability pass (in M6, unless the owner moves it). Optional for now.**
+**SHIFT (M3, M5).** At each relevant story beat, carry SHIFT through a visible event and sound, not only
+documents. No dimension-switching mechanic, no wider scope ([jam.md](jam.md) §4).
+
+### M2 usability
+
+- Pause menu: Resume, Restart Checkpoint, Settings, Quit to Desktop. Pausing stops gameplay appropriately
+  while the menu stays responsive.
+- Keyboard and gamepad menu navigation, reliable focus, and a usable Back/Cancel action.
+- Basic persistent settings, saved separately from game progress: music volume, effects volume and key
+  bindings. The volumes are prepared here and connected when audio exists (M4).
+- Keyboard rebinding for gameplay actions. Conflicts are explained, defaults can be restored, and menu
+  navigation and Back cannot be rebound, so nobody can trap themselves.
+
+**Exit checks:**
+- While paused, movement, timers and clips stop and the menu still takes input. Resume continues; Restart
+  Checkpoint returns to the active checkpoint, unpaused.
+- A control always has focus. Leaving Settings returns focus to where it was. One Back press closes one level.
+- Conflicts are explained, no action ends up unbound, a key capture can be cancelled from keyboard or gamepad,
+  defaults restore, and bindings survive a relaunch.
+- Missing or corrupt settings fall back to defaults, with no way to get stuck.
+- Simulated input does not prove physical devices, so the owner checks a real keyboard and controller.
+
+### M3 menus and save
+
+- Main menu: New Game, Continue, Settings, Credits, Quit. It becomes the main scene.
+- The pause menu gains Quit to Main Menu.
+- One persistent checkpoint save slot. Continue restores the last safe checkpoint after the application has
+  been closed and reopened. **This is an intentional scope change: the GDD excluded saves (D25).** No multiple
+  slots, and no saving at an arbitrary position.
+- It saves stable story and puzzle progress and checkpoint identity, not live node references or mid-cutscene
+  state.
+- Completed world outcomes restore correctly, without replaying one-shot events or creating softlocks. An unfinished
+  reveal or escape may replay from the preceding safe checkpoint (D27).
+- Safe file replacement and versioned data. Missing, corrupt or incompatible saves are handled gracefully.
+- New Game confirms before replacing existing progress. The game shows when checkpoint progress has been saved.
+- Restart Checkpoint uses the session checkpoint, and Continue after a relaunch uses the last valid disk save (D26).
+- The last checkpoint stays after the ending, and the menu explains that Continue resumes before the final sequence.
+- Quitting or returning to the main menu makes the checkpoint behaviour clear, and never implies that unsaved progress
+  has been persisted.
+
+**Exit checks,** with focused failure-path tests for each behaviour in [D26](decisions.md):
+- Unit: save data round trip; missing, truncated, corrupt and wrong-version data; beats that may not be saved
+  are refused.
+- For each savable beat: the restored world is correct, no clip or cue replays, consumed triggers stay
+  consumed, and the player can always go on.
+- Two separate processes, in one unique test directory: the first saves and exits, the second Continues.
+- New Game with a failed write stays in the menu with an error and Retry, and the old save is unchanged and unread.
+- After an autosave failure, Restart Checkpoint returns to the session checkpoint, Continue after a relaunch returns to
+  the last valid disk save, and the quit text says so.
+- Every on-disk state an interrupted replacement can leave loads a usable save, and a corrupt primary never overwrites
+  a valid backup.
+- Every scene that reads files in `_ready` uses the test directory, and the real `user://` listing is unchanged by a run.
+- New Game's confirmation defaults to Cancel, Continue is unavailable without a usable save, and a failed write
+  shows no "saved" notice.
+
+### M4 and M5 audio and transition
+
+- Keep the planned original environmental audio and footsteps and object sounds (M4), and story-trigger cues
+  (M5), as in GDD §7.
+- Make the transition beyond the Shore visually and sonically coherent, replacing the documented boundary at
+  the cliff opening.
+- Deliver a compact event-to-sound list and show the mix in gameplay. Check loop seams, abrupt transitions,
+  clipping, repeated-trigger stacking and whether important cues stay audible.
+- Connect the music and effects volume settings prepared in M2.
+- **Audio is not marked complete until a person has heard it in gameplay.** Automated checks cannot do this.
+
+### M6 verification
+
+Verify settings and save persistence, rebinding, menu focus, quit/relaunch/continue, and display usability.
+720p and 1080p presentation stays secondary to correctness and readable visuals.
+
 - **Displays:** ordinary players on 1280×720 and 1920×1080, windowed and fullscreen. Text stays readable
   and nothing clips.
 - **Resolution:** keep the 480×270 canvas and the pixel-art direction unless there is a demonstrated reason
@@ -86,8 +157,6 @@ bug fixes.
   which is the first candidate to test, not a decision.
 - **Not yet checked:** the default 1440×810 window is larger than a 720p screen, and there is no fullscreen
   option yet.
-- **Volume:** separate music and effects controls. `reset_global_state()` (architecture §7 rule 8) is
-  planned to reset bus volumes on every scene transition, so it must learn to keep the player's settings.
 
 ## M1 scope
 

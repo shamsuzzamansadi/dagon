@@ -2,7 +2,8 @@
 
 Status: Phase A approved. Entry for GitHub Game Off 2026, theme **SHIFT**
 (theme-fit assessed 2026-11-02 in [jam.md](jam.md) §4; the concept and scope
-are unchanged).
+are unchanged). **Scope change, 2026-11-02:** a main menu and one checkpoint save slot
+(§11, [D25](decisions.md)).
 
 **How the game expresses SHIFT:**
 - *Physical:* the seabed has been displaced from beneath the ocean, which now lies
@@ -41,7 +42,8 @@ or layouts.
 | Walk     | A/D, ←/→ / left stick, d-pad | Slow, heavy pace (~70 px/s at 480×270).       |
 | Jump     | Space / A (south)           | Low hop for rocks and narrow crevasses only.   |
 | Interact | E / X (west)                | Shown only when a prompt is visible.          |
-| Pause    | Esc / Start                 | Resume, restart, quit to title.               |
+| Pause    | Esc / Start                 | Resume, Restart Checkpoint, Settings, Quit to Desktop; Quit to Main Menu from M3. |
+| Back     | Esc / B (east)              | In menus. Cannot be rebound (§11).            |
 
 The lantern is always on and needs no input or fuel. It gives a warm radius of
 about 90 px against a cold, dark ambient. Interactable props get a faint rim
@@ -58,7 +60,7 @@ checkpoint.
 | I   | The Shore        | 2 min       | Wake on exposed seabed beside the stranded lifeboat. Teaches movement, a jump onto the boulder and the first interaction. Rotting fish on the mud, and the sea only a thin band far beyond the boat: the tide has drawn back unnaturally far and does not return ([D21](decisions.md)). No surf where it should be, only a faint, far-off sea that thins away as the player moves on. |
 | II  | The Exposed Abyss| 4–5 min     | Cracked black mud, fossils of creatures that should not exist, a whale-sized rib arch. Three **clue tablets** (one glyph each, see §5). A crevasse to hop. A distant shape moves once in the far parallax layer and is never mentioned. The ambience slowly loses its high frequencies. |
 | III | The Monolith     | 3–4 min     | A canyon opens and the monolith fills the frame. The camera pulls back on approach. Its mural is partly eroded. Three **glyph stones** at its base form the puzzle. When solved, the inscriptions glow and the mural can be read in full: figures bowing to a vast swimmer. |
-| IV  | The Witness      | 2 min       | The player steps onto the ledge behind the monolith. Control locks. Fog lifts, the camera zooms far out, and something rises from the trench water and embraces the monolith. Control returns and the sailor flees left under screen shake and roaring sound until he collapses. Fade to black, epilogue card, credits, title. |
+| IV  | The Witness      | 2 min       | The player steps onto the ledge behind the monolith. Control locks. Fog lifts, the camera zooms far out, and something rises from the trench water and embraces the monolith. Control returns and the sailor flees left under screen shake and roaring sound until he collapses. Fade to black, epilogue card, credits, main menu. |
 
 There is one ending (MVP). The epilogue text is original and written in the
 first-person, after-the-fact voice of the source.
@@ -160,8 +162,11 @@ game music. Nothing is purchased or commissioned without the owner's approval.
 
 **To deliver at the audio milestones** (M4 for beds and player sounds, M5 for story cues): a compact
 event-to-sound list and a demonstration of the mix in gameplay, checked for loop seams, abrupt
-transitions, clipping, repeated-trigger stacking, and whether important cues stay audible. Separate
-music and effects volume controls arrive by the usability pass (roadmap).
+transitions, clipping, repeated-trigger stacking, and whether important cues stay audible. The
+transition beyond the Shore must also be coherent in sound. Separate music and effects volume settings
+are prepared in M2 and connected when audio exists (§11).
+
+**Audio is not marked complete until a person has heard it in gameplay.**
 
 ## 8. Visual direction and acceptance
 
@@ -201,7 +206,10 @@ pacing from cinematic games, but no assets, compositions or recognizable designs
 **Art direction (2026-11-02).** The owner accepted the Shore's direction ahead of M4
 ([D19](decisions.md)), and it is what the standard build opens. That sets the look. It does
 not complete the deliverable below: stop, turn and landing animation, sound, and caption and
-prompt styling are still to come ([shore-preview.md](shore-preview.md)).
+prompt styling are still to come ([shore-preview.md](shore-preview.md)). The art currently stops at the
+cliff opening, and everything past it is unfinished greybox. Later environments arrive through the planned
+milestones in the same style, with no redesign, and M4 and M5 make that transition coherent in picture and
+sound.
 
 **Prove it before decorating (first M4 deliverable).** One short, playable section of
 the Shore, brought close to final quality, sets the character treatment, terrain and
@@ -245,6 +253,48 @@ treated as finished.
 
 ## 10. Out of scope (post-jam at earliest)
 
-Combat, enemies or monster AI, inventory, saves, dialogue trees, sanity meter,
-multiple characters, procedural levels, custom physics or rendering,
-multiplayer.
+Combat, enemies or monster AI, inventory, multiple save slots, saving at an
+arbitrary position, dialogue trees, sanity meter, multiple characters, procedural
+levels, custom physics or rendering, multiplayer.
+
+## 11. Menus, settings and saving
+
+**Status: planned. The current build has no menus, settings or saves.** Added by the owner on 2026-11-02
+([D24, D25](decisions.md)). Saving is an intentional scope change: this document excluded it before.
+
+| Screen | Options | Milestone |
+|---|---|---|
+| Pause | Resume, Restart Checkpoint, Settings, Quit to Desktop; Quit to Main Menu joins them in M3 | M2 |
+| Settings | Music volume, effects volume, keyboard bindings, Restore Defaults, Back | M2 |
+| Main menu | New Game, Continue, Settings, Credits, Quit | M3 |
+
+**Menus.** Every menu works with keyboard and gamepad, a control always has focus, and Back closes one level.
+Pausing stops gameplay while the menu stays responsive.
+
+**Rebinding.** Keyboard keys for gameplay actions can be changed. If a key is already in use, the game says
+which action has it and lets the player swap or cancel, so no action is left without a key. Restore Defaults is
+always reachable. Menu navigation, Back and the Esc pause key cannot be rebound, so nobody can lock themselves
+out. Gamepad mappings are fixed for the jam.
+
+**Settings** persist between runs and are stored separately from game progress. The volumes do nothing audible
+until audio exists.
+
+**One checkpoint save slot.**
+- Continue restores the last safe checkpoint, including after the application has been closed and reopened.
+- It keeps stable progress only: the story beat, whether the puzzle is solved, and which checkpoint. It never
+  keeps a position between checkpoints or a moment inside a cutscene, and an unfinished puzzle attempt is not
+  kept.
+- What the player has completed stays completed. A solved puzzle stays solved, an open gate stays open, and
+  one-shot events do not replay. Pillar 3 applies: restoring can never leave the player stuck.
+- Restart Checkpoint returns to the latest checkpoint reached this session, even if it could not be written to disk.
+  Continue after a relaunch uses the last valid save on disk.
+- Quitting during the reveal or escape resumes from the checkpoint before it, and that unfinished sequence replays.
+- The last checkpoint stays after the ending. The menu explains that Continue resumes before the final sequence. It
+  never implies a world after the ending.
+- A brief notice shows when checkpoint progress has actually been saved.
+- Quit to Desktop and Quit to Main Menu say plainly what Continue will resume from. They never imply that unsaved
+  progress has been kept, and they say so if the latest checkpoint could not be saved.
+- A missing, corrupt or incompatible save is explained and never crashes the game. Continue is simply
+  unavailable.
+- New Game asks for confirmation before replacing existing progress. If the fresh save cannot be written, the player
+  stays in the menu with an error and Retry. The old save is never loaded instead.

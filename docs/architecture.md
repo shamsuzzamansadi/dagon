@@ -4,7 +4,9 @@ Status: Phase A, **conditionally approved** by the independent reviewer
 (2026-10-28). The round-2 corrections are applied below. Approved decisions
 and the remaining validation are tracked in [decisions.md](decisions.md).
 Toolchain: see
-[toolchain.md](toolchain.md).
+[toolchain.md](toolchain.md). The menu, settings and save design in §5 ([D26](decisions.md))
+came after that approval. It is **approved in principle with corrections, which are included below, and it
+is not built**.
 
 ## 1. Principles
 
@@ -14,7 +16,9 @@ Toolchain: see
    behaviour Godot does not have.
 2. **State lives in the level scene.** There are no autoloads and no
    singletons. Restart is `SceneTree::reload_current_scene()`, which rebuilds
-   every piece of state from scratch.
+   every piece of state from scratch. From M3, restart replaces the world under a small
+   session node instead, which rebuilds it the same way (§5, GameSession). The only state that
+   outlives a scene or the application is in two files, settings and one save slot (§5, Persistence).
 3. **Wiring happens in the editor.** References are exported node properties.
    Events are Godot signals connected in the `.tscn`. No event bus, no
    hard-coded scene paths in C++.
@@ -36,10 +40,12 @@ Toolchain: see
 ┌──────────────▼─────────────────────────────────────────────────────────┐
 │ PlayerController  Interactor  Interactable  StoryTrigger               │
 │ PuzzleController  GameDirector  CameraRig  Hud  MenuController         │
+│ SettingsMenu  GameSession  + stateless functions: storage              │
 └──────────────┬─────────────────────────────────────────────────────────┘
                │ plain C++20, no godot-cpp (src/core/)
 ┌──────────────▼─────────────────────────────────────────────────────────┐
 │ movement.hpp (step function) · sequence_puzzle.hpp · story_progress.hpp│
+│ save_data.hpp · settings_data.hpp                                      │
 └────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -52,6 +58,7 @@ Toolchain: see
 | PuzzleController | **PuzzleController** | Same, with the logic in `core::SequencePuzzle`. |
 | GameDirector | **GameDirector** | Same. It is kept narrow: story beats, input lock, and the cinematics it starts. It does not drive the camera, UI, audio or puzzle internals. |
 | — | **CameraRig**, **Hud**, **MenuController** | Presentation code that would otherwise be GDScript (see D4). If D4 is rejected, these three move to GDScript and the C++ count drops to 6. |
+| — | **SettingsMenu**, **GameSession** | Added after Phase A for the owner's usability scope ([D26](decisions.md)), making 11 classes. Rebinding has enough states to stay out of MenuController, and the session checkpoint has to outlive the world it restores. |
 
 ## 4. Scene trees
 
@@ -112,8 +119,12 @@ Level                       Node2D
 └── PauseMenu               CanvasLayer (process_mode = Always) + MenuController
 ```
 
-`title.tscn` and `ending.tscn` are separate small scenes. Each is a `Control`
-with a `MenuController`. Flow: Title → Level → Ending → Title. The ending scene
+`title.tscn` (the main menu, and the main scene from M3) and `ending.tscn` are
+separate small scenes. Each is a `Control` with a `MenuController`. Flow: Main menu →
+Game → Ending → Main menu. From M3, `game.tscn` holds a `GameSession` with the level as its
+world, and the `PauseMenu` moves up beside it, so the menu survives a restart. The pause menu quits to the
+desktop in M2, and to the main menu as well from M3.
+`settings_menu.tscn` is instanced by both the pause menu and the main menu. The ending scene
 is assigned to `GameDirector.ending_scene` as a `PackedScene`. No scene path
 is hard-coded in C++.
 
@@ -369,13 +380,134 @@ This is a guard plus one deferred step, not an event framework.
 
 ### MenuController : Control
 - `mode` = Title | Pause | Ending.
-- Bound methods for Button `pressed`: `start_game`, `resume`, `restart`,
-  `quit_to_title`, `quit_game`.
-- In Pause mode it toggles `SceneTree.paused` on the `pause` action and grabs
-  focus for gamepad navigation.
-- Every scene transition (`start_game`, `restart`, `quit_to_title`, and the
-  Director's ending) first calls `dagon::reset_global_state()` (review finding
-  4). See §7 rule 8.
+- Bound methods for Button `pressed`: `new_game`, `continue_game`, `resume`,
+  `restart_checkpoint`, `open_settings`, `open_credits`, `quit_to_main_menu` (from M3),
+  `quit_game`, `back`.
+- In Pause mode it toggles `SceneTree.paused` on the `pause` action. Its
+  `process_mode` is Always, so the menu stays responsive while movement, timers and clips
+  stop.
+- **Focus:** a control always has focus while a menu is open, for keyboard and gamepad.
+  Returning from a submenu gives focus back to the control that opened it.
+- **Back** (`ui_cancel`: Esc, gamepad east) closes one level, and the input is marked
+  as handled so that one press cannot do two things. At the pause root it resumes. At the main menu
+  root it does nothing, so nobody quits by accident. In a confirmation it cancels.
+- **Restart Checkpoint:** in M2 it teleports the player to the active checkpoint and unpauses,
+  because there is no other state to restore yet. From M3 it asks `GameSession` to rebuild the world
+  at the session checkpoint.
+- **Quitting** states what will happen (see Persistence), from the pause menu, in both forms.
+- `_ready` applies the saved settings, so they take effect before the player can act.
+- Every scene transition (`new_game`, `continue_game`, `quit_to_main_menu`, and
+  the Director's ending) and `restart_checkpoint` from M3 first call
+  `dagon::reset_global_state()` (review finding 4). See §7 rule 8.
+
+### SettingsMenu : Control (M2)
+- Music volume, effects volume, keyboard bindings, Restore Defaults, Back. The volumes are stored
+  and set on the `Music` and `Effects` buses, and do nothing audible until audio exists.
+- **Rebindable:** keyboard keys for `move_left`, `move_right`, `jump` and `interact`. Gamepad
+  mappings are fixed for the jam.
+- **No way to get trapped:** the `ui_*` actions and `pause` cannot be rebound, so menu navigation
+  and Back always work, whatever the gameplay bindings are.
+- **Capture:** the next key press becomes the binding. Esc or gamepad Back cancels with no change, and Esc
+  cannot be bound. While capturing, the menu consumes all input.
+- **Conflicts:** the row explains which action already has the key and offers Swap or Cancel, so no
+  action can end up without a key.
+- Restore Defaults can always be reached from keyboard and gamepad.
+
+### GameSession : Node (M3)
+The root of `game.tscn`. Its children are the world, an instance of the level from an exported `PackedScene`, and the
+`PauseMenu`.
+- **It owns one small value, the session checkpoint:** the latest safe checkpoint reached this session, as a
+  `core::SaveData` value with no node references. It also remembers what was last written to disk. No singleton is
+  needed, because this lives and dies with the scene.
+- `GameDirector` emits `checkpoint_reached` once a beat has finalized. The session updates its checkpoint first and
+  then tries the write, so a failed write cannot lose it.
+- **Restart Checkpoint** frees the world, instantiates a fresh one and gives it the session checkpoint. It reads no
+  file, so it works after a failed autosave. A scene reload would destroy the value, so it is not used here, but every
+  piece of world state is still rebuilt from scratch, as D5 intends.
+- It starts from a value the main menu sets on the new instance, passed with `change_scene_to_node`. With none, as
+  when a developer runs the scene directly, it starts at Shore. It never reads the save.
+
+### Persistence (settings in M2, save in M3)
+
+Settings and progress are separate files, so replacing or losing one never affects the other.
+
+| File | Holds | Written |
+|---|---|---|
+| `settings.cfg` | Version, volumes, keyboard bindings | When the player changes a setting |
+| `save.dat` | Version, story beat, checkpoint id | At a safe checkpoint |
+
+**No autoload.** `storage` is a file of stateless functions. Every path starts from one function,
+`storage_root()`, which returns `user://` unless `DAGON_STORAGE_DIR` is set (§8, test storage). Parsing, validation and
+serialization are plain C++ in `core::settings_data` and `core::save_data`, so they are unit-tested without Godot.
+
+**Two different checkpoints:**
+
+| | Session checkpoint | Last persisted save |
+|---|---|---|
+| Lives in | `GameSession`, in memory | `save.dat`, or `save.bak` |
+| Updated | Whenever a safe checkpoint is reached | When a write succeeds |
+| Used by | Restart Checkpoint | Continue after a relaunch |
+
+They differ only after a failed write, and the next checkpoint tries again.
+
+**What can be saved.** Only stable progress: never a node reference, a position between checkpoints or clip
+state. The checkpoint id is the stable name of its `Marker2D`, and must be the one that belongs to the beat.
+
+| Beat | Saved? | Continue restores |
+|---|---|---|
+| Shore | Yes, by New Game | Checkpoint 0 |
+| Abyss | Yes | Checkpoint 1, with `enter_abyss` consumed |
+| Monolith | Yes | Checkpoint 2, with `reach_monolith` also consumed |
+| Awakened | Yes, once `monolith_awaken` has finalized | Checkpoint 3, with the puzzle solved, stones lit, the mural's second caption and the gate open |
+| Witness, Fleeing, Ended | Never | The Awakened save. An unfinished reveal or escape replays ([D27](decisions.md)). |
+
+- A save is written only with no active cinematic and with control enabled. Closing during a cinematic
+  returns to the previous checkpoint.
+- A solved puzzle follows from the beat, and a partial attempt is not kept. Any one-shot outcome must follow from
+  the beat too, or the format gains a field and a new version.
+- The Awakened save stays after the ending. Whenever the save's beat is Awakened, the main menu says Continue resumes
+  before the final sequence. No "finished" state exists, so nothing implies a post-ending world.
+
+**The one restore path.** `GameDirector` is given a checkpoint value before it enters the tree, and reads no file. In
+`_ready`:
+1. `StoryProgress::restore(beat)`, which accepts savable beats only.
+2. Apply each reached beat's essential outcome, idempotently as in D12, and consume its trigger. **No clip or
+   cue plays.** Atmosphere is set to that beat's end state.
+3. `player.teleport(checkpoint)`. The existing physics-fresh overlap check then runs as usual.
+
+| Action | Where the checkpoint value comes from | Reads the save? |
+|---|---|---|
+| New Game | A fresh Shore value, once a fresh save has been written | No |
+| Continue | What the main menu already loaded and validated | Main menu only |
+| Restart Checkpoint | The session checkpoint | No |
+
+**New Game** writes the fresh save first, after its confirmation. The scene changes only if that succeeds. If it fails,
+the player stays in the menu with an error and a Retry option, and the old save is neither changed nor read.
+
+**Safe replacement.** Once a save exists, at least one valid file is on disk at every moment:
+1. Write `save.tmp`, close it, read it back and validate it. On failure, stop: nothing else has changed.
+2. If `save.dat` is valid, copy it to `save.bak.tmp`, validate that, and move it over `save.bak`. **If `save.dat` is
+   corrupt, leave `save.bak` alone,** so a corrupt primary never overwrites a valid backup.
+3. Move `save.tmp` over `save.dat`.
+
+Loading tries `save.dat`, then `save.bak`, and never changes a file. Leftover temporary files are ignored. The Hud
+shows its "saved" notice only after step 3. Rename behaviour on Windows is tested, not assumed.
+
+**Quitting says what will happen.** Quit to Desktop and Quit to Main Menu confirm, after retrying a failed write once:
+- Latest checkpoint saved: Continue resumes from the last saved checkpoint, and anything since then is not kept.
+- Latest checkpoint not saved: it could not be saved, and Continue resumes from the earlier save, or there is no save.
+
+Closing the window shows no dialog, and the save on disk stands.
+
+| Situation | Behaviour |
+|---|---|
+| No save | Continue unavailable; New Game asks nothing |
+| Corrupt or truncated, usable backup | Continue uses the backup; neither file changes until the next save |
+| Corrupt, no usable backup | Explained; Continue unavailable; New Game asks first; the file stays until it is replaced |
+| Other version | Explained as incompatible, then the same. No migration during the jam. |
+| Autosave fails | No "saved" notice, a short message, and play continues. Restart Checkpoint still uses the session checkpoint. |
+| New Game's write fails | Stays in the menu with an error and Retry; no scene change |
+| Missing or invalid settings | Defaults for whatever is invalid |
 
 ### Plain-C++ core (`src/core/`, no Godot headers)
 - `movement.hpp/.cpp`: `MoveParams`, `MoveState` (timers and flags only, no
@@ -388,7 +520,11 @@ This is a guard plus one deferred step, not an event framework.
   `submit(id, now)` returning `Accepted | Rejected | Solved | Ignored`.
   Time is passed in, so tests need no clock.
 - `story_progress.hpp/.cpp`: `StoryProgress`, with `enum class Beat`,
-  `enum class Event`, and `std::optional<Beat> apply(Event)`.
+  `enum class Event`, `std::optional<Beat> apply(Event)`, and a `restore(Beat)` that accepts
+  savable beats only.
+- `save_data.hpp/.cpp` and `settings_data.hpp/.cpp`: versioned text formats. `parse` reports Ok, Corrupt or
+  Incompatible, and validation refuses unknown beats, mismatched checkpoints, reserved keys, duplicate
+  keys and actions with no key.
 
 ## 6. Signal and wiring map
 
@@ -400,6 +536,7 @@ PuzzleController.solved ──────────► GameDirector.on_puzzle
 StoryTrigger.triggered(id) ───────► GameDirector (connected in code, _ready, from story_triggers)
 Cinematics.animation_finished ────► GameDirector (connected in code, _ready)
 PlayerController.footstep ────────► Footsteps.play
+GameDirector.checkpoint_reached ──► GameSession (connected in code when it creates the world, M3)
 ```
 
 The ending no longer depends on `Hud.fade_finished`. The fade is part of the
@@ -418,7 +555,8 @@ silently.
 
 1. **Nodes are owned by the scene tree.** C++ never `delete`s a node. `memnew`
    is used only when the result is immediately `add_child`'d. We do not expect
-   to need runtime node creation in the MVP.
+   to need runtime node creation in the MVP, apart from `GameSession` instancing the
+   world from a `PackedScene`.
 2. **Resources and other `RefCounted` objects are always held in `Ref<T>`**
    (RAII). `Tween`s live in a `Ref<Tween>` member and are `kill()`ed before
    being replaced.
@@ -437,7 +575,7 @@ silently.
    disconnects them automatically when either object is freed. No manual
    bookkeeping.
 5. **No static mutable state** in extension code. Every piece of state belongs
-   to a node instance, which is what makes restart via scene reload correct.
+   to a node instance, which is what makes a restart from a fresh instance correct.
 6. **No exceptions.** godot-cpp builds with exceptions disabled by default.
    Errors use `ERR_FAIL_*` macros or `push_error`, and the game continues in a
    degraded state where possible.
@@ -449,9 +587,11 @@ silently.
    - AudioServer bus volume, mute and effect parameters
    - `Input` mouse mode
    - `Engine.time_scale`
+   - `InputMap` keyboard bindings (M2)
 
    Rules:
-   - `dagon::reset_global_state()` restores all of it to project defaults.
+   - `dagon::reset_global_state()` restores all of it to project defaults, then re-applies
+     the player's saved volumes and key bindings, so a scene transition never loses them.
    - It runs before every scene transition, and again (with a debug-build
      warning if anything was dirty) in `GameDirector::_ready`.
    - Rule for presentation: clips must not mutate AudioServer. Low-pass
@@ -462,12 +602,12 @@ silently.
 
 | Level | What | How | Runs in |
 |---|---|---|---|
-| Unit | `core::step`, `SequencePuzzle`, `StoryProgress` | doctest, native binary (`scons unit_tests`) | CI Linux + Windows |
-| Extension load | All 9 classes registered, with key methods and signals bound | `godot --headless --script res://tests/check_classes.gd` | CI Linux |
-| Integration | M1: spawn and land; walk distance; jump arc; wall stop; teleport contact invalidation (roadmap M1 7f). M2: focus gained and lost; focused object disabled or freed → focus cleared, no crash; double press → 1 event; Interactable `one_shot`. M3: puzzle right, wrong, repeated press and reset; trigger re-entry → 1 beat; **outbound crossing of `collapse` → not consumed, fires later in Fleeing**; player already inside the awaited trigger at beat entry → fires; cinematic lock and unlock; **missing clip, looping clip and watchdog timeout → gate open, camera restored, correct control state, `RevealDone` raised once**; **already-overlapping next trigger during finalization → next cinematic keeps its lock and camera**; **duplicate completion/finalization → outcome applied once**; **stale completion (older generation) → no effect on the newer cinematic**; **entering the kill plane while control is locked → recovered after finalization**; flee timeout → Ended; pause → restart and pause → title → start → unpaused; reload resets state; wiring check | Hand-rolled headless SceneTree runner (~80 lines, no GUT); rules below | CI Linux |
+| Unit | `core::step`, `SequencePuzzle`, `StoryProgress`, `save_data`, `settings_data` | doctest, native binary (`scons unit_tests`) | CI Linux + Windows |
+| Extension load | All 11 classes registered, with key methods and signals bound | `godot --headless --script res://tests/check_classes.gd` | CI Linux |
+| Integration | M1: spawn and land; walk distance; jump arc; wall stop; teleport contact invalidation (roadmap M1 7f). M2: focus gained and lost; focused object disabled or freed → focus cleared, no crash; double press → 1 event; Interactable `one_shot`; pausing stops gameplay and the menu still responds; focus and one-level Back; rebinding conflicts, capture cancel, defaults, persistence, corrupt settings. M3: puzzle right, wrong, repeated press and reset; trigger re-entry → 1 beat; **outbound crossing of `collapse` → not consumed, fires later in Fleeing**; player already inside the awaited trigger at beat entry → fires; cinematic lock and unlock; **missing clip, looping clip and watchdog timeout → gate open, camera restored, correct control state, `RevealDone` raised once**; **already-overlapping next trigger during finalization → next cinematic keeps its lock and camera**; **duplicate completion/finalization → outcome applied once**; **stale completion (older generation) → no effect on the newer cinematic**; **entering the kill plane while control is locked → recovered after finalization**; flee timeout → Ended; pause → Restart Checkpoint → unpaused; pause → Quit to Main Menu → New Game → unpaused; ending → main menu → New Game → unpaused; restart resets state; **save and restore at each savable beat: correct world, no clip or cue replayed, consumed triggers stay consumed, never stuck**; **saving refused during a cinematic**; **save written by one process and continued by another, in the same unique test directory**; **New Game with a failed write → stays in the menu, old save unchanged and unread**; **autosave failure → Restart Checkpoint returns to the session checkpoint, Continue after a relaunch to the last valid disk save, and the quit text says so**; **every on-disk state an interrupted replacement can leave → a usable save loads, and a corrupt primary never overwrites a valid backup**; **every scene that reads files in `_ready` uses the test directory**; missing, corrupt and incompatible saves; New Game confirmation; Continue's text for an Awakened save; wiring check | Hand-rolled headless SceneTree runner (~80 lines, no GUT); rules below | CI Linux |
 | Smoke | Main scene and greybox scene each run 600 frames with no `ERROR:` lines | `--headless --quit-after 600` piped through grep | CI Linux and Windows |
 | Export | Linux and Windows release exports build. The Linux export runs `--quit-after 300` with exit 0 and no errors. | `--export-release` | CI Linux (export); Windows run is manual or on a Windows runner |
-| Manual | Feel, readability, pacing, audio mix, a full playthrough on Windows and Linux | Checklist per milestone | Human |
+| Manual | Feel, readability, pacing, a full playthrough on Windows and Linux, menus and rebinding on a physical keyboard and controller, quit and relaunch, and audio, which is not complete until a person has heard it in gameplay | Checklist per milestone | Human |
 
 Reports always state which of these levels actually ran.
 
@@ -501,6 +641,16 @@ Reports always state which of these levels actually ran.
     not exercise the event callback path.
 - **Isolation:** at the end of each test (pass or fail), release every action
   in the project's InputMap, then reload the scene or reset the fixture.
+- **Test storage is isolated at every entry point,** because `user://` is shared with the real game on the same
+  machine.
+  - Every path comes from `storage_root()`, so scenes that read files in `_ready` are covered too.
+  - `tools/run_godot_checks.sh` and `tools/export_check.sh` create one unique directory per run, named `dagon-test-*`
+    and outside `user://`. They set `DAGON_STORAGE_DIR` for every Godot process they start, including
+    subprocess tests and smoke runs. Each test uses its own subdirectory.
+  - The test runner refuses to start without that directory.
+  - Cleanup deletes only inside a path it has checked is this run's directory, and never through `user://`. A check
+    compares the listing of the real `user://` before and after a run.
+  - Rebinding tests restore the InputMap.
 - **Assertions use tolerances** (positions ±2 px, velocities ±1 %) and
   **bounded waits**: `wait_until(cond, max_frames)` fails with a message
   instead of hanging.
@@ -549,7 +699,8 @@ dagon/
 │   ├── register_types.{hpp,cpp}
 │   ├── player_controller.{hpp,cpp}  interactor.*  interactable.*  story_trigger.*
 │   ├── puzzle_controller.*  game_director.*  camera_rig.*  hud.*  menu_controller.*
-│   └── core/  movement.*  sequence_puzzle.*  story_progress.*
+│   ├── settings_menu.*  game_session.*  storage.*
+│   └── core/  movement.*  sequence_puzzle.*  story_progress.*  save_data.*  settings_data.*
 ├── tests/unit/             # doctest.h (vendored v2.5.3) + test_*.cpp
 ├── project/
 │   ├── project.godot  export_presets.cfg
