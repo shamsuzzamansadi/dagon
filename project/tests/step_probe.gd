@@ -16,6 +16,8 @@ signal processed
 func _init() -> void:
 	process_physics_priority = 1000
 	process_priority = 1000
+	# Tests of the pause menu keep stepping while the game is paused.
+	process_mode = Node.PROCESS_MODE_ALWAYS
 
 
 func _physics_process(_delta: float) -> void:

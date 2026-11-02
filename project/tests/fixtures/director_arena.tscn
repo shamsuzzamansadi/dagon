@@ -1,0 +1,56 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://tests/fixtures/movement_arena.tscn" id="1_arena"]
+
+[sub_resource type="RectangleShape2D" id="trigger_shape"]
+size = Vector2(10, 60)
+
+[sub_resource type="RectangleShape2D" id="kill_shape"]
+size = Vector2(2000, 100)
+
+[node name="DirectorArena" instance=ExtResource("1_arena")]
+
+[node name="TriggerA" type="StoryTrigger" parent="."]
+position = Vector2(300, -30)
+collision_layer = 8
+collision_mask = 2
+monitorable = false
+trigger_id = &"a"
+
+[node name="Shape" type="CollisionShape2D" parent="TriggerA"]
+shape = SubResource("trigger_shape")
+
+[node name="TriggerB" type="StoryTrigger" parent="."]
+position = Vector2(500, -30)
+collision_layer = 8
+collision_mask = 2
+monitorable = false
+trigger_id = &"b"
+
+[node name="Shape" type="CollisionShape2D" parent="TriggerB"]
+shape = SubResource("trigger_shape")
+
+[node name="KillPlane" type="StoryTrigger" parent="."]
+position = Vector2(500, 200)
+collision_layer = 8
+collision_mask = 2
+monitorable = false
+trigger_id = &"out_of_bounds"
+
+[node name="Shape" type="CollisionShape2D" parent="KillPlane"]
+shape = SubResource("kill_shape")
+
+[node name="Checkpoint0" type="Marker2D" parent="."]
+position = Vector2(100, -2)
+
+[node name="Checkpoint1" type="Marker2D" parent="."]
+position = Vector2(350, -2)
+
+[node name="Checkpoint2" type="Marker2D" parent="."]
+position = Vector2(550, -2)
+
+[node name="GameDirector" type="GameDirector" parent="."]
+player_path = NodePath("../Player")
+kill_plane_path = NodePath("../KillPlane")
+checkpoints = [NodePath("../Checkpoint0"), NodePath("../Checkpoint1"), NodePath("../Checkpoint2")]
+story_triggers = [NodePath("../TriggerA"), NodePath("../TriggerB")]

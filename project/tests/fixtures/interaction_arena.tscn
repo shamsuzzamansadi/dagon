@@ -1,0 +1,50 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://tests/fixtures/movement_arena.tscn" id="1_arena"]
+
+[sub_resource type="RectangleShape2D" id="thing_shape"]
+size = Vector2(10, 10)
+
+[node name="InteractionArena" instance=ExtResource("1_arena")]
+
+[node name="Near" type="Interactable" parent="."]
+position = Vector2(230, -12)
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+interaction_id = &"near"
+caption = "Near"
+
+[node name="Shape" type="CollisionShape2D" parent="Near"]
+shape = SubResource("thing_shape")
+
+[node name="First" type="Interactable" parent="."]
+position = Vector2(400, -12)
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+interaction_id = &"first"
+
+[node name="Shape" type="CollisionShape2D" parent="First"]
+shape = SubResource("thing_shape")
+
+[node name="Second" type="Interactable" parent="."]
+position = Vector2(430, -12)
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+interaction_id = &"second"
+
+[node name="Shape" type="CollisionShape2D" parent="Second"]
+shape = SubResource("thing_shape")
+
+[node name="Once" type="Interactable" parent="."]
+position = Vector2(600, -12)
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+interaction_id = &"once"
+one_shot = true
+
+[node name="Shape" type="CollisionShape2D" parent="Once"]
+shape = SubResource("thing_shape")

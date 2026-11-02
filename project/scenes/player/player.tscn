@@ -1,8 +1,11 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [sub_resource type="CapsuleShape2D" id="body_shape"]
 radius = 6.0
 height = 24.0
+
+[sub_resource type="CircleShape2D" id="interact_shape"]
+radius = 24.0
 
 [node name="Player" type="PlayerController"]
 collision_layer = 2
@@ -24,3 +27,12 @@ polygon = PackedVector2Array(-5, 0, -5, -14, -6, -18, -3, -22, 0, -24, 3, -22, 6
 [node name="LanternMarker" type="Polygon2D" parent="Visual"]
 color = Color(0.95, 0.72, 0.3, 1)
 polygon = PackedVector2Array(6, -12, 10, -12, 10, -7, 6, -7)
+
+[node name="Interactor" type="Interactor" parent="."]
+position = Vector2(0, -12)
+collision_layer = 0
+collision_mask = 4
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Interactor"]
+shape = SubResource("interact_shape")

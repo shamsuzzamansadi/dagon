@@ -11,6 +11,7 @@ logs="${1:-$root/build/logs/godot}"
 mkdir -p "$logs"
 logs="$(cd "$logs" && pwd)"
 failures=0
+. "$root/tools/test_storage.sh"
 
 # step <name> <required-stdout-pattern or ""> <args...>
 step() {

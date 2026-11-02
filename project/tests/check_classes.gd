@@ -15,6 +15,48 @@ const EXPECTED := {
 		"methods": [],
 		"signals": [],
 	},
+	"Interactable": {
+		"base": "Area2D",
+		"properties": ["interaction_id", "prompt", "caption", "one_shot", "enabled", "cooldown"],
+		"methods": ["try_interact", "is_available"],
+		"signals": ["interacted"],
+	},
+	"Interactor": {
+		"base": "Area2D",
+		"properties": ["action_interact"],
+		"methods": ["get_focus"],
+		"signals": ["focus_changed", "interacted"],
+	},
+	"StoryTrigger": {
+		"base": "Area2D",
+		"properties": ["trigger_id", "enabled"],
+		"methods": ["is_player_inside"],
+		"signals": ["triggered"],
+	},
+	"Hud": {
+		"base": "CanvasLayer",
+		"properties": ["prompt_label_path", "caption_label_path", "fade_rect_path", "caption_hold_seconds"],
+		"methods": ["on_focus_changed", "on_interacted", "show_caption", "hide_caption", "fade_to_black", "fade_from_black"],
+		"signals": ["fade_finished"],
+	},
+	"GameDirector": {
+		"base": "Node",
+		"properties": ["player_path", "hud_path", "kill_plane_path", "checkpoints", "story_triggers"],
+		"methods": ["restart_checkpoint", "get_active_checkpoint"],
+		"signals": ["checkpoint_reached", "player_respawned"],
+	},
+	"MenuController": {
+		"base": "Control",
+		"properties": ["director_path", "main_panel_path", "quit_panel_path", "settings_menu_path", "resume_button_path", "settings_button_path", "quit_button_path", "quit_cancel_button_path"],
+		"methods": ["is_open", "open", "resume", "restart_checkpoint", "open_settings", "ask_quit", "cancel_quit", "confirm_quit", "back"],
+		"signals": [],
+	},
+	"SettingsMenu": {
+		"base": "Control",
+		"properties": ["music_slider_path", "effects_slider_path", "key_button_paths", "message_label_path", "conflict_row_path", "swap_button_path"],
+		"methods": ["open", "back", "begin_capture", "swap_conflict", "cancel_conflict", "restore_defaults", "set_music_volume", "set_effects_volume", "is_capturing", "has_conflict"],
+		"signals": ["closed"],
+	},
 }
 
 

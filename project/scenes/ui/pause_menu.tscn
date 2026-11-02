@@ -1,0 +1,106 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Theme" path="res://assets/ui/theme.tres" id="theme"]
+[ext_resource type="PackedScene" path="res://scenes/ui/settings_menu.tscn" id="1_settings"]
+
+[node name="PauseMenu" type="MenuController"]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("theme")
+main_panel_path = NodePath("Center/Main")
+quit_panel_path = NodePath("Center/QuitConfirm")
+settings_menu_path = NodePath("Settings")
+resume_button_path = NodePath("Center/Main/Items/Resume")
+settings_button_path = NodePath("Center/Main/Items/Settings")
+quit_button_path = NodePath("Center/Main/Items/Quit")
+quit_cancel_button_path = NodePath("Center/QuitConfirm/Items/Buttons/Cancel")
+
+[node name="Dim" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.0392, 0.0549, 0.0941, 0.6)
+
+[node name="Center" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Main" type="PanelContainer" parent="Center"]
+layout_mode = 2
+
+[node name="Items" type="VBoxContainer" parent="Center/Main"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Center/Main/Items"]
+layout_mode = 2
+text = "Paused"
+horizontal_alignment = 1
+
+[node name="Resume" type="Button" parent="Center/Main/Items"]
+custom_minimum_size = Vector2(130, 0)
+layout_mode = 2
+text = "Resume"
+
+[node name="RestartCheckpoint" type="Button" parent="Center/Main/Items"]
+layout_mode = 2
+text = "Restart Checkpoint"
+
+[node name="Settings" type="Button" parent="Center/Main/Items"]
+layout_mode = 2
+text = "Settings"
+
+[node name="Quit" type="Button" parent="Center/Main/Items"]
+layout_mode = 2
+text = "Quit to Desktop"
+
+[node name="QuitConfirm" type="PanelContainer" parent="Center"]
+visible = false
+layout_mode = 2
+
+[node name="Items" type="VBoxContainer" parent="Center/QuitConfirm"]
+layout_mode = 2
+
+[node name="Message" type="Label" parent="Center/QuitConfirm/Items"]
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+text = "Quit to desktop? This version does not save your progress. Your settings are kept."
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Buttons" type="HBoxContainer" parent="Center/QuitConfirm/Items"]
+layout_mode = 2
+alignment = 1
+
+[node name="Cancel" type="Button" parent="Center/QuitConfirm/Items/Buttons"]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+text = "Cancel"
+
+[node name="Confirm" type="Button" parent="Center/QuitConfirm/Items/Buttons"]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+text = "Quit"
+
+[node name="Settings" parent="." instance=ExtResource("1_settings")]
+visible = false
+layout_mode = 1
+
+[connection signal="pressed" from="Center/Main/Items/Resume" to="." method="resume"]
+[connection signal="pressed" from="Center/Main/Items/RestartCheckpoint" to="." method="restart_checkpoint"]
+[connection signal="pressed" from="Center/Main/Items/Settings" to="." method="open_settings"]
+[connection signal="pressed" from="Center/Main/Items/Quit" to="." method="ask_quit"]
+[connection signal="pressed" from="Center/QuitConfirm/Items/Buttons/Cancel" to="." method="cancel_quit"]
+[connection signal="pressed" from="Center/QuitConfirm/Items/Buttons/Confirm" to="." method="confirm_quit"]

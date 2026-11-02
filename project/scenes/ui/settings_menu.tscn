@@ -1,0 +1,178 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Theme" path="res://assets/ui/theme.tres" id="theme"]
+
+[node name="SettingsMenu" type="SettingsMenu"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("theme")
+music_slider_path = NodePath("Center/Panel/Items/Music/Slider")
+effects_slider_path = NodePath("Center/Panel/Items/Effects/Slider")
+key_button_paths = [NodePath("Center/Panel/Items/MoveLeft/Key"), NodePath("Center/Panel/Items/MoveRight/Key"), NodePath("Center/Panel/Items/Jump/Key"), NodePath("Center/Panel/Items/Interact/Key")]
+message_label_path = NodePath("Center/Panel/Items/Message")
+conflict_row_path = NodePath("Center/Panel/Items/Conflict")
+swap_button_path = NodePath("Center/Panel/Items/Conflict/Swap")
+
+[node name="Center" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="Center"]
+layout_mode = 2
+
+[node name="Items" type="VBoxContainer" parent="Center/Panel"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Center/Panel/Items"]
+layout_mode = 2
+text = "Settings"
+horizontal_alignment = 1
+
+[node name="Music" type="HBoxContainer" parent="Center/Panel/Items"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Center/Panel/Items/Music"]
+custom_minimum_size = Vector2(76, 0)
+layout_mode = 2
+text = "Music"
+
+[node name="Slider" type="HSlider" parent="Center/Panel/Items/Music"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+size_flags_vertical = 4
+max_value = 1.0
+step = 0.1
+value = 1.0
+
+[node name="Effects" type="HBoxContainer" parent="Center/Panel/Items"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Center/Panel/Items/Effects"]
+custom_minimum_size = Vector2(76, 0)
+layout_mode = 2
+text = "Effects"
+
+[node name="Slider" type="HSlider" parent="Center/Panel/Items/Effects"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+size_flags_vertical = 4
+max_value = 1.0
+step = 0.1
+value = 1.0
+
+[node name="MoveLeft" type="HBoxContainer" parent="Center/Panel/Items"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Center/Panel/Items/MoveLeft"]
+custom_minimum_size = Vector2(76, 0)
+layout_mode = 2
+text = "Move Left"
+
+[node name="Key" type="Button" parent="Center/Panel/Items/MoveLeft"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+text = "-"
+
+[node name="MoveRight" type="HBoxContainer" parent="Center/Panel/Items"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Center/Panel/Items/MoveRight"]
+custom_minimum_size = Vector2(76, 0)
+layout_mode = 2
+text = "Move Right"
+
+[node name="Key" type="Button" parent="Center/Panel/Items/MoveRight"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+text = "-"
+
+[node name="Jump" type="HBoxContainer" parent="Center/Panel/Items"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Center/Panel/Items/Jump"]
+custom_minimum_size = Vector2(76, 0)
+layout_mode = 2
+text = "Jump"
+
+[node name="Key" type="Button" parent="Center/Panel/Items/Jump"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+text = "-"
+
+[node name="Interact" type="HBoxContainer" parent="Center/Panel/Items"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Center/Panel/Items/Interact"]
+custom_minimum_size = Vector2(76, 0)
+layout_mode = 2
+text = "Interact"
+
+[node name="Key" type="Button" parent="Center/Panel/Items/Interact"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+text = "-"
+
+[node name="Note" type="Label" parent="Center/Panel/Items"]
+custom_minimum_size = Vector2(232, 0)
+layout_mode = 2
+text = "The arrow keys always move. Esc always pauses."
+autowrap_mode = 2
+
+[node name="Message" type="Label" parent="Center/Panel/Items"]
+custom_minimum_size = Vector2(232, 21)
+layout_mode = 2
+autowrap_mode = 2
+
+[node name="Conflict" type="HBoxContainer" parent="Center/Panel/Items"]
+visible = false
+layout_mode = 2
+alignment = 1
+
+[node name="Swap" type="Button" parent="Center/Panel/Items/Conflict"]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+focus_neighbor_left = NodePath("../Cancel")
+focus_neighbor_top = NodePath(".")
+focus_neighbor_right = NodePath("../Cancel")
+focus_neighbor_bottom = NodePath(".")
+focus_next = NodePath("../Cancel")
+focus_previous = NodePath("../Cancel")
+text = "Swap"
+
+[node name="Cancel" type="Button" parent="Center/Panel/Items/Conflict"]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+focus_neighbor_left = NodePath("../Swap")
+focus_neighbor_top = NodePath(".")
+focus_neighbor_right = NodePath("../Swap")
+focus_neighbor_bottom = NodePath(".")
+focus_next = NodePath("../Swap")
+focus_previous = NodePath("../Swap")
+text = "Cancel"
+
+[node name="RestoreDefaults" type="Button" parent="Center/Panel/Items"]
+layout_mode = 2
+text = "Restore Defaults"
+
+[node name="Back" type="Button" parent="Center/Panel/Items"]
+layout_mode = 2
+text = "Back"
+
+[connection signal="value_changed" from="Center/Panel/Items/Music/Slider" to="." method="set_music_volume"]
+[connection signal="value_changed" from="Center/Panel/Items/Effects/Slider" to="." method="set_effects_volume"]
+[connection signal="pressed" from="Center/Panel/Items/MoveLeft/Key" to="." method="begin_capture" binds= [0]]
+[connection signal="pressed" from="Center/Panel/Items/MoveRight/Key" to="." method="begin_capture" binds= [1]]
+[connection signal="pressed" from="Center/Panel/Items/Jump/Key" to="." method="begin_capture" binds= [2]]
+[connection signal="pressed" from="Center/Panel/Items/Interact/Key" to="." method="begin_capture" binds= [3]]
+[connection signal="pressed" from="Center/Panel/Items/Conflict/Swap" to="." method="swap_conflict"]
+[connection signal="pressed" from="Center/Panel/Items/Conflict/Cancel" to="." method="cancel_conflict"]
+[connection signal="pressed" from="Center/Panel/Items/RestoreDefaults" to="." method="restore_defaults"]
+[connection signal="pressed" from="Center/Panel/Items/Back" to="." method="back"]

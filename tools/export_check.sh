@@ -14,6 +14,7 @@ logs="$(cd "$logs" && pwd)"
 out="$root/build/export/$platform"
 rm -rf "$out"
 mkdir -p "$out"
+. "$root/tools/test_storage.sh"
 
 # The scene the game must start in.
 scene="res://scenes/level/shore.tscn"
@@ -58,6 +59,7 @@ if grep -aq "scenes/level/level\.tscn" "$pack"; then
 	fail "the greybox development scene was exported into $stem.pck"
 fi
 grep -aq "assets/shore/" "$pack" || fail "the Shore art is missing from $stem.pck"
+grep -aq "assets/ui/" "$pack" || fail "the UI assets are missing from $stem.pck"
 echo "export-$platform: created"
 ls -la "$out"
 

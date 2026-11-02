@@ -4,14 +4,41 @@ extends RefCounted
 
 const StepProbe := preload("res://tests/step_probe.gd")
 
+## Set by tools/test_storage.sh for the whole run. Each test gets its own folder inside it.
+const STORAGE_VARIABLE := "DAGON_STORAGE_DIR"
+
+static var _tests_started := 0
+
 var tree: SceneTree
 var fixture: Node
 var probe: Node
 var failures: PackedStringArray = []
+var storage_dir: String
+var _run_storage_dir: String
 
 
 func _init(p_tree: SceneTree) -> void:
 	tree = p_tree
+	_run_storage_dir = OS.get_environment(STORAGE_VARIABLE)
+	_tests_started += 1
+	use_storage("%s/test_%d" % [_run_storage_dir, _tests_started])
+
+
+## Everything that reads or writes a file goes through this variable, so no test can reach a player's files.
+func use_storage(path: String) -> void:
+	storage_dir = path
+	DirAccess.make_dir_recursive_absolute(path)
+	OS.set_environment(STORAGE_VARIABLE, path)
+
+
+func write_storage_file(file_name: String, bytes: PackedByteArray) -> void:
+	var file := FileAccess.open(storage_dir.path_join(file_name), FileAccess.WRITE)
+	file.store_buffer(bytes)
+	file.close()
+
+
+func read_storage_file(file_name: String) -> String:
+	return FileAccess.get_file_as_string(storage_dir.path_join(file_name))
 
 
 func load_fixture(path: String) -> Node:
@@ -25,6 +52,12 @@ func load_fixture(path: String) -> Node:
 
 func unload_fixture() -> void:
 	release_all_actions()
+	tree.paused = false
+	InputMap.load_from_project_settings()
+	for bus in ["Music", "Effects"]:
+		var index := AudioServer.get_bus_index(bus)
+		AudioServer.set_bus_mute(index, false)
+		AudioServer.set_bus_volume_db(index, 0.0)
 	# A test resumes inside the probe's signal emission, where free() is refused.
 	if is_instance_valid(fixture):
 		fixture.queue_free()
@@ -32,6 +65,7 @@ func unload_fixture() -> void:
 		probe.queue_free()
 	await tree.process_frame
 	await tree.physics_frame
+	OS.set_environment(STORAGE_VARIABLE, _run_storage_dir)
 
 
 func release_all_actions() -> void:
@@ -60,6 +94,61 @@ func wait_until(condition: Callable, max_steps: int, description: String) -> boo
 
 func landed_on_floor(player: CharacterBody2D) -> bool:
 	return await wait_until(player.is_on_floor, 120, "the player to land")
+
+
+## Moves the player and waits until it stands there, since is_on_floor() is out of date right after a teleport.
+func stand_at(player: CharacterBody2D, position: Vector2) -> void:
+	player.teleport(position)
+	await steps(30)
+	check(player.is_on_floor(), "the player did not land at %s" % position)
+
+
+## Event-path input: delivered to _input and _unhandled_input, not just the polled state.
+func send(event: InputEvent) -> void:
+	Input.parse_input_event(event)
+	Input.flush_buffered_events()
+
+
+func action_event(action: String, pressed: bool) -> InputEventAction:
+	var event := InputEventAction.new()
+	event.action = action
+	event.pressed = pressed
+	return event
+
+
+func key_event(physical_keycode: Key, pressed: bool) -> InputEventKey:
+	var event := InputEventKey.new()
+	event.physical_keycode = physical_keycode
+	event.keycode = physical_keycode
+	event.pressed = pressed
+	return event
+
+
+func pad_event(button: JoyButton, pressed: bool) -> InputEventJoypadButton:
+	var event := InputEventJoypadButton.new()
+	event.button_index = button
+	event.pressed = pressed
+	return event
+
+
+## A press and release with a step between them, as a person's would have.
+func tap(pressed_event: InputEvent, released_event: InputEvent) -> void:
+	send(pressed_event)
+	await steps(1)
+	send(released_event)
+	await steps(1)
+
+
+func tap_action(action: String) -> void:
+	await tap(action_event(action, true), action_event(action, false))
+
+
+func tap_key(physical_keycode: Key) -> void:
+	await tap(key_event(physical_keycode, true), key_event(physical_keycode, false))
+
+
+func tap_pad(button: JoyButton) -> void:
+	await tap(pad_event(button, true), pad_event(button, false))
 
 
 func fail(message: String) -> void:

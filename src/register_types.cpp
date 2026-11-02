@@ -1,5 +1,12 @@
 #include "camera_rig.hpp"
+#include "game_director.hpp"
+#include "hud.hpp"
+#include "interactable.hpp"
+#include "interactor.hpp"
+#include "menu_controller.hpp"
 #include "player_controller.hpp"
+#include "settings_menu.hpp"
+#include "story_trigger.hpp"
 
 #include <gdextension_interface.h>
 #include <godot_cpp/core/class_db.hpp>
@@ -38,6 +45,13 @@ void initialize_dagon(ModuleInitializationLevel p_level) {
 	}
 	GDREGISTER_CLASS(dagon::PlayerController);
 	GDREGISTER_CLASS(dagon::CameraRig);
+	GDREGISTER_CLASS(dagon::Interactable);
+	GDREGISTER_CLASS(dagon::Interactor);
+	GDREGISTER_CLASS(dagon::StoryTrigger);
+	GDREGISTER_CLASS(dagon::Hud);
+	GDREGISTER_CLASS(dagon::GameDirector);
+	GDREGISTER_CLASS(dagon::SettingsMenu);
+	GDREGISTER_CLASS(dagon::MenuController);
 	// Positive load proof for the release export check, which runs with --verbose.
 	print_verbose("dagon: extension initialized build=", BUILD_TYPE, " compiler=", COMPILER_NAME, " ", COMPILER_VERSION, " __cplusplus=", static_cast<int64_t>(__cplusplus));
 }
