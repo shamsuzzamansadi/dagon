@@ -1,0 +1,32 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="1_player"]
+
+[node name="Level" type="Node2D"]
+
+[node name="Terrain" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 0
+
+[node name="Ground" type="CollisionPolygon2D" parent="Terrain"]
+polygon = PackedVector2Array(0, -300, 24, -300, 24, 0, 200, 0, 200, -14, 240, -14, 240, 0, 360, 0, 420, -10, 480, -10, 540, 0, 640, 0, 640, 14, 710, 14, 710, 0, 900, 0, 900, -12, 930, -12, 930, -22, 980, -22, 980, 0, 1376, 0, 1376, -300, 1400, -300, 1400, 60, 0, 60)
+
+[node name="GroundVisual" type="Polygon2D" parent="Terrain"]
+color = Color(0.2, 0.24, 0.28, 1)
+polygon = PackedVector2Array(0, -300, 24, -300, 24, 0, 200, 0, 200, -14, 240, -14, 240, 0, 360, 0, 420, -10, 480, -10, 540, 0, 640, 0, 640, 14, 710, 14, 710, 0, 900, 0, 900, -12, 930, -12, 930, -22, 980, -22, 980, 0, 1376, 0, 1376, -300, 1400, -300, 1400, 60, 0, 60)
+
+[node name="LifeboatPlaceholder" type="Polygon2D" parent="."]
+color = Color(0.32, 0.27, 0.22, 1)
+polygon = PackedVector2Array(60, 0, 52, -10, 56, -14, 120, -14, 132, -6, 124, 0)
+
+[node name="Player" parent="." instance=ExtResource("1_player")]
+position = Vector2(150, -1)
+
+[node name="CameraRig" type="CameraRig" parent="."]
+limit_left = 0
+limit_top = -220
+limit_right = 1400
+limit_bottom = 50
+position_smoothing_enabled = true
+position_smoothing_speed = 5.0
+target_path = NodePath("../Player")

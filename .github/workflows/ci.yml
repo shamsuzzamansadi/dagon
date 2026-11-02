@@ -1,0 +1,131 @@
+# Builds, tests and exports on both desktop platforms for every push.
+# No secrets are used. Nothing here publishes a release.
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  desktop:
+    name: ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux
+            os: ubuntu-22.04
+          - platform: windows
+            os: windows-2025
+    env:
+      SCONS_CACHE: ${{ github.workspace }}/.scons-cache/
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          submodules: true
+
+      - name: Setup godot-cpp
+        uses: ./godot-cpp/.github/actions/setup-godot-cpp
+        with:
+          platform: ${{ matrix.platform }}
+          windows-compiler: msvc
+          scons-version: 4.9.1
+
+      - name: Restore SCons cache
+        uses: ./godot-cpp/.github/actions/godot-cache-restore
+        with:
+          scons-cache: ${{ github.workspace }}/.scons-cache/
+          cache-name: dagon-${{ matrix.platform }}
+
+      - name: Build extension (debug)
+        run: |
+          mkdir -p build/logs
+          scons platform=${{ matrix.platform }} target=template_debug show_flags=yes 2>&1 | tee build/logs/build-debug.log
+          test "${PIPESTATUS[0]}" -eq 0
+
+      - name: Build extension (release)
+        run: |
+          scons platform=${{ matrix.platform }} target=template_release show_flags=yes 2>&1 | tee build/logs/build-release.log
+          test "${PIPESTATUS[0]}" -eq 0
+
+      - name: Save SCons cache
+        if: always()
+        uses: ./godot-cpp/.github/actions/godot-cache-save
+        with:
+          scons-cache: ${{ github.workspace }}/.scons-cache/
+          cache-name: dagon-${{ matrix.platform }}
+
+      - name: Unit tests
+        run: |
+          scons unit_tests 2>&1 | tee build/logs/unit-tests.log
+          test "${PIPESTATUS[0]}" -eq 0
+
+      - name: Restore Godot and export templates
+        id: godot-cache
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.dagon-tools
+            ~/.local/share/godot/export_templates/4.7.2.stable
+            ~/AppData/Roaming/Godot/export_templates/4.7.2.stable
+          key: godot-4.7.2-${{ runner.os }}-${{ hashFiles('tools/install_godot.sh', 'tools/install_export_templates.sh', 'tools/extract_templates.py') }}
+
+      - name: Install Godot (SHA-512 verified)
+        run: echo "GODOT=$(sh tools/install_godot.sh "$HOME/.dagon-tools")" >> "$GITHUB_ENV"
+
+      - name: Install export templates (SHA-512 verified)
+        if: steps.godot-cache.outputs.cache-hit != 'true'
+        run: sh tools/install_export_templates.sh
+
+      - name: Godot checks (import, extension load, integration, smoke)
+        run: sh tools/run_godot_checks.sh build/logs/godot
+
+      - name: Export and run release build
+        run: sh tools/export_check.sh ${{ matrix.platform }} build/logs/export
+
+      # Annotations are readable through the public API without a token, which
+      # lets the M1 report quote this evidence. Job logs are not.
+      - name: Publish evidence as annotations
+        if: always()
+        run: |
+          annotate() {
+            if [ -s "$2" ]; then
+              echo "::notice title=${{ matrix.platform }} $1::$(tail -n 1 "$2" | tr -d '\r')"
+            fi
+          }
+          first_match() { grep -hE "$1" "$2" 2>/dev/null | head -n 1 > build/annotation.txt; annotate "$3" build/annotation.txt; }
+          first_match '^dagon: compiler:' build/logs/build-debug.log compiler
+          first_match '^dagon: own CXXFLAGS' build/logs/build-debug.log own-cxxflags-debug
+          first_match '^dagon: godot-cpp CXXFLAGS' build/logs/build-debug.log godot-cpp-cxxflags-debug
+          first_match '^dagon: CCFLAGS' build/logs/build-debug.log ccflags-debug
+          first_match '^dagon: CCFLAGS' build/logs/build-release.log ccflags-release
+          first_match 'test cases:' build/logs/unit-tests.log unit-tests
+          first_match '^RESULT' build/logs/godot/integration.stdout integration
+          first_match '^CHECK_CLASSES' build/logs/godot/check_classes.stdout extension-load-debug-library
+          first_match 'dagon: extension initialized' build/logs/godot/smoke.stdout smoke-debug-library
+          first_match 'dagon: extension initialized' build/logs/export/run-${{ matrix.platform }}.all exported-release-library
+          for step in import check_classes integration smoke; do
+            printf 'exit=%s\n' "$(cat "build/logs/godot/$step.exit" 2>/dev/null || echo missing)" > build/annotation.txt
+            annotate "$step" build/annotation.txt
+          done
+          printf 'exit=%s\n' "$(cat "build/logs/export/run-${{ matrix.platform }}.exit" 2>/dev/null || echo missing)" > build/annotation.txt
+          annotate exported-run build/annotation.txt
+
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: logs-${{ matrix.platform }}
+          path: build/logs/
+
+      - name: Upload export
+        uses: actions/upload-artifact@v7
+        with:
+          name: dagon-${{ matrix.platform }}
+          path: build/export/${{ matrix.platform }}/
