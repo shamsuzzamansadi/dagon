@@ -1,6 +1,6 @@
 # Toolchain, Dependencies and Build Plan
 
-Verified 2026-10-28. Each item says how it was verified. "Unverified" items
+First verified 2026-10-28; updated at M1 (2026-11-02). Each item says how it was verified. "Unverified" items
 have a named validation step.
 
 ## 1. Pinned versions
@@ -13,10 +13,10 @@ have a named validation step.
 | Project template | godot-cpp-template @ `d36f9d03e9e0` (2026-10-04) | Layout and SConstruct read from GitHub. |
 | SCons | **4.9.1** (pip) | Built the spike locally. The template CI action defaults to 4.4.0, so we override it to 4.9.1. |
 | Python | 3.x (3.13 local) | Needed only for SCons. |
-| Linux compiler | GCC 13.3 (Ubuntu 24.04) | Spike built and loaded. Clang 18 is available but untested. |
+| Linux compiler | GCC 13.3 (Ubuntu 24.04, local). CI: see the M1 package | The real project builds and loads. Clang 18 is available but untested. |
 | Windows compiler | MSVC 2022, on the `windows-latest` runner | **Unverified, and not pinned:** `windows-latest` is a moving image. The M1 CI job logs the exact `cl` version, and that version is recorded here. |
 | Unit-test framework | doctest **v2.5.3** (single header, vendored) | GitHub releases API. |
-| Export templates | 4.7.2 `.tpz` (1.28 GB) | **Unverified locally.** The local templates folder is empty, so export was not tested. The user approved the local download (2026-10-28) at the start of M1, with a SHA-512 check against the release's `SHA512-SUMS.txt`. CI also verifies exports independently. |
+| Export templates | 4.7.2 `.tpz` (1.28 GB) | **Downloaded 2026-11-02; official SHA-512 verified** (`tools/install_export_templates.sh`). Only the desktop templates are kept. |
 | Emscripten (web, stretch) | 3.1.62 (template's pin) | Not evaluated. See §6. |
 
 godot-cpp has been **versioned independently** of Godot since v10.
@@ -65,11 +65,11 @@ registered, bound method returned the expected value, signal present, and
 Linux:
 ```sh
 git clone --recurse-submodules https://github.com/shamsuzzamansadi/dagon.git && cd dagon
-sh tools/prepare_project.sh
 python3 -m venv .venv && .venv/bin/pip install scons==4.9.1
 .venv/bin/scons platform=linux target=template_debug   -j$(nproc)
 .venv/bin/scons platform=linux target=template_release -j$(nproc)
 .venv/bin/scons unit_tests            # native doctest binary, runs the tests
+sh tools/prepare_project.sh           # before the first Godot launch
 ```
 
 Windows (x64 Native Tools prompt, VS 2022):
@@ -80,9 +80,10 @@ py -m venv .venv && .venv\Scripts\pip install scons==4.9.1
 .venv\Scripts\scons unit_tests
 ```
 
-The `unit_tests` alias does not exist yet. It is an M1 deliverable: a separate
-SCons environment that compiles `src/core/*.cpp` and `tests/unit/*.cpp` with
-C++20 and no godot-cpp.
+`unit_tests` is a separate SCons environment that compiles `src/core/*.cpp` and
+`tests/unit/*.cpp` with C++20 and no godot-cpp, under `-Werror` or `/WX`.
+`show_flags=yes` prints the exact compiler version and effective flags.
+Set `SCONS_CACHE` to a directory to reuse objects between clean builds.
 
 A full godot-cpp build takes 86 s wall-clock on 12 cores (spike). CI uses
 godot-cpp's cache actions.
@@ -104,24 +105,31 @@ library: the spike's `.gdextension` had only `debug`/`release` keys and the
 The full evidence, commands and logs are in
 [evidence/import-crash/](evidence/import-crash/README.md).
 
-**Observed:**
+**Observed on the probe** (`docs/evidence/import-crash/`, a throwaway project
+with one `Node` subclass):
 - On a clean `.godot/`, with the extension present, `godot --headless --import`
-  exited 134 in 8 of 8 trials (5 manual, 3 via `reproduce.sh`).
+  exited 134 in 12 of 12 trials (5 manual, 3 via `reproduce.sh`, and 4 as same-day
+  controls on 2026-11-02).
 - Under gdb the first fatal event is a SIGSEGV inside the stripped engine
   binary. A signal handler in the binary then calls `abort()`, so the shell
-  sees 128 + SIGABRT(6) = 134.
-- Godot wrote nothing to stderr.
-- Pre-seeding `.godot/extension_list.cfg` prevented the crash in 6 of 6
-  trials.
-- The evidence package reproduces from its own layout with `reproduce.sh`.
+  sees 128 + SIGABRT(6) = 134. Godot wrote nothing to stderr.
+- Pre-seeding `.godot/extension_list.cfg` prevented the crash in 9 of 9 trials.
+- The crash persisted when each of these was changed on the probe: renderer,
+  `config/features`, main scene, export presets, all scripts and scenes removed.
+
+**Observed on the actual game project (2026-11-02,
+`docs/evidence/m1/import/`):**
+- **The crash did not reproduce:** 3 of 3 clean-cache imports **without**
+  preparation exited 0, and so did 3 of 3 with it.
 
 **Not established:**
-- The root cause. An engine-only stack does not rule out earlier corruption
-  caused by the extension.
-- The "extension discovered mid-session" explanation is a hypothesis.
-- The impact on interactive editor sessions is unknown.
-- The reviewer has not reproduced it.
-- No upstream issue has been filed yet; it will be linked here once it exists.
+- The root cause, or why the probe crashes and the game project does not. The
+  remaining differences are the extension code and library layout. An engine-only
+  stack does not rule out earlier corruption caused by the probe's extension.
+- That the game project is immune. It may crash later as it changes, so the
+  provisional workaround stays and any non-zero exit fails the run.
+- The impact on interactive editor sessions.
+- No upstream issue has been filed; without a root cause it is not yet ready.
 
 **Provisional workaround, used identically for local clean checkouts and CI.**
 It is run once after cloning, before the first Godot launch.
@@ -157,9 +165,11 @@ the results again, re-run on the real project.
   `windows_release_x86_64.exe`, …) under
   `~/.local/share/godot/export_templates/4.7.2.stable/`. CI downloads and
   caches the `.tpz` and checks it against `SHA512-SUMS.txt` from the release.
-- `export_presets.cfg` must be **generated by the editor**, then committed. A
-  hand-written minimal preset was rejected in the spike: it is missing
-  `include_filter`/`exclude_filter`, and more keys are probably needed.
+- `export_presets.cfg` is **hand-written and committed**. M1 corrected the earlier
+  claim that the editor must generate it: a preset with `include_filter` and
+  `exclude_filter` plus the options we set is accepted, and Godot uses defaults
+  for the rest. `exclude_filter="tests/*"` keeps tests out, and
+  `tools/export_check.sh` checks the `.pck` for that.
 - Exporting Windows from Linux works without `rcedit`. The only cost is that
   the exe icon and metadata are not set (a warning, not a failure).
   **Unverified:** validate in M1.

@@ -465,19 +465,24 @@ silently.
 Reports always state which of these levels actually ran.
 
 **Headless integration-test rules (review round 2, item 7):**
-- **Fixed physics tick:** `physics/common/physics_ticks_per_second = 60` and
-  `physics/common/max_physics_steps_per_frame = 1` in `project.godot`. Run
-  with `--fixed-fps 60`. Neither one is claimed to make physics fully
-  deterministic; they only make frame counting reproducible.
+- **Fixed physics tick:** `physics/common/physics_ticks_per_second = 60` in
+  `project.godot`, run with `--fixed-fps 60`, and a test asserts both the tick
+  rate and that one probe step equals one physics tick. Neither is claimed to
+  make physics fully deterministic; they only make frame counting reproducible.
+  *M1 change:* `max_physics_steps_per_frame = 1` was **not** set as first
+  planned. It is a shipped-game setting, and it would slow the game down on
+  machines below 60 FPS. `--fixed-fps` already gives one step per frame in tests.
 - **Observation point (M1 follow-up):** `SceneTree.physics_frame` is emitted
   *before* the nodes' `_physics_process` callbacks, so awaiting it does not
   mean the player has finished the step being measured.
-  - Tests observe through a test-only `StepProbe` node, with
-    `process_physics_priority` set higher than every gameplay node so it runs
-    after them. It emits `stepped(physics_frame)` at the end of each tick.
-  - M1 must **verify** the probe's ordering. One test asserts that a velocity
-    change made in `PlayerController._physics_process` during tick N is
-    visible in the probe's tick-N callback.
+  - Tests observe through a test-only `StepProbe` node
+    (`project/tests/step_probe.gd`), with `process_physics_priority = 1000` so
+    it runs after every gameplay node. It emits `stepped(physics_frame)` at the
+    end of each tick.
+  - `test_probe_observes_after_player_step` proves the ordering: within one
+    tick, the position at `physics_frame` is the old one and the position at
+    `stepped` includes that tick's movement. Reversing the priority makes this
+    test fail (`docs/evidence/m1/mutation/probe-order.txt`).
 - **Order within a test step:** inject, then await N `StepProbe.stepped`
   signals, then observe. Never inject and observe in the same tick.
 - **Injection method:**

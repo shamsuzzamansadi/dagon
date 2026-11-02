@@ -4,7 +4,7 @@
 
 # Compiled GDExtension libraries (built locally or by CI; never committed)
 project/bin/*/
-bin/
+/bin/
 *.os
 *.o
 *.obj

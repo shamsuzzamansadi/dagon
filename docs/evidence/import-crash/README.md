@@ -1,5 +1,10 @@
 # Evidence: headless import crash on a clean cache (Godot 4.7.2)
 
+> **Update 2026-11-02:** the actual game project does **not** show this crash,
+> while this probe still does when re-run the same day. See
+> [docs/evidence/m1/import/](../m1/import/) and `docs/toolchain.md` §5. Everything
+> below describes the probe only.
+
 Collected on 2026-10-28, before the jam, as a toolchain check. `spike/` holds
 the throwaway probe that produced it. The probe is **not part of the game**
 and is not built by the project's SConstruct.
