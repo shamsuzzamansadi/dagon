@@ -197,9 +197,10 @@ func test_a_new_caption_replaces_the_old_one_and_restarts_its_time(h) -> void:
 	await h.steps(120)
 	hud.show_caption("second")
 	h.check(caption.text == "second", "caption reads '%s'" % caption.text)
-	# The first caption's fade would have finished by now, had it not been replaced.
-	await h.steps(150)
+	# The first caption would have ended by now (4.5 s in), had its tween not been stopped.
+	await h.steps(180)
 	h.check(caption.visible, "the replaced caption's timer ended the new one")
+	h.check_near(caption.modulate.a, 1.0, 0.01, "the new caption's opacity")
 	h.check(player != null, "fixture lost the player")
 
 

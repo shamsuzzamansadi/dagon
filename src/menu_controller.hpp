@@ -60,6 +60,7 @@ private:
 
 	void show_screen(Screen p_screen);
 	void focus_path(const godot::NodePath &p_path);
+	void focus_default();
 	void on_settings_closed();
 
 	godot::NodePath director_path_;

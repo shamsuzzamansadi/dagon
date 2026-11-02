@@ -78,7 +78,7 @@ void MenuController::_unhandled_input(const Ref<InputEvent> &p_event) {
 	}
 	// A mouse click on nothing drops focus. The next press brings it back, so the menu stays usable.
 	if (get_viewport()->gui_get_focus_owner() == nullptr && (p_event->is_action_pressed("ui_up") || p_event->is_action_pressed("ui_down") || p_event->is_action_pressed("ui_left") || p_event->is_action_pressed("ui_right") || p_event->is_action_pressed("ui_accept"))) {
-		focus_path(default_focus_path_);
+		focus_default();
 		get_viewport()->set_input_as_handled();
 	}
 }
@@ -93,7 +93,11 @@ void MenuController::show_screen(Screen p_screen) {
 
 void MenuController::focus_path(const NodePath &p_path) {
 	default_focus_path_ = p_path;
-	if (Control *control = get_node<Control>(p_path)) {
+	focus_default();
+}
+
+void MenuController::focus_default() {
+	if (Control *control = get_node<Control>(default_focus_path_)) {
 		control->grab_focus();
 	}
 }
