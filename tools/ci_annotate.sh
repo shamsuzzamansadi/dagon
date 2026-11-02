@@ -44,6 +44,7 @@ case "$group" in
 		notice smoke-greybox-scene build/logs/godot/smoke_greybox.stdout "Completed load for: 'res://scenes/level/level.tscn'"
 		exit_of smoke-greybox-exit build/logs/godot/smoke_greybox.exit
 		notice exported-entry-scene "build/logs/export/run-$platform.all" "Completed load for: 'res://scenes/level/shore.tscn'"
+		notice user-dir-probe build/logs/user-dir-probe.log '^USER_DIR_PROBE'
 		notice first-failed-test build/logs/godot/integration.stdout '^FAIL'
 		notice first-failure-detail build/logs/godot/integration.stdout '^     '
 		;;

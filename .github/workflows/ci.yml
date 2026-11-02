@@ -89,6 +89,13 @@ jobs:
       - name: Export and run release build
         run: sh tools/export_check.sh ${{ matrix.platform }} build/logs/export
 
+      # Every other check redirects storage. This one uses the real user folder of this throwaway runner.
+      - name: Check the player's storage path
+        run: |
+          "$GODOT" --headless --path project --script res://tests/user_dir_probe.gd 2>&1 | tee build/logs/user-dir-probe.log
+          test "${PIPESTATUS[0]}" -eq 0
+          grep -q "^USER_DIR_PROBE ok" build/logs/user-dir-probe.log
+
       - name: Check Shore art (one palette, feet do not slide, ground on the collision)
         run: |
           python -m pip install pillow==13.0.0
