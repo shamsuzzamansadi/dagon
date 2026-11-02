@@ -9,7 +9,7 @@ const Harness := preload("res://tests/harness.gd")
 const SUITES: Array[Script] = [
 	preload("res://tests/test_movement.gd"),
 	preload("res://tests/test_level.gd"),
-	preload("res://tests/test_preview.gd"),
+	preload("res://tests/test_shore.gd"),
 ]
 const REQUIRED_CLASSES: Array[String] = ["PlayerController", "CameraRig"]
 
@@ -64,6 +64,7 @@ func _run() -> void:
 	var failed := 0
 	for suite in SUITES:
 		var instance: RefCounted = suite.new()
+		var suite_name: String = suite.resource_path.get_file().get_basename()
 		for method in instance.get_method_list():
 			var test_name: String = method["name"]
 			if not test_name.begins_with("test_"):
@@ -76,10 +77,10 @@ func _run() -> void:
 				harness.fail("logged error: %s" % error)
 			if harness.failures.is_empty():
 				passed += 1
-				print("PASS %s" % test_name)
+				print("PASS %s.%s" % [suite_name, test_name])
 			else:
 				failed += 1
-				print("FAIL %s" % test_name)
+				print("FAIL %s.%s" % [suite_name, test_name])
 				for failure in harness.failures:
 					print("     %s" % failure)
 	OS.remove_logger(_trap)

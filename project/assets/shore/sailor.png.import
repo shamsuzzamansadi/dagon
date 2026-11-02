@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dqj7lvj5a2aou"
-path="res://.godot/imported/bank.png-6c19352e550c09f8a09900b825ff0338.ctex"
+uid="uid://7gg105t4ebdh"
+path="res://.godot/imported/sailor.png-3c4406f76a4f09374361ff292e4ba3e5.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/preview/bank.png"
-dest_files=["res://.godot/imported/bank.png-6c19352e550c09f8a09900b825ff0338.ctex"]
+source_file="res://assets/shore/sailor.png"
+dest_files=["res://.godot/imported/sailor.png-3c4406f76a4f09374361ff292e4ba3e5.ctex"]
 
 [params]
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cunex80jgnsqx"
-path="res://.godot/imported/terrain.png-6d961b448b23f3b242e4bf22048d53ff.ctex"
+uid="uid://du0r30guyhunn"
+path="res://.godot/imported/fish.png-6f4f950d1002986448701c2ee4b5f9e1.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/preview/terrain.png"
-dest_files=["res://.godot/imported/terrain.png-6d961b448b23f3b242e4bf22048d53ff.ctex"]
+source_file="res://assets/shore/fish.png"
+dest_files=["res://.godot/imported/fish.png-6f4f950d1002986448701c2ee4b5f9e1.ctex"]
 
 [params]
 

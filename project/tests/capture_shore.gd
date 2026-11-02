@@ -1,6 +1,6 @@
 extends SceneTree
-## Records the Shore preview with scripted input through Movie Maker mode. Evidence, not a test.
-## Run: godot --path project --write-movie <dir>/frame.png --fixed-fps 60 --resolution 480x270 --script res://tests/capture_preview.gd
+## Records the Shore with scripted input through Movie Maker mode. Evidence, not a test.
+## Run: godot --path project --write-movie <dir>/frame.png --fixed-fps 60 --resolution 480x270 --script res://tests/capture_shore.gd
 
 const StepProbe := preload("res://tests/step_probe.gd")
 
@@ -33,7 +33,7 @@ func _jump() -> void:
 
 
 func _run() -> void:
-	var scene: Node = (load("res://scenes/preview/shore_preview.tscn") as PackedScene).instantiate()
+	var scene: Node = (load("res://scenes/level/shore.tscn") as PackedScene).instantiate()
 	_probe = StepProbe.new()
 	root.add_child(scene)
 	root.add_child(_probe)
@@ -44,9 +44,15 @@ func _run() -> void:
 	await _steps(70)
 	await _walk("move_right", player, 188.0)
 	await _jump()  # Up onto the rock.
-	await _walk("move_right", player, 250.0)
-	await _walk("move_right", player, 560.0)  # Over the slope, scrolling the view.
-	await _steps(80)
-	await _walk("move_left", player, 262.0)
-	await _steps(90)
+	await _walk("move_right", player, 222.0)
+	await _steps(60)  # Standing on it.
+	await _walk("move_right", player, 560.0)  # Off the rock and over the slope, scrolling the view.
+	await _steps(40)
+	await _walk("move_right", player, 636.0)  # Through the cleft, to where the greybox begins.
+	await _walk("move_right", player, 690.0)  # Down into the greybox trench.
+	await _steps(60)
+	await _walk("move_left", player, 650.0)
+	await _jump()  # Out of the trench, back into the art.
+	await _walk("move_left", player, 500.0)
+	await _steps(60)
 	quit(0)

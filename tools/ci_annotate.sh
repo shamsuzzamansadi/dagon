@@ -38,11 +38,12 @@ case "$group" in
 		exit_of exported-run-exit "build/logs/export/run-$platform.exit"
 		notice first-error build/logs/godot/integration.errors '.'
 		;;
-	preview)
+	entry)
 		notice check-art build/logs/check-art.log '^CHECK_ART'
-		notice preview-release-library "build/logs/export/run-$platform-preview.all" 'dagon: extension initialized'
-		notice preview-scene "build/logs/export/run-$platform-preview.all" "Completed load for: 'res://scenes/preview/shore_preview.tscn'"
-		exit_of preview-run-exit "build/logs/export/run-$platform-preview.exit"
+		notice smoke-entry-scene build/logs/godot/smoke.stdout "Completed load for: 'res://scenes/level/shore.tscn'"
+		notice smoke-greybox-scene build/logs/godot/smoke_greybox.stdout "Completed load for: 'res://scenes/level/level.tscn'"
+		exit_of smoke-greybox-exit build/logs/godot/smoke_greybox.exit
+		notice exported-entry-scene "build/logs/export/run-$platform.all" "Completed load for: 'res://scenes/level/shore.tscn'"
 		;;
 esac
 exit 0

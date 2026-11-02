@@ -1,6 +1,6 @@
 extends SceneTree
-## Records the greybox with scripted input through Movie Maker mode. This is
-## evidence for reviewers, not a test, and it plays the same way every time.
+## Records the greybox development scene with scripted input through Movie Maker
+## mode. This is evidence for reviewers, not a test, and it plays the same way every time.
 ## Run: godot --path project --write-movie <dir>/frame.png --fixed-fps 60 --resolution 480x270 --script res://tests/capture_demo.gd
 
 const StepProbe := preload("res://tests/step_probe.gd")

@@ -1,4 +1,4 @@
-"""Small drawing helpers shared by the preview's art scripts. Everything is deterministic."""
+"""Small drawing helpers shared by the Shore's art scripts. Everything is deterministic."""
 
 import math
 import random

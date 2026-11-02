@@ -1,4 +1,4 @@
-"""Writes every Shore preview asset into project/assets/preview/.
+"""Writes every Shore asset into project/assets/shore/.
 
 Run from anywhere (needs Pillow): python tools/art/generate.py
 Output is deterministic, so running it again changes nothing unless the scripts changed.
@@ -14,8 +14,8 @@ import gen_sailor
 import gen_shore
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
-OUT = ROOT / "project" / "assets" / "preview"
-RES = "res://assets/preview"
+OUT = ROOT / "project" / "assets" / "shore"
+RES = "res://assets/shore"
 
 GLINT_TOP = gen_shore.HORIZON
 GLINT_HEIGHT = gen_shore.TIDE_LINE - gen_shore.HORIZON + 2

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://sui3i63kny3p"
-path="res://.godot/imported/glints.png-3f0715e3c60eea8853266273b2bdaea8.ctex"
+uid="uid://cunex80jgnsqx"
+path="res://.godot/imported/terrain.png-94fac32d5bbd21ef1d389567a3b66ab5.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/preview/glints.png"
-dest_files=["res://.godot/imported/glints.png-3f0715e3c60eea8853266273b2bdaea8.ctex"]
+source_file="res://assets/shore/terrain.png"
+dest_files=["res://.godot/imported/terrain.png-94fac32d5bbd21ef1d389567a3b66ab5.ctex"]
 
 [params]
 

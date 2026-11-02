@@ -1,4 +1,4 @@
-"""The one palette every preview asset is drawn with (docs/shore-preview.md)."""
+"""The one palette every Shore asset is drawn with (docs/shore-preview.md)."""
 
 PALETTE = {
     # Cold ramp: sky, sea haze, moonlight, the sailor's coat.

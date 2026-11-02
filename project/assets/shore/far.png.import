@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://i1okf4kel8oo"
-path="res://.godot/imported/flats.png-c407280c4c3852523ea343d687131db3.ctex"
+uid="uid://xeymp2q7dry2"
+path="res://.godot/imported/far.png-769816ef47567b668f17b4fc2d6a4280.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/preview/flats.png"
-dest_files=["res://.godot/imported/flats.png-c407280c4c3852523ea343d687131db3.ctex"]
+source_file="res://assets/shore/far.png"
+dest_files=["res://.godot/imported/far.png-769816ef47567b668f17b4fc2d6a4280.ctex"]
 
 [params]
 

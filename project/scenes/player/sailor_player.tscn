@@ -1,8 +1,8 @@
 [gd_scene load_steps=4 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="1_player"]
-[ext_resource type="SpriteFrames" path="res://assets/preview/sailor_frames.tres" id="2_frames"]
-[ext_resource type="Texture2D" path="res://assets/preview/light.png" id="3_light"]
+[ext_resource type="SpriteFrames" path="res://assets/shore/sailor_frames.tres" id="2_frames"]
+[ext_resource type="Texture2D" path="res://assets/shore/light.png" id="3_light"]
 
 [node name="Player" instance=ExtResource("1_player")]
 sprite_path = NodePath("Visual/Sailor")

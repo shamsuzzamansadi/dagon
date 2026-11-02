@@ -1,5 +1,5 @@
-"""Draws the environment layers for the Shore preview. All images are 270 rows tall, matching the
-camera's fixed vertical range, so a row in an image is also a row on screen.
+"""Draws the environment layers for the Shore. All images are 270 rows tall, matching the camera's
+fixed vertical range, so a row in an image is also a row on screen.
 
 Screen plan: sky above row 150, then far sea, wet flats, a low bank, and the walkable ground at row 220.
 """
@@ -16,6 +16,9 @@ HORIZON = 150
 TIDE_LINE = 176
 MOON = (318, 54)
 MOON_R = 9
+# The cleft in the right cliff, where the ground carries on into the greybox part of the level.
+PASSAGE_X = 622
+PASSAGE_HEIGHT = 36
 
 SKY = ["C0", "C1", "C2", "C3", "C4", "C5", "C6"]
 FLAT = ["E1", "C2", "C3", "C4", "C5"]
@@ -289,20 +292,20 @@ def terrain(width=WORLD_WIDTH):
             if rng.random() > 0.75:
                 put(img, x, top + 1, "T0")
     draw_rock(img, noise, rng)
+    ground = img.copy()
     draw_side_cliff(img, noise, 0, 25, 62, +1, 37)
     draw_side_cliff(img, noise, width - 1, width - 21, width - 58, -1, 53)
+    draw_passage(img, ground, width - 21, width)
     return img
 
 
 def draw_rock(img, noise, rng):
-    """The boulder. Its top is the collision top at 14 px, with rounded shoulders and low stones at its
-    foot, so the silhouette stops reading as the rectangle underneath."""
+    """The boulder. Its whole top is the collision top at 14 px, so feet rest on what is drawn. Below the
+    top it flares out and low stones sit at its foot, so the silhouette stops reading as a rectangle."""
     x0, x1, top = 200, 239, GROUND_ROW - 14
-    for x in range(x0 - 1, x1 + 2):
-        edge = min(x - (x0 - 1), (x1 + 1) - x)
-        inset = max(0, 5 - edge) if edge < 5 else 0
-        inset = inset * inset // 3
-        y_top = top + inset + (1 if noise(x / 6.0, 8.0) > 0.68 else 0)
+    for x in range(x0 - 3, x1 + 4):
+        outside = max(x0 - x, x - x1, 0)
+        y_top = top if outside == 0 else top + 3 + 3 * outside + (1 if noise(x / 3.0, 8.0) > 0.5 else 0)
         for y in range(y_top, GROUND_ROW + 2):
             f = (y - top) / 15.0
             # Broad facets, not fine noise: planes turned to the moon are lighter.
@@ -333,8 +336,8 @@ def draw_rock(img, noise, rng):
 
 
 def draw_side_cliff(img, noise, edge_x, foot_x, top_x, direction, seed):
-    """A rock mass at the edge of the world, in dipping strata of uneven thickness. Its foot is the
-    collision wall; it widens toward the top so it frames the view."""
+    """A rock mass in dipping strata of uneven thickness, widening toward the top so it frames the view.
+    On the left its foot is the collision wall; on the right draw_passage opens a way through."""
     rng = random.Random(seed)
     bands = []
     u = -80
@@ -383,6 +386,20 @@ def draw_side_cliff(img, noise, edge_x, foot_x, top_x, direction, seed):
         put(img, edge - direction, row, "E4")
         if row > GROUND_ROW - 64 and rng.random() > 0.8:
             put(img, edge - direction * rng.randrange(2, 14), row, "T1")
+
+
+def draw_passage(img, ground, foot_x, width):
+    """A dark cleft through the foot of the right cliff, on the walkable ground. It rises from the left
+    jamb to clear the sailor's head, and meets the unlit greybox backdrop at the world's edge."""
+    for x in range(foot_x - 1, width):
+        for y in range(GROUND_ROW, GROUND_ROW + 3):
+            img.putpixel((x, y), ground.getpixel((x, y)))
+    x1 = width - 1
+    for x in range(PASSAGE_X, width):
+        clear = round(PASSAGE_HEIGHT * math.sqrt(1 - ((x1 - x) / (x1 - PASSAGE_X)) ** 2))
+        for y in range(GROUND_ROW - clear, GROUND_ROW):
+            put(img, x, y, "C0")
+        put(img, x, GROUND_ROW - clear - 1, "E0")
 
 
 def foreground(width=720):

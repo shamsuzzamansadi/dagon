@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 # Creates a release export and, when the host can run it, runs it headless and
 # looks for positive proof that the release extension library loaded.
-# Usage: GODOT=/path/to/godot tools/export_check.sh <linux|windows|linux-preview|windows-preview> [log-dir]
+# Usage: GODOT=/path/to/godot tools/export_check.sh <linux|windows> [log-dir]
 # Run the import first (tools/run_godot_checks.sh).
 set -u
 
@@ -15,16 +15,16 @@ out="$root/build/export/$platform"
 rm -rf "$out"
 mkdir -p "$out"
 
-# Which preset to export, what it must contain, and the scene it must start in.
-scene="res://scenes/level/level.tscn"
+# The scene the game must start in.
+scene="res://scenes/level/shore.tscn"
 stem="dagon"
 case "$platform" in
-	linux | linux-preview)
+	linux)
 		preset="Linux"
 		suffix=".x86_64"
 		library="libdagon.linux.template_release.x86_64.so"
 		;;
-	windows | windows-preview)
+	windows)
 		preset="Windows"
 		suffix=".exe"
 		library="dagon.windows.template_release.x86_64.dll"
@@ -32,13 +32,6 @@ case "$platform" in
 	*)
 		echo "Unknown platform: $platform" >&2
 		exit 2
-		;;
-esac
-case "$platform" in
-	*-preview)
-		preset="$preset Shore Preview"
-		scene="res://scenes/preview/shore_preview.tscn"
-		stem="dagon-shore-preview"
 		;;
 esac
 binary="$out/$stem$suffix"
@@ -61,15 +54,10 @@ pack="$out/$stem.pck"
 if grep -aq "tests/run_tests" "$pack"; then
 	fail "tests were exported into $stem.pck"
 fi
-case "$platform" in
-	*-preview) ;;
-	*)
-		# File names, not the setting that names the preview scene for its own preset.
-		if grep -aqE "shore_preview\.tscn\.remap|assets/preview/" "$pack"; then
-			fail "the preview was exported into the normal build"
-		fi
-		;;
-esac
+if grep -aq "scenes/level/level\.tscn" "$pack"; then
+	fail "the greybox development scene was exported into $stem.pck"
+fi
+grep -aq "assets/shore/" "$pack" || fail "the Shore art is missing from $stem.pck"
 echo "export-$platform: created"
 ls -la "$out"
 
