@@ -1,53 +1,55 @@
 # Jam Context: GitHub Game Off 2026
 
-Jam page: https://itch.io/jam/game-off-2026. Last checked 2026-10-28.
+Jam page: https://itch.io/jam/game-off-2026. Last checked 2026-11-02.
 
-**How this was checked:** the itch.io pages return HTTP 403 to automated
-fetching, and I did not try to bypass that. The facts below come from search
-excerpts of the official jam page, and they match the project owner's reading
-of the page. Re-read the page in a browser on 2026-11-01 after the theme
-announcement.
+**How this was checked:**
+- Read directly on 2026-11-02: the
+  [GitHub theme announcement](https://github.blog/open-source/gaming/game-off-2026-the-theme-is-shift/).
+- **Not readable from the development environment:** the itch.io jam page and
+  [FAQ](https://itch.io/jam/game-off-2026/topic/7290154/frequently-asked-questions-faq)
+  return HTTP 403 to automated fetching, and that was not bypassed. FAQ facts
+  below were checked directly by the independent reviewer and relayed by the
+  project owner; they are marked *(FAQ, relayed)*.
 
 ## 1. Confirmed requirements
 
-| Item | Value |
-|---|---|
-| Host | GitHub & Lee Reilly |
-| Development period | The month of November 2026 |
-| Theme announcement | 2026-11-01 |
-| Submission window (itch.io) | 2026-11-01 21:37 UTC → **2026-12-01 21:37 UTC** (13:37 PST, 22:37 Europe/Berlin) |
-| Source code | Must be in a **public GitHub repository**, pushed before the deadline |
-| Submission | On itch.io |
-| Tools | Any languages, engines and libraries |
-| Judging categories | Overall, Gameplay, Graphics, Audio, Innovation, **Theme Interpretation** |
-| Voting ends | 2027-01-01 13:37 PST |
-
-## 2. Unresolved points (not assumed either way)
-
-| Topic | What is known | What is open |
+| Item | Value | Source |
 |---|---|---|
-| **Theme** | It is announced 2026-11-01. | The theme itself, and how strictly it is judged beyond the "Theme Interpretation" category. |
-| **Pre-existing work and existing projects** | A participant asked in [topic 7170868](https://itch.io/jam/game-off-2026/topic/7170868/there-a-theme). The project owner reports no host answer. Earlier editions' FAQ (Game Off 2024) allowed pre-made code and assets with attribution, and discouraged resubmitting old projects with minor changes. **That is not a 2026 rule.** | Whether pre-jam design documents, a toolchain probe, or a template-derived repository skeleton are acceptable in 2026. |
-| **Template reuse** | Libraries and engines are allowed. godot-cpp is MIT; godot-cpp-template is Unlicense (public domain) boilerplate. | Whether template boilerplate counts as "pre-existing project" work. **Unresolved. Not treated as either permitted or prohibited.** Its use will be disclosed in the README regardless. |
-| **AI disclosure** | In [topic 7079155](https://itch.io/jam/game-off-2026/topic/7079155/will-there-be-a-way-to-separate-ai-generated-games), the host said the submission form will identify AI use, and the granularity was still under consideration. I have not read that post directly; this is from the project owner's reading plus a secondary write-up. No AI ban has been found. | The final form options. **Do not anticipate them.** Answer whatever the form asks, accurately, using §5. Community opinions in that thread are not rules. |
-| Asset and code licensing | No requirement found beyond a public repository. | Re-check on 2026-11-01. |
+| Host | GitHub & Lee Reilly | Jam page |
+| **Theme** | **SHIFT.** "How you interpret the theme is entirely up to you." | Announcement |
+| Submission window (itch.io) | Closes **2026-12-01 21:37 UTC** (13:37 PST, 22:37 Europe/Berlin) | Announcement |
+| Source code | Must live in a GitHub repository, pushed before the deadline | Announcement |
+| Tools | Any languages, engines and libraries | Jam page |
+| Judging categories | Overall, Gameplay, Graphics, Audio, Innovation, **Theme Interpretation** | Jam page |
+| Voting ends | 2027-01-01 13:37 PST | Announcement |
+| **Templates and starter projects** | Welcome | Announcement; FAQ, relayed |
+| **Reusable code** | Permitted | FAQ, relayed |
+| **Pre-jam repository and environment preparation** | Permitted | FAQ, relayed |
+| **Most game development** | Must occur during the jam | FAQ, relayed |
+| **AI-assisted development** | Allowed. "When submitting your game, you'll be asked about your use of AI." | Announcement; FAQ, relayed |
 
-## 3. Our conservative schedule policy
+Our internal submission target remains **2026-11-29 21:37 UTC**.
 
-This is our own choice. It is not a claim that the organizer bans
-preparation.
+## 2. Remaining open points
 
-- **No gameplay implementation before the jam starts and the theme has been
-  checked for fit.**
-- Before the start, work is limited to planning documents and the toolchain
-  evidence in `docs/evidence/`, which is a probe and not game code.
-- **Repository:** https://github.com/shamsuzzamansadi/dagon. The owner
-  created it on 2026-10-28 at 06:35 UTC. It is public, with default branch
-  `main`. On 2026-10-28 it was **empty: no commits, so no AI co-author
-  trailers to check.**
-  - No game code is pushed before the jam starts.
-  - The pre-jam documents and toolchain evidence go into the first commits,
-    dated honestly. The README discloses what existed before the jam (§6).
+| Topic | Status |
+|---|---|
+| Final wording of the AI question on the submission form | Seen only when the form is filled in. Answer it accurately from §5. Do not anticipate the options. |
+| Any other change on the FAQ page | The owner should glance at the FAQ again at M7 before submitting, because this environment cannot read it. |
+
+The earlier open questions on pre-existing work, template reuse and whether
+AI-assisted work is allowed are **resolved** by §1.
+
+## 3. Repository and preparation record
+
+- **Repository:** https://github.com/shamsuzzamansadi/dagon, created by the
+  owner on 2026-10-28 at 06:35 UTC. Public, default branch `main`. It was empty
+  until the first push on 2026-11-02.
+- **Pre-jam work** was limited to planning documents and toolchain evidence
+  (§6). No gameplay code was written before the jam started and the theme was
+  checked. The first commit imports that material unchanged. Its commit date is
+  2026-11-02, the day it was committed; the actual preparation date is recorded
+  here and in the commit message. History is not backdated or rewritten.
 - **Commit authorship:** commits use the owner's own Git identity. They carry
   no AI author, co-author or `Co-authored-by` trailers, and no automatic
   assistant footers in commits or PR descriptions. Claude Code's attribution
@@ -55,27 +57,40 @@ preparation.
   replace, the AI-use disclosure in the README, this document (§5) and the
   submission form.
 
-## 4. Theme-fit gate (before M1)
+## 4. Theme-fit assessment (G0, completed 2026-11-02)
 
-On 2026-11-01, after the announcement:
+**Verdict: DAGON fits SHIFT with no change to the core loop, architecture, act
+structure or scope.** The concept and title stay. The theme is expressed by
+making what the design already contains legible to the player. M1 may proceed.
 
-1. Read the official theme statement in a browser (project owner), and record
-   it here verbatim.
-2. Write a short theme-fit note here: how DAGON's mechanics or story, not just
-   its title, express the theme.
-3. If the fit needs **substantial** changes to the core loop, the act
-   structure or the puzzle, bring the owner a concise proposal before writing
-   any code. Small changes (a renamed act, a new clue motif) are recorded here
-   and in `gdd.md`.
-4. Re-check §2 for any new official rulings.
-5. Only then start M1.
+| Shift | Meaning | What the player actually sees and does | Delivered by | Milestone |
+|---|---|---|---|---|
+| **Physical** | The seabed has been displaced from beneath the ocean. | Waking beside a boat with no water in sight. Fish rotting on dry mud. Silence where surf should be. Walking across terrain that is plainly ocean floor: rib arch, fossils, drained trench. | Act I–II layout, existing examine captions, ambience | M3 (layout, captions), M4 (ambience, silhouettes) |
+| **Interpretive** | The glyph sequence restores the mural's meaning, turning apparent ruins into evidence of worship. | **Before solving:** examining the mural gives a caption describing eroded, meaningless carvings, and the mural is dim and fragmentary. **After solving:** the same mural, examined in the same place, is lit and readable, and its caption describes figures bowing to a vast swimmer. The player's own action caused that change. | The existing puzzle and mural Interactable. One caption swap on the Awakened beat, plus the existing `monolith_awaken` clip | M3 (caption swap, greybox lit state), M5 (final art) |
+| **Perceptual** | The reveal changes the player's understanding of the landscape and their own scale; exploration becomes escape. | The camera pulls back far enough to make the sailor tiny. What read as a far ridge or background shape turns out to be part of the creature. The direction of travel reverses: the player walked right for the whole game and must now run left, back over ground that means something different. | Existing `dagon_reveal` camera framing, the Dagon parallax layer, the existing Fleeing beat | M3 (framing, flee), M5 (final reveal) |
+
+**Explicitly not added:** dimension switching, alternate physics, a new player
+verb, a new puzzle system, another ending. The optional perception shaders stay
+stretch work after M6 and are not needed for this interpretation.
+
+**Requirements this adds to existing work, and nothing else:**
+1. M3: the mural has a before and an after caption, swapped as part of the
+   Awakened beat's C++ essential outcome so a missing clip cannot leave it
+   unchanged.
+2. M3 and M5: at least one far-background silhouette is placed so it visibly
+   becomes part of Dagon during the reveal.
+3. M3: playtest check: can a player describe what the mural meant before and
+   after solving it?
+
+The submission page should state this interpretation in one or two sentences
+(M7).
 
 ## 5. AI-assisted workflow record (for honest disclosure)
 
 | Role | Who / what | Scope |
 |---|---|---|
 | Direction, decisions, playtesting, final approval, upload and submission | Human project owner | All |
-| Architecture, documentation, C++ code, tests, CI configuration | **Claude (Anthropic), via Claude Code**, working under the owner's direction | Expected to author most source code and documents |
+| Architecture, documentation, C++ code, tests, CI configuration, greybox scenes | **Claude (Anthropic), via Claude Code**, working under the owner's direction | Authors most source code and documents |
 | Independent design and code review | **ChatGPT (OpenAI)**, relayed by the owner | Review only |
 | Placeholder art and audio | Silhouette polygons and shaders made in the editor or by scripts, and procedurally generated audio, produced with AI assistance | First playable |
 | Final assets | Decided before M4 | Each asset's provenance (human, AI-assisted, or third-party CC0/OFL) recorded in `CREDITS.md` |
@@ -87,7 +102,8 @@ table. If the form only offers yes/no, the answer is **yes**.
 
 | Date | Work | Kind |
 |---|---|---|
-| 2026-10-28 | GDD, architecture, toolchain, roadmap, risks, decisions; two review rounds | Planning documents |
+| 2026-10-28 | GDD, architecture, toolchain, roadmap, risks, decisions; review rounds | Planning documents |
 | 2026-10-28 | Toolchain probe: C++20 GDExtension load test and import-crash investigation, plus the reproducible package and `reproduce.sh` (`docs/evidence/import-crash/`) | Toolchain evidence, not game code |
 | 2026-10-28 06:35 UTC | Owner created the empty public GitHub repository | Repository setup |
 | — | **No gameplay implementation before the jam start and theme-fit gate** | — |
+| 2026-11-02 | First commit of the above; G0 completed; M1 started | Jam work begins |

@@ -1,9 +1,15 @@
 # DAGON: Beneath the Black Tide — Game Design Document
 
-Status: Phase A, conditionally approved (2026-10-28). **The concept is
-provisional for GitHub Game Off 2026.** The theme is announced on 2026-11-01.
-Before any jam implementation, the theme fit is assessed in
-[jam.md](jam.md) §4, and changes to this document are proposed if needed.
+Status: Phase A approved. Entry for GitHub Game Off 2026, theme **SHIFT**
+(theme-fit assessed 2026-11-02 in [jam.md](jam.md) §4; the concept and scope
+are unchanged).
+
+**How the game expresses SHIFT:**
+- *Physical:* the seabed has been displaced from beneath the ocean.
+- *Interpretive:* solving the glyphs restores the mural's meaning, turning
+  apparent ruins into evidence of worship (§5).
+- *Perceptual:* the reveal changes what the landscape is and how big the sailor
+  is, and exploration becomes escape (§4, Act IV).
 
 ## 1. Pitch
 
@@ -56,6 +62,11 @@ checkpoint.
 There is one ending (MVP). The epilogue text is original and written in the
 first-person, after-the-fact voice of the source.
 
+**The perceptual shift in Act IV.** The camera pulls back until the sailor is
+tiny. A far-background shape the player has walked past turns out to be part of
+the creature. The player has walked right for the whole game and now runs left,
+back over the same ground.
+
 **Flee rules (still one ending):**
 - The way right is the trench edge, a solid rock wall, so moving the wrong way
   just presses against it.
@@ -75,6 +86,14 @@ stones in the order the story happens.
 | Wave   | Rising water lines    | The waters rise         | 1     |
 | Kneel  | Bowing figure         | The faithful bow        | 2     |
 | Eye    | Open eye above a hand | He looks upon them      | 3     |
+
+**Before and after (the interpretive shift).** The same mural, examined in the
+same place, reads differently:
+- *Before solving:* dim and fragmentary. Its caption describes worn, meaningless
+  carvings, and the player can take it for ruins.
+- *After solving:* lit and legible. Its caption describes figures bowing to a
+  vast swimmer. The caption swap is part of the Awakened beat's essential
+  outcome, so a missing clip cannot leave the mural unchanged.
 
 **Clues.** The three Act II tablets each show one glyph, with a short examine
 line ("The waters rose first…", "…and they bowed…", "…and He saw them.").
