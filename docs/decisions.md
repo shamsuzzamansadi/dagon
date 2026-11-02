@@ -208,3 +208,14 @@ check passed ([package §16](reviews/m1-review-package.md)).
   timestamps or appearance. Later milestone playtests identify the exact artifact or run.
 - **The review's limits still stand:** Godot integration tests, engine rendering and release exports rely on supplied CI
   evidence, not independent reruns ([package §17](reviews/m1-review-package.md)).
+
+## 7. M2 implementation choices (2026-11-02, for the M2 review)
+
+| ID | Choice | Why |
+|---|---|---|
+| D30 | M2 builds in the entry scene, `shore.tscn`. `level.tscn` stays the art-free movement test scene. | Settles the question left open in D20. The player meets menus and interaction in the scene the build opens, and the greybox keeps testing movement alone. |
+| D31 | `GameDirector` starts in M2 with only the session checkpoint and kill plane | No extra class just for M2, keeping the approved count of 11. M3 adds `StoryProgress`, cinematics and moves the session checkpoint to `GameSession`. |
+| D32 | One rebindable key per gameplay action. The arrows stay on movement and Esc stays on pause, and neither can be assigned elsewhere. | Swapping two keys can never leave an action unbound, and nobody can lock themselves out. The cost is that arrow keys cannot be used for jump or interact. |
+| D33 | `reset_global_state()` leaves volumes and bindings alone | They change only through Settings, so they are already the player's. Re-reading the file would undo a change that could not be saved, which the player was told lasts until they quit. Changes the wording of architecture §7 rule 8. |
+| D34 | An original pixel font, drawn by `tools/art/gen_ui.py` | The engine's default font is not readable on a 480x270 canvas. This is UI groundwork, not the M4 styling pass. |
+| D35 | The project defines `ui_accept` and `ui_cancel` itself | The engine's defaults for these have no gamepad buttons in 4.7.2, so a controller could neither press nor back out. |

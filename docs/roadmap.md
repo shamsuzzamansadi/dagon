@@ -56,7 +56,8 @@ rebinding and save support are never removed silently (risk R20).
   ([D19, D20](decisions.md), [shore-preview.md](shore-preview.md)). The art stops at the cliff opening
   (x = 640), and everything past it is unfinished greybox: a documented boundary, not a finished
   transition. **This is not M4,** and it closes none of the M1 checks above.
-- [ ] M2 next, with the scope below. M3–M7 not started.
+- [ ] **M2: implemented on branch `m2/interaction-and-usability`, at the M2 review gate, not merged**
+  ([package](reviews/m2-review-package.md)). M3–M7 not started.
 - **Every later playtest identifies the exact artifact or run it tested.**
 
 ## Review follow-ups by milestone (Phase A final review, 2026-10-28)

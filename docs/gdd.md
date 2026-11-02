@@ -259,8 +259,9 @@ levels, custom physics or rendering, multiplayer.
 
 ## 11. Menus, settings and saving
 
-**Status: planned. The current build has no menus, settings or saves.** Added by the owner on 2026-11-02
-([D24, D25](decisions.md)). Saving is an intentional scope change: this document excluded it before.
+**Status: the pause menu, Settings and rebinding are implemented in M2, on its branch and at its review gate. The main
+menu and the save slot are planned for M3.** Added by the owner on 2026-11-02 ([D24, D25](decisions.md)). Saving is an
+intentional scope change: this document excluded it before.
 
 | Screen | Options | Milestone |
 |---|---|---|
@@ -271,10 +272,10 @@ levels, custom physics or rendering, multiplayer.
 **Menus.** Every menu works with keyboard and gamepad, a control always has focus, and Back closes one level.
 Pausing stops gameplay while the menu stays responsive.
 
-**Rebinding.** Keyboard keys for gameplay actions can be changed. If a key is already in use, the game says
+**Rebinding.** One keyboard key for each gameplay action can be changed. If a key is already in use, the game says
 which action has it and lets the player swap or cancel, so no action is left without a key. Restore Defaults is
-always reachable. Menu navigation, Back and the Esc pause key cannot be rebound, so nobody can lock themselves
-out. Gamepad mappings are fixed for the jam.
+always reachable. Menu navigation, Back, the Esc pause key and the arrow keys for movement cannot be rebound, so
+nobody can lock themselves out. Gamepad mappings are fixed for the jam.
 
 **Settings** persist between runs and are stored separately from game progress. The volumes do nothing audible
 until audio exists.

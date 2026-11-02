@@ -1,0 +1,15 @@
+Rechecked at 6ea0509, after the caption test was corrected and the focus fix went in.
+
+=== control: no change
+RESULT passed=107 failed=0
+
+=== a new caption keeps the old tween
+FAIL test_director.test_a_new_caption_replaces_the_old_one_and_restarts_its_time
+     the replaced caption's timer ended the new one
+     the new caption's opacity: expected 1.000 ±0.010, got 0.000
+RESULT passed=106 failed=1
+
+=== focus is not brought back
+FAIL test_pause_menu.test_focus_comes_back_after_it_is_lost
+     a press did not bring focus back: <Object#null>
+RESULT passed=106 failed=1

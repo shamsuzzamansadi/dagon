@@ -7,7 +7,8 @@ under the ocean. Godot 4.7 with gameplay in C++20 through GDExtension.
 **Status: M1 foundation, accepted by the owner with documented deferrals.** The game opens on the Shore, in its accepted art
 direction: a sailor you can walk and jump with, on exposed seabed beside a stranded boat, with the sea
 far off. The artwork stops at the cliff opening, a known boundary: past it, the level carries on as
-unfinished greybox. There is no interaction, story, puzzle, audio, menu or save yet. See
+unfinished greybox. M2 adds examining things, checkpoints, a pause menu, settings and key rebinding, on its
+branch and at its review gate. There is no story, puzzle, audio, main menu or save yet. See
 [docs/roadmap.md](docs/roadmap.md) and
 [docs/shore-preview.md](docs/shore-preview.md).
 
@@ -22,7 +23,7 @@ Nothing is released yet. Builds come from CI, and downloading them needs a GitHu
 4. **Windows:** run `dagon.exe`. The build is not code-signed, so SmartScreen may warn you; choose
    **More info**, then **Run anyway**. **Linux:** run `chmod +x dagon.x86_64`, then `./dagon.x86_64`.
 
-The game opens in a 1440×810 window. To quit, close the window.
+The game opens in a 1440×810 window. To quit, close the window, or use the pause menu in M2 builds.
 
 ## Controls
 
@@ -30,6 +31,12 @@ The game opens in a 1440×810 window. To quit, close the window.
 |---|---|---|
 | Walk | A / D, ← / → | Left stick, D-pad |
 | Jump | Space | South button (A / Cross) |
+| Examine, when a prompt shows | E | West button (X / Square) |
+| Pause | Esc | Start |
+| Menus: move, choose, back | Arrow keys, Enter or Space, Esc | D-pad or left stick, south button, east button (B / Circle) |
+
+In Settings you can change the keyboard keys for walking, jumping and examining. The arrow keys always move and Esc
+always pauses.
 
 These are checked by automated tests with simulated input. A, D, the arrow keys and Space have also worked in a
 human test. Physical controllers are untested so far, and testing them is deferred to M6, before release.
@@ -100,7 +107,9 @@ GODOT=/path/to/godot sh tools/export_check.sh linux  # or: windows
 ```
 
 Logs go to `build/logs/`, with a separate stdout, stderr and exit status for
-each step.
+each step. These scripts give every Godot process one unique storage folder, so they cannot touch your own
+settings. The test runner refuses to start without one: to run it by hand, set `DAGON_STORAGE_DIR` to a folder
+whose path contains `dagon-test-`.
 
 ## How this was made
 
