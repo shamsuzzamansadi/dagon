@@ -9,8 +9,8 @@
 
 namespace dagon {
 
-// Follows a target with a look-ahead. Smoothing and level limits are the
-// built-in Camera2D properties, set in the scene.
+// Follows a target with a look-ahead, locked to whole pixels. Level limits are
+// the built-in Camera2D properties, set in the scene.
 class CameraRig : public godot::Camera2D {
 	GDCLASS(CameraRig, godot::Camera2D)
 
@@ -44,7 +44,7 @@ private:
 
 	// Pixel lock keeps the camera a whole number of pixels from the target. Otherwise the target
 	// and a smoothed camera round separately and the character flickers by a pixel on screen.
-	bool pixel_lock_ = false;
+	bool pixel_lock_ = true;
 	float lock_speed_ = 2.5f;
 	godot::Vector2 locked_offset_;
 };

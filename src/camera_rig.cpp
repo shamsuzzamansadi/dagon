@@ -73,6 +73,9 @@ PackedStringArray CameraRig::_get_configuration_warnings() const {
 	if (target_path_.is_empty()) {
 		warnings.push_back("target_path is not set, so the camera will not follow anything.");
 	}
+	if (pixel_lock_ && is_position_smoothing_enabled()) {
+		warnings.push_back("Position smoothing defeats pixel_lock: the character will flicker by a pixel while followed.");
+	}
 	return warnings;
 }
 
