@@ -38,5 +38,12 @@ case "$group" in
 		exit_of exported-run-exit "build/logs/export/run-$platform.exit"
 		notice first-error build/logs/godot/integration.errors '.'
 		;;
+	entry)
+		notice check-art build/logs/check-art.log '^CHECK_ART'
+		notice smoke-entry-scene build/logs/godot/smoke.stdout "Completed load for: 'res://scenes/level/shore.tscn'"
+		notice smoke-greybox-scene build/logs/godot/smoke_greybox.stdout "Completed load for: 'res://scenes/level/level.tscn'"
+		exit_of smoke-greybox-exit build/logs/godot/smoke_greybox.exit
+		notice exported-entry-scene "build/logs/export/run-$platform.all" "Completed load for: 'res://scenes/level/shore.tscn'"
+		;;
 esac
 exit 0

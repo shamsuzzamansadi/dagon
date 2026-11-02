@@ -65,9 +65,17 @@ making what the design already contains legible to the player. M1 may proceed.
 
 | Shift | Meaning | What the player actually sees and does | Delivered by | Milestone |
 |---|---|---|---|---|
-| **Physical** | The seabed has been displaced from beneath the ocean. | Waking beside a boat with no water in sight. Fish rotting on dry mud. Silence where surf should be. Walking across terrain that is plainly ocean floor: rib arch, fossils, drained trench. | Act I–II layout, existing examine captions, ambience | M3 (layout, captions), M4 (ambience, silhouettes) |
+| **Physical** | The seabed has been displaced from beneath the ocean. | Waking on exposed seabed beside a stranded boat, with the sea only a thin band far beyond it, drawn back unnaturally far ([D21](decisions.md)). Fish rotting on the mud. No surf where it should be, only a faint, far-off sea. Walking across terrain that is plainly ocean floor: rib arch, fossils, drained trench. | Act I–II layout, existing examine captions, ambience | M3 (layout, captions), M4 (ambience, silhouettes) |
 | **Interpretive** | The glyph sequence restores the mural's meaning, turning apparent ruins into evidence of worship. | **Before solving:** examining the mural gives a caption describing eroded, meaningless carvings, and the mural is dim and fragmentary. **After solving:** the same mural, examined in the same place, is lit and readable, and its caption describes figures bowing to a vast swimmer. The player's own action caused that change. | The existing puzzle and mural Interactable. One caption swap on the Awakened beat, plus the existing `monolith_awaken` clip | M3 (caption swap, greybox lit state), M5 (final art) |
 | **Perceptual** | The reveal changes the player's understanding of the landscape and their own scale; exploration becomes escape. | The camera pulls back far enough to make the sailor tiny. What read as a far ridge or background shape turns out to be part of the creature. The direction of travel reverses: the player walked right for the whole game and must now run left, back over ground that means something different. | Existing `dagon_reveal` camera framing, the Dagon parallax layer, the existing Fleeing beat | M3 (framing, flee), M5 (final reveal) |
+
+**What exists now and what is planned (2026-11-02).** Only part of the physical shift is in the game.
+
+| Shift | In the standard build today | Still planned |
+|---|---|---|
+| Physical | The exposed seabed on the Shore: wet flats, the sea far beyond the stranded boat, dead fish | Examine captions, fossils, rib arch, drained trench, and all ambience (M3, M4) |
+| Interpretive | Nothing | Tablets, mural, puzzle and caption swap (M3); final art and sound (M5) |
+| Perceptual | Nothing | Camera pull-back, the reveal, and the turn from exploration to escape (M3, M5) |
 
 **Explicitly not added:** dimension switching, alternate physics, a new player
 verb, a new puzzle system, another ending. The optional perception shaders stay
@@ -81,6 +89,9 @@ stretch work after M6 and are not needed for this interpretation.
    becomes part of Dagon during the reveal.
 3. M3: playtest check: can a player describe what the mural meant before and
    after solving it?
+4. M3 to M5 (owner direction, 2026-11-02): at each relevant story beat, the player meets
+   the change through a visible event and through sound, not only in documents (GDD §7).
+   This does not justify a new mechanic or wider scope.
 
 The submission page should state this interpretation in one or two sentences
 (M7).
@@ -93,6 +104,8 @@ The submission page should state this interpretation in one or two sentences
 | Architecture, documentation, C++ code, tests, CI configuration, greybox scenes | **Claude (Anthropic), via Claude Code**, working under the owner's direction | Authors most source code and documents |
 | Independent design and code review | **ChatGPT (OpenAI)**, relayed by the owner | Review only |
 | Placeholder art and audio | Silhouette polygons and shaders made in the editor or by scripts, and procedurally generated audio, produced with AI assistance | First playable |
+| Shore art | Pixel art drawn by Python scripts written and tuned with AI assistance (Claude), under the owner's direction, who accepted the art direction. No image generators or third-party art | Shipped in the standard build (`docs/shore-preview.md`) |
+| Audio | None yet. Direction and provenance rules in GDD §7: state accurately how each sound was made, and never describe stock or generated audio as personally recorded or composed | M4 onward |
 | Final assets | Decided before M4 | Each asset's provenance (human, AI-assisted, or third-party CC0/OFL) recorded in `CREDITS.md` |
 
 On the submission form, choose the option that most accurately matches this

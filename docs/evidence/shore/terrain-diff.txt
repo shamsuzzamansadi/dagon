@@ -1,0 +1,7 @@
+terrain.png: the accepted preview (c32a65e) against the integrated art.
+Changed pixels: 646 of 172800. Every other image is an exact rename.
+
+  columns 198-202, rows 206-217: 19 px (the rock)
+  columns 215-224, rows 206-208: 25 px (the rock)
+  columns 232-242, rows 206-220: 31 px (the rock)
+  columns 619-639, rows 183-222: 571 px (the right cliff's cleft)

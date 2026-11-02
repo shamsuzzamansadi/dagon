@@ -1,0 +1,5 @@
+FAIL test_walk_frame_follows_distance_travelled
+     at 2.1 px the frame is 4, expected about 2
+     at 3.0 px the frame is 4, expected about 2
+     at 4.1 px the frame is 5, expected about 3
+     at 5.3 px the frame is 5, expected about 3

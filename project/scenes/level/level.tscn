@@ -27,6 +27,4 @@ limit_left = 0
 limit_top = -220
 limit_right = 1400
 limit_bottom = 50
-position_smoothing_enabled = true
-position_smoothing_speed = 5.0
 target_path = NodePath("../Player")

@@ -1,5 +1,5 @@
 extends RefCounted
-## Tests of the Act I greybox and the input map.
+## Tests of the Act I greybox and the input map. test_shore.gd runs all of these on the entry scene too.
 
 const LEVEL := "res://scenes/level/level.tscn"
 const LIMIT_RIGHT := 1400
@@ -7,8 +7,12 @@ const WALL_LEFT := 24.0
 const WALL_RIGHT := 1376.0
 
 
+func _scene_path() -> String:
+	return LEVEL
+
+
 func _setup(h) -> CharacterBody2D:
-	await h.load_fixture(LEVEL)
+	await h.load_fixture(_scene_path())
 	return h.fixture.get_node("Player")
 
 
@@ -106,6 +110,59 @@ func test_camera_stays_inside_level_limits(h) -> void:
 	player.teleport(Vector2(WALL_RIGHT - 10.0, -2))
 	await h.steps(240)
 	h.check_near(camera.get_screen_center_position().x, LIMIT_RIGHT - half_width, 2.0, "camera center at the right limit")
+
+
+## Where the character lands on screen. With snap_2d_transforms_to_pixel the renderer rounds the
+## canvas and the node separately, so this does too: rounding their sum would hide a flicker. It reads
+## at physics_frame because that fires before anything moves: the player and canvas are still exactly
+## as they were last drawn. Godot applies a camera's transform after processing, so a read during
+## processing would pair the new player position with the old camera.
+func _screen_x(h, player: CharacterBody2D) -> int:
+	await h.tree.physics_frame
+	return floori(player.get_canvas_transform().origin.x + 0.5) + floori(player.global_position.x + 0.5)
+
+
+## The defect from the owner's recording: the character flickered by a pixel while followed.
+func test_camera_holds_the_character_still_on_screen(h) -> void:
+	var player: CharacterBody2D = await _setup(h)
+	await h.landed_on_floor(player)
+	# Open ground in both directions, far enough for the look-ahead to settle after turning.
+	for leg in [["move_right", Vector2(250, -2), 50, 40], ["move_left", Vector2(895, -2), 125, 30]]:
+		var action: String = leg[0]
+		player.teleport(leg[1])
+		await h.landed_on_floor(player)
+		Input.action_press(action)
+		await h.steps(leg[2])
+		var seen := {}
+		for i in leg[3]:
+			seen[await _screen_x(h, player)] = true
+		Input.action_release(action)
+		h.check(player.is_on_floor(), "%s left the flat ground at x=%.1f" % [action, player.global_position.x])
+		h.check(seen.size() == 1, "%s: the screen position varied while walking: %s" % [action, str(seen.keys())])
+
+
+## Turning moves the look-ahead across the view: one slow slide, not a jump and no flicker back.
+func test_camera_slides_one_way_when_turning(h) -> void:
+	const MAX_STEP := 3 # The first frame of the slide is the fastest: about 2 px at lock_speed 2.5.
+	var player: CharacterBody2D = await _setup(h)
+	await h.landed_on_floor(player)
+	player.teleport(Vector2(895, -2))
+	await h.landed_on_floor(player)
+	await h.steps(240) # Let any camera lag from the teleport settle before turning.
+	Input.action_press("move_left")
+	var previous: int = await _screen_x(h, player)
+	var first := previous
+	var went_back := 0
+	var biggest_step := 0
+	for i in 125:
+		var current: int = await _screen_x(h, player)
+		if current < previous:
+			went_back += 1
+		biggest_step = maxi(biggest_step, current - previous)
+		previous = current
+	h.check(went_back == 0, "the screen position went back on %d frames" % went_back)
+	h.check(biggest_step <= MAX_STEP, "the look-ahead jumped %d px in one frame" % biggest_step)
+	h.check(previous - first > 30, "the look-ahead only moved %d px" % (previous - first))
 
 
 func _key(physical_keycode: Key, pressed: bool) -> InputEventKey:

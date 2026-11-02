@@ -5,13 +5,13 @@ extends SceneTree
 const EXPECTED := {
 	"PlayerController": {
 		"base": "CharacterBody2D",
-		"properties": ["walk_speed", "acceleration", "deceleration", "air_control", "gravity_scale", "max_fall_speed", "jump_velocity", "jump_cut", "coyote_time", "jump_buffer_time", "action_move_left", "action_move_right", "action_jump", "visual_path"],
+		"properties": ["walk_speed", "acceleration", "deceleration", "air_control", "gravity_scale", "max_fall_speed", "jump_velocity", "jump_cut", "coyote_time", "jump_buffer_time", "action_move_left", "action_move_right", "action_jump", "visual_path", "sprite_path", "walk_pixels_per_frame"],
 		"methods": ["set_control_enabled", "is_control_enabled", "teleport", "get_facing"],
 		"signals": ["jumped", "landed"],
 	},
 	"CameraRig": {
 		"base": "Camera2D",
-		"properties": ["target_path", "look_ahead", "vertical_offset"],
+		"properties": ["target_path", "look_ahead", "vertical_offset", "pixel_lock", "lock_speed"],
 		"methods": [],
 		"signals": [],
 	},

@@ -1,0 +1,12 @@
+Camera jitter, measured from every rendered frame of the source of shore-preview-in-engine.mp4 (60 fps).
+The tracked point is the left edge of the sailor's face, which keeps one x offset in every walk frame.
+
+With pixel lock, walking right while the camera follows, frames 392-491:
+  x = 214 on all 100 frames, 0 changes in 99 frame transitions.
+  From frame 492 the camera has reached its right limit, so the sailor then moves on screen, as intended.
+
+Before pixel lock, M1 engine capture while the camera follows:
+  changed by 1 px or more on 89 of 600 frames (88 of them by exactly 1 px).
+  See docs/evidence/m1/windows-recording-2026-11-02.md.
+
+This measures one scripted capture with llvmpipe software rendering, not your display.

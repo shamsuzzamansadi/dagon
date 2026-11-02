@@ -1,0 +1,7 @@
+FAIL test_shore.test_shore_has_the_whole_greybox_level
+     collision differs from the greybox
+FAIL test_shore.test_act1_can_be_crossed_in_both_directions
+     stuck going right at x=613.9
+FAIL test_shore.test_camera_holds_the_character_still_on_screen
+     move_left left the flat ground at x=721.6
+RESULT passed=44 failed=3

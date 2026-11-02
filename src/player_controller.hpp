@@ -3,6 +3,7 @@
 #include "core/movement.hpp"
 #include "node_ref.hpp"
 
+#include <godot_cpp/classes/animated_sprite2d.hpp>
 #include <godot_cpp/classes/character_body2d.hpp>
 #include <godot_cpp/classes/node2d.hpp>
 #include <godot_cpp/variant/node_path.hpp>
@@ -58,12 +59,17 @@ public:
 
 	void set_visual_path(const godot::NodePath &p_value) { visual_path_ = p_value; }
 	godot::NodePath get_visual_path() const { return visual_path_; }
+	void set_sprite_path(const godot::NodePath &p_value) { sprite_path_ = p_value; }
+	godot::NodePath get_sprite_path() const { return sprite_path_; }
+	void set_walk_pixels_per_frame(float p_value) { walk_pixels_per_frame_ = p_value; }
+	float get_walk_pixels_per_frame() const { return walk_pixels_per_frame_; }
 
 protected:
 	static void _bind_methods();
 
 private:
 	void update_facing(float p_axis);
+	void update_sprite(float p_moved_pixels, float p_delta);
 
 	core::MoveParams params_;
 	core::MoveState state_;
@@ -80,6 +86,14 @@ private:
 
 	godot::NodePath visual_path_;
 	NodeRef<godot::Node2D> visual_;
+
+	// Optional: scenes without a sprite, such as the greybox, skip all of this.
+	godot::NodePath sprite_path_;
+	NodeRef<godot::AnimatedSprite2D> sprite_;
+	float walk_pixels_per_frame_ = 4.0f;
+	float walk_distance_ = 0.0f;
+	float airborne_time_ = 0.0f;
+	bool was_walking_ = false;
 };
 
 } // namespace dagon

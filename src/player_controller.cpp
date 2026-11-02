@@ -1,9 +1,12 @@
 #include "player_controller.hpp"
 
+#include "core/body_pose.hpp"
+
 #include <godot_cpp/classes/engine.hpp>
 #include <godot_cpp/classes/input.hpp>
 #include <godot_cpp/classes/input_map.hpp>
 #include <godot_cpp/classes/project_settings.hpp>
+#include <godot_cpp/classes/sprite_frames.hpp>
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/core/error_macros.hpp>
 
@@ -55,6 +58,12 @@ void PlayerController::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_visual_path", "path"), &PlayerController::set_visual_path);
 	ClassDB::bind_method(D_METHOD("get_visual_path"), &PlayerController::get_visual_path);
 	ADD_PROPERTY(PropertyInfo(Variant::NODE_PATH, "visual_path", PROPERTY_HINT_NODE_PATH_VALID_TYPES, "Node2D"), "set_visual_path", "get_visual_path");
+	ClassDB::bind_method(D_METHOD("set_sprite_path", "path"), &PlayerController::set_sprite_path);
+	ClassDB::bind_method(D_METHOD("get_sprite_path"), &PlayerController::get_sprite_path);
+	ADD_PROPERTY(PropertyInfo(Variant::NODE_PATH, "sprite_path", PROPERTY_HINT_NODE_PATH_VALID_TYPES, "AnimatedSprite2D"), "set_sprite_path", "get_sprite_path");
+	ClassDB::bind_method(D_METHOD("set_walk_pixels_per_frame", "value"), &PlayerController::set_walk_pixels_per_frame);
+	ClassDB::bind_method(D_METHOD("get_walk_pixels_per_frame"), &PlayerController::get_walk_pixels_per_frame);
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "walk_pixels_per_frame"), "set_walk_pixels_per_frame", "get_walk_pixels_per_frame");
 
 	ADD_SIGNAL(MethodInfo("jumped"));
 	ADD_SIGNAL(MethodInfo("landed"));
@@ -80,6 +89,17 @@ void PlayerController::_ready() {
 		}
 		visual_.set(visual);
 	}
+
+	if (!sprite_path_.is_empty()) {
+		AnimatedSprite2D *sprite = get_node<AnimatedSprite2D>(sprite_path_);
+		const Ref<SpriteFrames> frames = sprite != nullptr ? sprite->get_sprite_frames() : Ref<SpriteFrames>();
+		const bool complete = frames.is_valid() && frames->has_animation("idle") && frames->has_animation("walk") && frames->has_animation("jump") && frames->has_animation("fall");
+		if (complete) {
+			sprite_.set(sprite);
+		} else {
+			ERR_PRINT("PlayerController: sprite_path needs an AnimatedSprite2D with idle, walk, jump and fall animations.");
+		}
+	}
 }
 
 void PlayerController::_physics_process(double p_delta) {
@@ -104,6 +124,7 @@ void PlayerController::_physics_process(double p_delta) {
 
 	// velocity holds the post-collision result of the previous move_and_slide().
 	const Vector2 velocity = get_velocity();
+	const float previous_x = get_global_position().x;
 	const core::StepResult result = core::step(state_, params_, input, core::Vec2{ velocity.x, velocity.y }, contact, static_cast<float>(p_delta));
 
 	set_velocity(Vector2(result.velocity.x, result.velocity.y));
@@ -111,6 +132,7 @@ void PlayerController::_physics_process(double p_delta) {
 	contact_stale_ = false;
 
 	update_facing(input.axis);
+	update_sprite(get_global_position().x - previous_x, static_cast<float>(p_delta));
 
 	if (result.landed) {
 		emit_signal("landed");
@@ -140,6 +162,47 @@ void PlayerController::teleport(const Vector2 &p_position) {
 	set_velocity(Vector2());
 	state_ = core::MoveState{};
 	contact_stale_ = true;
+}
+
+void PlayerController::update_sprite(float p_moved_pixels, float p_delta) {
+	AnimatedSprite2D *sprite = sprite_.get();
+	if (sprite == nullptr) {
+		return;
+	}
+
+	const bool grounded = is_on_floor();
+	airborne_time_ = grounded ? 0.0f : airborne_time_ + p_delta;
+	const core::BodyPose pose = core::select_body_pose(grounded, p_moved_pixels, get_velocity().y, airborne_time_);
+
+	switch (pose) {
+		case core::BodyPose::Walk: {
+			if (!was_walking_) {
+				// Start on the passing frame, the closest match to the standing pose.
+				walk_distance_ = 2.0f * walk_pixels_per_frame_;
+				sprite->set_animation("walk");
+				sprite->pause();
+			}
+			walk_distance_ += std::abs(p_moved_pixels);
+			const int frame_count = sprite->get_sprite_frames()->get_frame_count("walk");
+			sprite->set_frame(core::walk_frame_index(walk_distance_, walk_pixels_per_frame_, frame_count));
+			break;
+		}
+		case core::BodyPose::Idle:
+			if (sprite->get_animation() != StringName("idle") || !sprite->is_playing()) {
+				sprite->play("idle");
+			}
+			break;
+		case core::BodyPose::Jump:
+		case core::BodyPose::Fall: {
+			const StringName name = pose == core::BodyPose::Jump ? "jump" : "fall";
+			if (sprite->get_animation() != name) {
+				sprite->set_animation(name);
+				sprite->pause();
+			}
+			break;
+		}
+	}
+	was_walking_ = pose == core::BodyPose::Walk;
 }
 
 void PlayerController::update_facing(float p_axis) {

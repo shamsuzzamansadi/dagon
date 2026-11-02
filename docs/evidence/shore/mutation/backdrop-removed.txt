@@ -1,0 +1,4 @@
+FAIL test_shore.test_art_ends_where_the_greybox_begins
+     logged error: scene/main/node.cpp:1975 get_node: Method/function failed. Returning: nullptr Node not found: "GreyboxBackdrop" (relative to "/root/Shore").
+     logged error: res://tests/test_shore.gd:72 test_art_ends_where_the_greybox_begins: Invalid access to property or key 'polygon' on a base object of type 'null instance'. 
+RESULT passed=46 failed=1

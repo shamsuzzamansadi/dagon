@@ -5,7 +5,8 @@ Status: Phase A approved. Entry for GitHub Game Off 2026, theme **SHIFT**
 are unchanged).
 
 **How the game expresses SHIFT:**
-- *Physical:* the seabed has been displaced from beneath the ocean.
+- *Physical:* the seabed has been displaced from beneath the ocean, which now lies
+  unnaturally far off, beyond the stranded boat.
 - *Interpretive:* solving the glyphs restores the mural's meaning, turning
   apparent ruins into evidence of worship (§5).
 - *Perceptual:* the reveal changes what the landscape is and how big the sailor
@@ -54,7 +55,7 @@ checkpoint.
 
 | Act | Name             | Target time | Beats |
 |-----|------------------|-------------|-------|
-| I   | The Shore        | 2 min       | Wake beside the overturned lifeboat. Teaches movement, a jump over the oar wreckage and the first interaction. Rotting fish everywhere, and no sea in sight. Silence where surf should be. |
+| I   | The Shore        | 2 min       | Wake on exposed seabed beside the stranded lifeboat. Teaches movement, a jump onto the boulder and the first interaction. Rotting fish on the mud, and the sea only a thin band far beyond the boat: the tide has drawn back unnaturally far and does not return ([D21](decisions.md)). No surf where it should be, only a faint, far-off sea that thins away as the player moves on. |
 | II  | The Exposed Abyss| 4–5 min     | Cracked black mud, fossils of creatures that should not exist, a whale-sized rib arch. Three **clue tablets** (one glyph each, see §5). A crevasse to hop. A distant shape moves once in the far parallax layer and is never mentioned. The ambience slowly loses its high frequencies. |
 | III | The Monolith     | 3–4 min     | A canyon opens and the monolith fills the frame. The camera pulls back on approach. Its mural is partly eroded. Three **glyph stones** at its base form the puzzle. When solved, the inscriptions glow and the mural can be read in full: figures bowing to a vast swimmer. |
 | IV  | The Witness      | 2 min       | The player steps onto the ledge behind the monolith. Control locks. Fog lifts, the camera zooms far out, and something rises from the trench water and embraces the monolith. Control returns and the sailor flees left under screen shake and roaring sound until he collapses. Fade to black, epilogue card, credits, title. |
@@ -132,14 +133,35 @@ about 4 s and never pauses the game.
 
 ## 7. Audio direction
 
-- Layered ambience per act, crossfaded: distant wind, wet mud ticks, low drones.
-- The usual sea sounds are deliberately absent. Silence is a feature.
-- Footsteps on mud/stone, lantern creak, examine "breath" cue, puzzle tones and
-  grinding.
-- Reveal: a sub-bass swell, then a low-pass sweep that opens up, then a roar
-  built from layered processed sources, then silence at the collapse.
-- Source: original synthesized or recorded sounds, plus CC0 only, all logged in
-  `CREDITS.md`.
+**Status: planned. The build has no audio yet.** Direction from the owner, 2026-11-02: original,
+cohesive audio with a Lovecraftian atmosphere, tied to environments and story triggers.
+
+**Sound communicates the world's change.** Familiar coastal sounds thin out or disappear as unnatural
+resonances emerge. Avoid a constant generic horror loop and repeated loud jump scares.
+
+| Group | Small palette |
+|---|---|
+| Environmental beds | Distant sea, exposed shore wind, sparse coastal details, wet mud ticks. Layered per area and crossfaded. |
+| Player and objects | Footsteps by surface (mud, stone), landing, boat wood and rope, lantern creak, stone interaction, examine "breath" cue, puzzle tones and grinding. |
+| Story cues | Discovery, puzzle completion, reveal, escape. |
+| Music and drones | Restrained music or low drones, spatial placement, deliberate silence. |
+
+| Where | How it should change |
+|---|---|
+| The Shore | No surf where it should be. A faint sea far off, wind, a few coastal details. |
+| The Exposed Abyss | The sea and coastal details thin out, the ambience slowly loses its high frequencies, and low drones begin. |
+| The Monolith | Unnatural resonances take over. The puzzle's tones belong to them. |
+| The Witness | A sub-bass swell, then a low-pass sweep that opens up, then a roar built from layered processed sources, then silence at the collapse. |
+
+**Provenance.** Prefer original recordings, synthesis or purpose-made audio; third-party sound is CC0
+only. Log every sound in `CREDITS.md`. Never describe stock or generated audio as personally recorded
+or composed, and keep any AI-use disclosure accurate (`jam.md` §5). Do not copy recognizable film or
+game music. Nothing is purchased or commissioned without the owner's approval.
+
+**To deliver at the audio milestones** (M4 for beds and player sounds, M5 for story cues): a compact
+event-to-sound list and a demonstration of the mix in gameplay, checked for loop seams, abrupt
+transitions, clipping, repeated-trigger stacking, and whether important cues stay audible. Separate
+music and effects volume controls arrive by the usability pass (roadmap).
 
 ## 8. Visual direction and acceptance
 
@@ -152,7 +174,8 @@ presentation. Passing automated checks says nothing about any of this.
 pacing from cinematic games, but no assets, compositions or recognizable designs.
 - 480×270 internal resolution, integer-scaled.
 - Palette: charcoal, slate, muted navy, restrained sickly teal. Warm amber lantern
-  light is the only warm colour.
+  light is the only warm colour. The accepted Shore palette (`tools/art/palette.py`) also
+  has muted wood and skin; amber stays the lantern's alone.
 - Clear separation between foreground, playable ground and distant scenery, using
   4–6 parallax layers and a foreground fog layer.
 - Deliberate negative space and scale contrast.
@@ -174,6 +197,11 @@ pacing from cinematic games, but no assets, compositions or recognizable designs
 - *UI:* consistent typography, spacing, alignment and restrained transitions. Captions
   are readable at target window sizes. Prompts and menus feel part of the same game.
   No debug labels or overlays in normal release gameplay.
+
+**Art direction (2026-11-02).** The owner accepted the Shore's direction ahead of M4
+([D19](decisions.md)), and it is what the standard build opens. That sets the look. It does
+not complete the deliverable below: stop, turn and landing animation, sound, and caption and
+prompt styling are still to come ([shore-preview.md](shore-preview.md)).
 
 **Prove it before decorating (first M4 deliverable).** One short, playable section of
 the Shore, brought close to final quality, sets the character treatment, terrain and

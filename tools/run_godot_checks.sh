@@ -45,9 +45,11 @@ step import "" --import
 step check_classes "^CHECK_CLASSES classes=[0-9]+ problems=0" --script res://tests/check_classes.gd
 step integration "^RESULT passed=[0-9]+ failed=0" --fixed-fps 60 --script res://tests/run_tests.gd
 step smoke "dagon: extension initialized" --verbose --fixed-fps 60 --quit-after 600
+step smoke_greybox "dagon: extension initialized" --verbose --fixed-fps 60 --quit-after 600 res://scenes/level/level.tscn
 
 grep -E "^(PASS|FAIL|     )" "$logs/integration.stdout" || true
 grep -hE "^(RESULT|CHECK_CLASSES)" "$logs/check_classes.stdout" "$logs/integration.stdout" || true
 grep -h "dagon: extension initialized" "$logs/smoke.stdout" || true
+grep -h "Completed load for: 'res://scenes/level/" "$logs/smoke.stdout" "$logs/smoke_greybox.stdout" || true
 
 exit "$failures"
