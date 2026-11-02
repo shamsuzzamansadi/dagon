@@ -83,7 +83,7 @@ func _bounds(polygon: PackedVector2Array) -> Rect2:
 
 
 ## The mismatch this replaces: rounded shoulders drawn on a rectangular collision left the feet in
-## the air at the rock's corners, by up to 6 px. Lands the real body on the rock and compares.
+## the air at the rock's corners, by up to 5 px. Lands the real body on the rock and compares.
 func test_feet_rest_on_the_drawn_rock(h) -> void:
 	var player: CharacterBody2D = await _setup(h)
 	await h.landed_on_floor(player)

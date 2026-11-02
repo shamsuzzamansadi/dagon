@@ -112,13 +112,14 @@ func test_camera_stays_inside_level_limits(h) -> void:
 	h.check_near(camera.get_screen_center_position().x, LIMIT_RIGHT - half_width, 2.0, "camera center at the right limit")
 
 
-## Where the character lands on screen, through the same transform the renderer uses. It reads at
-## physics_frame because that fires before anything moves: the player and canvas are still exactly as
-## they were last drawn. Godot applies a camera's transform after processing, so a read during
+## Where the character lands on screen. With snap_2d_transforms_to_pixel the renderer rounds the
+## canvas and the node separately, so this does too: rounding their sum would hide a flicker. It reads
+## at physics_frame because that fires before anything moves: the player and canvas are still exactly
+## as they were last drawn. Godot applies a camera's transform after processing, so a read during
 ## processing would pair the new player position with the old camera.
 func _screen_x(h, player: CharacterBody2D) -> int:
 	await h.tree.physics_frame
-	return floori(player.get_global_transform_with_canvas().origin.x + 0.5)
+	return floori(player.get_canvas_transform().origin.x + 0.5) + floori(player.global_position.x + 0.5)
 
 
 ## The defect from the owner's recording: the character flickered by a pixel while followed.
@@ -140,19 +141,27 @@ func test_camera_holds_the_character_still_on_screen(h) -> void:
 		h.check(seen.size() == 1, "%s: the screen position varied while walking: %s" % [action, str(seen.keys())])
 
 
-## Turning moves the look-ahead across the view. That is one slow slide, with no flicker back.
+## Turning moves the look-ahead across the view: one slow slide, not a jump and no flicker back.
 func test_camera_slides_one_way_when_turning(h) -> void:
+	const MAX_STEP := 3 # The first frame of the slide is the fastest: about 2 px at lock_speed 2.5.
 	var player: CharacterBody2D = await _setup(h)
 	await h.landed_on_floor(player)
 	player.teleport(Vector2(895, -2))
 	await h.landed_on_floor(player)
+	await h.steps(240) # Let any camera lag from the teleport settle before turning.
 	Input.action_press("move_left")
 	var previous: int = await _screen_x(h, player)
 	var first := previous
+	var went_back := 0
+	var biggest_step := 0
 	for i in 125:
 		var current: int = await _screen_x(h, player)
-		h.check(current >= previous, "the screen position went back from %d to %d" % [previous, current])
+		if current < previous:
+			went_back += 1
+		biggest_step = maxi(biggest_step, current - previous)
 		previous = current
+	h.check(went_back == 0, "the screen position went back on %d frames" % went_back)
+	h.check(biggest_step <= MAX_STEP, "the look-ahead jumped %d px in one frame" % biggest_step)
 	h.check(previous - first > 30, "the look-ahead only moved %d px" % (previous - first))
 
 

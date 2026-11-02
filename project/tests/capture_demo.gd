@@ -1,7 +1,8 @@
 extends SceneTree
-## Records the greybox development scene with scripted input through Movie Maker
-## mode. This is evidence for reviewers, not a test, and it plays the same way every time.
-## Run: godot --path project --write-movie <dir>/frame.png --fixed-fps 60 --resolution 480x270 --script res://tests/capture_demo.gd
+## Records a walk across the greybox development scene, or another scene named after
+## "--", with scripted input through Movie Maker mode. This is evidence for reviewers,
+## not a test, and it plays the same way every time.
+## Run: godot --path project --write-movie <dir>/frame.png --fixed-fps 60 --resolution 480x270 --script res://tests/capture_demo.gd [-- res://scenes/level/shore.tscn]
 
 const StepProbe := preload("res://tests/step_probe.gd")
 const SECONDS := 15
@@ -12,7 +13,9 @@ func _initialize() -> void:
 
 
 func _run() -> void:
-	var level: Node = (load("res://scenes/level/level.tscn") as PackedScene).instantiate()
+	var args := OS.get_cmdline_user_args()
+	var scene: String = args[0] if not args.is_empty() else "res://scenes/level/level.tscn"
+	var level: Node = (load(scene) as PackedScene).instantiate()
 	var probe: Node = StepProbe.new()
 	root.add_child(level)
 	root.add_child(probe)
