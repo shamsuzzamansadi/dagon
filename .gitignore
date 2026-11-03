@@ -20,3 +20,11 @@ __pycache__/
 .scons-cache/
 build/
 custom.py
+
+# Editor and IDE settings
+.vscode/
+.vs/
+.idea/
+*.code-workspace
+*.sublime-project
+*.sublime-workspace
