@@ -1,0 +1,73 @@
+== connections per scene, as written
+  shore.tscn: 2
+  player.tscn: 0
+  sailor_player.tscn: 0
+  hud.tscn: 0
+  pause_menu.tscn: 6
+  settings_menu.tscn: 10
+== re-packing the source scene the way a save or export does
+  pack result: 0
+  shore.tscn connections before: 2, after: 0
+== the same re-pack, with the Player instance marked editable
+  connections: 2
+== mounted: <downloads>/dagon-windows/dagon.pck true
+  shore.tscn: exported connections=0 only in source=3 only in export=1
+     - conn Player/Interactor.focus_changed -> Hud.on_focus_changed binds=[]
+     - conn Player/Interactor.interacted -> Hud.on_interacted binds=[]
+     - node ./Terrain StaticBody2D collision_layer=1,collision_mask=0
+     + node ./Terrain StaticBody2D collision_mask=0
+  player.tscn: exported connections=0 only in source=1 only in export=1
+     - node . PlayerController collision_layer=2,collision_mask=1,floor_constant_speed=true,floor_snap_length=4.0,visual_path=Visual
+     + node . PlayerController collision_layer=2,floor_constant_speed=true,floor_snap_length=4.0,visual_path=Visual
+  sailor_player.tscn: exported connections=0 only in source=5 only in export=5
+     - node .  sprite_path=Visual/Sailor,walk_pixels_per_frame=4.0
+     - node ./Visual/Lantern PointLight2D color=(1.0, 0.68, 0.34, 1.0),energy=0.5,position=(8.0, -9.0),range_item_cull_mask=1,texture=<res>
+     - node ./Visual/LanternMarker  visible=false
+     - node ./Visual/Sailor AnimatedSprite2D animation=idle,centered=false,light_mask=2,offset=(-16.0, -32.0),sprite_frames=<res>
+     - node ./Visual/Silhouette  visible=false
+     + node .  sprite_path=Visual/Sailor
+     + node Visual/Lantern PointLight2D color=(1.0, 0.68, 0.34, 1.0),energy=0.5,position=(8.0, -9.0),texture=<res>
+     + node Visual/LanternMarker  visible=false
+     + node Visual/Sailor AnimatedSprite2D animation=idle,centered=false,light_mask=2,offset=(-16.0, -32.0),sprite_frames=<res>
+     + node Visual/Silhouette  visible=false
+  hud.tscn: exported connections=0 only in source=1 only in export=1
+     - node ./Fade ColorRect anchor_bottom=1.0,anchor_right=1.0,anchors_preset=15,color=(0.0392, 0.0549, 0.0941, 1.0),grow_horizontal=2,grow_vertical=2,layout_mode=3,mouse_filte
+     + node ./Fade ColorRect anchor_bottom=1.0,anchor_right=1.0,anchors_preset=15,color=(0.0392, 0.0549, 0.0941, 1.0),grow_horizontal=2,grow_vertical=2,mouse_filter=2,visible=fa
+  pause_menu.tscn: exported connections=6 only in source=7 only in export=7
+     - conn Center/Main/Items/Quit.pressed -> ..ask_quit binds=[]
+     - conn Center/Main/Items/RestartCheckpoint.pressed -> ..restart_checkpoint binds=[]
+     - conn Center/Main/Items/Resume.pressed -> ..resume binds=[]
+     - conn Center/Main/Items/Settings.pressed -> ..open_settings binds=[]
+     - conn Center/QuitConfirm/Items/Buttons/Cancel.pressed -> ..cancel_quit binds=[]
+     - conn Center/QuitConfirm/Items/Buttons/Confirm.pressed -> ..confirm_quit binds=[]
+     - node . MenuController anchor_bottom=1.0,anchor_right=1.0,anchors_preset=15,grow_horizontal=2,grow_vertical=2,layout_mode=3,main_panel_path=Center/Main,process_mode=3,quit
+     + conn ./Center/Main/Items/Quit.pressed -> ..ask_quit binds=[]
+     + conn ./Center/Main/Items/RestartCheckpoint.pressed -> ..restart_checkpoint binds=[]
+     + conn ./Center/Main/Items/Resume.pressed -> ..resume binds=[]
+     + conn ./Center/Main/Items/Settings.pressed -> ..open_settings binds=[]
+     + conn ./Center/QuitConfirm/Items/Buttons/Cancel.pressed -> ..cancel_quit binds=[]
+     + conn ./Center/QuitConfirm/Items/Buttons/Confirm.pressed -> ..confirm_quit binds=[]
+     + node . MenuController anchor_bottom=1.0,anchor_right=1.0,anchors_preset=15,grow_horizontal=2,grow_vertical=2,main_panel_path=Center/Main,process_mode=3,quit_button_path=C
+  settings_menu.tscn: exported connections=10 only in source=11 only in export=11
+     - conn Center/Panel/Items/Back.pressed -> ..back binds=[]
+     - conn Center/Panel/Items/Conflict/Cancel.pressed -> ..cancel_conflict binds=[]
+     - conn Center/Panel/Items/Conflict/Swap.pressed -> ..swap_conflict binds=[]
+     - conn Center/Panel/Items/Effects/Slider.value_changed -> ..set_effects_volume binds=[]
+     - conn Center/Panel/Items/Interact/Key.pressed -> ..begin_capture binds=[3]
+     - conn Center/Panel/Items/Jump/Key.pressed -> ..begin_capture binds=[2]
+     - conn Center/Panel/Items/MoveLeft/Key.pressed -> ..begin_capture binds=[0]
+     - conn Center/Panel/Items/MoveRight/Key.pressed -> ..begin_capture binds=[1]
+     - conn Center/Panel/Items/Music/Slider.value_changed -> ..set_music_volume binds=[]
+     - conn Center/Panel/Items/RestoreDefaults.pressed -> ..restore_defaults binds=[]
+     - node . SettingsMenu anchor_bottom=1.0,anchor_right=1.0,anchors_preset=15,conflict_row_path=Center/Panel/Items/Conflict,effects_slider_path=Center/Panel/Items/Effects/Slid
+     + conn ./Center/Panel/Items/Back.pressed -> ..back binds=[]
+     + conn ./Center/Panel/Items/Conflict/Cancel.pressed -> ..cancel_conflict binds=[]
+     + conn ./Center/Panel/Items/Conflict/Swap.pressed -> ..swap_conflict binds=[]
+     + conn ./Center/Panel/Items/Effects/Slider.value_changed -> ..set_effects_volume binds=[]
+     + conn ./Center/Panel/Items/Interact/Key.pressed -> ..begin_capture binds=[3]
+     + conn ./Center/Panel/Items/Jump/Key.pressed -> ..begin_capture binds=[2]
+     + conn ./Center/Panel/Items/MoveLeft/Key.pressed -> ..begin_capture binds=[0]
+     + conn ./Center/Panel/Items/MoveRight/Key.pressed -> ..begin_capture binds=[1]
+     + conn ./Center/Panel/Items/Music/Slider.value_changed -> ..set_music_volume binds=[]
+     + conn ./Center/Panel/Items/RestoreDefaults.pressed -> ..restore_defaults binds=[]
+     + node . SettingsMenu anchor_bottom=1.0,anchor_right=1.0,anchors_preset=15,conflict_row_path=Center/Panel/Items/Conflict,effects_slider_path=Center/Panel/Items/Effects/Slid

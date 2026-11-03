@@ -7,7 +7,7 @@
 using namespace dagon::core;
 
 TEST_CASE("names that drivers report are recognized, whatever their case") {
-	for (const char *const name : { "Xbox Series Controller", "Xbox 360 Controller", "XInput Gamepad", "XBOX ONE CONTROLLER", "Microsoft X-Box pad" }) {
+	for (const char *const name : { "Xbox Series Controller", "Xbox 360 Controller", "XInput Gamepad", "XInput Controller", "XBOX ONE CONTROLLER", "Microsoft X-Box pad" }) {
 		CHECK(controller_family(name, 0) == ControllerFamily::Xbox);
 	}
 	for (const char *const name : { "PS5 Controller", "PS4 Controller", "PS3 Controller", "DualSense Wireless Controller", "Sony DualShock 4", "PLAYSTATION(R)3 Controller" }) {

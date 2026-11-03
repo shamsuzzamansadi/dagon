@@ -40,10 +40,10 @@ or layouts.
 | Verb     | Default input (KB / pad)    | Notes                                         |
 |----------|-----------------------------|-----------------------------------------------|
 | Walk     | A/D, ←/→ / left stick, d-pad | Slow, heavy pace (~70 px/s at 480×270).       |
-| Jump     | Space / A (south)           | Low hop for rocks and narrow crevasses only.   |
-| Interact | E / X (west)                | Shown only when a prompt is visible.          |
-| Pause    | Esc / Start                 | Resume, Restart Checkpoint, Settings, Quit to Desktop; Quit to Main Menu from M3. |
-| Back     | Esc / B (east)              | In menus. Cannot be rebound (§11).            |
+| Jump     | Space / south (Xbox A, PlayStation Cross) | Low hop for rocks and narrow crevasses only.   |
+| Interact | E / west (Xbox X, PlayStation Square) | Shown only when a prompt is visible, and the prompt names the button for the device in use. |
+| Pause    | Esc / Start (Xbox Menu, PlayStation Options) | Resume, Restart Checkpoint, Settings, Controls, Quit to Main Menu, Quit to Desktop. |
+| Back     | Esc / east (Xbox B, PlayStation Circle) | In menus. Cannot be rebound (§11). |
 
 The lantern is always on and needs no input or fuel. It gives a warm radius of
 about 90 px against a cold, dark ambient. Interactable props get a faint rim
@@ -259,18 +259,24 @@ levels, custom physics or rendering, multiplayer.
 
 ## 11. Menus, settings and saving
 
-**Status: the pause menu, Settings and rebinding are implemented in M2, on its branch and at its review gate. The main
-menu and the save slot are planned for M3.** Added by the owner on 2026-11-02 ([D24, D25](decisions.md)). Saving is an
-intentional scope change: this document excluded it before.
+**Status: all of this is implemented in M2, on its branch and at its review gate, for the beats that exist so far.** Added by
+the owner on 2026-11-02 and brought forward on 2026-11-03 ([D24, D25, D36](decisions.md)). Saving is an intentional scope change:
+this document excluded it before.
 
 | Screen | Options | Milestone |
 |---|---|---|
-| Pause | Resume, Restart Checkpoint, Settings, Quit to Desktop; Quit to Main Menu joins them in M3 | M2 |
+| Pause | Resume, Restart Checkpoint, Settings, Controls, Quit to Main Menu, Quit to Desktop | M2 |
 | Settings | Music volume, effects volume, keyboard bindings, Restore Defaults, Back | M2 |
-| Main menu | New Game, Continue, Settings, Credits, Quit | M3 |
+| Main menu, on launch | New Game, Continue, Settings, Controls, Credits, Quit to Desktop | M2 |
+| Controls | Movement, jumping, examining, pausing and menus, on keyboard with the current keys and on controller. Starting a new game shows a short version for the device in use | M2 |
+| Credits | Attribution and licenses, from the project's records | M2 |
 
-**Menus.** Every menu works with keyboard and gamepad, a control always has focus, and Back closes one level.
+**Menus.** Every menu works with keyboard and controller, a control always has focus, and Back closes one level.
 Pausing stops gameplay while the menu stays responsive.
+
+**Controllers.** Buttons are fixed, and bound by position. The prompt and Controls follow the device in use: the current key on
+a keyboard, A, B, X and Menu on a recognized Xbox controller, Cross, Circle, Square and Options on a recognized PlayStation
+controller, and the button's position on anything else. Disconnecting hands back to the keyboard.
 
 **Rebinding.** One keyboard key for each gameplay action can be changed. If a key is already in use, the game says
 which action has it and lets the player swap or cancel, so no action is left without a key. Restore Defaults is

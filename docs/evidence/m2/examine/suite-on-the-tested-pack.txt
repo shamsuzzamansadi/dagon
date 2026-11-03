@@ -1,0 +1,16 @@
+PACK mounted <downloads>/dagon-windows/dagon.pck
+FAIL test_director.test_every_scene_connection_is_in_place
+     focus_changed is not connected to the Hud
+     interacted is not connected to the Hud
+FAIL test_director.test_the_prompt_follows_focus_and_names_the_key
+     no prompt beside the boat
+     prompt reads ''
+FAIL test_director.test_the_prompt_follows_the_last_device_used
+     after a pad button it reads ''
+     after a key it reads ''
+FAIL test_director.test_examining_shows_the_caption_and_never_pauses
+     no caption after examining
+     caption reads ''
+FAIL test_settings.test_the_prompt_names_a_rebound_key
+     the prompt reads ''
+RESULT passed=116 failed=5

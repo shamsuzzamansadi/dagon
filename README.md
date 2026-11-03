@@ -4,13 +4,12 @@ A short 2D cinematic horror game for [GitHub Game Off 2026](https://itch.io/jam/
 (theme: SHIFT). A shipwrecked sailor wakes on a stretch of seabed that should be
 under the ocean. Godot 4.7 with gameplay in C++20 through GDExtension.
 
-**Status: M1 foundation, accepted by the owner with documented deferrals.** The game opens on the Shore, in its accepted art
-direction: a sailor you can walk and jump with, on exposed seabed beside a stranded boat, with the sea
-far off. The artwork stops at the cliff opening, a known boundary: past it, the level carries on as
-unfinished greybox. M2 adds examining things, checkpoints, a pause menu, settings and key rebinding, on its
-branch and at its review gate. There is no story, puzzle, audio, main menu or save yet. See
-[docs/roadmap.md](docs/roadmap.md) and
-[docs/shore-preview.md](docs/shore-preview.md).
+**Status: M1 foundation, accepted by the owner with documented deferrals. M2 is on its own branch, at its review gate and not
+merged.** On `main`, the game opens on the Shore, in its accepted art direction: a sailor you can walk and jump with, on exposed
+seabed beside a stranded boat, with the sea far off. The artwork stops at the cliff opening, a known boundary: past it, the level
+carries on as unfinished greybox. The M2 branch adds a main menu, New Game, Continue from one checkpoint save, Controls, Credits,
+examining things, a pause menu, settings and key rebinding, and controller labels. There is no story, puzzle or audio yet. See
+[docs/roadmap.md](docs/roadmap.md) and [docs/shore-preview.md](docs/shore-preview.md).
 
 ## Play the current build
 
@@ -23,29 +22,39 @@ Nothing is released yet. Builds come from CI, and downloading them needs a GitHu
 4. **Windows:** run `dagon.exe`. The build is not code-signed, so SmartScreen may warn you; choose
    **More info**, then **Run anyway**. **Linux:** run `chmod +x dagon.x86_64`, then `./dagon.x86_64`.
 
-The game opens in a 1440×810 window. To quit, close the window, or use the pause menu in M2 builds.
+The game opens in a 1440×810 window. In M2 builds it opens on the main menu: choose **New Game**, or **Continue** to carry on
+from your last checkpoint. To quit, close the window, or use **Quit to Desktop** in M2 builds.
 
 ## Controls
 
-| Action | Keyboard | Gamepad |
-|---|---|---|
-| Walk | A / D, ← / → | Left stick, D-pad |
-| Jump | Space | South button (A / Cross) |
-| Examine, when a prompt shows | E | West button (X / Square) |
-| Pause | Esc | Start |
-| Menus: move, choose, back | Arrow keys, Enter or Space, Esc | D-pad or left stick, south button, east button (B / Circle) |
+| Action | Keyboard | Xbox controller | PlayStation controller | Other controllers |
+|---|---|---|---|---|
+| Walk | A / D, ← / → | Left stick, D-pad | Left stick, D-pad | Left stick, D-pad |
+| Jump | Space | A | Cross | Bottom face button |
+| Examine, when a prompt shows | E | X | Square | Left face button |
+| Pause | Esc | Menu | Options | Start |
+| Menus: move | Arrow keys | Left stick, D-pad | Left stick, D-pad | Left stick, D-pad |
+| Menus: confirm | Enter, Space | A | Cross | Bottom face button |
+| Menus: back | Esc | B | Circle | Right face button |
+
+The controller columns are the same physical buttons, by position. The prompt and the Controls screen use the names for the
+device you are using, and an unrecognized controller is described by position.
 
 In Settings you can change the keyboard keys for walking, jumping and examining. The Left and Right arrows always move
-and Esc always pauses.
+and Esc always pauses. Controller buttons are fixed.
 
-These are checked by automated tests with simulated input. A, D, the Left and Right arrows and Space have also worked in
-a human test. Physical controllers are untested so far, and testing them is deferred to M6, before release.
+All of this is checked by automated tests with simulated input for each layout. In human tests, A, D, the Left and Right arrows and
+Space have worked, and the owner reports that the Xbox controller controls they tried worked. Other Xbox actions and all
+PlayStation hardware are still untested. Testing a controller on Windows says nothing about Xbox or PlayStation console platforms,
+which are not targets.
 
 ## Scenes
 
 | Scene | Use |
 |---|---|
-| `project/scenes/level/shore.tscn` | **Entry scene,** and what the standard build opens. Art from x = 0 to 640, greybox from there to x = 1400. |
+| `project/scenes/ui/title.tscn` | **Entry scene on the M2 branch:** the main menu, which is what the standard build opens. |
+| `project/scenes/level/game.tscn` | The session: the world, which it can replace, and the pause menu. |
+| `project/scenes/level/shore.tscn` | The world on the M2 branch, and the entry scene on `main`. Art from x = 0 to 640, greybox from there to x = 1400. |
 | `project/scenes/level/level.tscn` | Greybox development and test scene, with the same collision. Not exported. Run it with `godot --path project res://scenes/level/level.tscn`, or open it in the editor. |
 
 The art is regenerated by `python tools/art/generate.py`, which needs Pillow.
@@ -108,7 +117,7 @@ GODOT=/path/to/godot sh tools/export_check.sh linux  # or: windows
 
 Logs go to `build/logs/`, with a separate stdout, stderr and exit status for
 each step. These scripts give every Godot process one unique storage folder, so they cannot touch your own
-settings. The test runner refuses to start without one: to run it by hand, set `DAGON_STORAGE_DIR` to a folder
+settings or save. The test runner refuses to start without one: to run it by hand, set `DAGON_STORAGE_DIR` to a folder
 whose path contains `dagon-test-`.
 
 ## How this was made
