@@ -13,7 +13,7 @@ carries on as unfinished greybox. Volume controls and buses are prepared, but th
 
 ## Play the current build
 
-Nothing is released yet. Builds come from CI, and downloading them needs a GitHub account.
+Nothing is released yet. Milestone prereleases will appear under [Releases](https://github.com/shamsuzzamansadi/dagon/releases) when they pass their gates ([docs/release.md](docs/release.md)). Until then, builds come from CI, and downloading them needs a GitHub account.
 
 1. Open the [CI runs for `main`](https://github.com/shamsuzzamansadi/dagon/actions/workflows/ci.yml?query=branch%3Amain)
    and choose the newest run with a green check.

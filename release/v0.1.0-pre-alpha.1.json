@@ -1,0 +1,26 @@
+{
+  "version": "v0.1.0-pre-alpha.1",
+  "milestone": "M3",
+  "state": "planned",
+  "summary": "",
+  "owner_acceptance": {
+    "status": "pending",
+    "record": "",
+    "build": "",
+    "gameplay_fingerprint": "",
+    "scope": ""
+  },
+  "criteria": {
+    "playable_slice": { "status": "pending", "evidence": "" },
+    "working_controls": { "status": "pending", "evidence": "" },
+    "interactions": { "status": "pending", "evidence": "" },
+    "checkpoint_persistence": { "status": "pending", "evidence": "" }
+  },
+  "known_limitations": [],
+  "deferred": [
+    "All physical PlayStation hardware",
+    "Individual physical Xbox actions, including disconnecting and reconnecting",
+    "Key names under German on the real Windows build",
+    "Native Linux hardware-accelerated rendering"
+  ]
+}

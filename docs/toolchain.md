@@ -13,7 +13,8 @@ have a named validation step.
 | Project template | godot-cpp-template @ `d36f9d03e9e0` (2026-10-04) | Layout and SConstruct read from GitHub. |
 | SCons | **4.9.1** (pip) | Built the spike locally. The template CI action defaults to 4.4.0, so we override it to 4.9.1. |
 | Python | 3.x (3.13 local) | Needed only for SCons. |
-| Linux compiler | GCC 13.3 (Ubuntu 24.04, local). CI: see the M1 package | The real project builds and loads. Clang 18 is available but untested. |
+| Linux compiler | GCC 13.3 (Ubuntu 24.04, local). CI: g++ 11.4 on `ubuntu-22.04`, which makes the Linux package | The real project builds and loads. |
+| Linux validation compiler | **Clang 18.1.3** (`clang-18=1:18.1.3-1ubuntu1`), on `ubuntu-24.04`, and the same version locally | Compatible with godot-cpp's `use_llvm=yes`. CI fails if the version differs. Validation only: its build is never shipped ([D46](decisions.md)). |
 | Windows compiler | **MSVC 2022 (19.44.35229 observed), on the pinned `windows-2022` runner** | `windows-2025` was tried first: it ships MSVC 19.51 (VS 2026), which SCons up to 4.9.1 does not detect, and godot-cpp then **silently falls back to MinGW**. A CI matrix confirmed this on 2026-11-02. CI now builds with `require_msvc=yes`, which fails instead of falling back. Results are in the M1 review package. |
 | Unit-test framework | doctest **v2.5.3** (single header, vendored) | GitHub releases API. |
 | Export templates | 4.7.2 `.tpz` (1.28 GB) | **Downloaded 2026-11-02; official SHA-512 verified** (`tools/install_export_templates.sh`). Only the desktop templates are kept. |
@@ -85,6 +86,20 @@ py -m venv .venv && .venv\Scripts\pip install scons==4.9.1
 
 `unit_tests` is a separate SCons environment that compiles `src/core/*.cpp` and
 `tests/unit/*.cpp` with C++20 and no godot-cpp, under `-Werror` or `/WX`.
+
+**Warnings:** the project's own code builds with no warnings on GCC, Clang and MSVC, and CI fails if it does not. That covers
+`src/` and `tests/` only. Warnings from godot-cpp and other third-party code are not ours to fail on, and its flags are unchanged.
+
+**Clang, locally:** use a separate clone, because the extension's objects and library have the same names for every compiler:
+```sh
+git clone --recurse-submodules https://github.com/shamsuzzamansadi/dagon.git dagon-clang && cd dagon-clang
+python3 -m venv .venv && .venv/bin/pip install scons==4.9.1
+.venv/bin/scons platform=linux target=template_debug   use_llvm=yes -j$(nproc)
+.venv/bin/scons platform=linux target=template_release use_llvm=yes -j$(nproc)
+.venv/bin/scons unit_tests use_llvm=yes                # in build/tests-clang
+```
+This helps while working. It does not replace the `linux-clang` CI job.
+
 `show_flags=yes` prints the exact compiler version and effective flags.
 Set `SCONS_CACHE` to a directory to reuse objects between clean builds.
 

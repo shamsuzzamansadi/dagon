@@ -70,6 +70,12 @@ if localEnv["show_flags"]:
 
 # Native unit tests: plain C++20 with no godot-cpp. Build and run with `scons unit_tests`.
 test_env = Environment(tools=["default"])
+# godot-cpp's use_llvm option does not reach this environment, so name the same compiler here. Its outputs
+# stay in their own folder. The extension's do not: build each compiler in its own clone (docs/toolchain.md).
+use_llvm = env.get("use_llvm", False)
+tests_dir = "build/tests-clang" if use_llvm else "build/tests"
+if use_llvm:
+    test_env.Replace(CC="clang", CXX="clang++")
 if localEnv["show_flags"]:
     print("dagon: unit_tests compiler: {}".format(test_env.subst("$CXX")))
 if "msvc" in test_env["TOOLS"]:
@@ -77,10 +83,10 @@ if "msvc" in test_env["TOOLS"]:
 else:
     test_env.Append(CXXFLAGS=["-std=c++20", "-Wall", "-Wextra", "-Wpedantic", "-Werror"])
 test_env.Append(CPPPATH=["src/", "tests/unit/"])
-test_env.VariantDir("build/tests/core", "src/core", duplicate=0)
-test_env.VariantDir("build/tests/unit", "tests/unit", duplicate=0)
+test_env.VariantDir(tests_dir + "/core", "src/core", duplicate=0)
+test_env.VariantDir(tests_dir + "/unit", "tests/unit", duplicate=0)
 test_program = test_env.Program(
-    "build/tests/dagon_tests", Glob("build/tests/core/*.cpp") + Glob("build/tests/unit/*.cpp")
+    tests_dir + "/dagon_tests", Glob(tests_dir + "/core/*.cpp") + Glob(tests_dir + "/unit/*.cpp")
 )
 unit_tests = test_env.Alias("unit_tests", test_program, '"{}"'.format(test_program[0].abspath))
 AlwaysBuild(unit_tests)

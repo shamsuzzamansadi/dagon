@@ -1,0 +1,58 @@
+Deliberate breakage of the release tools and workflow rules, one change at a time, in a scratch copy.
+A change is caught if tools/test_release_tools.py fails.
+
+control: exit 0, OK
+
+caught     | CI failure no longer blocks | FAIL: test_a_skipped_or_cancelled_ci_is_not_success and 1 more
+caught     | owner acceptance is not required | FAIL: test_a_candidate_with_open_gates_reports_them_without_failing and 2 more
+caught     | the acceptance record need not exist | FAIL: test_acceptance_needs_a_record_that_exists
+caught     | the build tested need not be stated | ERROR: test_a_candidate_is_packaged_and_never_published_even_with_every_gate_passed and 15 more
+caught     | the acceptance scope need not be stated | ERROR: test_a_candidate_is_packaged_and_never_published_even_with_every_gate_passed and 15 more
+caught     | changed gameplay keeps the acceptance | FAIL: test_changed_gameplay_voids_the_acceptance
+caught     | project tests count as gameplay | FAIL: test_acceptance_survives_documents_tests_and_the_record_itself
+caught     | art and scenes do not count as gameplay | FAIL: test_the_build_inputs_count_as_gameplay
+caught     | the build scripts do not count as gameplay | FAIL: test_the_build_inputs_count_as_gameplay
+caught     | a deferred criterion counts as met | FAIL: test_a_deferred_check_is_not_a_pass
+caught     | a missing criterion counts as met | FAIL: test_a_missing_criterion_is_not_a_pass
+caught     | a criterion needs no evidence | FAIL: test_a_met_criterion_needs_evidence_that_exists
+caught     | known limitations are optional | FAIL: test_known_limitations_must_be_documented
+caught     | a release candidate may leave checks deferred | FAIL: test_a_release_candidate_cannot_leave_checks_deferred
+caught     | any base version is accepted for a label | FAIL: test_stable_and_mislabelled_versions_are_refused
+caught     | an unauthorized label is accepted | ERROR: test_stable_and_mislabelled_versions_are_refused
+caught     | a stable version is accepted | FAIL: test_a_rehearsal_can_never_be_published and 1 more
+caught     | version .0 is publishable | FAIL: test_a_rehearsal_can_never_be_published and 1 more
+caught     | an existing tag is published again | FAIL: test_an_existing_tag_is_never_published_again
+caught     | two requested releases are allowed | FAIL: test_two_requested_releases_stop_both
+caught     | a candidate is published | FAIL: test_a_candidate_is_packaged_and_never_published_even_with_every_gate_passed and 1 more
+caught     | a planned record is treated as requested | FAIL: test_a_planned_record_reports_what_remains_and_does_nothing
+caught     | a failed CI still packages | FAIL: test_failed_ci_blocks_and_packages_nothing
+caught     | a rehearsal can publish | FAIL: test_a_rehearsal_can_never_be_published
+caught     | a second package per OS is allowed | FAIL: test_more_than_one_package_per_os_is_refused
+caught     | provenance may lack a compiler | FAIL: test_a_missing_compiler_stops_the_release and 2 more
+caught     | deferred checks are left out of the notes | ERROR: test_notes_state_the_commit_limits_and_what_was_not_tested
+caught     | the Linux binary loses its executable bit | ERROR: test_smoke_passes_on_a_game_that_gives_every_proof and 3 more
+caught     | package timestamps vary | FAIL: test_the_same_export_gives_the_same_package and 1 more
+caught     | the zip timestamps vary | FAIL: test_timestamps_inside_a_package_are_fixed
+caught     | an incomplete export is packaged | FAIL: test_an_incomplete_or_extra_export_is_refused
+caught     | the license is left out | FAIL: test_a_package_holds_the_export_and_the_license_and_credits
+caught     | smoke ignores the exit code | FAIL: test_smoke_fails_on_an_exit_code_or_a_logged_error
+caught     | smoke ignores logged errors | FAIL: test_smoke_fails_on_an_exit_code_or_a_logged_error
+caught     | smoke needs no proof | ERROR: test_smoke_fails_when_any_proof_is_missing and 1 more
+caught     | smoke skips the release library | ERROR: test_smoke_fails_when_any_proof_is_missing and 1 more
+caught     | smoke skips the prompt | ERROR: test_smoke_fails_when_any_proof_is_missing and 1 more
+caught     | the publisher publishes straight away | ERROR: test_the_publisher_never_forces_or_moves_anything
+caught     | the publisher does not check uploads | ERROR: test_the_publisher_never_forces_or_moves_anything
+caught     | the publisher deletes the tag too | FAIL: test_the_publisher_never_forces_or_moves_anything
+caught     | publish can run from any branch | FAIL: test_only_the_publish_job_can_write_and_only_from_main
+caught     | publish can run off any event | FAIL: test_only_the_publish_job_can_write_and_only_from_main
+caught     | publish ignores the gate | FAIL: test_only_the_publish_job_can_write_and_only_from_main
+caught     | publication is not serialized | FAIL: test_publication_is_serialized_and_never_cancelled
+caught     | every job can write | FAIL: test_only_the_publish_job_can_write_and_only_from_main
+caught     | a stored secret is used | FAIL: test_no_secret_but_the_runs_own_token
+caught     | Clang's build ships | FAIL: test_the_three_compilers_must_pass_and_clang_never_ships
+caught     | a compiler failure is ignored | FAIL: test_the_three_compilers_must_pass_and_clang_never_ships
+caught     | the export uploads from every job | FAIL: test_the_three_compilers_must_pass_and_clang_never_ships
+
+control again: exit 0, OK
+
+49 changes, 49 caught, not caught: none

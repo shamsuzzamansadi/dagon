@@ -1,0 +1,27 @@
+godot-cpp 507ed9d
+Ubuntu clang version 18.1.3 (1ubuntu1)
+debug build exit=0
+release build exit=0
+dagon: own CXXFLAGS=-fno-exceptions -std=c++20
+dagon: compiler: Ubuntu clang version 18.1.3 (1ubuntu1)
+dagon: unit_tests compiler: clang++
+warnings in project code: 0
+warnings in third-party code: 0
+unit tests exit=0
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+[doctest] assertions: 994 | 994 passed | 0 failed |
+godot checks exit=0
+import: ok
+check_classes: ok
+integration: ok
+smoke: ok
+smoke_greybox: ok
+smoke_game: ok
+CHECK_CLASSES classes=10 problems=0
+RESULT passed=195 failed=0
+dagon: extension initialized build=debug compiler=clang 180103 __cplusplus=202002
+export-linux: created
+export-linux: new game and continue ran
+RESULT passed=195 failed=0
+export-linux: ran exit=0
+finished
