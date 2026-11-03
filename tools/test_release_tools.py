@@ -390,8 +390,7 @@ class PrepareTests(unittest.TestCase):
         git(self.root, "update-index", "--add", "--cacheinfo", f"160000,{'1' * 40},godot-cpp")
         git(self.root, "commit", "-q", "-m", "module")
         self.commit = git(self.root, "rev-parse", "HEAD")
-        record = self.repo.good_record()
-        self.record = write(self.root, "record.json", json.dumps(record))
+        self.record = write(self.root, "record.json", json.dumps(self.repo.good_record()))
         for name in (f"dagon-{PRE_ALPHA}-linux-x86_64.tar.gz", f"dagon-{PRE_ALPHA}-windows-x86_64.zip"):
             write(self.root, f"packages/{name}", name)
         for job, compiler in (("logs-windows", "MSVC 19"), ("logs-linux", "g++ 11"), ("logs-linux-clang", "clang 18")):
@@ -424,6 +423,31 @@ class PrepareTests(unittest.TestCase):
         self.assertIn("have not passed", not_tested)
         self.assertIn("PlayStation", not_tested)
         self.assertIn("Validation only, not shipped: clang 18", notes)
+
+    def test_notes_claim_acceptance_only_when_it_covers_this_build(self):
+        record = json.loads(self.record.read_text(encoding="utf-8"))
+        claim, none = "so the acceptance applies to it", "No owner acceptance covers this build"
+        record["owner_acceptance"]["gameplay_fingerprint"] = self.repo.gameplay()
+        self.record.write_text(json.dumps(record), encoding="utf-8")
+        notes = (self.prepare() / "RELEASE_NOTES.md").read_text(encoding="utf-8")
+        self.assertIn(claim, notes)
+        self.assertNotIn(none, notes)
+        for change in ({"status": "pending"}, {"gameplay_fingerprint": "sha256:other"}):
+            with self.subTest(change):
+                altered = dict(record, owner_acceptance={**record["owner_acceptance"], **change})
+                self.record.write_text(json.dumps(altered), encoding="utf-8")
+                notes = (self.prepare() / "RELEASE_NOTES.md").read_text(encoding="utf-8")
+                self.assertNotIn(claim, notes)
+                self.assertNotIn("Keyboard on Windows.", notes)
+                self.assertIn(none, notes)
+
+    def test_the_rehearsal_record_can_be_prepared(self):
+        self.record.write_text(Path(__file__).with_name("release_rehearsal.json").read_text(encoding="utf-8"), encoding="utf-8")
+        for name in list((self.root / "packages").iterdir()):
+            name.rename(name.with_name(name.name.replace(PRE_ALPHA, "v0.1.0-pre-alpha.0")))
+        notes = (self.prepare() / "RELEASE_NOTES.md").read_text(encoding="utf-8")
+        self.assertIn("rehearsal", notes)
+        self.assertIn("No owner acceptance covers this build", notes)
 
     def test_checksums_verify_and_provenance_names_the_commit(self):
         prepared = self.prepare()

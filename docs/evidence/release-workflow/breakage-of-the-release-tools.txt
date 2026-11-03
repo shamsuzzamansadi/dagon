@@ -30,6 +30,9 @@ caught     | a rehearsal can publish | FAIL: test_a_rehearsal_can_never_be_publi
 caught     | a second package per OS is allowed | FAIL: test_more_than_one_package_per_os_is_refused
 caught     | provenance may lack a compiler | FAIL: test_a_missing_compiler_stops_the_release and 2 more
 caught     | deferred checks are left out of the notes | ERROR: test_notes_state_the_commit_limits_and_what_was_not_tested
+caught     | the notes always claim acceptance | FAIL: test_notes_claim_acceptance_only_when_it_covers_this_build and 2 more
+caught     | the notes ignore a changed fingerprint | FAIL: test_notes_claim_acceptance_only_when_it_covers_this_build
+caught     | a rehearsal cannot be prepared | ERROR: test_the_rehearsal_record_can_be_prepared
 caught     | the Linux binary loses its executable bit | ERROR: test_smoke_passes_on_a_game_that_gives_every_proof and 3 more
 caught     | package timestamps vary | FAIL: test_the_same_export_gives_the_same_package and 1 more
 caught     | the zip timestamps vary | FAIL: test_timestamps_inside_a_package_are_fixed
@@ -55,4 +58,4 @@ caught     | the export uploads from every job | FAIL: test_the_three_compilers_
 
 control again: exit 0, OK
 
-49 changes, 49 caught, not caught: none
+52 changes, 52 caught, not caught: none

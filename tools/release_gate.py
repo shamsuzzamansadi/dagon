@@ -80,8 +80,9 @@ def version_problems(version):
 
 
 def label_of(version):
-    match = VERSION.match(version)
-    return match.group("label") if match else None
+    """The label of any prerelease-shaped version, including a rehearsal's .0, which version_problems refuses."""
+    match = re.match(r"^v\d+\.\d+\.\d+-([a-z-]+)\.\d+$", version or "")
+    return match.group(1) if match and match.group(1) in LABELS else None
 
 
 def fingerprint(root=".", commit="HEAD"):
@@ -301,14 +302,24 @@ def prepare(args):
     ]
     if deferred:
         notes += ["## Not tested", "These checks are deferred, and have not passed.", *[f"- {item}" for item in deferred], ""]
+    gameplay = fingerprint(".", args.commit)
+    if acceptance.get("status") == "accepted" and acceptance.get("gameplay_fingerprint") == gameplay:
+        notes += [
+            "## Owner acceptance",
+            str(acceptance.get("scope", "")),
+            "",
+            f"- Build tested: {acceptance.get('build', '')}",
+            f"- Record: `{acceptance.get('record', '')}` in this version's source",
+            "- This build's gameplay fingerprint matches the one accepted, so the acceptance applies to it.",
+            "",
+        ]
+    else:
+        notes += [
+            "## Owner acceptance",
+            "**No owner acceptance covers this build, so it cannot be published as it stands.**",
+            "",
+        ]
     notes += [
-        "## Owner acceptance",
-        f"{acceptance.get('scope', 'None recorded.')}",
-        "",
-        f"- Build tested: {acceptance.get('build', 'not recorded')}",
-        f"- Record: `{acceptance.get('record', 'none')}` in this version's source",
-        "- This build's gameplay fingerprint matches the one accepted, so the acceptance applies to it.",
-        "",
         "## Downloads",
         "| Package | SHA-256 |",
         "|---|---|",
