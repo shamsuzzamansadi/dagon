@@ -28,7 +28,13 @@ public:
 	};
 
 	void _ready() override;
+	void _input(const godot::Ref<godot::InputEvent> &p_event) override;
 	void _unhandled_input(const godot::Ref<godot::InputEvent> &p_event) override;
+
+	// Keyboard, or a controller's device number. This node keeps running while the game is paused, so
+	// it is what notices a change of device, and it passes the news on.
+	void set_active_device(int p_device);
+	int get_active_device() const { return active_device_; }
 
 	bool is_open() const { return screen_ != Screen::Closed; }
 
@@ -63,8 +69,8 @@ public:
 	void set_title_scene_path(const godot::String &p_value) { title_scene_path_ = p_value; }
 	godot::String get_title_scene_path() const { return title_scene_path_; }
 
-#define DAGON_PATH_PROPERTY(m_name)                                                       \
-	void set_##m_name(const godot::NodePath &p_value) { m_name##_ = p_value; }            \
+#define DAGON_PATH_PROPERTY(m_name)                                            \
+	void set_##m_name(const godot::NodePath &p_value) { m_name##_ = p_value; } \
 	godot::NodePath get_##m_name() const { return m_name##_; }
 
 	DAGON_PATH_PROPERTY(session_path)
@@ -115,6 +121,7 @@ private:
 	void focus_path(const godot::NodePath &p_path);
 	void focus_default();
 	void on_settings_closed();
+	void on_joy_connection_changed(int p_device, bool p_connected);
 	void refresh_controls_text();
 	void autostart();
 	void ask_confirm(ConfirmAction p_action, const godot::String &p_message, const godot::String &p_ok_text);
@@ -163,6 +170,7 @@ private:
 	Screen screen_ = Screen::Closed;
 	ConfirmAction confirm_action_ = ConfirmAction::QuitToDesktop;
 	godot::NodePath default_focus_path_;
+	int active_device_ = -1;
 	bool intro_ = false;
 	bool can_continue_ = false;
 	bool save_file_exists_ = false;

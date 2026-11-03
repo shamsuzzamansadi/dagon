@@ -213,7 +213,7 @@ func test_controls_open_from_the_pause_menu_with_the_current_keys(h) -> void:
 	await h.tap_action("ui_accept")
 	h.check(panel.visible and not menu.get_node("Center/Main").visible, "Controls did not replace the main panel")
 	h.check(_focus(h) == panel.get_node("Items/Back"), "focus is on %s" % _focus(h))
-	for line in ["Walk: A and D", "Jump: Space", "Examine: E", "Pause: Esc", "gamepad"]:
+	for line in ["Keyboard", "Walk: A and D", "Jump: Space", "Examine: E", "Pause: Esc", "Enter or Space to confirm", "Esc for Back", "Xbox / PlayStation controller", "Jump: A / Cross", "Examine: X / Square"]:
 		h.check(text.text.contains(line), "the text lacks '%s': %s" % [line, text.text])
 	h.check(panel.get_node("Items/Title").text == "Controls", "the title reads '%s'" % panel.get_node("Items/Title").text)
 	await h.tap_key(KEY_ESCAPE)

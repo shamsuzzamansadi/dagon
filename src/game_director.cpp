@@ -177,6 +177,12 @@ void GameDirector::fade_in() {
 	}
 }
 
+void GameDirector::set_input_device(int p_device) {
+	if (Hud *hud = hud_.get()) {
+		hud->set_input_device(p_device);
+	}
+}
+
 void GameDirector::show_notice(const String &p_text) {
 	if (Hud *hud = hud_.get()) {
 		hud->show_notice(p_text);

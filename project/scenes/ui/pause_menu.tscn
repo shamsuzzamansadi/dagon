@@ -122,7 +122,7 @@ text = "Controls"
 horizontal_alignment = 1
 
 [node name="Text" type="Label" parent="Center/Controls/Items"]
-custom_minimum_size = Vector2(320, 0)
+custom_minimum_size = Vector2(390, 0)
 layout_mode = 2
 autowrap_mode = 2
 

@@ -36,7 +36,7 @@ const EXPECTED := {
 	"Hud": {
 		"base": "CanvasLayer",
 		"properties": ["interactor_path", "notice_label_path", "prompt_label_path", "caption_label_path", "fade_rect_path", "caption_hold_seconds"],
-		"methods": ["on_focus_changed", "on_interacted", "show_caption", "hide_caption", "show_notice", "fade_to_black", "fade_from_black"],
+		"methods": ["on_focus_changed", "on_interacted", "show_caption", "hide_caption", "show_notice", "set_input_device", "fade_to_black", "fade_from_black"],
 		"signals": ["fade_finished"],
 	},
 	"GameDirector": {
@@ -48,13 +48,13 @@ const EXPECTED := {
 	"GameSession": {
 		"base": "Node",
 		"properties": ["world_scene", "director_path", "menu_path"],
-		"methods": ["set_start", "restart_checkpoint", "retry_save", "is_checkpoint_saved", "has_any_save", "get_session_beat", "get_persisted_beat", "get_world", "get_director"],
+		"methods": ["set_start", "set_active_device", "get_active_device", "restart_checkpoint", "retry_save", "is_checkpoint_saved", "has_any_save", "get_session_beat", "get_persisted_beat", "get_world", "get_director"],
 		"signals": [],
 	},
 	"MenuController": {
 		"base": "Control",
 		"properties": ["mode", "game_scene", "title_scene_path", "session_path", "main_panel_path", "confirm_panel_path", "controls_panel_path", "credits_panel_path", "settings_menu_path", "first_button_path", "continue_button_path", "new_game_button_path", "settings_button_path", "controls_button_path", "credits_button_path", "quit_button_path", "quit_to_menu_button_path", "confirm_cancel_button_path", "confirm_ok_button_path", "confirm_message_label_path", "controls_title_label_path", "controls_text_label_path", "controls_back_button_path", "credits_back_button_path", "save_status_label_path"],
-		"methods": ["is_open", "open", "resume", "restart_checkpoint", "ask_quit_to_desktop", "ask_quit_to_main_menu", "show_intro", "new_game", "continue_game", "open_credits", "quit_now", "refresh_save_status", "open_settings", "open_controls", "confirm", "cancel_confirm", "back"],
+		"methods": ["set_active_device", "get_active_device", "is_open", "open", "resume", "restart_checkpoint", "ask_quit_to_desktop", "ask_quit_to_main_menu", "show_intro", "new_game", "continue_game", "open_credits", "quit_now", "refresh_save_status", "open_settings", "open_controls", "confirm", "cancel_confirm", "back"],
 		"signals": [],
 	},
 	"SettingsMenu": {

@@ -40,6 +40,8 @@ public:
 	bool is_capturing() const { return state_ == State::Capturing; }
 	bool has_conflict() const { return state_ == State::Conflict; }
 	bool has_unsaved_changes() const { return unsaved_; }
+	// What cancels a capture besides Esc, for the device in use. Empty on a keyboard.
+	void set_cancel_label(const godot::String &p_label) { cancel_label_ = p_label; }
 	// What a key is called on screen, given the letter a keyboard layout puts on it.
 	godot::String describe_key(int p_key, int p_layout_label) const;
 
@@ -73,6 +75,7 @@ private:
 	void refresh_controls();
 	void show_idle_message();
 	godot::String key_label(int p_key) const;
+	godot::String cancel_keys() const;
 	void set_message(const godot::String &p_text);
 	void set_conflict_row_visible(bool p_visible);
 	godot::String action_label(core::GameAction p_action) const;
@@ -91,6 +94,7 @@ private:
 	NodeRef<godot::Control> conflict_row_;
 	NodeRef<godot::Button> swap_button_;
 
+	godot::String cancel_label_;
 	core::Settings settings_;
 	// A write failed, so settings_ is newer than the file and must not be replaced by it.
 	bool unsaved_ = false;

@@ -2,15 +2,19 @@
 
 #include "game_session.hpp"
 #include "global_state.hpp"
+#include "input_labels.hpp"
 #include "storage.hpp"
 
 #include <godot_cpp/classes/engine.hpp>
+#include <godot_cpp/classes/input.hpp>
 #include <godot_cpp/classes/os.hpp>
+#include <godot_cpp/classes/resource_loader.hpp>
 #include <godot_cpp/classes/scene_tree.hpp>
 #include <godot_cpp/classes/viewport.hpp>
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/core/error_macros.hpp>
 #include <godot_cpp/core/print_string.hpp>
+#include <godot_cpp/variant/typed_array.hpp>
 
 using namespace godot;
 
@@ -53,6 +57,8 @@ void MenuController::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("cancel_confirm"), &MenuController::cancel_confirm);
 	ClassDB::bind_method(D_METHOD("back"), &MenuController::back);
 	ClassDB::bind_method(D_METHOD("autostart"), &MenuController::autostart);
+	ClassDB::bind_method(D_METHOD("set_active_device", "device"), &MenuController::set_active_device);
+	ClassDB::bind_method(D_METHOD("get_active_device"), &MenuController::get_active_device);
 
 	ClassDB::bind_method(D_METHOD("set_mode", "mode"), &MenuController::set_mode);
 	ClassDB::bind_method(D_METHOD("get_mode"), &MenuController::get_mode);
@@ -65,9 +71,9 @@ void MenuController::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_title_scene_path"), &MenuController::get_title_scene_path);
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "title_scene_path", PROPERTY_HINT_FILE, "*.tscn"), "set_title_scene_path", "get_title_scene_path");
 
-#define DAGON_BIND_PATH(m_name)                                                                          \
-	ClassDB::bind_method(D_METHOD("set_" #m_name, "path"), &MenuController::set_##m_name);               \
-	ClassDB::bind_method(D_METHOD("get_" #m_name), &MenuController::get_##m_name);                       \
+#define DAGON_BIND_PATH(m_name)                                                            \
+	ClassDB::bind_method(D_METHOD("set_" #m_name, "path"), &MenuController::set_##m_name); \
+	ClassDB::bind_method(D_METHOD("get_" #m_name), &MenuController::get_##m_name);         \
 	ADD_PROPERTY(PropertyInfo(Variant::NODE_PATH, #m_name), "set_" #m_name, "get_" #m_name)
 
 	DAGON_BIND_PATH(session_path);
@@ -114,6 +120,14 @@ void MenuController::_ready() {
 	}
 	settings_menu_.get()->connect("closed", callable_mp(this, &MenuController::on_settings_closed));
 
+	Input *input = Input::get_singleton();
+	input->connect("joy_connection_changed", callable_mp(this, &MenuController::on_joy_connection_changed));
+	const TypedArray<int> controllers = input->get_connected_joypads();
+	for (int i = 0; i < controllers.size(); i++) {
+		input_labels::log_controller(controllers[i]);
+	}
+	settings_menu_.get()->set_cancel_label(input_labels::back_label(active_device_));
+
 	if (mode_ == MODE_TITLE) {
 		credits_panel_.set(get_node<Control>(credits_panel_path_));
 		save_status_label_.set(get_node<Label>(save_status_label_path_));
@@ -135,6 +149,42 @@ void MenuController::autostart() {
 		new_game();
 	} else if (choice == String("continue")) {
 		continue_game();
+	}
+}
+
+void MenuController::_input(const Ref<InputEvent> &p_event) {
+	if (Engine::get_singleton()->is_editor_hint()) {
+		return;
+	}
+	const int device = input_labels::device_from_event(p_event, active_device_);
+	if (device != active_device_) {
+		set_active_device(device);
+	}
+}
+
+void MenuController::set_active_device(int p_device) {
+	active_device_ = p_device;
+	if (GameSession *session = session_.get()) {
+		session->set_active_device(p_device);
+	}
+	if (SettingsMenu *settings = settings_menu_.get()) {
+		settings->set_cancel_label(input_labels::back_label(p_device));
+	}
+	if (screen_ == Screen::Controls) {
+		refresh_controls_text();
+	}
+}
+
+void MenuController::on_joy_connection_changed(int p_device, bool p_connected) {
+	if (p_connected) {
+		input_labels::log_controller(p_device);
+	}
+	// A controller that is gone cannot be what the player is using. Coming back changes nothing until it is
+	// pressed, so a reconnection can never relabel what is on screen by itself.
+	if (!p_connected && p_device == active_device_) {
+		set_active_device(input_labels::KEYBOARD);
+	} else if (screen_ == Screen::Controls) {
+		refresh_controls_text();
 	}
 }
 
@@ -252,19 +302,9 @@ void MenuController::open_controls() {
 }
 
 void MenuController::refresh_controls_text() {
-	Label *label = get_node<Label>(controls_text_label_path_);
-	if (label == nullptr) {
-		return;
+	if (Label *label = get_node<Label>(controls_text_label_path_)) {
+		label->set_text(input_labels::controls_text(active_device_, intro_, label->get_theme_font("font")));
 	}
-	const Ref<Font> font = label->get_theme_font("font");
-	const auto key = [&font](const char *p_action) { return storage::key_name(storage::current_key(p_action), font); };
-	String text;
-	text += String("Walk: ") + key("move_left") + " and " + key("move_right") + ", or the Left and Right arrows\n";
-	text += String("Jump: ") + key("jump") + "\n";
-	text += String("Examine: ") + key("interact") + ", when a prompt appears near something\n";
-	text += "Pause: Esc\n\n";
-	text += "With a gamepad: left stick or D-pad to walk, south button to jump, west button to examine, Start to pause.";
-	label->set_text(text);
 }
 
 void MenuController::open_settings() {
@@ -351,11 +391,12 @@ void MenuController::quit_now() {
 }
 
 void MenuController::quit_to_main_menu() {
+	const Ref<PackedScene> scene = ResourceLoader::get_singleton()->load(title_scene_path_);
+	MenuController *title = scene.is_valid() ? Object::cast_to<MenuController>(scene->instantiate()) : nullptr;
+	ERR_FAIL_NULL_MSG(title, "MenuController: title_scene_path could not be loaded; staying in the game.");
 	reset_global_state();
-	const Error error = get_tree()->change_scene_to_file(title_scene_path_);
-	if (error != OK) {
-		ERR_PRINT("MenuController: title_scene_path could not be loaded; staying in the game.");
-	}
+	title->set_active_device(active_device_);
+	get_tree()->change_scene_to_node(title);
 }
 
 void MenuController::refresh_save_status() {
@@ -408,6 +449,7 @@ void MenuController::start_session(core::Beat p_beat, bool p_show_intro) {
 	GameSession *session = Object::cast_to<GameSession>(game_scene_->instantiate());
 	ERR_FAIL_NULL_MSG(session, "MenuController: game_scene's root is not a GameSession.");
 	session->set_start(static_cast<int>(p_beat), true, p_show_intro);
+	session->set_active_device(active_device_);
 	get_tree()->change_scene_to_node(session);
 }
 

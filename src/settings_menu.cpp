@@ -33,9 +33,9 @@ void SettingsMenu::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("has_conflict"), &SettingsMenu::has_conflict);
 	ClassDB::bind_method(D_METHOD("describe_key", "key", "layout_label"), &SettingsMenu::describe_key);
 
-#define DAGON_BIND_PATH(m_name)                                                             \
-	ClassDB::bind_method(D_METHOD("set_" #m_name, "path"), &SettingsMenu::set_##m_name);    \
-	ClassDB::bind_method(D_METHOD("get_" #m_name), &SettingsMenu::get_##m_name);            \
+#define DAGON_BIND_PATH(m_name)                                                          \
+	ClassDB::bind_method(D_METHOD("set_" #m_name, "path"), &SettingsMenu::set_##m_name); \
+	ClassDB::bind_method(D_METHOD("get_" #m_name), &SettingsMenu::get_##m_name);         \
 	ADD_PROPERTY(PropertyInfo(Variant::NODE_PATH, #m_name), "set_" #m_name, "get_" #m_name)
 
 	DAGON_BIND_PATH(music_slider_path);
@@ -113,7 +113,7 @@ void SettingsMenu::begin_capture(int p_action) {
 	if (Button *button = key_buttons_[static_cast<std::size_t>(p_action)].get()) {
 		button->set_text("...");
 	}
-	set_message(String("Press a key for ") + action_label(capture_action_) + ". Esc cancels.");
+	set_message(String("Press a key for ") + action_label(capture_action_) + ". " + cancel_keys() + " cancels.");
 }
 
 // Runs before the GUI and before MenuController, so a captured key does nothing else.
@@ -144,7 +144,7 @@ void SettingsMenu::_input(const Ref<InputEvent> &p_event) {
 
 void SettingsMenu::capture_key(int p_key) {
 	if (p_key == KEY_NONE) {
-		set_message("That key cannot be used. Press another key, or Esc to cancel.");
+		set_message(String("That key cannot be used. Press another key, or ") + cancel_keys() + " to cancel.");
 		return;
 	}
 	const core::Assignment assignment = core::assign_key(settings_, capture_action_, p_key);
@@ -157,7 +157,7 @@ void SettingsMenu::capture_key(int p_key) {
 			finish_capture();
 			break;
 		case core::AssignResult::Reserved:
-			set_message(key_label(p_key) + " is kept for the game. Press another key, or Esc to cancel.");
+			set_message(key_label(p_key) + " is kept for the game. Press another key, or " + cancel_keys() + " to cancel.");
 			break;
 		case core::AssignResult::Conflict:
 			conflict_other_ = assignment.other;
@@ -250,6 +250,10 @@ void SettingsMenu::refresh_controls() {
 			button->set_text(key_label(settings_.keys[i]));
 		}
 	}
+}
+
+String SettingsMenu::cancel_keys() const {
+	return cancel_label_.is_empty() ? String("Esc") : String("Esc or ") + cancel_label_;
 }
 
 String SettingsMenu::key_label(int p_key) const {

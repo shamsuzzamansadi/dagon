@@ -163,16 +163,6 @@ func test_the_prompt_follows_focus_and_names_the_key(h) -> void:
 	h.check(not prompt.visible, "the prompt stayed with nothing in range")
 
 
-func test_the_prompt_follows_the_last_device_used(h) -> void:
-	var player: CharacterBody2D = await _shore(h)
-	var prompt: Label = h.fixture.get_node("Hud/Prompt")
-	await h.stand_at(player, Vector2(150, -2))
-	await h.tap_pad(JOY_BUTTON_LEFT_SHOULDER)
-	h.check(prompt.text == "[X] Examine", "after a pad button it reads '%s'" % prompt.text)
-	await h.tap_key(KEY_T)
-	h.check(prompt.text == "[E] Examine", "after a key it reads '%s'" % prompt.text)
-
-
 func test_examining_shows_the_caption_and_never_pauses(h) -> void:
 	var player: CharacterBody2D = await _shore(h)
 	var caption: Label = h.fixture.get_node("Hud/Caption")

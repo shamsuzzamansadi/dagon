@@ -154,8 +154,10 @@ func test_new_game_with_no_save_saves_first_then_starts_with_the_introduction(h)
 	h.check(panel.get_node("Items/Title").text == "How to Play", "the title reads '%s'" % panel.get_node("Items/Title").text)
 	h.check(panel.get_node("Items/Back").text == "Begin", "the button reads '%s'" % panel.get_node("Items/Back").text)
 	h.check(menu.get_viewport().gui_get_focus_owner() == panel.get_node("Items/Back"), "focus is on %s" % menu.get_viewport().gui_get_focus_owner())
-	for line in ["Walk: A and D", "Jump: Space", "Examine: E", "Pause: Esc", "gamepad"]:
-		h.check(panel.get_node("Items/Text").text.contains(line), "the text lacks '%s': %s" % [line, panel.get_node("Items/Text").text])
+	var text: String = panel.get_node("Items/Text").text
+	for line in ["Walk: A and D", "Jump: Space", "Examine: E", "Pause: Esc", "under Controls"]:
+		h.check(text.contains(line), "the text lacks '%s': %s" % [line, text])
+	h.check(not text.contains("controller"), "the short introduction lists a device not in use: %s" % text)
 
 
 func test_beginning_with_the_jump_key_starts_play_without_jumping(h) -> void:

@@ -37,6 +37,7 @@ public:
 
 	void fade_in();
 	void show_notice(const godot::String &p_text);
+	void set_input_device(int p_device);
 
 	void set_player_path(const godot::NodePath &p_value) { player_path_ = p_value; }
 	godot::NodePath get_player_path() const { return player_path_; }

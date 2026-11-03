@@ -1,19 +1,14 @@
 #include "hud.hpp"
 
+#include "input_labels.hpp"
 #include "interactable.hpp"
-#include "storage.hpp"
 
 #include <godot_cpp/classes/engine.hpp>
-#include <godot_cpp/classes/input_event_joypad_button.hpp>
-#include <godot_cpp/classes/input_event_joypad_motion.hpp>
-#include <godot_cpp/classes/input_event_key.hpp>
 #include <godot_cpp/classes/property_tweener.hpp>
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/core/error_macros.hpp>
 #include <godot_cpp/core/print_string.hpp>
 #include <godot_cpp/variant/callable.hpp>
-
-#include <cmath>
 
 using namespace godot;
 
@@ -23,8 +18,6 @@ namespace {
 
 constexpr float CAPTION_FADE_SECONDS = 0.25f;
 constexpr float NOTICE_HOLD_SECONDS = 2.5f;
-constexpr double STICK_MOVED = 0.5;
-const char *const GAMEPAD_INTERACT_LABEL = "X";
 
 } // namespace
 
@@ -34,6 +27,7 @@ void Hud::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("show_caption", "text"), &Hud::show_caption);
 	ClassDB::bind_method(D_METHOD("hide_caption"), &Hud::hide_caption);
 	ClassDB::bind_method(D_METHOD("show_notice", "text"), &Hud::show_notice);
+	ClassDB::bind_method(D_METHOD("set_input_device", "device"), &Hud::set_input_device);
 	ClassDB::bind_method(D_METHOD("fade_to_black", "seconds"), &Hud::fade_to_black);
 	ClassDB::bind_method(D_METHOD("fade_from_black", "seconds"), &Hud::fade_from_black);
 
@@ -89,23 +83,9 @@ void Hud::_notification(int p_what) {
 	}
 }
 
-void Hud::_input(const Ref<InputEvent> &p_event) {
-	if (Engine::get_singleton()->is_editor_hint()) {
-		return;
-	}
-	bool gamepad = using_gamepad_;
-	const Ref<InputEventJoypadButton> button = p_event;
-	const Ref<InputEventJoypadMotion> motion = p_event;
-	const Ref<InputEventKey> key = p_event;
-	if (button.is_valid() || (motion.is_valid() && std::abs(motion->get_axis_value()) > STICK_MOVED)) {
-		gamepad = true;
-	} else if (key.is_valid()) {
-		gamepad = false;
-	}
-	if (gamepad != using_gamepad_) {
-		using_gamepad_ = gamepad;
-		refresh_prompt();
-	}
+void Hud::set_input_device(int p_device) {
+	input_device_ = p_device;
+	refresh_prompt();
 }
 
 void Hud::on_focus_changed(Object *p_target) {
@@ -123,8 +103,7 @@ void Hud::refresh_prompt() {
 		label->hide();
 		return;
 	}
-	const String key = using_gamepad_ ? String(GAMEPAD_INTERACT_LABEL) : storage::key_name(storage::current_key("interact"), label->get_theme_font("font"));
-	label->set_text(String("[") + key + "] " + prompt_text_);
+	label->set_text(String("[") + input_labels::interact_label(input_device_, label->get_theme_font("font")) + "] " + prompt_text_);
 	label->show();
 	// Positive proof for the export check, which cannot see the screen.
 	print_verbose("dagon: prompt: ", label->get_text());

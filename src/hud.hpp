@@ -5,7 +5,6 @@
 
 #include <godot_cpp/classes/canvas_layer.hpp>
 #include <godot_cpp/classes/color_rect.hpp>
-#include <godot_cpp/classes/input_event.hpp>
 #include <godot_cpp/classes/label.hpp>
 #include <godot_cpp/classes/tween.hpp>
 #include <godot_cpp/variant/node_path.hpp>
@@ -21,8 +20,10 @@ class Hud : public godot::CanvasLayer {
 
 public:
 	void _ready() override;
-	void _input(const godot::Ref<godot::InputEvent> &p_event) override;
 	void _notification(int p_what);
+
+	// Set by the session. The Hud pauses with the world, so it cannot track input itself.
+	void set_input_device(int p_device);
 
 	// From Interactor.focus_changed and Interactor.interacted.
 	void on_focus_changed(godot::Object *p_target);
@@ -75,7 +76,7 @@ private:
 	godot::Ref<godot::Tween> caption_tween_;
 	godot::Ref<godot::Tween> fade_tween_;
 	godot::String prompt_text_;
-	bool using_gamepad_ = false;
+	int input_device_ = -1;
 };
 
 } // namespace dagon

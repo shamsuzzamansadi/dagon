@@ -41,6 +41,12 @@ func read_storage_file(file_name: String) -> String:
 	return FileAccess.get_file_as_string(storage_dir.path_join(file_name))
 
 
+## There is no way to make a real device in a test. This names what the game takes device 0 to be, and
+## everything after that runs for real. It says nothing about physical controllers.
+func use_controller(controller_name: String) -> void:
+	OS.set_environment("DAGON_TEST_CONTROLLER", controller_name)
+
+
 func load_fixture(path: String) -> Node:
 	fixture = (load(path) as PackedScene).instantiate()
 	probe = StepProbe.new()
@@ -73,6 +79,7 @@ func unload_fixture() -> void:
 	release_all_actions()
 	tree.paused = false
 	Engine.time_scale = 1.0
+	OS.set_environment("DAGON_TEST_CONTROLLER", "")
 	if is_instance_valid(tree.current_scene) and tree.current_scene != fixture:
 		tree.current_scene.queue_free()
 	tree.current_scene = null
@@ -88,7 +95,6 @@ func unload_fixture() -> void:
 		probe.queue_free()
 	await tree.process_frame
 	await tree.physics_frame
-	OS.set_environment(STORAGE_VARIABLE, _run_storage_dir)
 
 
 func release_all_actions() -> void:
@@ -130,6 +136,13 @@ func stand_at(player: CharacterBody2D, position: Vector2) -> void:
 func send(event: InputEvent) -> void:
 	Input.parse_input_event(event)
 	Input.flush_buffered_events()
+
+
+## Tests resume inside a physics tick, where no real input arrives. The engine's menu navigation by stick
+## needs is_action_just_pressed, which input from mid-tick only satisfies from the next tick.
+func send_between_ticks(event: InputEvent) -> void:
+	await tree.process_frame
+	send(event)
 
 
 func action_event(action: String, pressed: bool) -> InputEventAction:

@@ -22,6 +22,8 @@ const char *const SAVE_FAILED_NOTICE = "Could not save this checkpoint";
 
 void GameSession::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_start", "beat", "persisted", "show_intro"), &GameSession::set_start);
+	ClassDB::bind_method(D_METHOD("set_active_device", "device"), &GameSession::set_active_device);
+	ClassDB::bind_method(D_METHOD("get_active_device"), &GameSession::get_active_device);
 	ClassDB::bind_method(D_METHOD("restart_checkpoint"), &GameSession::restart_checkpoint);
 	ClassDB::bind_method(D_METHOD("retry_save"), &GameSession::retry_save);
 	ClassDB::bind_method(D_METHOD("is_checkpoint_saved"), &GameSession::is_checkpoint_saved);
@@ -48,14 +50,23 @@ void GameSession::set_start(int p_beat, bool p_persisted, bool p_show_intro) {
 	show_intro_ = p_show_intro;
 }
 
+void GameSession::set_active_device(int p_device) {
+	active_device_ = p_device;
+	if (GameDirector *director = director_.get()) {
+		director->set_input_device(p_device);
+	}
+}
+
 void GameSession::_ready() {
 	if (Engine::get_singleton()->is_editor_hint()) {
 		return;
 	}
 	print_verbose("dagon: session start beat=", session_beat_, " persisted=", persisted_beat_);
 	build_world();
-	if (show_intro_) {
-		if (MenuController *menu = menu_path_.is_empty() ? nullptr : get_node<MenuController>(menu_path_)) {
+	MenuController *menu = menu_path_.is_empty() ? nullptr : get_node<MenuController>(menu_path_);
+	if (menu != nullptr) {
+		menu->set_active_device(active_device_);
+		if (show_intro_) {
 			menu->show_intro();
 		}
 	}
@@ -80,6 +91,9 @@ void GameSession::build_world() {
 	move_child(world, 0);
 	world_.set(world);
 	director_.set(director);
+	if (director != nullptr) {
+		director->set_input_device(active_device_);
+	}
 }
 
 void GameSession::remove_world() {
