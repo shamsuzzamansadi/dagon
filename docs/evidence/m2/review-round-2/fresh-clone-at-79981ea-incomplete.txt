@@ -1,0 +1,18 @@
+INCOMPLETE. This fresh-clone check of 79981ea stopped after repeat 5 of 10, when the session running it ended. The ten repeats and the export check did
+not finish, so it is not a complete result. Everything it reached passed. Superseded by fresh-clone-at-3426d3b.txt.
+
+commit 79981ea
+debug build exit=0 warnings=0
+release build exit=0 warnings=0
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+[doctest] assertions: 994 | 994 passed | 0 failed |
+godot checks exit=0
+CHECK_CLASSES classes=10 problems=0
+RESULT passed=191 failed=0
+CHECK_ART problems=0
+art regenerated, changed files: 0
+repeat 1: RESULT passed=191 failed=0 
+repeat 2: RESULT passed=191 failed=0 
+repeat 3: RESULT passed=191 failed=0 
+repeat 4: RESULT passed=191 failed=0 
+repeat 5: RESULT passed=191 failed=0 

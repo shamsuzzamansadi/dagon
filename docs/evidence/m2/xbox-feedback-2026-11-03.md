@@ -25,4 +25,4 @@
 button (see [examine/](examine/README.md)). So if the owner pressed X near something in such a build, it would have done nothing visible. That
 follows from the code. It was not observed with a controller, and it may be part of why the interaction button seemed unclear.
 
-**Still pending:** the Xbox buttons in the review package's manual checklist, and all physical PlayStation coverage.
+**Still deferred to M6, and not passed:** the individual Xbox buttons in the review package's manual check, and all physical PlayStation coverage. The owner's later [acceptance of M2](owner-acceptance-2026-11-03.md) does not list them either.

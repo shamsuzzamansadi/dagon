@@ -56,9 +56,9 @@ rebinding and save support are never removed silently (risk R20).
   ([D19, D20](decisions.md), [shore-preview.md](shore-preview.md)). The art stops at the cliff opening
   (x = 640), and everything past it is unfinished greybox: a documented boundary, not a finished
   transition. **This is not M4,** and it closes none of the M1 checks above.
-- [ ] **M2: implemented on branch `m2/interaction-and-usability`, at the M2 review gate, not merged**
-  ([package](reviews/m2-review-package.md)). The main menu and save moved here from M3 (D36). Acceptance waits on the focused
-  follow-up review and the owner's manual checks. M3–M7 not started.
+- [x] **M2: accepted by the owner on 2026-11-03, with documented deferrals** ([record](evidence/m2/owner-acceptance-2026-11-03.md),
+  [package](reviews/m2-review-package.md)). The main menu and save moved here from M3 (D36). Audio is volume controls and buses
+  prepared, and nothing more (D42). M3–M7 not started.
 - **Every later playtest identifies the exact artifact or run it tested.**
 
 ## Review follow-ups by milestone (Phase A final review, 2026-10-28)
@@ -169,8 +169,11 @@ Verify settings and save persistence, rebinding, menu focus, quit/relaunch/conti
 
 **Deferred from M1, and required before release:**
 - Physical controller testing. **Moved earlier in part:** the owner reports that the Xbox controls they tried worked
-  ([record](evidence/m2/xbox-feedback-2026-11-03.md)), and the M2 manual checklist names each Xbox button. Whatever that leaves
-  open stays here, including all PlayStation hardware. Labels and mappings themselves were not deferred, and are M2 work.
+  ([record](evidence/m2/xbox-feedback-2026-11-03.md)), and accepted M2 after manual testing, without listing what they ran
+  ([record](evidence/m2/owner-acceptance-2026-11-03.md)). **So none of this is recorded as passed, and it stays here:** all physical
+  PlayStation hardware, and the individual Xbox actions in the M2 manual check, including disconnecting and reconnecting. Labels and
+  mappings themselves were not deferred, and are M2 work.
+- Key names under German on the real build, left unverified because the owner asked to keep layout changes off their active desktop.
 - Native Linux hardware-accelerated rendering validation. The M1 Linux run used software rendering.
 
 - **Displays:** ordinary players on 1280×720 and 1920×1080, windowed and fullscreen. Text stays readable

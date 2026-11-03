@@ -260,7 +260,7 @@ levels, custom physics or rendering, multiplayer.
 
 ## 11. Menus, settings and saving
 
-**Status: all of this is implemented in M2, on its branch and at its review gate, for the beats that exist so far.** Added by
+**Status: all of this is implemented in M2, accepted by the owner, for the beats that exist so far.** Added by
 the owner on 2026-11-02 and brought forward on 2026-11-03 ([D24, D25, D36](decisions.md)). Saving is an intentional scope change:
 this document excluded it before.
 

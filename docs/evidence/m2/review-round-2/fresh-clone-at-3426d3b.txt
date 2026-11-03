@@ -1,0 +1,25 @@
+PARTIAL. This check was still running when this file was committed, at 7 of 10 repeats. The rest, and the Linux export check, had not finished.
+
+commit 3426d3bb5289c35a7a694235c6f750f777acaad3
+debug build exit=0 warnings=0
+release build exit=0 warnings=0
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+[doctest] assertions: 994 | 994 passed | 0 failed |
+godot checks exit=0
+import: ok
+check_classes: ok
+integration: ok
+smoke: ok
+smoke_greybox: ok
+smoke_game: ok
+CHECK_CLASSES classes=10 problems=0
+RESULT passed=195 failed=0
+CHECK_ART problems=0
+art regenerated, changed files: 0
+repeat 1: RESULT passed=195 failed=0 
+repeat 2: RESULT passed=195 failed=0 
+repeat 3: RESULT passed=195 failed=0 
+repeat 4: RESULT passed=195 failed=0 
+repeat 5: RESULT passed=195 failed=0 
+repeat 6: RESULT passed=195 failed=0 
+repeat 7: RESULT passed=195 failed=0 

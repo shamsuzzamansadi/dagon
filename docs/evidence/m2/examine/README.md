@@ -101,7 +101,7 @@ only. I looked at every screenshot in [after/](after/). The run's text output is
 - **The keys were window messages, not a physical keyboard.** That reaches the game's real input path, but says nothing about hardware.
 - **German and English after the fix:** I sent layout requests in one run, but only recorded the layout of the window that had focus, which was not the game. So
   those two are not proven by a read-back. German's letters for A, D and E match English, so the font fallback does not come into it, and this is low risk.
-  The owner's check under German closes it.
+  The owner has since asked to keep system keyboard-layout changes out of further testing on their active desktop, so this stays a stated limit.
 - **Controller:** nothing here pressed a controller. Controller input on this build is covered only by the suite on the exported pack, with
   injected events, on Windows CI, and by the owner's manual checks. The one real observation: with a controller attached to this machine, the
   driver reported `XInput Controller`, vendor 1118 (`0x045E`), and the game classified it as Xbox.
