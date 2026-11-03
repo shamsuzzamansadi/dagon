@@ -6,6 +6,7 @@
 
 #include <godot_cpp/classes/control.hpp>
 #include <godot_cpp/classes/input_event.hpp>
+#include <godot_cpp/classes/label.hpp>
 #include <godot_cpp/variant/node_path.hpp>
 
 namespace dagon {
@@ -46,6 +47,8 @@ public:
 	godot::NodePath get_quit_button_path() const { return quit_button_path_; }
 	void set_quit_cancel_button_path(const godot::NodePath &p_value) { quit_cancel_button_path_ = p_value; }
 	godot::NodePath get_quit_cancel_button_path() const { return quit_cancel_button_path_; }
+	void set_quit_message_label_path(const godot::NodePath &p_value) { quit_message_label_path_ = p_value; }
+	godot::NodePath get_quit_message_label_path() const { return quit_message_label_path_; }
 
 protected:
 	static void _bind_methods();
@@ -71,11 +74,13 @@ private:
 	godot::NodePath settings_button_path_;
 	godot::NodePath quit_button_path_;
 	godot::NodePath quit_cancel_button_path_;
+	godot::NodePath quit_message_label_path_;
 
 	NodeRef<GameDirector> director_;
 	NodeRef<godot::Control> main_panel_;
 	NodeRef<godot::Control> quit_panel_;
 	NodeRef<SettingsMenu> settings_menu_;
+	NodeRef<godot::Label> quit_message_label_;
 	Screen screen_ = Screen::Closed;
 	godot::NodePath default_focus_path_;
 };

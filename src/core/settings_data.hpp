@@ -51,7 +51,8 @@ std::string serialize_settings(const Settings &p_settings);
 
 const char *action_name(GameAction p_action);
 
-// Esc always opens and closes the pause menu, and the arrows always move, so nobody can lock themselves out.
+// Esc always opens and closes the pause menu, and Left and Right always move, so nobody can lock themselves
+// out. Up and Down stay free: menus use their own actions, so rebinding those keys cannot break navigation.
 bool is_reserved_key(int p_key);
 
 enum class AssignResult {

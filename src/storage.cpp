@@ -24,7 +24,7 @@ namespace {
 const char *const SETTINGS_FILE = "settings.cfg";
 const char *const STORAGE_DIR_VARIABLE = "DAGON_STORAGE_DIR";
 
-// The arrows stay on movement whatever the player rebinds (core::is_reserved_key).
+// Left and Right stay on movement whatever the player rebinds (core::is_reserved_key).
 bool is_fixed_key(const StringName &p_action, int p_key) {
 	return (p_action == StringName("move_left") && p_key == core::KEY_CODE_LEFT) || (p_action == StringName("move_right") && p_key == core::KEY_CODE_RIGHT);
 }

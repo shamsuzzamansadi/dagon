@@ -47,7 +47,7 @@ const EXPECTED := {
 	},
 	"MenuController": {
 		"base": "Control",
-		"properties": ["director_path", "main_panel_path", "quit_panel_path", "settings_menu_path", "resume_button_path", "settings_button_path", "quit_button_path", "quit_cancel_button_path"],
+		"properties": ["director_path", "main_panel_path", "quit_panel_path", "settings_menu_path", "resume_button_path", "settings_button_path", "quit_button_path", "quit_cancel_button_path", "quit_message_label_path"],
 		"methods": ["is_open", "open", "resume", "restart_checkpoint", "open_settings", "ask_quit", "cancel_quit", "confirm_quit", "back"],
 		"signals": [],
 	},

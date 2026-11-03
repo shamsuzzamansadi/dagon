@@ -123,7 +123,7 @@ text = "-"
 [node name="Note" type="Label" parent="Center/Panel/Items"]
 custom_minimum_size = Vector2(232, 0)
 layout_mode = 2
-text = "The arrow keys always move. Esc always pauses."
+text = "Left/Right arrows always move. Esc always pauses."
 autowrap_mode = 2
 
 [node name="Message" type="Label" parent="Center/Panel/Items"]

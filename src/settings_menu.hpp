@@ -27,6 +27,8 @@ public:
 	void open();
 	// Closes one level: a conflict first, then the menu. A capture cancels through _input.
 	void back();
+	// Gives focus to a visible control, without leaving a conflict's choice or changing anything else.
+	void focus_current();
 
 	void begin_capture(int p_action);
 	void swap_conflict();
@@ -37,6 +39,7 @@ public:
 
 	bool is_capturing() const { return state_ == State::Capturing; }
 	bool has_conflict() const { return state_ == State::Conflict; }
+	bool has_unsaved_changes() const { return unsaved_; }
 
 	void set_music_slider_path(const godot::NodePath &p_value) { music_slider_path_ = p_value; }
 	godot::NodePath get_music_slider_path() const { return music_slider_path_; }
@@ -66,6 +69,7 @@ private:
 	void finish_capture();
 	void commit();
 	void refresh_controls();
+	void show_idle_message();
 	void set_message(const godot::String &p_text);
 	void set_conflict_row_visible(bool p_visible);
 	godot::String action_label(core::GameAction p_action) const;

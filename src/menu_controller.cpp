@@ -13,6 +13,13 @@ using namespace godot;
 
 namespace dagon {
 
+namespace {
+
+const char *const QUIT_MESSAGE = "Quit to desktop? This version does not save your progress. Your settings are kept.";
+const char *const QUIT_MESSAGE_UNSAVED = "Quit to desktop? This version does not save your progress, and your latest settings could not be saved.";
+
+} // namespace
+
 void MenuController::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("is_open"), &MenuController::is_open);
 	ClassDB::bind_method(D_METHOD("open"), &MenuController::open);
@@ -37,6 +44,7 @@ void MenuController::_bind_methods() {
 	DAGON_BIND_PATH(settings_button_path);
 	DAGON_BIND_PATH(quit_button_path);
 	DAGON_BIND_PATH(quit_cancel_button_path);
+	DAGON_BIND_PATH(quit_message_label_path);
 
 #undef DAGON_BIND_PATH
 }
@@ -51,6 +59,7 @@ void MenuController::_ready() {
 	main_panel_.set(get_node<Control>(main_panel_path_));
 	quit_panel_.set(get_node<Control>(quit_panel_path_));
 	settings_menu_.set(get_node<SettingsMenu>(settings_menu_path_));
+	quit_message_label_.set(get_node<Label>(quit_message_label_path_));
 	if (main_panel_.get() == nullptr || quit_panel_.get() == nullptr || settings_menu_.get() == nullptr) {
 		ERR_PRINT("MenuController: a panel path is not set; the menu cannot open.");
 		return;
@@ -76,7 +85,8 @@ void MenuController::_unhandled_input(const Ref<InputEvent> &p_event) {
 	if (!is_open()) {
 		return;
 	}
-	// A mouse click on nothing drops focus. The next press brings it back, so the menu stays usable.
+	// Focus is always set on the way into a screen, and a click on empty space leaves it alone. If it
+	// is ever lost all the same, the next press brings it back, so the menu cannot strand a keyboard or pad.
 	if (get_viewport()->gui_get_focus_owner() == nullptr && (p_event->is_action_pressed("ui_up") || p_event->is_action_pressed("ui_down") || p_event->is_action_pressed("ui_left") || p_event->is_action_pressed("ui_right") || p_event->is_action_pressed("ui_accept"))) {
 		focus_default();
 		get_viewport()->set_input_as_handled();
@@ -97,6 +107,10 @@ void MenuController::focus_path(const NodePath &p_path) {
 }
 
 void MenuController::focus_default() {
+	if (screen_ == Screen::Settings) {
+		settings_menu_.get()->focus_current();
+		return;
+	}
 	if (Control *control = get_node<Control>(default_focus_path_)) {
 		control->grab_focus();
 	}
@@ -138,6 +152,9 @@ void MenuController::on_settings_closed() {
 }
 
 void MenuController::ask_quit() {
+	if (Label *label = quit_message_label_.get()) {
+		label->set_text(settings_menu_.get()->has_unsaved_changes() ? QUIT_MESSAGE_UNSAVED : QUIT_MESSAGE);
+	}
 	show_screen(Screen::QuitConfirm);
 	focus_path(quit_cancel_button_path_);
 }

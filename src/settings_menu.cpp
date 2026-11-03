@@ -77,10 +77,18 @@ void SettingsMenu::open() {
 	}
 	state_ = State::Idle;
 	set_conflict_row_visible(false);
-	set_message("");
+	show_idle_message();
 	refresh_controls();
-	if (HSlider *slider = music_slider_.get()) {
-		slider->grab_focus();
+	focus_current();
+}
+
+void SettingsMenu::focus_current() {
+	Control *control = music_slider_.get();
+	if (state_ == State::Conflict) {
+		control = swap_button_.get();
+	}
+	if (control != nullptr) {
+		control->grab_focus();
 	}
 }
 
@@ -168,7 +176,7 @@ void SettingsMenu::cancel_capture() {
 
 void SettingsMenu::finish_capture() {
 	state_ = State::Idle;
-	set_message("");
+	show_idle_message();
 	refresh_controls();
 }
 
@@ -187,7 +195,7 @@ void SettingsMenu::cancel_conflict() {
 	}
 	state_ = State::Idle;
 	set_conflict_row_visible(false);
-	set_message("");
+	show_idle_message();
 	refresh_controls();
 	if (Button *button = key_buttons_[static_cast<std::size_t>(capture_action_)].get()) {
 		button->grab_focus();
@@ -199,8 +207,10 @@ void SettingsMenu::restore_defaults() {
 	state_ = State::Idle;
 	set_conflict_row_visible(false);
 	refresh_controls();
-	set_message("Defaults restored.");
 	commit();
+	if (!unsaved_) {
+		set_message("Defaults restored.");
+	}
 }
 
 void SettingsMenu::set_music_volume(double p_value) {
@@ -217,9 +227,14 @@ void SettingsMenu::commit() {
 	storage::apply_settings(settings_);
 	refresh_controls();
 	unsaved_ = !storage::save_settings(settings_);
-	if (unsaved_) {
-		set_message(SAVE_FAILED_MESSAGE);
+	// A capture or conflict keeps its own instructions. The warning returns when they end.
+	if (state_ == State::Idle) {
+		show_idle_message();
 	}
+}
+
+void SettingsMenu::show_idle_message() {
+	set_message(unsaved_ ? SAVE_FAILED_MESSAGE : "");
 }
 
 void SettingsMenu::refresh_controls() {

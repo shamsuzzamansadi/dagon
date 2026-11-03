@@ -19,6 +19,7 @@ resume_button_path = NodePath("Center/Main/Items/Resume")
 settings_button_path = NodePath("Center/Main/Items/Settings")
 quit_button_path = NodePath("Center/Main/Items/Quit")
 quit_cancel_button_path = NodePath("Center/QuitConfirm/Items/Buttons/Cancel")
+quit_message_label_path = NodePath("Center/QuitConfirm/Items/Message")
 
 [node name="Dim" type="ColorRect" parent="."]
 layout_mode = 1

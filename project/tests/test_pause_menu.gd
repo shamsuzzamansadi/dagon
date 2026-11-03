@@ -209,6 +209,52 @@ func test_focus_comes_back_after_it_is_lost(h) -> void:
 	h.check(_focus(h) == _button(h, "Resume"), "a press did not bring focus back: %s" % _focus(h))
 
 
+func test_focus_lost_after_leaving_settings_comes_back_to_a_visible_button(h) -> void:
+	await _setup(h)
+	var menu := _menu(h)
+	await h.tap_action("pause")
+	menu.open_settings()
+	await h.steps(1)
+	await h.tap_key(KEY_ESCAPE)
+	menu.get_viewport().gui_release_focus()
+	await h.tap_key(KEY_DOWN)
+	h.check(_focus(h) == _button(h, "Settings"), "focus came back to %s" % _focus(h))
+	h.check(_focus(h) != null and _focus(h).is_visible_in_tree(), "the recovered button is not visible")
+
+
+func test_focus_lost_in_the_quit_confirmation_stays_in_it(h) -> void:
+	await _setup(h)
+	var menu := _menu(h)
+	await h.tap_action("pause")
+	menu.ask_quit()
+	await h.steps(1)
+	var panel: Control = h.fixture.get_node("PauseLayer/PauseMenu/Center/QuitConfirm")
+	menu.get_viewport().gui_release_focus()
+	await h.tap_pad(JOY_BUTTON_DPAD_DOWN)
+	h.check(_focus(h) == panel.get_node("Items/Buttons/Cancel"), "focus came back to %s" % _focus(h))
+	h.check(panel.visible, "recovering focus closed the confirmation")
+	await h.tap_action("ui_accept")
+	h.check(not panel.visible and menu.is_open(), "the recovered Cancel did not cancel")
+
+
+## Measured on 4.7.2: clicking something that takes no focus leaves focus where it was.
+func test_clicking_empty_space_keeps_focus_and_the_keyboard_working(h) -> void:
+	await _setup(h)
+	await h.tap_action("pause")
+	var click_pressed := InputEventMouseButton.new()
+	click_pressed.button_index = MOUSE_BUTTON_LEFT
+	click_pressed.position = Vector2(5, 5)
+	click_pressed.global_position = click_pressed.position
+	click_pressed.pressed = true
+	var click_released: InputEventMouseButton = click_pressed.duplicate()
+	click_released.pressed = false
+	await h.tap(click_pressed, click_released)
+	h.check(_focus(h) == _button(h, "Resume"), "a click on empty space moved focus to %s" % _focus(h))
+	h.check(_menu(h).is_open(), "a click on empty space closed the menu")
+	await h.tap_key(KEY_DOWN)
+	h.check(_focus(h) == _button(h, "RestartCheckpoint"), "the keyboard stopped working: %s" % _focus(h))
+
+
 func test_every_button_is_connected(h) -> void:
 	await _setup(h)
 	var menu := _menu(h)

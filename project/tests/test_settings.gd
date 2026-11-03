@@ -44,6 +44,34 @@ func _bytes(text: String) -> PackedByteArray:
 	return text.to_utf8_buffer()
 
 
+func _focus(h) -> Control:
+	return h.fixture.get_node(MENU).get_viewport().gui_get_focus_owner()
+
+
+func _lose_focus(h) -> void:
+	h.fixture.get_node(MENU).get_viewport().gui_release_focus()
+	h.check(_focus(h) == null, "the test did not lose focus")
+
+
+## Ways a player can press something with nothing focused: pressed and released events.
+func _recovery_presses(h) -> Dictionary:
+	return {
+		"Down key": [h.key_event(KEY_DOWN, true), h.key_event(KEY_DOWN, false)],
+		"D-pad": [h.pad_event(JOY_BUTTON_DPAD_DOWN, true), h.pad_event(JOY_BUTTON_DPAD_DOWN, false)],
+		"Enter": [h.key_event(KEY_ENTER, true), h.key_event(KEY_ENTER, false)],
+		"south button": [h.pad_event(JOY_BUTTON_A, true), h.pad_event(JOY_BUTTON_A, false)],
+	}
+
+
+## A folder where the temporary file has to go, so the write fails on every platform.
+func _block_writes(h) -> void:
+	DirAccess.make_dir_recursive_absolute(h.storage_dir.path_join(SETTINGS_FILE + ".tmp"))
+
+
+func _allow_writes(h) -> void:
+	DirAccess.remove_absolute(h.storage_dir.path_join(SETTINGS_FILE + ".tmp"))
+
+
 func test_settings_are_written_to_the_test_directory(h) -> void:
 	await _setup(h)
 	var settings := await _open(h)
@@ -328,8 +356,7 @@ func test_damaged_files_fall_back_to_defaults_without_errors(h) -> void:
 func test_a_failed_write_is_reported_and_the_change_still_applies(h) -> void:
 	await _setup(h)
 	var settings := await _open(h)
-	# A folder where the temporary file has to go, so the write fails on every platform.
-	DirAccess.make_dir_recursive_absolute(h.storage_dir.path_join(SETTINGS_FILE + ".tmp"))
+	_block_writes(h)
 	settings.begin_capture(JUMP)
 	await h.tap_key(KEY_J)
 	h.check(_keys_of("jump") == [KEY_J], "the change did not apply: %s" % str(_keys_of("jump")))
@@ -348,13 +375,258 @@ func test_a_failed_write_is_reported_and_the_change_still_applies(h) -> void:
 	h.check(_keys_of("jump") == [KEY_J], "restarting lost the unsaved key: %s" % str(_keys_of("jump")))
 
 	# Once writing works again, the next change saves it all.
-	DirAccess.remove_absolute(h.storage_dir.path_join(SETTINGS_FILE + ".tmp"))
+	_allow_writes(h)
 	menu.open()
 	menu.open_settings()
 	await h.steps(1)
 	settings.set_music_volume(0.5)
 	h.check(h.read_storage_file(SETTINGS_FILE).contains("key_jump=%d" % KEY_J), "the recovered write did not save the key")
 	h.check(_message(h) == "", "the failure message stayed after a good write: '%s'" % _message(h))
+
+
+func test_focus_lost_in_settings_comes_back_to_a_usable_control(h) -> void:
+	await _setup(h)
+	var settings := await _open(h)
+	var menu: Control = h.fixture.get_node(MENU)
+	var presses := _recovery_presses(h)
+	for press: String in presses:
+		_lose_focus(h)
+		await h.tap(presses[press][0], presses[press][1])
+		var focus := _focus(h)
+		h.check(focus != null and focus.is_visible_in_tree() and settings.is_ancestor_of(focus), "after %s, focus is on %s" % [press, focus])
+		h.check(settings.visible and menu.is_open(), "%s changed the screen" % press)
+
+	# What came back has to work: it responds, and focus can move on from it.
+	var music: HSlider = h.fixture.get_node(ITEMS + "Music/Slider")
+	h.check(music.has_focus(), "recovered to %s" % _focus(h))
+	await h.tap_action("ui_left")
+	h.check_near(music.value, 0.9, 0.001, "the recovered slider after a press left")
+	await h.tap_action("ui_down")
+	h.check(h.fixture.get_node(ITEMS + "Effects/Slider").has_focus(), "focus did not move on: %s" % _focus(h))
+
+	# Back still closes one level.
+	await h.tap_key(KEY_ESCAPE)
+	h.check(menu.is_open() and not settings.visible, "Back after recovering did not close only Settings")
+
+
+func test_focus_lost_in_a_conflict_comes_back_inside_the_choice(h) -> void:
+	await _setup(h)
+	var settings := await _open(h)
+	settings.begin_capture(INTERACT)
+	await h.tap_key(KEY_SPACE)
+	var swap: Button = h.fixture.get_node(ITEMS + "Conflict/Swap")
+	var cancel: Button = h.fixture.get_node(ITEMS + "Conflict/Cancel")
+	var message := _message(h)
+	var presses := _recovery_presses(h)
+	for press: String in presses:
+		_lose_focus(h)
+		await h.tap(presses[press][0], presses[press][1])
+		h.check(_focus(h) == swap or _focus(h) == cancel, "after %s, focus is on %s" % [press, _focus(h)])
+		h.check(settings.has_conflict(), "%s ended the conflict" % press)
+		h.check(_message(h) == message, "%s changed the message to '%s'" % [press, _message(h)])
+		h.check(_keys_of("interact") == [KEY_E] and _keys_of("jump") == [KEY_SPACE], "%s changed the keys" % press)
+
+	# The recovered choice works.
+	h.check(swap.has_focus(), "recovered to %s" % _focus(h))
+	await h.tap_action("ui_accept")
+	h.check(not settings.has_conflict(), "the recovered Swap did nothing")
+	h.check(_keys_of("interact") == [KEY_SPACE] and _keys_of("jump") == [KEY_E], "the recovered Swap did not swap")
+
+
+func test_losing_focus_during_a_capture_changes_nothing(h) -> void:
+	await _setup(h)
+	var settings := await _open(h)
+	settings.begin_capture(JUMP)
+	_lose_focus(h)
+	await h.tap_pad(JOY_BUTTON_DPAD_DOWN)
+	h.check(settings.is_capturing(), "a pad press ended the capture")
+	h.check(_focus(h) == null, "a pad press moved focus during the capture: %s" % _focus(h))
+	await h.tap_pad(JOY_BUTTON_B)
+	h.check(not settings.is_capturing(), "the east button did not cancel the capture")
+	h.check(settings.visible, "cancelling the capture also closed Settings")
+	h.check(_keys_of("jump") == [KEY_SPACE], "the capture changed the key: %s" % str(_keys_of("jump")))
+	await h.tap_pad(JOY_BUTTON_DPAD_DOWN)
+	var focus := _focus(h)
+	h.check(focus != null and focus.is_visible_in_tree() and settings.is_ancestor_of(focus), "after the capture, focus is on %s" % focus)
+
+
+func test_recovering_focus_keeps_unsaved_settings(h) -> void:
+	await _setup(h)
+	var settings := await _open(h)
+	_block_writes(h)
+	settings.begin_capture(JUMP)
+	await h.tap_key(KEY_J)
+	_lose_focus(h)
+	await h.tap_key(KEY_DOWN)
+	h.check(_keys_of("jump") == [KEY_J], "recovering focus lost the key: %s" % str(_keys_of("jump")))
+	h.check(_key_button(h, "Jump").text == "J", "the row reads '%s'" % _key_button(h, "Jump").text)
+	h.check(_message(h).contains("Could not save"), "recovering focus lost the warning: '%s'" % _message(h))
+
+
+func test_a_good_write_removes_the_warning_on_the_same_screen(h) -> void:
+	await _setup(h)
+	var settings := await _open(h)
+	_block_writes(h)
+	settings.set_music_volume(0.5)
+	h.check(_message(h).contains("Could not save"), "the failed write was not reported: '%s'" % _message(h))
+	_allow_writes(h)
+	settings.set_music_volume(0.4)
+	h.check(_message(h) == "", "the warning stayed after a good write: '%s'" % _message(h))
+	h.check(h.read_storage_file(SETTINGS_FILE).contains("music_volume=0.4"), "the retry did not save")
+
+
+func test_reopening_with_unsaved_changes_still_says_so(h) -> void:
+	await _setup(h)
+	var settings := await _open(h)
+	var menu: Control = h.fixture.get_node(MENU)
+	_block_writes(h)
+	settings.begin_capture(JUMP)
+	await h.tap_key(KEY_J)
+	settings.back()
+	menu.open_settings()
+	await h.steps(1)
+	h.check(_message(h).contains("Could not save"), "reopening hid the warning: '%s'" % _message(h))
+	h.check(_key_button(h, "Jump").text == "J", "reopening lost the unsaved key: '%s'" % _key_button(h, "Jump").text)
+
+	settings.back()
+	menu.restart_checkpoint()
+	await h.steps(2)
+	menu.open()
+	menu.open_settings()
+	await h.steps(1)
+	h.check(_message(h).contains("Could not save"), "restarting hid the warning: '%s'" % _message(h))
+	h.check(_keys_of("jump") == [KEY_J], "restarting lost the unsaved key: %s" % str(_keys_of("jump")))
+
+	# Saved at last: the warning goes, and stays gone on reopening.
+	_allow_writes(h)
+	settings.set_music_volume(0.5)
+	settings.back()
+	menu.open_settings()
+	await h.steps(1)
+	h.check(_message(h) == "", "the warning came back after a good write: '%s'" % _message(h))
+
+
+func test_instructions_replace_the_warning_and_it_returns_afterwards(h) -> void:
+	await _setup(h)
+	var settings := await _open(h)
+	_block_writes(h)
+	settings.set_music_volume(0.5)
+
+	settings.begin_capture(JUMP)
+	h.check(_message(h).contains("Press a key"), "no capture instruction: '%s'" % _message(h))
+	await h.tap_key(KEY_ESCAPE)
+	h.check(_message(h).contains("Could not save"), "cancelling a capture hid the warning: '%s'" % _message(h))
+
+	settings.begin_capture(INTERACT)
+	await h.tap_key(KEY_SPACE)
+	h.check(_message(h).contains("Space") and _message(h).contains("Jump"), "no conflict explanation: '%s'" % _message(h))
+	await h.tap_key(KEY_ESCAPE)
+	h.check(_message(h).contains("Could not save"), "cancelling a conflict hid the warning: '%s'" % _message(h))
+
+	# A slider moved with the mouse during a conflict must not wipe the explanation.
+	settings.begin_capture(INTERACT)
+	await h.tap_key(KEY_SPACE)
+	settings.set_music_volume(0.3)
+	h.check(_message(h).contains("Space") and _message(h).contains("Jump"), "a change during a conflict wiped its explanation: '%s'" % _message(h))
+	await h.tap_key(KEY_ESCAPE)
+	h.check(_message(h).contains("Could not save"), "the warning did not return after the conflict: '%s'" % _message(h))
+
+	# The key an action already has changes nothing, so it is still unsaved.
+	settings.begin_capture(JUMP)
+	await h.tap_key(KEY_SPACE)
+	h.check(_message(h).contains("Could not save"), "an unchanged key hid the warning: '%s'" % _message(h))
+
+
+func test_restore_defaults_reports_what_really_happened(h) -> void:
+	await _setup(h)
+	var settings := await _open(h)
+	settings.restore_defaults()
+	h.check(_message(h).contains("restored"), "no confirmation: '%s'" % _message(h))
+	settings.set_music_volume(0.5)
+	h.check(_message(h) == "", "the confirmation outlived a later change: '%s'" % _message(h))
+
+	_block_writes(h)
+	settings.restore_defaults()
+	h.check(_message(h).contains("Could not save"), "a failed restore was not reported: '%s'" % _message(h))
+	h.check(_keys_of("jump") == [KEY_SPACE], "the failed restore did not apply: %s" % str(_keys_of("jump")))
+
+	_allow_writes(h)
+	settings.restore_defaults()
+	h.check(_message(h).contains("restored"), "a restore after a failure reads: '%s'" % _message(h))
+	h.check(h.read_storage_file(SETTINGS_FILE).contains("music_volume=1"), "the restore did not save")
+
+
+func test_quitting_with_unsaved_settings_does_not_claim_they_are_kept(h) -> void:
+	await _setup(h)
+	var settings := await _open(h)
+	var menu: Control = h.fixture.get_node(MENU)
+	var message: Label = menu.get_node("Center/QuitConfirm/Items/Message")
+	settings.back()
+	menu.ask_quit()
+	h.check(message.text.contains("settings are kept"), "the normal message reads '%s'" % message.text)
+	menu.cancel_quit()
+
+	_block_writes(h)
+	menu.open_settings()
+	await h.steps(1)
+	settings.set_music_volume(0.5)
+	settings.back()
+	menu.ask_quit()
+	h.check(not message.text.contains("settings are kept"), "it claims unsaved settings are kept: '%s'" % message.text)
+	h.check(message.text.contains("could not be saved"), "it does not mention the failed save: '%s'" % message.text)
+	menu.cancel_quit()
+
+	_allow_writes(h)
+	menu.open_settings()
+	await h.steps(1)
+	settings.set_music_volume(0.4)
+	settings.back()
+	menu.ask_quit()
+	h.check(message.text.contains("settings are kept"), "the message did not recover: '%s'" % message.text)
+
+
+func test_the_settings_screen_says_exactly_which_keys_are_kept(h) -> void:
+	await _setup(h)
+	await _open(h)
+	var note: String = h.fixture.get_node(ITEMS + "Note").text
+	h.check(note == "Left/Right arrows always move. Esc always pauses.", "the note reads '%s'" % note)
+
+
+func test_up_and_down_can_be_rebound_and_the_menu_still_works(h) -> void:
+	var player: CharacterBody2D = await _setup(h)
+	var settings := await _open(h)
+	var menu: Control = h.fixture.get_node(MENU)
+	var jumps := [0]
+	player.jumped.connect(func() -> void: jumps[0] += 1)
+	settings.begin_capture(JUMP)
+	await h.tap_key(KEY_UP)
+	settings.begin_capture(INTERACT)
+	await h.tap_key(KEY_DOWN)
+	h.check(_keys_of("jump") == [KEY_UP], "Up was not accepted: %s" % str(_keys_of("jump")))
+	h.check(_keys_of("interact") == [KEY_DOWN], "Down was not accepted: %s" % str(_keys_of("interact")))
+	h.check(_key_button(h, "Jump").text == "Up" and _key_button(h, "Interact").text == "Down", "the rows did not update")
+
+	# The same keys still navigate the menus, and pressing them there does nothing to the game.
+	_key_button(h, "Interact").grab_focus()
+	await h.tap_key(KEY_UP)
+	h.check(_key_button(h, "Jump").has_focus(), "Up did not move focus up: %s" % _focus(h))
+	await h.tap_key(KEY_DOWN)
+	h.check(_key_button(h, "Interact").has_focus(), "Down did not move focus down: %s" % _focus(h))
+	h.check(jumps[0] == 0, "navigating with Up jumped")
+
+	# Back still closes one level at a time.
+	await h.tap_key(KEY_ESCAPE)
+	h.check(menu.is_open() and not settings.visible, "Esc did not close only Settings")
+	await h.tap_key(KEY_DOWN)
+	h.check(_focus(h) == menu.get_node("Center/Main/Items/Quit"), "Down did not move focus in the main menu: %s" % _focus(h))
+	await h.tap_key(KEY_ESCAPE)
+	h.check(not menu.is_open() and not h.tree.paused, "Esc did not resume")
+
+	# And in the game they are the new keys.
+	await h.steps(5)
+	await h.tap_key(KEY_UP)
+	await h.steps(2)
+	h.check(jumps[0] == 1, "Up did not jump in the game")
 
 
 func test_settings_survive_a_relaunch(h) -> void:
