@@ -1,0 +1,21 @@
+The three review findings, reproduced at a7859c2 before any fix, on the tools as they stood. Published and tagged nothing.
+
+=== Finding 1: which changes alter the acceptance fingerprint
+  .github/workflows/ci.yml: fingerprint UNCHANGED
+  tools/export_check.sh: fingerprint UNCHANGED
+  tools/run_godot_checks.sh: fingerprint UNCHANGED
+  tools/package_release.py: fingerprint UNCHANGED
+  project/export_presets.cfg: CHANGES the fingerprint
+  docs/r.md: fingerprint UNCHANGED
+=== Finding 2: a tag with no release behind it
+  tag exists, no release was ever created:
+    failed=False outcome={'version': '', 'record': '', 'publish': 'false'}
+    notice::v0.1.0-pre-alpha.1 is already published. A release is never replaced.
+  publisher's check for an existing release, from tools/publish_release.sh:
+    draft="$(gh release view "$version" --json isDraft --jq .isDraft 2> /dev/null || echo none)"
+    gh release view "$version" --json url,isPrerelease,isDraft --jq '"published \(.url) prerelease=\(.isPrerelease) draft=\(.isDraft)"'
+    so a network or authentication failure reads as 'none', meaning no release exists
+=== Finding 3: the same Linux export packaged at two different times
+  clock 1000000000: sha256 b6493e95a14c91f0...  gzip MTIME field 1000000000  gzip FLG 8
+  clock 2000000000: sha256 2156192faed5c98d...  gzip MTIME field 2000000000  gzip FLG 8
+  identical bytes: False

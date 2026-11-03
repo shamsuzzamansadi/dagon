@@ -6,8 +6,12 @@ publishes anything. See docs/release.md.
 
   evaluate    What is due at this commit. Writes the outcome for the workflow, and names every blocker.
   validate    Checks that every record is well formed. Runs on every pull request.
-  fingerprint Prints this commit's gameplay fingerprint, for an owner acceptance record.
+  fingerprint Prints a commit's acceptance fingerprint, for an owner acceptance record.
   prepare     Writes the notes, checksums and provenance beside the packages.
+  preflight   Inside the publication lock: says whether to create the release, and removes a failed attempt's draft.
+  verify      After publishing: fails unless the release is complete and consistent, at the tested commit.
+
+A question about tags or releases that goes unanswered stops the release. It is never read as "absent".
 """
 import argparse
 import hashlib
@@ -16,24 +20,36 @@ import os
 import re
 import subprocess
 import sys
+import urllib.error
+import urllib.parse
+import urllib.request
 from pathlib import Path
 
 RECORDS_DIR = "release"
 REHEARSAL_RECORD = "tools/release_rehearsal.json"
 
-# What makes up the game a player receives. An owner's acceptance stays valid while this is unchanged, so
-# documents, tests and CI changes do not need a new playthrough. docs/release.md states the exact scope.
-GAMEPLAY_PATHS = (
+# What an owner's acceptance covers: the files that make up the game, and every file that decides how it is built,
+# exported and packaged. Changing any of them voids the acceptance. This is deliberately conservative: a comment in a
+# workflow voids it too, because nothing here tries to tell which changes matter. docs/release.md states the scope.
+ACCEPTANCE_INPUTS = (
     "src",
     "project",
     "SConstruct",
     "methods.py",
     "godot-cpp",
+    ".gitmodules",
+    ".gitattributes",
+    ".github/workflows",
+    "tools/run_godot_checks.sh",
+    "tools/export_check.sh",
+    "tools/prepare_project.sh",
+    "tools/test_storage.sh",
+    "tools/package_release.py",
     "tools/install_godot.sh",
     "tools/install_export_templates.sh",
     "tools/extract_templates.py",
 )
-NOT_GAMEPLAY = ("project/tests/",)
+NOT_COVERED = ("project/tests/",)  # The export check fails if these reach a build.
 
 # Each label has one base version, so a stable or 1.0 version cannot be expressed. A correction takes the next
 # number, as a published version is never replaced. A rehearsal uses .0, which can never be published.
@@ -86,23 +102,137 @@ def label_of(version):
 
 
 def fingerprint(root=".", commit="HEAD"):
-    """A hash of exactly what ships. It survives a squash merge, which changes the commit and not the files."""
+    """A hash of ACCEPTANCE_INPUTS. It survives a squash merge, which changes the commit and not the files."""
     listing = subprocess.run(
-        ["git", "ls-tree", "-r", commit, "--", *GAMEPLAY_PATHS],
+        ["git", "ls-tree", "-r", commit, "--", *ACCEPTANCE_INPUTS],
         cwd=root,
         check=True,
         capture_output=True,
         text=True,
     ).stdout
-    lines = [line for line in listing.splitlines() if not line.split("\t", 1)[1].startswith(NOT_GAMEPLAY)]
+    lines = [line for line in listing.splitlines() if not line.split("\t", 1)[1].startswith(NOT_COVERED)]
     return "sha256:" + hashlib.sha256("\n".join(sorted(lines)).encode()).hexdigest()
 
 
-def existing_tags(root="."):
-    listing = subprocess.run(
-        ["git", "ls-remote", "--tags", "origin"], cwd=root, check=True, capture_output=True, text=True
-    ).stdout
-    return {line.split("refs/tags/", 1)[1].removesuffix("^{}") for line in listing.splitlines()}
+class StateUnknown(Exception):
+    """A question about tags or releases went unanswered. It must never be read as "absent"."""
+
+
+def remote_tags(root="."):
+    """{tag: the commit it points at}. A failure raises, because an empty answer would mean no tags exist."""
+    result = subprocess.run(["git", "ls-remote", "--tags", "origin"], cwd=root, capture_output=True, text=True)
+    if result.returncode != 0:
+        raise StateUnknown(f"could not list the remote tags: git ls-remote exited with {result.returncode}")
+    tags = {}
+    for line in result.stdout.splitlines():
+        commit, reference = line.split("\t", 1)
+        # An annotated tag has a second line, straight after its first, ending ^{}. It gives the commit itself.
+        tags[reference.removeprefix("refs/tags/").removesuffix("^{}")] = commit
+    return tags
+
+
+class GitHub:
+    """Reads releases through the API. Only a 404 for something in a repository we can see means "absent"."""
+
+    def __init__(self, api=None, repository=None, token=None):
+        self.api = (api or os.environ.get("GITHUB_API_URL") or "https://api.github.com").rstrip("/")
+        self.repository = repository or os.environ.get("GITHUB_REPOSITORY")
+        self.token = token if token is not None else os.environ.get("GH_TOKEN")
+        self.confirmed = False
+
+    def _request(self, path, method="GET"):
+        if not self.repository or not self.token:
+            raise StateUnknown("GITHUB_REPOSITORY and GH_TOKEN are needed to ask GitHub about releases")
+        return urllib.request.Request(
+            f"{self.api}/repos/{self.repository}{path}",
+            method=method,
+            headers={
+                "Accept": "application/vnd.github+json",
+                "Authorization": f"Bearer {self.token}",
+                "User-Agent": "dagon-release-gate",
+                "X-GitHub-Api-Version": "2022-11-28",
+            },
+        )
+
+    def _send(self, path, method="GET"):
+        try:
+            with urllib.request.urlopen(self._request(path, method), timeout=30) as response:
+                body = response.read()
+            return json.loads(body) if body else {}
+        except urllib.error.HTTPError as error:
+            if error.code == 404:
+                return None
+            raise StateUnknown(f"GitHub answered {error.code} for {method} {path or '/'}") from None
+        except (OSError, ValueError) as error:
+            raise StateUnknown(f"no usable answer from GitHub for {method} {path or '/'}: {type(error).__name__}") from None
+
+    def get(self, path):
+        # A token that cannot see a private repository gets a 404 for everything in it. Seeing the repository first
+        # is what makes a later 404 mean "absent", and not "not allowed".
+        if not self.confirmed:
+            if self._send("") is None:
+                raise StateUnknown(f"GitHub says the repository {self.repository} does not exist for this token")
+            self.confirmed = True
+        return self._send(path)
+
+    def published_release(self, version):
+        """The published release for this tag, or None. GitHub never returns a draft from this endpoint."""
+        return self.get(f"/releases/tags/{urllib.parse.quote(version, safe='')}")
+
+    def all_releases(self):
+        """Every release this token can see. Drafts are visible only with write access."""
+        found = []
+        for page in range(1, 1000):
+            batch = self.get(f"/releases?per_page=100&page={page}")
+            if batch is None:
+                raise StateUnknown("GitHub answered 404 for the list of releases")
+            found += batch
+            if len(batch) < 100:
+                return found
+        raise StateUnknown("the list of releases did not end")
+
+    def delete_draft(self, release_id):
+        """Removes an unpublished draft. It looks again first, and refuses anything else."""
+        release = self.get(f"/releases/{int(release_id)}")
+        if release is None or release.get("draft") is not True:
+            raise StateUnknown(f"release {release_id} is not an unpublished draft, so it was left alone")
+        if self._send(f"/releases/{int(release_id)}", method="DELETE") is None:
+            raise StateUnknown(f"draft {release_id} had gone by the time it was removed")
+
+
+def expected_assets(version):
+    return {
+        f"dagon-{version}-linux-x86_64.tar.gz",
+        f"dagon-{version}-windows-x86_64.zip",
+        "SHA256SUMS.txt",
+        "PROVENANCE.txt",
+    }
+
+
+def publication_problems(version, tag_commit, release):
+    """Why what exists for this version is not a complete, consistent release. Nothing here looks at HEAD: a release
+    stays correct when main moves on, so the tag is checked against the target the release itself recorded."""
+    if release is None:
+        return [f"the tag exists at {tag_commit}, with no published release. This workflow never moves or deletes a tag: resolve it by hand, or use a new version"]
+    problems = []
+    if release.get("draft") is not False:
+        problems.append("the release is not published")
+    if release.get("tag_name") != version:
+        problems.append(f"the release is named for the tag '{release.get('tag_name')}'")
+    if release.get("prerelease") is not True:
+        problems.append("the release is not marked as a prerelease")
+    target = str(release.get("target_commitish", ""))
+    if tag_commit is None:
+        problems.append(f"the release has no tag, and recorded the target {target or 'none'}")
+    elif not re.fullmatch(r"[0-9a-f]{40}", target):
+        problems.append(f"the release recorded the target '{target}', which is not a commit, so the tag at {tag_commit} cannot be checked against it")
+    elif target != tag_commit:
+        problems.append(f"the tag points at {tag_commit}, and the release recorded the target {target}")
+    uploaded = {asset.get("name") for asset in release.get("assets", []) if asset.get("state") == "uploaded"}
+    missing = sorted(expected_assets(version) - uploaded)
+    if missing:
+        problems.append("the release is missing: " + ", ".join(missing))
+    return problems
 
 
 def load_records(root="."):
@@ -129,7 +259,7 @@ def format_problems(path, record):
     return problems
 
 
-def gate_blockers(record, root, gameplay, ci_result):
+def gate_blockers(record, root, current, ci_result):
     """Everything standing between this record and publication. An empty list means it may be published."""
     blockers = []
     if ci_result != "success":
@@ -145,11 +275,11 @@ def gate_blockers(record, root, gameplay, ci_result):
         for field, what in (("build", "which build the owner tested"), ("scope", "what the acceptance covers")):
             if not str(acceptance.get(field, "")).strip():
                 blockers.append(f"the owner acceptance does not state {what}")
-        accepted = acceptance.get("gameplay_fingerprint", "")
-        if accepted != gameplay:
+        accepted = acceptance.get("fingerprint", "")
+        if accepted != current:
             blockers.append(
-                f"gameplay has changed since the owner accepted it, so that acceptance does not cover this build: "
-                f"accepted {accepted or 'nothing'}, this commit {gameplay}"
+                f"the game, or how it is built, exported or packaged, has changed since the owner accepted it, so that "
+                f"acceptance does not cover this build: accepted {accepted or 'nothing'}, this commit {current}"
             )
 
     label = label_of(record.get("version") or "")
@@ -170,17 +300,12 @@ def gate_blockers(record, root, gameplay, ci_result):
     return blockers
 
 
-def evaluate(root, gameplay, ci_result, tags, rehearse=False):
-    """Returns (outcome, messages, failed). Outcome is what the workflow needs: version, record and publish."""
+def evaluate(root, current, ci_result, tags, find_release, rehearse=False):
+    """Returns (outcome, messages, failed). Outcome is what the workflow needs: version, record and publish.
+    tags is {tag: commit}. find_release(version) gives the published release or None, and raises StateUnknown."""
     outcome = {"version": "", "record": "", "publish": "false"}
     messages = []
     failed = False
-
-    if rehearse:
-        record = json.loads(Path(root, REHEARSAL_RECORD).read_text(encoding="utf-8"))
-        outcome.update(version=record["version"], record=REHEARSAL_RECORD)
-        messages.append(f"notice::Rehearsal: packaging {record['version']}, which can never be published.")
-        return outcome, messages, False
 
     active = []
     for path, record in load_records(root):
@@ -188,17 +313,31 @@ def evaluate(root, gameplay, ci_result, tags, rehearse=False):
         if problems:
             failed = True
             messages += [f"error::{path.name}: {problem}" for problem in problems]
-        elif record["version"] in tags:
-            messages.append(f"notice::{record['version']} is already published. A release is never replaced.")
-        else:
+            continue
+        version = record["version"]
+        release = find_release(version)
+        if version not in tags and release is None:
             active.append((path, record))
+            continue
+        problems = publication_problems(version, tags.get(version), release)
+        if problems:
+            failed = True
+            messages += [f"error::{version} is not a complete release: {problem}" for problem in problems]
+        else:
+            messages.append(f"notice::{version} is already published, at {release['target_commitish']}. A release is never replaced.")
 
     wanted = [(path, record) for path, record in active if record["state"] in ("candidate", "publish")]
     for path, record in active:
         if record["state"] == "planned":
-            remaining = gate_blockers(record, root, gameplay, ci_result)
+            remaining = gate_blockers(record, root, current, ci_result)
             messages.append(f"notice::{record['version']} is planned, with {len(remaining)} gates open: " + "; ".join(remaining))
 
+    if rehearse:
+        if not failed:
+            record = json.loads(Path(root, REHEARSAL_RECORD).read_text(encoding="utf-8"))
+            outcome.update(version=record["version"], record=REHEARSAL_RECORD)
+            messages.append(f"notice::Rehearsal: packaging {record['version']}, which can never be published.")
+        return outcome, messages, failed
     if len(wanted) > 1:
         names = ", ".join(record["version"] for _, record in wanted)
         messages.append(f"error::Only one release can be prepared at a time, and these are all requested: {names}")
@@ -207,7 +346,7 @@ def evaluate(root, gameplay, ci_result, tags, rehearse=False):
         return outcome, messages, failed
 
     path, record = wanted[0]
-    blockers = gate_blockers(record, root, gameplay, ci_result)
+    blockers = gate_blockers(record, root, current, ci_result)
     if ci_result == "success":
         outcome.update(version=record["version"], record=f"{RECORDS_DIR}/{path.name}")
     if record["state"] == "candidate":
@@ -220,6 +359,40 @@ def evaluate(root, gameplay, ci_result, tags, rehearse=False):
         outcome["publish"] = "true"
         messages.append(f"notice::{record['version']} has passed every gate, and will be published from this commit.")
     return outcome, messages, failed
+
+
+def preflight(version, tags, releases, delete_draft, report):
+    """Inside the publication lock. Returns "create" or "skip", and raises StateUnknown if anything is wrong.
+    A draft is removed only when nothing was published and no tag exists, so a failed attempt is all it can be."""
+    matching = [release for release in releases if release.get("tag_name") == version]
+    published = [release for release in matching if release.get("draft") is False]
+    drafts = [release for release in matching if release.get("draft") is True]
+    if len(published) + len(drafts) != len(matching):
+        raise StateUnknown(f"{version}: a release does not say whether it is a draft")
+    tag = tags.get(version)
+
+    if tag is None and not published:
+        for draft in drafts:
+            report(f"notice::Removing draft {draft['id']} of {version}, left by a failed attempt. It was never published, and has no tag.")
+            delete_draft(draft["id"])
+        return "create"
+    if len(published) > 1:
+        raise StateUnknown(f"{version}: {len(published)} published releases claim this version")
+    problems = publication_problems(version, tag, published[0] if published else None)
+    if drafts:
+        problems.append(f"{len(drafts)} unpublished draft(s) also claim this version, and were left alone")
+    if problems:
+        raise StateUnknown(f"{version} is not a complete release: " + "; ".join(problems))
+    report(f"notice::{version} is already published, at {published[0]['target_commitish']}. A release is never replaced.")
+    return "skip"
+
+
+def verify(version, commit, tags, release):
+    """After publishing. Unlike the later checks, this one does compare with the commit just tested."""
+    problems = publication_problems(version, tags.get(version), release) if (release or tags.get(version)) else ["neither a tag nor a published release exists"]
+    if tags.get(version) != commit:
+        problems.append(f"the tag points at {tags.get(version) or 'nothing'}, not the tested commit {commit}")
+    return problems
 
 
 def sha256_of(path):
@@ -279,7 +452,7 @@ def prepare(args):
         f"Version: {version}",
         f"Source commit: {args.commit}",
         f"Built and tested by CI run: {args.run_url}",
-        f"Gameplay fingerprint: {fingerprint('.', args.commit)}",
+        f"Acceptance fingerprint: {fingerprint('.', args.commit)}",
         *[f"{name}: {value}" for name, value in facts.items()],
         f"godot-cpp: {godot_cpp}",
         "",
@@ -302,15 +475,14 @@ def prepare(args):
     ]
     if deferred:
         notes += ["## Not tested", "These checks are deferred, and have not passed.", *[f"- {item}" for item in deferred], ""]
-    gameplay = fingerprint(".", args.commit)
-    if acceptance.get("status") == "accepted" and acceptance.get("gameplay_fingerprint") == gameplay:
+    if acceptance.get("status") == "accepted" and acceptance.get("fingerprint") == fingerprint(".", args.commit):
         notes += [
             "## Owner acceptance",
             str(acceptance.get("scope", "")),
             "",
             f"- Build tested: {acceptance.get('build', '')}",
             f"- Record: `{acceptance.get('record', '')}` in this version's source",
-            "- This build's gameplay fingerprint matches the one accepted, so the acceptance applies to it.",
+            "- This build's fingerprint matches the one accepted, so the acceptance applies to it.",
             "",
         ]
     else:
@@ -366,6 +538,11 @@ def main():
     prepare_parser = commands.add_parser("prepare")
     for name in ("--record", "--packages", "--logs", "--out", "--commit", "--run-url"):
         prepare_parser.add_argument(name, required=True)
+    preflight_parser = commands.add_parser("preflight")
+    preflight_parser.add_argument("--version", required=True)
+    verify_parser = commands.add_parser("verify")
+    verify_parser.add_argument("--version", required=True)
+    verify_parser.add_argument("--commit", required=True)
     args = parser.parse_args()
 
     if args.command == "fingerprint":
@@ -377,11 +554,35 @@ def main():
         print(f"release records: {len(load_records())}, problems: {len(problems)}")
         sys.exit(1 if problems else 0)
     elif args.command == "evaluate":
-        outcome, messages, failed = evaluate(".", fingerprint(), args.ci_result, existing_tags(), args.rehearse)
+        github = GitHub()
+        try:
+            outcome, messages, failed = evaluate(".", fingerprint(), args.ci_result, remote_tags(), github.published_release, args.rehearse)
+        except StateUnknown as error:
+            outcome = {"version": "", "record": "", "publish": "false"}
+            messages, failed = [f"error::The release state could not be determined, so nothing was prepared or published: {error}"], True
         write_outcome(outcome, messages)
         sys.exit(1 if failed else 0)
     elif args.command == "prepare":
         prepare(args)
+    elif args.command == "preflight":
+        github = GitHub()
+        try:
+            # Reports go to the log. The decision on stdout is all the publisher reads.
+            print(preflight(args.version, remote_tags(), github.all_releases(), github.delete_draft, lambda line: print(f"::{line}", file=sys.stderr)))
+        except StateUnknown as error:
+            print(f"::error::{args.version} was not published: {error}", file=sys.stderr)
+            sys.exit(1)
+    elif args.command == "verify":
+        github = GitHub()
+        try:
+            problems = verify(args.version, args.commit, remote_tags(), github.published_release(args.version))
+        except StateUnknown as error:
+            problems = [str(error)]
+        for problem in problems:
+            print(f"::error::{args.version} was published, and needs checking by hand: {problem}")
+        if problems:
+            sys.exit(1)
+        print(f"verified {args.version}: complete, consistent and at {args.commit}")
 
 
 if __name__ == "__main__":

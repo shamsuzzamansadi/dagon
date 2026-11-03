@@ -4,9 +4,11 @@
   package  Wraps the exact exported files, with the license and credits. Nothing is rebuilt.
   smoke    Extracts a package into a clean folder and runs it headless, on the OS it is for.
 
-The timestamps inside are fixed, so the same export always gives the same package.
+The tar and gzip timestamps are fixed, and gzip stores no file name, so the same export always gives the same bytes,
+whenever it is packaged.
 """
 import argparse
+import gzip
 import os
 import subprocess
 import sys
@@ -51,15 +53,16 @@ def package(platform, version, export_dir, legal_dir, out_dir):
     target = out / package_name(platform, version)
     folder = target.name.removesuffix(spec["extension"])
     if platform == "linux":
-        with tarfile.open(target, "w:gz") as archive:
-            for source, name in sources:
-                info = archive.gettarinfo(source, f"{folder}/{name}")
-                info.mtime = 0
-                info.uid = info.gid = 0
-                info.uname = info.gname = ""
-                info.mode = 0o755 if name == spec["binary"] else 0o644
-                with open(source, "rb") as data:
-                    archive.addfile(info, data)
+        with open(target, "wb") as raw, gzip.GzipFile(filename="", mode="wb", fileobj=raw, mtime=0) as compressed:
+            with tarfile.open(fileobj=compressed, mode="w") as archive:
+                for source, name in sources:
+                    info = archive.gettarinfo(source, f"{folder}/{name}")
+                    info.mtime = 0
+                    info.uid = info.gid = 0
+                    info.uname = info.gname = ""
+                    info.mode = 0o755 if name == spec["binary"] else 0o644
+                    with open(source, "rb") as data:
+                        archive.addfile(info, data)
     else:
         with zipfile.ZipFile(target, "w", zipfile.ZIP_DEFLATED) as archive:
             for source, name in sources:

@@ -30,6 +30,7 @@ jobs:
       - name: Evaluate the release gates
         id: gate
         env:
+          GH_TOKEN: ${{ github.token }}
           CI_RESULT: ${{ inputs.ci-result }}
           REHEARSE: ${{ inputs.rehearse && '--rehearse' || '' }}
         run: python tools/release_gate.py evaluate --ci-result "$CI_RESULT" $REHEARSE
@@ -96,6 +97,13 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           COMMIT: ${{ github.sha }}
         run: python tools/release_gate.py prepare --record "$RECORD" --packages packages --logs logs --out prepared --commit "$COMMIT" --run-url "$RUN_URL"
+      # The publish job cannot run in a rehearsal, so this runs its first check, with this job's read-only token.
+      - name: Rehearse the publisher's first check
+        if: ${{ inputs.rehearse }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.gate.outputs.version }}
+        run: python tools/release_gate.py preflight --version "$VERSION"
       - uses: actions/upload-artifact@v7
         with:
           name: release-candidate-${{ needs.gate.outputs.version }}
@@ -114,6 +122,9 @@ jobs:
       cancel-in-progress: false
     steps:
       - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
       - uses: actions/download-artifact@v8
         with:
           name: release-candidate-${{ needs.gate.outputs.version }}
