@@ -1,0 +1,124 @@
+Developer-scripted runs of the final Windows build. Window messages to the game's window only: not a physical keyboard or controller. No controller button was pressed.
+
+Build: dagon-windows from CI run 41682543058, commit 3426d3bb5289c35a7a694235c6f750f777acaad3.
+Zip SHA-256: cbfca7c95e25852e5c7a45438806751a0e8df637d093bd7f1e34253d0fa2a434, equal to the digest GitHub publishes for that artifact.
+Files in it:
+d34d36f3be1a6c49c56525ae86469b92e4f417ddf0b43cf00dd80c385c4b0562  dagon.exe
+497cacfed37d3dfc350aea2161bd4b5101226fe885f7f8be6a0216964b8f985e  dagon.pck
+919713da655e38cce47286ce127b2bd3f4a72389b3e90f5985384bfd989edd7f  dagon.windows.template_release.x86_64.dll
+
+Each run used its own new, isolated APPDATA and DAGON_STORAGE_DIR folders. Keyboard layout: only ever read. The driver has no call that can change it.
+E= and J= count the prompt lines in the game's log for the first launch. A clean run has E=7 J=5.
+
+========== Run 1, on a loaded machine, before the driver recorded physical input. THE UNEXPLAINED RUN: see README.md.
+layout of the focused window before: 04090409
+xinput slots: none
+storage before:
+client area: 1440x810
+the game's own layout: 04090409
+after one Left on Music: music_volume=0.9 effects_volume=1
+after three Left on Effects: music_volume=0.9 effects_volume=0.7
+after New Game: dagon_save=1 beat=shore checkpoint=Shore
+reached the checkpoint: True after 15 hops
+after the checkpoint: dagon_save=1 beat=abyss checkpoint=PastTheTrench
+quit to desktop: exited=True exit code=0
+storage after first run: save.bak,save.dat,settings.cfg
+volumes after first run: music_volume=0.9 effects_volume=0.7
+still running after Continue and restart: True
+save after Continue: dagon_save=1 beat=abyss checkpoint=PastTheTrench
+volumes after relaunch: music_volume=0.9 effects_volume=0.7
+layout of the focused window after: 04090409
+E=7 J=6
+
+========== Run 2, idle. THE RUN WHOSE SCREENSHOTS ARE IN windows/.
+layout of the focused window before: 04090409
+xinput slots: none
+storage before: 
+client area: 1440x810
+the game's own layout: 04090409
+after one Left on Music: music_volume=0.9 effects_volume=1
+after three Left on Effects: music_volume=0.9 effects_volume=0.7
+after New Game: dagon_save=1 beat=shore checkpoint=Shore 
+physical input, before shot 14: none since the run began (29498 ms)
+game has focus: True
+reached the checkpoint: True after 15 hops
+after the checkpoint: dagon_save=1 beat=abyss checkpoint=PastTheTrench 
+quit to desktop: exited=True exit code=0
+storage after first run: save.bak,save.dat,settings.cfg
+volumes after first run: music_volume=0.9 effects_volume=0.7
+still running after Continue and restart: True
+save after Continue: dagon_save=1 beat=abyss checkpoint=PastTheTrench 
+volumes after relaunch: music_volume=0.9 effects_volume=0.7
+physical input, at the end: none since the run began (61222 ms)
+layout of the focused window after: 04090409
+E=7 J=5
+
+========== Run 3, with 9 busy threads.
+layout of the focused window before: 04090409
+xinput slots: none
+storage before: 
+client area: 1440x810
+the game's own layout: 04090409
+after one Left on Music: music_volume=0.9 effects_volume=1
+after three Left on Effects: music_volume=0.9 effects_volume=0.7
+after New Game: dagon_save=1 beat=shore checkpoint=Shore 
+physical input, before shot 14: none since the run began (30086 ms)
+game has focus: True
+reached the checkpoint: True after 15 hops
+after the checkpoint: dagon_save=1 beat=abyss checkpoint=PastTheTrench 
+quit to desktop: exited=True exit code=0
+storage after first run: save.bak,save.dat,settings.cfg
+volumes after first run: music_volume=0.9 effects_volume=0.7
+still running after Continue and restart: True
+save after Continue: dagon_save=1 beat=abyss checkpoint=PastTheTrench 
+volumes after relaunch: music_volume=0.9 effects_volume=0.7
+physical input, at the end: none since the run began (62453 ms)
+layout of the focused window after: 04090409
+E=7 J=5
+
+========== Run 4, with 9 busy threads.
+layout of the focused window before: 04090409
+xinput slots: none
+storage before: 
+client area: 1440x810
+the game's own layout: 04090409
+after one Left on Music: music_volume=0.9 effects_volume=1
+after three Left on Effects: music_volume=0.9 effects_volume=0.7
+after New Game: dagon_save=1 beat=shore checkpoint=Shore 
+physical input, before shot 14: none since the run began (30124 ms)
+game has focus: True
+reached the checkpoint: True after 15 hops
+after the checkpoint: dagon_save=1 beat=abyss checkpoint=PastTheTrench 
+quit to desktop: exited=True exit code=0
+storage after first run: save.bak,save.dat,settings.cfg
+volumes after first run: music_volume=0.9 effects_volume=0.7
+still running after Continue and restart: True
+save after Continue: dagon_save=1 beat=abyss checkpoint=PastTheTrench 
+volumes after relaunch: music_volume=0.9 effects_volume=0.7
+physical input, at the end: none since the run began (62467 ms)
+layout of the focused window after: 04090409
+E=7 J=5
+
+========== Focused test of the old key, run between runs 1 and 2, on a loaded machine. Times are from the driver's start. No J was pressed until the last step.
+   7446 ms  examined with E, before rebinding
+  11249 ms  rebound to J
+  11948 ms  resumed
+  12992 ms  frame b1
+  14023 ms  frame b2
+  15055 ms  frame b3
+  16085 ms  frame b4
+  17118 ms  frame b5
+  18148 ms  frame b6
+  19199 ms  frame b7
+  20230 ms  frame b8
+  20230 ms  pressing old key E
+  20465 ms  E released
+  20649 ms  frame c1
+  20835 ms  frame c2
+  21023 ms  frame c3
+  21211 ms  frame c4
+  26743 ms  pressing old key E again
+  27512 ms  frame d2
+  33021 ms  pressing new key J
+  33787 ms  frame e1
+Result of the focused test, read from its frames: the earlier caption fades between 3 and 4 seconds after resuming. The prompt stays [J]. E twice changes nothing. J shows the boat's caption.

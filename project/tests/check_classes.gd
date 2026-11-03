@@ -15,6 +15,54 @@ const EXPECTED := {
 		"methods": [],
 		"signals": [],
 	},
+	"Interactable": {
+		"base": "Area2D",
+		"properties": ["interaction_id", "prompt", "caption", "one_shot", "enabled", "cooldown"],
+		"methods": ["try_interact", "is_available"],
+		"signals": ["interacted"],
+	},
+	"Interactor": {
+		"base": "Area2D",
+		"properties": ["action_interact"],
+		"methods": ["get_focus"],
+		"signals": ["focus_changed", "interacted"],
+	},
+	"StoryTrigger": {
+		"base": "Area2D",
+		"properties": ["trigger_id", "enabled"],
+		"methods": ["is_player_inside"],
+		"signals": ["triggered"],
+	},
+	"Hud": {
+		"base": "CanvasLayer",
+		"properties": ["interactor_path", "notice_label_path", "prompt_label_path", "caption_label_path", "fade_rect_path", "caption_hold_seconds"],
+		"methods": ["on_focus_changed", "on_interacted", "show_caption", "hide_caption", "show_notice", "set_input_device", "fade_to_black", "fade_from_black"],
+		"signals": ["fade_finished"],
+	},
+	"GameDirector": {
+		"base": "Node",
+		"properties": ["player_path", "hud_path", "kill_plane_path", "checkpoints", "story_triggers"],
+		"methods": ["restart_checkpoint", "get_active_checkpoint", "set_start_beat", "get_start_beat", "fade_in", "show_notice"],
+		"signals": ["checkpoint_reached", "player_respawned"],
+	},
+	"GameSession": {
+		"base": "Node",
+		"properties": ["world_scene", "director_path", "menu_path"],
+		"methods": ["set_start", "set_active_device", "get_active_device", "restart_checkpoint", "retry_save", "is_checkpoint_saved", "has_any_save", "get_session_beat", "get_persisted_beat", "get_world", "get_director"],
+		"signals": [],
+	},
+	"MenuController": {
+		"base": "Control",
+		"properties": ["mode", "game_scene", "title_scene_path", "session_path", "main_panel_path", "confirm_panel_path", "controls_panel_path", "credits_panel_path", "settings_menu_path", "first_button_path", "continue_button_path", "new_game_button_path", "settings_button_path", "controls_button_path", "credits_button_path", "quit_button_path", "quit_to_menu_button_path", "confirm_cancel_button_path", "confirm_ok_button_path", "confirm_message_label_path", "controls_title_label_path", "controls_text_label_path", "controls_back_button_path", "credits_back_button_path", "save_status_label_path"],
+		"methods": ["set_active_device", "get_active_device", "is_open", "open", "resume", "restart_checkpoint", "ask_quit_to_desktop", "ask_quit_to_main_menu", "show_intro", "new_game", "continue_game", "open_credits", "quit_now", "refresh_save_status", "open_settings", "open_controls", "confirm", "cancel_confirm", "back"],
+		"signals": [],
+	},
+	"SettingsMenu": {
+		"base": "Control",
+		"properties": ["music_slider_path", "effects_slider_path", "key_button_paths", "message_label_path", "conflict_row_path", "swap_button_path"],
+		"methods": ["open", "back", "begin_capture", "swap_conflict", "cancel_conflict", "restore_defaults", "set_music_volume", "set_effects_volume", "is_capturing", "has_conflict", "describe_key"],
+		"signals": ["closed"],
+	},
 }
 
 

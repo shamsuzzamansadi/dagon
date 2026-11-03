@@ -27,8 +27,14 @@ func _first_drawn_y(art: Sprite2D, x: int) -> int:
 	return 1 << 16
 
 
-func test_the_game_starts_in_the_shore(h) -> void:
-	h.check(ProjectSettings.get_setting("application/run/main_scene") == SHORE, "main scene is %s" % ProjectSettings.get_setting("application/run/main_scene"))
+func test_the_game_starts_in_the_main_menu_and_plays_on_the_shore(h) -> void:
+	const TITLE := "res://scenes/ui/title.tscn"
+	h.check(ProjectSettings.get_setting("application/run/main_scene") == TITLE, "main scene is %s" % ProjectSettings.get_setting("application/run/main_scene"))
+	var title: Node = (load(TITLE) as PackedScene).instantiate()
+	var game: Node = title.game_scene.instantiate()
+	h.check(game.world_scene.resource_path.get_file() == SHORE.get_file(), "the game plays %s" % game.world_scene.resource_path)
+	game.free()
+	title.free()
 
 
 func test_shore_shows_the_sailor_not_the_placeholder(h) -> void:

@@ -16,8 +16,8 @@ starts only after M6 is green, and is time-boxed.
 |---|---|---|---|
 | G0 Start | Nov 1–2 | Theme read and theme-fit note (jam.md §4); owner approves any proposal | Theme fit recorded; no open blocking rule question |
 | M1 Foundation | Nov 2–5 | See "M1 scope" below | M1 acceptance below |
-| M2 Interaction and usability | Nov 6–8 | Interactable, Interactor, StoryTrigger, Hud (prompt, caption, fade), `interact` and `pause` mappings, kill plane and checkpoints, `reset_global_state`. Pause menu, persistent settings and keyboard rebinding ("M2 usability" below) | Integration tests: focus, disabled or freed focus, double press, one-shot, trigger re-arm, respawn, pause → Restart Checkpoint. M2 usability checks below. |
-| M3 Complete gameplay (greybox) | Nov 9–14 | Full 4-act greybox layout, SequencePuzzle and PuzzleController, StoryProgress and GameDirector with the full cinematic contract, placeholder clips, flee timer, Ending scene. Main menu and one persistent checkpoint save slot, a scope change ("M3 menus and save" below) | Start→end greybox playthrough. All M3 regression tests in architecture §8, including quit, relaunch and Continue. |
+| M2 Interaction and usability | Nov 6–8 | Interactable, Interactor, StoryTrigger, Hud (prompt, caption, fade), `interact` and `pause` mappings, kill plane and checkpoints, `reset_global_state`. Pause menu, persistent settings and keyboard rebinding ("M2 usability" below). **Moved from M3 by the owner (D36):** main menu, Controls, Credits and one persistent checkpoint save slot ("Menus and save" below). Controller labels and mappings explained | Integration tests: focus, disabled or freed focus, double press, one-shot, trigger re-arm, respawn, pause → Restart Checkpoint. M2 usability checks, and the checks in "Menus and save" for the beats that exist. Exported-pack suite. |
+| M3 Complete gameplay (greybox) | Nov 9–14 | Full 4-act greybox layout, SequencePuzzle and PuzzleController, GameDirector's full cinematic contract, placeholder clips, flee timer, Ending scene. Saving extended to each beat as it is built | Start→end greybox playthrough. All M3 regression tests in architecture §8, including quit, relaunch and Continue at each beat. |
 | M4 Atmosphere | Nov 15–19 | **Final asset-production decision before Nov 15.** **First deliverable: one short playable Shore section near final quality, shown for visual review before the treatment spreads** ([GDD §8](gdd.md)). Its art direction is already accepted (D19); this brings that section to final quality. Then later environments in the accepted Shore style, parallax, CanvasModulate, lantern, occluders, fog shader, ambience per act, footsteps and object sounds, silhouette art through the level, and a coherent transition beyond the Shore. Volume settings connected | Visual review evidence and acceptance checklist in GDD §8; readability on 2 displays; smoke test clean; frame time checked; audio heard in gameplay before it is marked complete |
 | M5 Cinematic horror | Nov 20–23 | Dagon silhouette and animation, the `monolith_awaken`, `dagon_reveal` and `collapse` clips, shake, baked audio sweeps, story-trigger cues, epilogue | Full playthrough with final content; GDD §8 checklist on the reveal; cinematic regression tests still green; audio heard in gameplay before it is marked complete |
 | M6 Stabilization | Nov 24–27 | Fixes from at least 2 external playtests, timing (10–15 min), performance, release workflow, native runs on Windows and Linux, usability verification ("M6 verification" below) | Release candidate artifacts from CI launched on real Windows and Linux; GDD §8 checklist on every scene; M6 verification passed |
@@ -56,7 +56,9 @@ rebinding and save support are never removed silently (risk R20).
   ([D19, D20](decisions.md), [shore-preview.md](shore-preview.md)). The art stops at the cliff opening
   (x = 640), and everything past it is unfinished greybox: a documented boundary, not a finished
   transition. **This is not M4,** and it closes none of the M1 checks above.
-- [ ] M2 next, with the scope below. M3–M7 not started.
+- [x] **M2: accepted by the owner on 2026-11-03, with documented deferrals** ([record](evidence/m2/owner-acceptance-2026-11-03.md),
+  [package](reviews/m2-review-package.md)). The main menu and save moved here from M3 (D36). Audio is volume controls and buses
+  prepared, and nothing more (D42). M3–M7 not started.
 - **Every later playtest identifies the exact artifact or run it tested.**
 
 ## Review follow-ups by milestone (Phase A final review, 2026-10-28)
@@ -89,7 +91,8 @@ documents. No dimension-switching mechanic, no wider scope ([jam.md](jam.md) §4
   while the menu stays responsive.
 - Keyboard and gamepad menu navigation, reliable focus, and a usable Back/Cancel action.
 - Basic persistent settings, saved separately from game progress: music volume, effects volume and key
-  bindings. The volumes are prepared here and connected when audio exists (M4).
+  bindings. M2 delivers volume controls and buses prepared, not audio. They are connected when audio exists (M4), and until
+  then Settings says "This build has no audio yet." ([D42](decisions.md)).
 - Keyboard rebinding for gameplay actions. Conflicts are explained, defaults can be restored, and menu
   navigation and Back cannot be rebound, so nobody can trap themselves.
 
@@ -101,11 +104,21 @@ documents. No dimension-switching mechanic, no wider scope ([jam.md](jam.md) §4
   defaults restore, and bindings survive a relaunch.
 - Missing or corrupt settings fall back to defaults, with no way to get stuck.
 - Simulated input does not prove physical devices, so the owner checks a real keyboard and controller.
+- Controls explains the controller in both menus, and prompts name the button for the device in use (D39). A controller
+  must produce the prompt and caption at the boat and the fish, as the keyboard does.
 
-### M3 menus and save
+### Menus and save (moved from M3 to M2 by the owner, 2026-11-03, D36)
 
-- Main menu: New Game, Continue, Settings, Credits, Quit. It becomes the main scene.
-- The pause menu gains Quit to Main Menu.
+**Scheduling tradeoff, flagged as D28 asks.** M2 was on Nov 6–8 and M3 on Nov 9–14. This work was planned for M3's window and was
+done before M2's gate instead, so **no target date moves, and M3 gets lighter by this much.** The cost is one that dates do not
+show: M2 now has more to review, and M3 cannot start until M2 is accepted, so a long review round takes time directly from the
+4-act greybox, which is the part of the game that matters most. If that gate runs past about Nov 9, the first thing to give way is
+the Nov 15 start of M4's polish, by the existing cut order, not the playable loop. Only the Shore and Abyss beats are built, so **the checks below
+for later beats stay in M3,** as those beats arrive.
+
+- Main menu on launch: New Game, Continue, Settings, Controls, Credits, Quit to Desktop. It is the main scene.
+- The pause menu gains Controls and Quit to Main Menu.
+- Starting a new game shows a short introduction to the controls.
 - One persistent checkpoint save slot. Continue restores the last safe checkpoint after the application has
   been closed and reopened. **This is an intentional scope change: the GDD excluded saves (D25).** No multiple
   slots, and no saving at an arbitrary position.
@@ -145,7 +158,8 @@ documents. No dimension-switching mechanic, no wider scope ([jam.md](jam.md) §4
   the cliff opening.
 - Deliver a compact event-to-sound list and show the mix in gameplay. Check loop seams, abrupt transitions,
   clipping, repeated-trigger stacking and whether important cues stay audible.
-- Connect the music and effects volume settings prepared in M2.
+- Connect the music and effects volume settings prepared in M2. **When audio is connected, remove the temporary Settings note,
+  "This build has no audio yet.", and its tests** ([D42](decisions.md)).
 - **Audio is not marked complete until a person has heard it in gameplay.** Automated checks cannot do this.
 
 ### M6 verification
@@ -154,7 +168,12 @@ Verify settings and save persistence, rebinding, menu focus, quit/relaunch/conti
 720p and 1080p presentation stays secondary to correctness and readable visuals.
 
 **Deferred from M1, and required before release:**
-- Physical gamepad testing: left stick, D-pad, south button, and menu navigation.
+- Physical controller testing. **Moved earlier in part:** the owner reports that the Xbox controls they tried worked
+  ([record](evidence/m2/xbox-feedback-2026-11-03.md)), and accepted M2 after manual testing, without listing what they ran
+  ([record](evidence/m2/owner-acceptance-2026-11-03.md)). **So none of this is recorded as passed, and it stays here:** all physical
+  PlayStation hardware, and the individual Xbox actions in the M2 manual check, including disconnecting and reconnecting. Labels and
+  mappings themselves were not deferred, and are M2 work.
+- Key names under German on the real build, left unverified because the owner asked to keep layout changes off their active desktop.
 - Native Linux hardware-accelerated rendering validation. The M1 Linux run used software rendering.
 
 - **Displays:** ordinary players on 1280×720 and 1920×1080, windowed and fullscreen. Text stays readable

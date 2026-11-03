@@ -105,6 +105,7 @@ The submission page should state this interpretation in one or two sentences
 | Independent design and code review | **ChatGPT (OpenAI)**, relayed by the owner | Review only |
 | Placeholder art and audio | Silhouette polygons and shaders made in the editor or by scripts, and procedurally generated audio, produced with AI assistance | First playable |
 | Shore art | Pixel art drawn by Python scripts written and tuned with AI assistance (Claude), under the owner's direction, who accepted the art direction. No image generators or third-party art | Shipped in the standard build (`docs/shore-preview.md`) |
+| UI font and text | An original pixel font drawn by a Python script, and menu, controls, credits and caption text, written with AI assistance (Claude) under the owner's direction | M2 |
 | Audio | None yet. Direction and provenance rules in GDD §7: state accurately how each sound was made, and never describe stock or generated audio as personally recorded or composed | M4 onward |
 | Final assets | Decided before M4 | Each asset's provenance (human, AI-assisted, or third-party CC0/OFL) recorded in `CREDITS.md` |
 

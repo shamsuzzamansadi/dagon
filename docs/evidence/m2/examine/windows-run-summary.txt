@@ -1,0 +1,33 @@
+xinput slots: 0
+storage before: 
+dagon: extension initialized build=release compiler=MSVC 194435229 __cplusplus=202002
+dagon: controller device=0 name='XInput Controller' vendor=1118 family=0
+dagon: save status=1 backup=false
+dagon: controller device=0 name='XInput Controller' vendor=1118 family=0
+client area: 1440x810
+dagon: save status=1 backup=false
+dagon: controller device=0 name='XInput Controller' vendor=1118 family=0
+dagon: session start beat=0 persisted=0
+dagon: introduction shown
+after New Game: dagon_save=1 beat=shore checkpoint=Shore 
+dagon: prompt: [E] Examine
+dagon: prompt: [J] Examine
+reached the checkpoint: True after 15 hops
+after the checkpoint: dagon_save=1 beat=abyss checkpoint=PastTheTrench 
+dagon: controller device=0 name='XInput Controller' vendor=1118 family=0
+dagon: save status=0 backup=false
+quit to desktop: exited=True exit code=0
+storage after first run: save.bak,save.dat,settings.cfg
+dagon: extension initialized build=release compiler=MSVC 194435229 __cplusplus=202002
+dagon: controller device=0 name='XInput Controller' vendor=1118 family=0
+dagon: save status=0 backup=false
+dagon: controller device=0 name='XInput Controller' vendor=1118 family=0
+dagon: session start beat=1 persisted=1
+still running after Continue and restart: True
+save after Continue: dagon_save=1 beat=abyss checkpoint=PastTheTrench 
+
+--- no layout request sent: the game was launched with the layout it was given
+foreground before: FFFFFFFFF0C00845
+the game's own layout: FFFFFFFFF0C00845
+the game's own layout at the end: FFFFFFFFF0C00845
+foreground after: FFFFFFFFF0C00845

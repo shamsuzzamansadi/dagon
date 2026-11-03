@@ -40,10 +40,10 @@ or layouts.
 | Verb     | Default input (KB / pad)    | Notes                                         |
 |----------|-----------------------------|-----------------------------------------------|
 | Walk     | A/D, ←/→ / left stick, d-pad | Slow, heavy pace (~70 px/s at 480×270).       |
-| Jump     | Space / A (south)           | Low hop for rocks and narrow crevasses only.   |
-| Interact | E / X (west)                | Shown only when a prompt is visible.          |
-| Pause    | Esc / Start                 | Resume, Restart Checkpoint, Settings, Quit to Desktop; Quit to Main Menu from M3. |
-| Back     | Esc / B (east)              | In menus. Cannot be rebound (§11).            |
+| Jump     | Space / south (Xbox A, PlayStation Cross) | Low hop for rocks and narrow crevasses only.   |
+| Interact | E / west (Xbox X, PlayStation Square) | Shown only when a prompt is visible, and the prompt names the button for the device in use. |
+| Pause    | Esc / Start (Xbox Menu, PlayStation Options) | Resume, Restart Checkpoint, Settings, Controls, Quit to Main Menu, Quit to Desktop. |
+| Back     | Esc / east (Xbox B, PlayStation Circle) | In menus. Cannot be rebound (§11). |
 
 The lantern is always on and needs no input or fuel. It gives a warm radius of
 about 90 px against a cold, dark ambient. Interactable props get a faint rim
@@ -164,7 +164,8 @@ game music. Nothing is purchased or commissioned without the owner's approval.
 event-to-sound list and a demonstration of the mix in gameplay, checked for loop seams, abrupt
 transitions, clipping, repeated-trigger stacking, and whether important cues stay audible. The
 transition beyond the Shore must also be coherent in sound. Separate music and effects volume settings
-are prepared in M2 and connected when audio exists (§11).
+are prepared in M2 and connected when audio exists (§11). Until then, Settings says "This build has no audio yet."
+That note is removed when audio is connected.
 
 **Audio is not marked complete until a person has heard it in gameplay.**
 
@@ -259,25 +260,33 @@ levels, custom physics or rendering, multiplayer.
 
 ## 11. Menus, settings and saving
 
-**Status: planned. The current build has no menus, settings or saves.** Added by the owner on 2026-11-02
-([D24, D25](decisions.md)). Saving is an intentional scope change: this document excluded it before.
+**Status: all of this is implemented in M2, accepted by the owner, for the beats that exist so far.** Added by
+the owner on 2026-11-02 and brought forward on 2026-11-03 ([D24, D25, D36](decisions.md)). Saving is an intentional scope change:
+this document excluded it before.
 
 | Screen | Options | Milestone |
 |---|---|---|
-| Pause | Resume, Restart Checkpoint, Settings, Quit to Desktop; Quit to Main Menu joins them in M3 | M2 |
-| Settings | Music volume, effects volume, keyboard bindings, Restore Defaults, Back | M2 |
-| Main menu | New Game, Continue, Settings, Credits, Quit | M3 |
+| Pause | Resume, Restart Checkpoint, Settings, Controls, Quit to Main Menu, Quit to Desktop | M2 |
+| Settings | Music volume, effects volume, keyboard bindings, Restore Defaults, Back, and a temporary note that there is no audio yet | M2 |
+| Main menu, on launch | New Game, Continue, Settings, Controls, Credits, Quit to Desktop | M2 |
+| Controls | Movement, jumping, examining, pausing and menus, on keyboard with the current keys and on controller. Starting a new game shows a short version for the device in use | M2 |
+| Credits | Attribution and licenses, from the project's records | M2 |
 
-**Menus.** Every menu works with keyboard and gamepad, a control always has focus, and Back closes one level.
+**Menus.** Every menu works with keyboard and controller, a control always has focus, and Back closes one level.
 Pausing stops gameplay while the menu stays responsive.
 
-**Rebinding.** Keyboard keys for gameplay actions can be changed. If a key is already in use, the game says
+**Controllers.** Buttons are fixed, and bound by position. The prompt and Controls follow the device in use: the current key on
+a keyboard, A, B, X and Menu on a recognized Xbox controller, Cross, Circle, Square and Options on a recognized PlayStation
+controller, and the button's position on anything else. Disconnecting hands back to the keyboard.
+
+**Rebinding.** One keyboard key for each gameplay action can be changed. If a key is already in use, the game says
 which action has it and lets the player swap or cancel, so no action is left without a key. Restore Defaults is
-always reachable. Menu navigation, Back and the Esc pause key cannot be rebound, so nobody can lock themselves
-out. Gamepad mappings are fixed for the jam.
+always reachable. Menu navigation, Back, the Esc pause key and the Left and Right arrows for movement cannot be
+rebound, so nobody can lock themselves out. The Up and Down arrows can be rebound, and still navigate menus. Gamepad
+mappings are fixed for the jam.
 
 **Settings** persist between runs and are stored separately from game progress. The volumes do nothing audible
-until audio exists.
+until audio exists, and a short note in Settings says so until then.
 
 **One checkpoint save slot.**
 - Continue restores the last safe checkpoint, including after the application has been closed and reopened.

@@ -1,0 +1,57 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Theme" path="res://assets/ui/theme.tres" id="theme"]
+
+[node name="Hud" type="Hud"]
+layer = 5
+notice_label_path = NodePath("Notice")
+prompt_label_path = NodePath("Prompt")
+caption_label_path = NodePath("Caption")
+fade_rect_path = NodePath("Fade")
+
+[node name="Notice" type="Label" parent="."]
+visible = false
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_top = 6.0
+offset_bottom = 20.0
+grow_horizontal = 2
+theme = ExtResource("theme")
+theme_type_variation = &"CaptionLabel"
+horizontal_alignment = 1
+
+[node name="Prompt" type="Label" parent="."]
+visible = false
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_top = 224.0
+offset_bottom = 238.0
+grow_horizontal = 2
+theme = ExtResource("theme")
+theme_type_variation = &"CaptionLabel"
+horizontal_alignment = 1
+
+[node name="Caption" type="Label" parent="."]
+visible = false
+offset_left = 30.0
+offset_top = 240.0
+offset_right = 450.0
+offset_bottom = 266.0
+theme = ExtResource("theme")
+theme_type_variation = &"CaptionLabel"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="Fade" type="ColorRect" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.0392, 0.0549, 0.0941, 1)

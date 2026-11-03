@@ -1,0 +1,559 @@
+Deliberate breakage at c1f1ca6, in a scratch clone, with user:// redirected. One change at a time.
+
+=== control: no change
+integration: ok
+smoke: ok
+smoke_greybox: ok
+RESULT passed=107 failed=0
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped
+
+=== handled press not consumed
+integration: FAILED exit=1
+smoke: ok
+smoke_greybox: ok
+FAIL test_interaction.test_a_handled_press_reaches_nothing_else
+     a press with focus also reached another consumer
+     a press with no focus was swallowed
+RESULT passed=106 failed=1
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped
+
+=== no cooldown after a press
+integration: FAILED exit=1
+smoke: ok
+smoke_greybox: ok
+FAIL test_interaction.test_a_double_press_is_one_event_until_the_cooldown_ends
+     two quick presses gave 2 events
+     a press after the cooldown gave 3 events in total
+RESULT passed=106 failed=1
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped
+
+=== focus ignores availability
+integration: FAILED exit=1
+smoke: ok
+smoke_greybox: ok
+FAIL test_interaction.test_the_nearest_available_thing_has_focus
+     focus did not fall back when the nearest was disabled
+FAIL test_interaction.test_disabling_the_focused_thing_clears_focus_in_one_frame
+     focus survived the object being disabled
+FAIL test_interaction.test_a_one_shot_works_once_and_stops_taking_focus
+     one_shot kept focus after it was used
+RESULT passed=104 failed=3
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped
+
+=== focus ignores the control lock
+integration: FAILED exit=1
+smoke: ok
+smoke_greybox: ok
+FAIL test_interaction.test_a_locked_player_cannot_interact
+     focus survived the control lock
+     a locked player interacted
+     focus did not return after the lock
+RESULT passed=106 failed=1
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped
+
+=== focus_changed fires every frame
+integration: FAILED exit=1
+smoke: ok
+smoke_greybox: ok
+FAIL test_interaction.test_focus_changed_fires_only_when_the_focus_changes
+     expected 1 change walking into range, got 60
+FAIL test_interaction.test_freeing_the_focused_thing_clears_focus_without_a_crash
+     expected one change to nothing, got [<Object#null>, <Object#null>]
+RESULT passed=105 failed=2
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped
+
+=== a trigger latches itself
+integration: FAILED exit=1
+smoke: ok
+smoke_greybox: ok
+FAIL test_director.test_a_trigger_fires_on_every_entry_and_never_latches_itself
+     a second entry gave 1 events in total
+     a disabled trigger fired
+FAIL test_director.test_a_rejected_trigger_changes_nothing_and_stays_armed
+     a rejected trigger was consumed
+     the rejected trigger did not work when its turn came
+FAIL test_director.test_the_kill_plane_respawns_at_the_active_checkpoint_every_time
+     respawn x at checkpoint 1: expected 350.000 ±1.000, got 400.000
+     second fall gave 1 respawns in total
+     the kill plane was consumed
+FAIL test_director.test_the_shore_kill_plane_catches_a_fall_anywhere_in_the_level
+     respawn x after a fall at x=700: expected 150.000 ±1.000, got 700.000
+     not on the floor after a fall at x=700
+     respawn x after a fall at x=1360: expected 150.000 ±1.000, got 1360.000
+     not on the floor after a fall at x=1360
+RESULT passed=103 failed=4
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped
+
+=== any trigger is accepted out of order
+integration: FAILED exit=1
+smoke: ok
+smoke_greybox: ok
+FAIL test_director.test_a_rejected_trigger_changes_nothing_and_stays_armed
+     an out-of-order trigger moved the checkpoint
+RESULT passed=106 failed=1
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped
+
+=== an accepted trigger is not consumed
+integration: FAILED exit=1
+smoke: ok
+smoke_greybox: ok
+FAIL test_director.test_triggers_advance_the_checkpoint_in_order
+     an accepted trigger was not consumed
+RESULT passed=106 failed=1
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped
+
+=== the kill plane is not connected
+integration: FAILED exit=1
+smoke: ok
+smoke_greybox: ok
+FAIL test_director.test_the_kill_plane_respawns_at_the_active_checkpoint_every_time
+     respawn x at checkpoint 0: expected 100.000 ±1.000, got 400.000
+     the player did not land after respawning
+     first fall gave 0 respawns
+     respawn x at checkpoint 1: expected 350.000 ±1.000, got 400.000
+     second fall gave 0 respawns in total
+FAIL test_director.test_the_shore_kill_plane_catches_a_fall_anywhere_in_the_level
+     respawn x after a fall at x=40: expected 150.000 ±1.000, got 40.000
+     not on the floor after a fall at x=40
+     respawn x after a fall at x=700: expected 150.000 ±1.000, got 700.000
+     not on the floor after a fall at x=700
+     respawn x after a fall at x=1360: expected 150.000 ±1.000, got 1360.000
+     not on the floor after a fall at x=1360
+FAIL test_director.test_the_shore_checkpoint_moves_past_the_trench
+     respawn x past the trench: expected 750.000 ±1.000, got 300.000
+FAIL test_director.test_every_scene_connection_is_in_place
+     KillPlane is not connected to the director
+RESULT passed=103 failed=4
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped
+
+=== a new caption keeps the old tween
+integration: ok
+smoke: ok
+smoke_greybox: ok
+RESULT passed=107 failed=0
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped
+
+=== the prompt is not refreshed after pausing
+integration: FAILED exit=1
+smoke: ok
+smoke_greybox: ok
+FAIL test_settings.test_the_prompt_names_a_rebound_key
+     the prompt reads '[E] Examine'
+RESULT passed=106 failed=1
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped
+
+=== the prompt ignores the gamepad
+integration: FAILED exit=1
+smoke: ok
+smoke_greybox: ok
+FAIL test_director.test_the_prompt_follows_the_last_device_used
+     after a pad button it reads '[E] Examine'
+RESULT passed=106 failed=1
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped
+
+=== pausing does not pause
+integration: FAILED exit=1
+smoke: ok
+smoke_greybox: ok
+FAIL test_pause_menu.test_pausing_stops_gameplay_and_focuses_resume
+     the tree did not pause
+     the player moved while paused
+     the sailor animated while paused
+FAIL test_pause_menu.test_resuming_with_the_jump_button_does_not_jump
+     resuming with the south button made the sailor jump
+     resuming with Space made the sailor jump
+FAIL test_pause_menu.test_nothing_can_be_examined_while_paused
+     examined something while paused
+     a caption appeared while paused
+FAIL test_pause_menu.test_back_closes_one_level_and_focus_returns
+     the game unpaused while the menu was still open
+FAIL test_settings.test_the_prompt_names_a_rebound_key
+     the prompt reads '[E] Examine'
+RESULT passed=102 failed=5
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped
+
+=== back closes everything
+integration: FAILED exit=1
+smoke: ok
+smoke_greybox: ok
+FAIL test_pause_menu.test_back_closes_one_level_and_focus_returns
+     one Esc closed the whole menu
+     focus returned to <Object#null>
+     the game unpaused while the menu was still open
+FAIL test_settings.test_cancelling_a_conflict_changes_nothing
+     back did not cancel the conflict
+     back also closed Settings
+     back left the choice showing
+RESULT passed=105 failed=2
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped
+
+=== focus is not brought back
+integration: FAILED exit=1
+smoke: ok
+smoke_greybox: ok
+FAIL test_pause_menu.test_focus_comes_back_after_it_is_lost
+     a press did not bring focus back: <Object#null>
+RESULT passed=106 failed=1
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped
+
+=== restart leaves the game paused
+integration: FAILED exit=1
+smoke: ok
+smoke_greybox: ok
+FAIL test_pause_menu.test_restart_checkpoint_returns_to_the_checkpoint_and_unpauses
+     still paused after restarting
+FAIL test_pause_menu.test_restart_checkpoint_uses_the_newest_checkpoint_repeatedly
+     paused after restart 0
+     paused after restart 1
+     paused after restart 2
+RESULT passed=105 failed=2
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped
+
+=== Esc in a capture also reaches the menu
+integration: FAILED exit=1
+smoke: ok
+smoke_greybox: ok
+FAIL test_settings.test_escape_cancels_a_capture_and_changes_nothing
+     one Esc cancelled the capture and also closed Settings
+FAIL test_settings.test_a_gamepad_can_cancel_a_capture_and_cannot_wander_off
+     the east button cancelled and also closed Settings
+RESULT passed=105 failed=2
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped
+
+=== a capture lets pad input through
+integration: FAILED exit=1
+smoke: ok
+smoke_greybox: ok
+FAIL test_settings.test_a_gamepad_can_cancel_a_capture_and_cannot_wander_off
+     a pad button moved focus during the capture
+RESULT passed=106 failed=1
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped
+
+=== a failed write is not reported
+integration: FAILED exit=1
+smoke: ok
+smoke_greybox: ok
+FAIL test_settings.test_a_failed_write_is_reported_and_the_change_still_applies
+     the failure was not reported: ''
+RESULT passed=106 failed=1
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped
+
+=== reopening Settings forgets unsaved changes
+integration: FAILED exit=1
+smoke: ok
+smoke_greybox: ok
+FAIL test_settings.test_a_failed_write_is_reported_and_the_change_still_applies
+     reopening Settings lost the unsaved key: 'Space'
+     the recovered write did not save the key
+RESULT passed=106 failed=1
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped
+
+=== resetting global state reverts the bindings
+integration: FAILED exit=1
+smoke: ok
+smoke_greybox: ok
+FAIL test_settings.test_bindings_survive_restart_checkpoint
+     reset_global_state lost the binding: [32]
+FAIL test_settings.test_a_failed_write_is_reported_and_the_change_still_applies
+     restarting lost the unsaved key: [32]
+RESULT passed=105 failed=2
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped
+
+=== rebinding leaves the old key active
+integration: FAILED exit=1
+smoke: ok
+smoke_greybox: ok
+FAIL test_settings.test_a_rebound_key_drives_the_action_and_the_old_one_does_not
+     jump is bound to [32, 74]
+     the old key still jumps
+FAIL test_settings.test_a_captured_key_does_nothing_else
+     Enter was not captured: [32, 4194309]
+FAIL test_settings.test_reserved_keys_are_refused_with_an_explanation
+     another key was not accepted after the refusal
+FAIL test_settings.test_a_conflict_is_explained_and_can_be_swapped
+     interact is bound to [69, 32]
+     jump is bound to [32, 69]
+FAIL test_settings.test_the_arrows_still_move_after_rebinding
+     move_right is bound to [68, 4194321, 76]
+FAIL test_settings.test_restore_defaults_brings_everything_back
+     jump is bound to [32, 74]
+FAIL test_settings.test_a_scene_loads_the_saved_settings
+     jump is bound to [32, 75]
+FAIL test_settings.test_the_prompt_names_a_rebound_key
+     the prompt reads '[E] Examine'
+FAIL test_settings.test_bindings_survive_restart_checkpoint
+     reset_global_state lost the binding: [32, 74]
+FAIL test_settings.test_a_failed_write_is_reported_and_the_change_still_applies
+     the change did not apply: [32, 74]
+     restarting lost the unsaved key: [32, 74]
+FAIL test_settings.test_settings_survive_a_relaunch
+     a new process loaded something else: Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+RESULT passed=96 failed=11
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped
+
+=== rebinding removes the arrow keys
+integration: FAILED exit=1
+smoke: ok
+smoke_greybox: ok
+FAIL test_settings.test_the_arrows_still_move_after_rebinding
+     move_right is bound to [76]
+     the right arrow stopped moving the player
+FAIL test_settings.test_a_scene_loads_the_saved_settings
+     move_left is bound to [74]
+RESULT passed=105 failed=2
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped
+
+=== volumes go to the wrong bus
+integration: FAILED exit=1
+smoke: ok
+smoke_greybox: ok
+FAIL test_settings.test_volumes_reach_their_own_buses
+     the Music bus at 50%: expected -6.021 ±0.050, got 0.000
+     0% did not mute the Effects bus
+     the Music bus was muted too
+FAIL test_settings.test_a_focused_slider_moves_with_the_keys_and_the_change_is_kept
+     the Music bus: expected -0.915 ±0.050, got 0.000
+FAIL test_settings.test_a_scene_loads_the_saved_settings
+     the Music bus: expected -6.021 ±0.050, got 0.000
+FAIL test_settings.test_settings_survive_a_relaunch
+     a new process loaded something else: Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+RESULT passed=103 failed=4
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped
+
+=== storage ignores the test directory
+integration: FAILED exit=1
+smoke: ok
+smoke_greybox: ok
+FAIL test_settings.test_settings_are_written_to_the_test_directory
+     no settings file in /tmp/dagon-test-C7w147/test_87
+FAIL test_settings.test_the_core_key_codes_match_the_engine
+     the default file lacks key_move_left=65:
+     the default file lacks key_move_right=68:
+     the default file lacks key_jump=32:
+     the default file lacks key_interact=69:
+FAIL test_settings.test_a_rebound_key_drives_the_action_and_the_old_one_does_not
+     the new key was not saved
+FAIL test_settings.test_escape_cancels_a_capture_and_changes_nothing
+     jump changed to [4194309]
+     the row reads 'Enter'
+FAIL test_settings.test_reserved_keys_are_refused_with_an_explanation
+     jump changed to [4194309]
+FAIL test_settings.test_a_conflict_is_explained_and_can_be_swapped
+     no conflict for a key already in use
+     the message does not explain the conflict: ''
+     keys changed before the choice
+     the choice is not offered with focus
+     jump is bound to [75]
+     focus did not return to the row
+     the rows did not update
+FAIL test_settings.test_cancelling_a_conflict_changes_nothing
+     button changed the keys
+     back also closed Settings
+     back changed the keys
+FAIL test_settings.test_focus_cannot_leave_a_conflict_choice
+     down left the choice
+     up left the choice
+     right did not reach Cancel
+FAIL test_settings.test_restore_defaults_brings_everything_back
+     the defaults were not saved
+FAIL test_settings.test_volumes_reach_their_own_buses
+     the volumes were not saved:
+FAIL test_settings.test_a_focused_slider_moves_with_the_keys_and_the_change_is_kept
+     the music slider after one press left: expected 0.900 ±0.001, got 0.400
+     the Music bus: expected -0.915 ±0.050, got -7.959
+     the change was not saved
+     the music slider after one press right: expected 1.000 ±0.001, got 0.500
+FAIL test_settings.test_a_scene_loads_the_saved_settings
+     jump is bound to [32]
+     move_left is bound to [4194319, 65]
+     the row reads 'Space'
+FAIL test_settings.test_damaged_files_fall_back_to_defaults_without_errors
+     binary noise: jump is bound to [74]
+     another version: jump is bound to [74]
+     truncated: jump is bound to [74]
+     two actions on one key: jump is bound to [74]
+     Esc rebound: jump is bound to [74]
+FAIL test_settings.test_a_failed_write_is_reported_and_the_change_still_applies
+     the failure was not reported: ''
+     the recovered write did not save the key
+FAIL the test run changed the player's real files in /tmp/claude-1000/-mnt-c-Users-sadi-projects-dagon/7b63b859-b3dc-415f-8712-aa789523d9c3/scratchpad/fakehome/godot/app_
+RESULT passed=93 failed=15
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped
+
+=== a key in use is simply taken
+integration: FAILED exit=1
+smoke: ok
+smoke_greybox: ok
+FAIL test_settings.test_a_conflict_is_explained_and_can_be_swapped
+     no conflict for a key already in use
+     the message does not explain the conflict: ''
+     keys changed before the choice
+     the choice is not offered with focus
+     jump is bound to [32]
+     focus did not return to the row
+     the rows did not update
+FAIL test_settings.test_cancelling_a_conflict_changes_nothing
+     button changed the keys
+     back also closed Settings
+     back changed the keys
+FAIL test_settings.test_focus_cannot_leave_a_conflict_choice
+     down left the choice
+     up left the choice
+     right did not reach Cancel
+RESULT passed=104 failed=3
+TEST CASE:  a conflict names the other action and changes nothing
+[doctest] test cases:  58 |  57 passed | 1 failed | 0 skipped
+
+=== Esc can be rebound
+integration: FAILED exit=1
+smoke: ok
+smoke_greybox: ok
+FAIL test_settings.test_damaged_files_fall_back_to_defaults_without_errors
+     Esc rebound: jump is bound to [4194305]
+RESULT passed=106 failed=1
+TEST CASE:  keys that could trap the player reset the whole set
+TEST CASE:  reserved keys are refused
+[doctest] test cases:  58 |  56 passed | 2 failed | 0 skipped
+
+=== damaged keys are kept
+integration: FAILED exit=1
+smoke: ok
+smoke_greybox: ok
+FAIL test_settings.test_damaged_files_fall_back_to_defaults_without_errors
+     truncated: jump is bound to [0]
+     two actions on one key: jump is bound to [0, 75]
+     Esc rebound: jump is bound to [0, 4194305]
+RESULT passed=106 failed=1
+
+=== the pause menu stops with the game
+integration: FAILED exit=1
+smoke: ok
+smoke_greybox: ok
+FAIL test_pause_menu.test_resuming_continues_gameplay
+     still paused after resuming
+     the menu stayed open
+     the player did not continue
+     a hidden button kept focus
+FAIL test_pause_menu.test_one_escape_press_acts_once
+     Esc did not close the menu
+     Esc closed the menu but left the game paused
+FAIL test_pause_menu.test_the_gamepad_can_open_navigate_press_and_back_out
+     the east button did not back out
+     the south button did not press Resume
+     still paused after pressing Resume
+FAIL test_pause_menu.test_resuming_with_the_jump_button_does_not_jump
+     the south button did not resume
+     Space did not resume
+FAIL test_pause_menu.test_restart_checkpoint_returns_to_the_checkpoint_and_unpauses
+     still paused after restarting
+     the menu stayed open after restarting
+     x after restarting: expected 150.000 ±1.000, got 500.000
+FAIL test_pause_menu.test_back_closes_one_level_and_focus_returns
+     Settings did not open
+     the main panel stayed visible under Settings
+     focus in Settings is on Settings:<Button#672514705164>
+FAIL test_pause_menu.test_quit_asks_first_with_cancel_focused_and_says_what_is_kept
+     no confirmation before quitting
+     focus is on Quit:<Button#681373075058>
+FAIL test_pause_menu.test_focus_comes_back_after_it_is_lost
+     a press did not bring focus back: <Object#null>
+FAIL test_settings.test_a_rebound_key_drives_the_action_and_the_old_one_does_not
+     pressing the row did not start a capture
+     the capture message reads ''
+     the row reads 'Space'
+     jump is bound to [32]
+     the new key was not saved
+     the old key still jumps
+FAIL test_settings.test_a_captured_key_does_nothing_else
+     Enter was not captured: [32]
+     Enter was not accepted as a key
+FAIL test_settings.test_escape_cancels_a_capture_and_changes_nothing
+     Esc did not cancel the capture
+     the row reads '...'
+FAIL test_settings.test_a_gamepad_can_cancel_a_capture_and_cannot_wander_off
+     a pad button moved focus during the capture
+     the east button did not cancel the capture
+FAIL test_settings.test_reserved_keys_are_refused_with_an_explanation
+     the message does not name the key: 'Press a key for Jump. Esc cancels.'
+     another key was not accepted after the refusal
+FAIL test_settings.test_a_conflict_is_explained_and_can_be_swapped
+     no conflict for a key already in use
+     the message does not explain the conflict: 'Press a key for Interact. Esc cancels.'
+     the choice is not offered with focus
+     interact is bound to [69]
+     jump is bound to [32]
+     focus did not return to the row
+     the rows did not update
+FAIL test_settings.test_focus_cannot_leave_a_conflict_choice
+     down left the choice
+     up left the choice
+     right did not reach Cancel
+FAIL test_settings.test_the_arrows_still_move_after_rebinding
+     move_right is bound to [4194321, 68]
+FAIL test_settings.test_restore_defaults_brings_everything_back
+     the music slider: expected 1.000 ±0.001, got 0.200
+     the Music bus: expected 0.000 ±0.010, got -13.979
+     no confirmation: 'Press a key for Jump. Esc cancels.'
+FAIL test_settings.test_a_focused_slider_moves_with_the_keys_and_the_change_is_kept
+     the music slider after one press left: expected 0.900 ±0.001, got 1.000
+     the Music bus: expected -0.915 ±0.050, got 0.000
+     the change was not saved
+FAIL test_settings.test_the_prompt_names_a_rebound_key
+     the prompt reads '[E] Examine'
+FAIL test_settings.test_bindings_survive_restart_checkpoint
+     reset_global_state lost the binding: [32]
+FAIL test_settings.test_a_failed_write_is_reported_and_the_change_still_applies
+     the change did not apply: [32]
+     the failure was not reported: 'Press a key for Jump. Esc cancels.'
+     reopening Settings lost the unsaved key: 'Space'
+     restarting lost the unsaved key: [32]
+     the recovered write did not save the key
+FAIL test_settings.test_settings_survive_a_relaunch
+     a new process loaded something else: Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+RESULT passed=85 failed=22
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped
+
+=== Resume fires on press
+integration: FAILED exit=1
+smoke: ok
+smoke_greybox: ok
+FAIL test_pause_menu.test_resuming_with_the_jump_button_does_not_jump
+     resuming with the south button made the sailor jump
+     resuming with Space made the sailor jump
+RESULT passed=106 failed=1
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped
+
+=== Quit has no confirmation
+integration: FAILED: missing '^RESULT passed=[0-9]+ failed=0'
+smoke: ok
+smoke_greybox: ok
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped
+
+=== the menu actions have no gamepad buttons
+integration: FAILED exit=1
+smoke: ok
+smoke_greybox: ok
+FAIL test_pause_menu.test_menus_and_new_actions_have_keyboard_and_gamepad_events
+     Joypad Button 0 (Bottom Action, Sony Cross, Xbox A, Nintendo B) does not trigger ui_accept
+     Joypad Button 1 (Right Action, Sony Circle, Xbox B, Nintendo A) does not trigger ui_cancel
+FAIL test_pause_menu.test_the_gamepad_can_open_navigate_press_and_back_out
+     the east button did not back out
+FAIL test_pause_menu.test_resuming_with_the_jump_button_does_not_jump
+     the south button did not resume
+     resuming with Space made the sailor jump
+FAIL test_settings.test_a_gamepad_can_cancel_a_capture_and_cannot_wander_off
+     the east button did not cancel the capture
+RESULT passed=103 failed=4
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped
+
+=== the runner, started with no test directory
+exit 1
+FAIL DAGON_STORAGE_DIR must name a dagon-test-* directory; tools/run_godot_checks.sh creates one
+RESULT passed=0 failed=1
+
+=== control again: no change
+integration: ok
+smoke: ok
+smoke_greybox: ok
+RESULT passed=107 failed=0
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped

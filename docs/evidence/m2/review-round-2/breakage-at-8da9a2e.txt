@@ -1,0 +1,684 @@
+READ THIS FIRST. This run was disturbed by my own tooling at about 15:21 on 2026-11-03. A stop signal killed the suite during
+'every PlayStation controller is treated as Xbox', which unit tests had already caught. A second script then force-reverted this working copy during
+'an unknown controller gets Xbox's letter', so that change was not in the build, and its 'not caught' is invalid. A clean run caught it by unit test.
+The other two 'not caught' entries are real, and their tests were corrected. Superseded by breakage-at-3426d3b.txt. Kept as it ran.
+
+Deliberate breakage at 8da9a2e, in a scratch clone, with test storage isolated. One change at a time, then reverted.
+A change is 'caught' if a unit or integration test fails, or the run stops. Results are simulated input only.
+
+=== control: no change
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+RESULT passed=191 failed=0
+
+=== PlayStation's Interact is named Cross
+tests/unit/test_controller_labels.cpp:32: ERROR: CHECK( pad_label(ControllerFamily::PlayStation, PadButton::West) == "Square" ) is NOT correct!
+tests/unit/test_controller_labels.cpp:34: ERROR: CHECK( pad_label(ControllerFamily::PlayStation, PadButton::West) != pad_label(ControllerFamily::PlayStation, PadButton::South) ) is NOT corre
+tests/unit/test_controller_labels.cpp:62: ERROR: CHECK( playstation.find(line) != std::string::npos ) is NOT correct!
+tests/unit/test_controller_labels.cpp:74: ERROR: CHECK( text.find(line) != std::string::npos ) is NOT correct!
+[doctest] test cases:  83 |  80 passed | 3 failed | 0 skipped
+FAIL test_pause_menu.test_controls_open_from_the_pause_menu_with_the_current_keys
+     the text lacks 'Examine: X / Square': Keyboard
+FAIL test_controller.test_the_prompt_names_the_button_for_each_layout_and_returns_to_the_key
+     PS5 Controller: the prompt reads '[Cross] Examine'
+FAIL test_controller.test_playstation_never_shows_an_xbox_letter
+     the prompt reads '[Cross] Examine'
+FAIL test_controller.test_a_controller_can_work_the_main_menu
+     Controls reads: Keyboard
+FAIL test_controller.test_examine_works_with_a_controller_at_the_boat_and_the_fish
+     PS5 Controller: at the boat the prompt reads '[Cross] Examine'
+     PS5 Controller: at the fish the prompt reads '[Cross] Examine'
+FAIL test_controller.test_controls_explain_the_controller_in_both_menus
+     PS5 Controller: lacks 'Examine: Square,': Keyboard
+     PS5 Controller on the main menu: lacks 'Examine: Square,': Keyboard
+FAIL test_controller.test_the_device_survives_restarting_and_new_worlds_are_labelled_at_once
+     after restarting the prompt reads '[Cross] Examine'
+RESULT passed=184 failed=7
+
+=== every PlayStation controller is treated as Xbox
+tests/unit/test_controller_labels.cpp:14: ERROR: CHECK( controller_family(name, 0) == ControllerFamily::PlayStation ) is NOT correct!
+tests/unit/test_controller_labels.cpp:14: ERROR: CHECK( controller_family(name, 0) == ControllerFamily::PlayStation ) is NOT correct!
+tests/unit/test_controller_labels.cpp:14: ERROR: CHECK( controller_family(name, 0) == ControllerFamily::PlayStation ) is NOT correct!
+tests/unit/test_controller_labels.cpp:14: ERROR: CHECK( controller_family(name, 0) == ControllerFamily::PlayStation ) is NOT correct!
+tests/unit/test_controller_labels.cpp:14: ERROR: CHECK( controller_family(name, 0) == ControllerFamily::PlayStation ) is NOT correct!
+tests/unit/test_controller_labels.cpp:14: ERROR: CHECK( controller_family(name, 0) == ControllerFamily::PlayStation ) is NOT correct!
+no RESULT line: the run stopped, exit -15
+
+=== an unknown controller gets Xbox's letter
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+RESULT passed=191 failed=0
+
+=== every unknown controller is treated as Xbox
+tests/unit/test_controller_labels.cpp:25: ERROR: CHECK( controller_family(name, 0) == ControllerFamily::Unknown ) is NOT correct!
+tests/unit/test_controller_labels.cpp:25: ERROR: CHECK( controller_family(name, 0) == ControllerFamily::Unknown ) is NOT correct!
+tests/unit/test_controller_labels.cpp:25: ERROR: CHECK( controller_family(name, 0) == ControllerFamily::Unknown ) is NOT correct!
+tests/unit/test_controller_labels.cpp:25: ERROR: CHECK( controller_family(name, 0) == ControllerFamily::Unknown ) is NOT correct!
+tests/unit/test_controller_labels.cpp:25: ERROR: CHECK( controller_family(name, 0) == ControllerFamily::Unknown ) is NOT correct!
+tests/unit/test_controller_labels.cpp:27: ERROR: CHECK( controller_family("Wireless Controller", 0x057E) == ControllerFamily::Unknown ) is NOT correct!
+FAIL test_controller.test_the_prompt_names_the_button_for_each_layout_and_returns_to_the_key
+     Generic USB Joystick: the prompt reads '[X] Examine'
+FAIL test_controller.test_the_longest_prompt_fits_on_screen
+     the prompt reads '[X] Examine'
+FAIL test_controller.test_controls_explain_the_controller_in_both_menus
+     Generic USB Joystick: lacks 'Jump: bottom face button
+     Generic USB Joystick: lacks 'Examine: left face button,': Keyboard
+     Generic USB Joystick: lacks 'Pause: Start
+     Generic USB Joystick: lacks 'bottom face button to confirm': Keyboard
+     Generic USB Joystick: lacks 'right face button for Back': Keyboard
+     Generic USB Joystick on the main menu: lacks 'Jump: bottom face button
+     Generic USB Joystick on the main menu: lacks 'Examine: left face button,': Keyboard
+     Generic USB Joystick on the main menu: lacks 'Pause: Start
+     Generic USB Joystick on the main menu: lacks 'bottom face button to confirm': Keyboard
+     Generic USB Joystick on the main menu: lacks 'right face button for Back': Keyboard
+RESULT passed=188 failed=3
+
+=== Back is named for the wrong button
+tests/unit/test_controller_labels.cpp:39: ERROR: CHECK( pad_label(ControllerFamily::Xbox, PadButton::East) == "B" ) is NOT correct!
+tests/unit/test_controller_labels.cpp:57: ERROR: CHECK( xbox.find(line) != std::string::npos ) is NOT correct!
+tests/unit/test_controller_labels.cpp:74: ERROR: CHECK( text.find(line) != std::string::npos ) is NOT correct!
+[doctest] test cases:  83 |  80 passed | 3 failed | 0 skipped
+FAIL test_controller.test_controls_explain_the_controller_in_both_menus
+     Xbox Series Controller: lacks 'B for Back': Keyboard
+     Xbox Series Controller on the main menu: lacks 'B for Back': Keyboard
+FAIL test_controller.test_a_controller_can_work_every_level_of_the_pause_menu
+     the capture reads 'Press a key for Jump. Esc or Y cancels.'
+RESULT passed=189 failed=2
+
+=== Interact moves to the north button
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+FAIL test_pause_menu.test_menus_and_new_actions_have_keyboard_and_gamepad_events
+     Joypad Button 2 (Left Action, Sony Square, Xbox X, Nintendo Y) does not trigger interact
+FAIL test_controller.test_each_action_is_on_the_button_the_labels_name
+     button 2 and interact: expected true
+     the north button is Interact
+FAIL test_controller.test_the_prompt_names_the_button_for_each_layout_and_returns_to_the_key
+     Xbox Series Controller: after a key the prompt reads '[X] Examine'
+     PS5 Controller: after a key the prompt reads '[Square] Examine'
+     Generic USB Joystick: after a key the prompt reads '[Left face button] Examine'
+FAIL test_controller.test_a_rebound_key_comes_back_after_using_a_controller
+     back on the keyboard the prompt reads '[X] Examine'
+FAIL test_controller.test_examine_works_with_a_controller_at_the_boat_and_the_fish
+     Xbox Series Controller: west at the boat shows ''
+     Xbox Series Controller: west at the fish shows ''
+     PS5 Controller: west at the boat shows ''
+     PS5 Controller: west at the fish shows ''
+FAIL test_controller.test_no_other_button_examines
+     a button other than west examined
+FAIL test_controller.test_a_disconnected_controller_hands_back_to_the_keyboard
+     after disconnecting the prompt reads '[X] Examine'
+     reconnecting relabelled the prompt: '[X] Examine'
+RESULT passed=184 failed=7
+
+=== Jump moves to the west button, sharing Interact
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+FAIL test_level.test_input_map_has_keyboard_and_gamepad_events
+     Joypad Button 0 (Bottom Action, Sony Cross, Xbox A, Nintendo B) does not trigger jump
+FAIL test_level.test_key_and_pad_events_drive_the_player
+     south button did not jump
+FAIL test_shore.test_input_map_has_keyboard_and_gamepad_events
+     Joypad Button 0 (Bottom Action, Sony Cross, Xbox A, Nintendo B) does not trigger jump
+FAIL test_shore.test_key_and_pad_events_drive_the_player
+     south button did not jump
+FAIL test_controller.test_each_action_is_on_the_button_the_labels_name
+     button 0 and jump: expected true
+     button 2 and jump: expected false
+RESULT passed=186 failed=5
+
+=== the device never changes from the keyboard
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+FAIL test_controller.test_the_prompt_names_the_button_for_each_layout_and_returns_to_the_key
+     Xbox Series Controller: the prompt reads '[E] Examine'
+     PS5 Controller: the prompt reads '[E] Examine'
+     Generic USB Joystick: the prompt reads '[E] Examine'
+FAIL test_controller.test_playstation_never_shows_an_xbox_letter
+     the prompt reads '[E] Examine'
+FAIL test_controller.test_a_stick_resting_near_centre_does_not_change_the_device
+     a real stick movement did not: '[E] Examine'
+FAIL test_controller.test_only_a_real_action_changes_the_device
+     a key release relabelled the prompt: '[E] Examine'
+FAIL test_controller.test_the_longest_prompt_fits_on_screen
+     the prompt reads '[E] Examine'
+FAIL test_controller.test_a_rebound_key_comes_back_after_using_a_controller
+     the pad prompt reads '[J] Examine'
+FAIL test_controller.test_examine_works_with_a_controller_at_the_boat_and_the_fish
+     Xbox Series Controller: at the boat the prompt reads '[E] Examine'
+     Xbox Series Controller: at the fish the prompt reads '[E] Examine'
+     PS5 Controller: at the boat the prompt reads '[E] Examine'
+     PS5 Controller: at the fish the prompt reads '[E] Examine'
+FAIL test_controller.test_controls_change_when_the_device_does_while_they_are_open
+     the open screen did not follow the device: Keyboard
+FAIL test_controller.test_a_disconnected_controller_hands_back_to_the_keyboard
+     the prompt reads '[E] Examine'
+     after reconnecting and pressing the prompt reads '[E] Examine'
+FAIL test_controller.test_another_controller_disconnecting_changes_nothing
+     another device's disconnection relabelled the prompt: '[E] Examine'
+FAIL test_controller.test_the_device_survives_restarting_and_new_worlds_are_labelled_at_once
+     after restarting the prompt reads '[E] Examine'
+FAIL test_controller.test_the_device_carries_through_the_main_menu_new_game_and_back
+     the introduction on a controller reads: Keyboard
+     the short introduction lists the keyboard too: Keyboard
+     after Begin the prompt reads '[E] Examine'
+FAIL test_controller.test_a_controller_can_work_every_level_of_the_pause_menu
+     the capture reads 'Press a key for Jump. Esc cancels.'
+RESULT passed=178 failed=13
+
+=== a key release changes the device
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+FAIL test_controller.test_only_a_real_action_changes_the_device
+     a key release relabelled the prompt: '[E] Examine'
+RESULT passed=190 failed=1
+
+=== a button release changes the device
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+FAIL test_controller.test_only_a_real_action_changes_the_device
+     a resting trigger or a button release relabelled the prompt: '[X] Examine'
+RESULT passed=190 failed=1
+
+=== a resting trigger changes the device
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+FAIL test_controller.test_only_a_real_action_changes_the_device
+     a resting trigger or a button release relabelled the prompt: '[X] Examine'
+RESULT passed=190 failed=1
+
+=== any stick movement changes the device
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+FAIL test_controller.test_a_stick_resting_near_centre_does_not_change_the_device
+     a small stick movement relabelled the prompt: '[X] Examine'
+RESULT passed=190 failed=1
+
+=== a disconnected controller stays active
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+FAIL test_controller.test_a_disconnected_controller_hands_back_to_the_keyboard
+     after disconnecting the prompt reads '[X] Examine'
+     reconnecting relabelled the prompt: '[X] Examine'
+RESULT passed=190 failed=1
+
+=== any disconnection hands back to the keyboard
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+FAIL test_controller.test_another_controller_disconnecting_changes_nothing
+     another device's disconnection relabelled the prompt: '[E] Examine'
+RESULT passed=190 failed=1
+
+=== reconnecting relabels the prompt by itself
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+FAIL test_controller.test_a_disconnected_controller_hands_back_to_the_keyboard
+     reconnecting relabelled the prompt: '[X] Examine'
+RESULT passed=190 failed=1
+
+=== a press from a device that has gone logs an engine error
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+       [0] send (res://tests/harness.gd:138)
+       [1] tap (res://tests/harness.gd:172)
+       [2] tap_pad (res://tests/harness.gd:187)
+       [3] test_the_gamepad_can_open_navigate_press_and_back_out (res://tests/test_pause_menu.gd:89)
+       [4] _setup (res://tests/test_pause_menu.gd:12)
+       [5] landed_on_floor (res://tests/harness.gd:125)
+       [6] wait_until (res://tests/harness.gd:116)
+       [7] _physics_process (res://tests/step_probe.gd:24)
+FAIL test_pause_menu.test_the_gamepad_can_open_navigate_press_and_back_out
+     logged error: core/input/input.cpp:2282 get_joy_info: Condition "!joy_names.has(p_device)" is true. Returning: Dictionary() 
+RESULT passed=190 failed=1
+
+=== restarting forgets the device
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+FAIL test_controller.test_the_device_survives_restarting_and_new_worlds_are_labelled_at_once
+     after restarting the prompt reads '[E] Examine'
+RESULT passed=190 failed=1
+
+=== the main menu does not pass the device to the game
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+FAIL test_controller.test_the_device_carries_through_the_main_menu_new_game_and_back
+     the introduction on a controller reads: Keyboard
+     the short introduction lists the keyboard too: Keyboard
+RESULT passed=190 failed=1
+
+=== Quit to Main Menu forgets the device
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+RESULT passed=191 failed=0
+
+=== the session does not tell the pause menu the device
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+FAIL test_controller.test_the_device_carries_through_the_main_menu_new_game_and_back
+     the introduction on a controller reads: Keyboard
+     the short introduction lists the keyboard too: Keyboard
+RESULT passed=190 failed=1
+
+=== the Hud is not told about a new device
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+FAIL test_controller.test_the_prompt_names_the_button_for_each_layout_and_returns_to_the_key
+     Xbox Series Controller: the prompt reads '[E] Examine'
+     PS5 Controller: the prompt reads '[E] Examine'
+     Generic USB Joystick: the prompt reads '[E] Examine'
+FAIL test_controller.test_playstation_never_shows_an_xbox_letter
+     the prompt reads '[E] Examine'
+FAIL test_controller.test_a_stick_resting_near_centre_does_not_change_the_device
+     a real stick movement did not: '[E] Examine'
+FAIL test_controller.test_only_a_real_action_changes_the_device
+     a key release relabelled the prompt: '[E] Examine'
+FAIL test_controller.test_the_longest_prompt_fits_on_screen
+     the prompt reads '[E] Examine'
+FAIL test_controller.test_a_rebound_key_comes_back_after_using_a_controller
+     the pad prompt reads '[J] Examine'
+FAIL test_controller.test_examine_works_with_a_controller_at_the_boat_and_the_fish
+     Xbox Series Controller: at the boat the prompt reads '[E] Examine'
+     Xbox Series Controller: at the fish the prompt reads '[E] Examine'
+     PS5 Controller: at the boat the prompt reads '[E] Examine'
+     PS5 Controller: at the fish the prompt reads '[E] Examine'
+FAIL test_controller.test_a_disconnected_controller_hands_back_to_the_keyboard
+     the prompt reads '[E] Examine'
+     after reconnecting and pressing the prompt reads '[E] Examine'
+FAIL test_controller.test_another_controller_disconnecting_changes_nothing
+     another device's disconnection relabelled the prompt: '[E] Examine'
+RESULT passed=182 failed=9
+
+=== Controls omits the controller
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+FAIL test_pause_menu.test_controls_open_from_the_pause_menu_with_the_current_keys
+     the text lacks 'Xbox / PlayStation controller': Keyboard
+     the text lacks 'Jump: A / Cross': Keyboard
+     the text lacks 'Examine: X / Square': Keyboard
+FAIL test_controller.test_a_controller_can_work_the_main_menu
+     Controls reads: Keyboard
+FAIL test_controller.test_controls_explain_the_controller_in_both_menus
+     Xbox Series Controller: lacks 'Xbox controller': Keyboard
+     Xbox Series Controller: lacks 'Jump: A
+     Xbox Series Controller: lacks 'Examine: X,': Keyboard
+     Xbox Series Controller: lacks 'Pause: Menu
+     Xbox Series Controller: lacks 'A to confirm': Keyboard
+     Xbox Series Controller: lacks 'B for Back': Keyboard
+     Xbox Series Controller: lacks 'Walk: left stick or D-pad'
+     Xbox Series Controller: lacks 'left stick or D-pad to move'
+     Xbox Series Controller on the main menu: lacks 'Xbox controller': Keyboard
+     Xbox Series Controller on the main menu: lacks 'Jump: A
+     Xbox Series Controller on the main menu: lacks 'Examine: X,': Keyboard
+     Xbox Series Controller on the main menu: lacks 'Pause: Menu
+     Xbox Series Controller on the main menu: lacks 'A to confirm': Keyboard
+     Xbox Series Controller on the main menu: lacks 'B for Back': Keyboard
+     PS5 Controller: lacks 'PlayStation controller': Keyboard
+     PS5 Controller: lacks 'Jump: Cross
+     PS5 Controller: lacks 'Examine: Square,': Keyboard
+     PS5 Controller: lacks 'Pause: Options
+     PS5 Controller: lacks 'Cross to confirm': Keyboard
+     PS5 Controller: lacks 'Circle for Back': Keyboard
+     PS5 Controller: lacks 'Walk: left stick or D-pad'
+     PS5 Controller: lacks 'left stick or D-pad to move'
+     PS5 Controller on the main menu: lacks 'PlayStation controller': Keyboard
+     PS5 Controller on the main menu: lacks 'Jump: Cross
+     PS5 Controller on the main menu: lacks 'Examine: Square,': Keyboard
+     PS5 Controller on the main menu: lacks 'Pause: Options
+     PS5 Controller on the main menu: lacks 'Cross to confirm': Keyboard
+     PS5 Controller on the main menu: lacks 'Circle for Back': Keyboard
+     Generic USB Joystick: lacks 'Jump: bottom face button
+     Generic USB Joystick: lacks 'Examine: left face button,': Keyboard
+     Generic USB Joystick: lacks 'Pause: Start
+     Generic USB Joystick: lacks 'bottom face button to confirm': Keyboard
+     Generic USB Joystick: lacks 'right face button for Back': Keyboard
+     Generic USB Joystick: lacks 'Walk: left stick or D-pad'
+     Generic USB Joystick: lacks 'left stick or D-pad to move'
+     Generic USB Joystick on the main menu: lacks 'Jump: bottom face button
+     Generic USB Joystick on the main menu: lacks 'Examine: left face button,': Keyboard
+     Generic USB Joystick on the main menu: lacks 'Pause: Start
+     Generic USB Joystick on the main menu: lacks 'bottom face button to confirm': Keyboard
+     Generic USB Joystick on the main menu: lacks 'right face button for Back': Keyboard
+FAIL test_controller.test_controls_change_when_the_device_does_while_they_are_open
+     the open screen did not follow the device: Keyboard
+FAIL test_controller.test_the_device_carries_through_the_main_menu_new_game_and_back
+     the main menu forgot the controller
+RESULT passed=186 failed=5
+
+=== the introduction lists every device
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+FAIL test_title.test_new_game_with_no_save_saves_first_then_starts_with_the_introduction
+     the text lacks 'under Controls': Keyboard
+     the short introduction lists a device not in use: Keyboard
+FAIL test_controller.test_the_device_carries_through_the_main_menu_new_game_and_back
+     the short introduction lists the keyboard too: Keyboard
+RESULT passed=189 failed=2
+
+=== Controls does not follow the device while open
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+FAIL test_controller.test_controls_change_when_the_device_does_while_they_are_open
+     the open screen did not follow the device: Keyboard
+RESULT passed=190 failed=1
+
+=== a key capture does not say which button cancels it
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+FAIL test_controller.test_a_controller_can_work_every_level_of_the_pause_menu
+     the capture reads 'Press a key for Jump. Esc cancels.'
+RESULT passed=190 failed=1
+
+=== the Controls panel is too wide for the screen
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+FAIL test_controller.test_the_controls_screens_fit_on_every_layout
+     '': the panel is clipped: [P: (-220.0, 31.0), S: (920.0, 208.0)]
+     'Xbox Series Controller': the panel is clipped: [P: (-220.0, 31.0), S: (920.0, 208.0)]
+     'PS5 Controller': the panel is clipped: [P: (-220.0, 31.0), S: (920.0, 208.0)]
+     'Generic USB Joystick': the panel is clipped: [P: (-220.0, 31.0), S: (920.0, 208.0)]
+RESULT passed=190 failed=1
+
+=== the Hud is not connected to the Interactor
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+FAIL test_director.test_every_scene_connection_is_in_place
+     focus_changed is not connected to the Hud
+FAIL test_director.test_the_prompt_follows_focus_and_names_the_key
+     no prompt beside the boat
+     prompt reads ''
+FAIL test_settings.test_the_prompt_names_a_rebound_key
+     the prompt reads ''
+FAIL test_session.test_examine_works_through_normal_play_at_the_boat_and_the_fish
+     no prompt beside the boat at the start
+     the prompt reads ''
+     no prompt at the fish, at x=174
+FAIL test_session.test_examine_still_works_after_restarting
+     after restarting the prompt reads ''
+FAIL test_session.test_examine_follows_a_rebound_key_at_the_boat_and_the_fish
+     after rebinding the prompt reads ''
+     at the fish the prompt reads ''
+FAIL test_session.test_the_hud_is_connected_in_code_and_only_once_after_restarts
+     focus_changed has 0 connections
+     focus_changed has 0 connections
+     focus_changed has 0 connections
+FAIL test_title.test_beginning_with_the_jump_key_starts_play_without_jumping
+     no prompt once play began
+FAIL test_title.test_the_introduction_can_be_closed_with_back_and_uses_the_current_keys
+     the prompt reads ''
+FAIL test_controller.test_the_prompt_names_the_button_for_each_layout_and_returns_to_the_key
+     Xbox Series Controller: before any button the prompt reads ''
+     Xbox Series Controller: the prompt reads ''
+     Xbox Series Controller: after a key the prompt reads ''
+     PS5 Controller: before any button the prompt reads ''
+     PS5 Controller: the prompt reads ''
+     PS5 Controller: after a key the prompt reads ''
+     Generic USB Joystick: before any button the prompt reads ''
+     Generic USB Joystick: the prompt reads ''
+     Generic USB Joystick: after a key the prompt reads ''
+FAIL test_controller.test_playstation_never_shows_an_xbox_letter
+     the prompt reads ''
+FAIL test_controller.test_a_stick_resting_near_centre_does_not_change_the_device
+     a small stick movement relabelled the prompt: ''
+     a real stick movement did not: ''
+FAIL test_controller.test_only_a_real_action_changes_the_device
+     a resting trigger or a button release relabelled the prompt: ''
+     a key release relabelled the prompt: ''
+FAIL test_controller.test_the_longest_prompt_fits_on_screen
+     the prompt reads ''
+FAIL test_controller.test_a_rebound_key_comes_back_after_using_a_controller
+     after rebinding the prompt reads ''
+     the pad prompt reads ''
+     back on the keyboard the prompt reads ''
+FAIL test_controller.test_examine_works_with_a_controller_at_the_boat_and_the_fish
+     Xbox Series Controller: at the boat the prompt reads ''
+     Xbox Series Controller: at the fish the prompt reads ''
+     PS5 Controller: at the boat the prompt reads ''
+     PS5 Controller: at the fish the prompt reads ''
+FAIL test_controller.test_a_disconnected_controller_hands_back_to_the_keyboard
+     the prompt reads ''
+     after disconnecting the prompt reads ''
+     reconnecting relabelled the prompt: ''
+     after reconnecting and pressing the prompt reads ''
+FAIL test_controller.test_another_controller_disconnecting_changes_nothing
+     another device's disconnection relabelled the prompt: ''
+FAIL test_controller.test_a_disconnection_while_paused_keeps_the_menu_working
+     the prompt reads ''
+FAIL test_controller.test_the_device_survives_restarting_and_new_worlds_are_labelled_at_once
+     after restarting the prompt reads ''
+FAIL test_controller.test_the_device_carries_through_the_main_menu_new_game_and_back
+     after Begin the prompt reads ''
+RESULT passed=170 failed=21
+
+=== Examine is not delivered to the Hud
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+FAIL test_director.test_every_scene_connection_is_in_place
+     interacted is not connected to the Hud
+FAIL test_director.test_examining_shows_the_caption_and_never_pauses
+     no caption after examining
+     caption reads ''
+FAIL test_session.test_examine_works_through_normal_play_at_the_boat_and_the_fish
+     pressing E at the boat shows ''
+     pressing E at the fish shows ''
+FAIL test_session.test_examine_still_works_after_restarting
+     after restarting E shows ''
+FAIL test_session.test_examine_follows_a_rebound_key_at_the_boat_and_the_fish
+     the new key does not examine at the boat
+     the new key at the fish shows ''
+FAIL test_session.test_the_hud_is_connected_in_code_and_only_once_after_restarts
+     interacted has 0 connections
+     interacted has 0 connections
+     interacted has 0 connections
+FAIL test_controller.test_examine_works_with_a_controller_at_the_boat_and_the_fish
+     Xbox Series Controller: west at the boat shows ''
+     Xbox Series Controller: west at the fish shows ''
+     PS5 Controller: west at the boat shows ''
+     PS5 Controller: west at the fish shows ''
+FAIL test_controller.test_a_disconnected_controller_hands_back_to_the_keyboard
+     the reconnected controller cannot examine
+RESULT passed=183 failed=8
+
+=== a label the font cannot draw is shown anyway
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+FAIL test_settings.test_a_key_is_named_even_when_the_font_cannot_draw_the_layout_letter
+     Bangla on A reads 'া', expected 'A'
+     Bangla on D reads 'ড', expected 'D'
+     Bangla on E reads 'ী', expected 'E'
+RESULT passed=190 failed=1
+
+=== Continue is enabled with no save
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+FAIL test_session.test_continue_restores_the_checkpoint_after_quitting_and_relaunching
+     the first launch saw: Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+FAIL test_title.test_with_no_save_continue_is_disabled_and_explained
+     Continue is enabled with no save
+FAIL test_title.test_unusable_saves_are_explained_and_nothing_is_changed
+     binary noise: Continue is enabled
+     truncated: Continue is enabled
+     a mismatched checkpoint: Continue is enabled
+     the final sequence: Continue is enabled
+     another version: Continue is enabled
+     a beat this build lacks: Continue is enabled
+FAIL test_title.test_both_files_corrupt_is_explained
+     Continue is enabled
+FAIL test_title.test_a_backup_alone_being_damaged_is_explained
+     Continue is enabled
+RESULT passed=186 failed=5
+
+=== New Game replaces a save without asking
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+SCRIPT ERROR: Invalid type in function '_confirm_panel' in base 'RefCounted (test_title.gd)'. The Object-derived class of argument 1 (previously freed) is not a subclass of the expected argu
+          at: test_new_game_asks_first_with_cancel_focused_and_cancelling_changes_nothing (res://tests/test_title.gd:237)
+          GDScript backtrace (most recent call first):
+              [0] test_new_game_asks_first_with_cancel_focused_and_cancelling_changes_nothing (res://tests/test_title.gd:237)
+              [1] tap_key (res://tests/harness.gd:183)
+              [2] tap (res://tests/harness.gd:175)
+              [3] steps (res://tests/harness.gd:109)
+              [4] _physics_process (res://tests/step_probe.gd:24)
+FAIL test_title.test_new_game_asks_first_with_cancel_focused_and_cancelling_changes_nothing
+     logged error: res://tests/test_title.gd:237 test_new_game_asks_first_with_cancel_focused_and_cancelling_changes_nothing: Invalid type in function '_confirm_panel' in base 'RefCounted (t
+       [0] test_confirming_a_new_game_replaces_the_save_and_starts_from_the_beginning (res://tests/test_title.gd:257)
+       [1] _setup (res://tests/test_title.gd:24)
+       [2] steps (res://tests/harness.gd:109)
+       [3] _physics_process (res://tests/step_probe.gd:24)
+FAIL test_title.test_confirming_a_new_game_replaces_the_save_and_starts_from_the_beginning
+     logged error: scene/gui/control.cpp:3001 grab_focus: Condition "!is_inside_tree()" is true. 
+FAIL test_title.test_a_damaged_save_is_named_when_a_new_game_would_replace_it
+     no confirmation before replacing the damaged file
+     the message reads ''
+     asking changed the file
+SCRIPT ERROR: Invalid call. Nonexistent function 'get_session_beat' in base 'MenuController'.
+          at: test_a_failed_new_game_stays_in_the_menu_and_never_loads_the_old_save (res://tests/test_title.gd:304)
+          GDScript backtrace (most recent call first):
+              [0] test_a_failed_new_game_stays_in_the_menu_and_never_loads_the_old_save (res://tests/test_title.gd:304)
+              [1] wait_for_scene (res://tests/harness.gd:75)
+              [2] steps (res://tests/harness.gd:109)
+              [3] _physics_process (res://tests/step_probe.gd:24)
+FAIL test_title.test_a_failed_new_game_stays_in_the_menu_and_never_loads_the_old_save
+     focus is on Ok:<Button#1531088733964>
+     timed out after 60 steps waiting for the scene to change to GameSession
+     logged error: res://tests/test_title.gd:304 test_a_failed_new_game_stays_in_the_menu_and_never_loads_the_old_save: Invalid call. Nonexistent function 'get_session_beat' in base 'MenuCon
+RESULT passed=187 failed=4
+
+=== Continue shows the introduction
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+FAIL test_title.test_the_introduction_appears_only_for_a_new_game
+     Continue paused the game
+     Continue showed the introduction
+FAIL test_title.test_continue_restores_the_saved_checkpoint
+     not on the floor after Continue
+RESULT passed=189 failed=2
+
+=== New Game skips the introduction
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+FAIL test_title.test_new_game_with_no_save_saves_first_then_starts_with_the_introduction
+     the introduction does not pause the game
+     no introduction
+     the title reads 'Controls'
+     the button reads 'Back'
+     focus is on <Object#null>
+     the text lacks 'Walk: A and D': 
+     the text lacks 'Jump: Space': 
+     the text lacks 'Examine: E': 
+     the text lacks 'Pause: Esc': 
+     the text lacks 'under Controls': 
+FAIL test_title.test_beginning_with_the_jump_key_starts_play_without_jumping
+     beginning with Space jumped
+FAIL test_title.test_the_introduction_can_be_closed_with_back_and_uses_the_current_keys
+     the text lacks 'Walk: J and L': 
+     the text lacks 'Jump: K': 
+     the text lacks 'Examine: U': 
+     Esc did not begin play
+FAIL test_controller.test_the_device_carries_through_the_main_menu_new_game_and_back
+     the introduction on a controller reads: 
+FAIL test_controller.test_beginning_with_a_controller_does_not_jump
+     beginning with A jumped
+RESULT passed=186 failed=5
+
+=== a damaged save is not recovered from the backup
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+FAIL test_title.test_every_state_an_interrupted_replacement_can_leave_loads_a_usable_save
+     the save is gone, the backup is good: Continue is disabled
+     the save is gone, the backup is good: the status reads 'No saved game yet.'
+     the save is corrupt, the backup is good: Continue is disabled
+     the save is corrupt, the backup is good: the status reads 'The saved game is damaged and cannot be used.'
+FAIL test_title.test_a_backup_alone_being_damaged_is_explained
+     the status reads 'No saved game yet.'
+       [0] test_continue_from_a_backup_leaves_the_files_alone_until_the_next_save (res://tests/test_title.gd:227)
+       [1] steps (res://tests/harness.gd:109)
+       [2] _physics_process (res://tests/step_probe.gd:24)
+SCRIPT ERROR: Invalid access to property or key 'global_position' on a base object of type 'null instance'.
+          at: test_continue_from_a_backup_leaves_the_files_alone_until_the_next_save (res://tests/test_title.gd:227)
+          GDScript backtrace (most recent call first):
+              [0] test_continue_from_a_backup_leaves_the_files_alone_until_the_next_save (res://tests/test_title.gd:227)
+              [1] steps (res://tests/harness.gd:109)
+              [2] _physics_process (res://tests/step_probe.gd:24)
+FAIL test_title.test_continue_from_a_backup_leaves_the_files_alone_until_the_next_save
+     timed out after 60 steps waiting for the scene to change to GameSession
+     logged error: scene/main/node.cpp:1975 get_node: Method/function failed. Returning: nullptr Node not found: "World/Player" (relative to "/root/Title").
+     logged error: res://tests/test_title.gd:227 test_continue_from_a_backup_leaves_the_files_alone_until_the_next_save: Invalid access to property or key 'global_position' on a base object 
+RESULT passed=188 failed=3
+
+=== a corrupt save replaces a good backup
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+FAIL test_session.test_a_corrupt_save_never_overwrites_a_valid_backup
+     the backup became: damaged
+RESULT passed=190 failed=1
+
+=== no backup is written
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+FAIL test_session.test_writing_keeps_the_old_save_as_the_backup
+     the backup holds: 
+FAIL test_session.test_a_failure_at_each_step_of_replacing_leaves_a_usable_save
+     a blocked backup reported success
+     step 2: the save holds: dagon_save=1
+     the retry's backup holds: 
+FAIL test_title.test_confirming_a_new_game_replaces_the_save_and_starts_from_the_beginning
+     the backup holds: 
+RESULT passed=188 failed=3
+
+=== reaching a checkpoint does not save
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+FAIL test_session.test_a_checkpoint_is_saved_and_the_notice_is_truthful
+     the persisted beat is -1
+     the file holds: 
+FAIL test_session.test_an_autosave_failure_keeps_the_session_checkpoint_and_says_so
+     the notice reads 'Checkpoint saved'
+FAIL test_session.test_repeated_restarts_produce_no_duplicate_events
+     the file holds: 
+FAIL test_session.test_writing_keeps_the_old_save_as_the_backup
+     the save holds: dagon_save=1
+     the backup holds: 
+FAIL test_session.test_a_corrupt_save_never_overwrites_a_valid_backup
+     the write failed
+     the save holds: damaged
+FAIL test_session.test_continue_restores_the_checkpoint_after_quitting_and_relaunching
+     the checkpoint was not saved: Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+     the second launch saw: Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+     Continue started: Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+RESULT passed=185 failed=6
+
+=== the failed-save notice is never shown
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+FAIL test_session.test_an_autosave_failure_keeps_the_session_checkpoint_and_says_so
+     the notice reads 'Checkpoint saved'
+RESULT passed=190 failed=1
+
+=== the final sequence is saved as a checkpoint
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+       [0] test_the_final_sequence_is_not_a_checkpoint_and_replays_after_a_restart (res://tests/test_session.gd:315)
+       [1] stand_at (res://tests/harness.gd:132)
+       [2] steps (res://tests/harness.gd:109)
+       [3] _physics_process (res://tests/step_probe.gd:24)
+FAIL test_session.test_the_final_sequence_is_not_a_checkpoint_and_replays_after_a_restart
+     the session adopted beat 4
+     an earlier trigger came back
+     x after restarting: expected 700.000 ±1.000, got 200.000
+     the reveal did not replay: 0
+     logged error: src/game_director.cpp:96 restore_start_beat: GameDirector: the start beat may not be restored; starting at the first checkpoint. 
+RESULT passed=190 failed=1
+
+=== Restart keeps the old world
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+FAIL test_pause_menu.test_restart_checkpoint_returns_to_the_checkpoint_and_unpauses
+     x after restarting: expected 150.000 ±1.000, got 500.000
+FAIL test_pause_menu.test_restart_checkpoint_uses_the_newest_checkpoint_repeatedly
+     x after restart 0: expected 750.000 ±1.000, got 1000.000
+     x after restart 1: expected 750.000 ±1.000, got 1000.000
+     x after restart 2: expected 750.000 ±1.000, got 1000.000
+FAIL test_session.test_examine_still_works_after_restarting
+     restarting did not rebuild the world
+     after restarting E shows 'Dead fish, rotting where the water left them. They have not been dry for long.'
+FAIL test_session.test_an_autosave_failure_keeps_the_session_checkpoint_and_says_so
+     x after restarting: expected 750.000 ±1.000, got 735.000
+FAIL test_session.test_restarting_reads_no_file
+     x after restarting: expected 750.000 ±1.000, got 735.000
+FAIL test_session.test_replacing_the_world_cuts_off_the_old_one
+     the old world is still in the tree
+     the old director can still reach the session
+     the world was not replaced
+     the old world was not freed
+     the old player was not freed
+FAIL test_session.test_the_final_sequence_is_not_a_checkpoint_and_replays_after_a_restart
+     the reveal's trigger is not armed again
+     x after restarting: expected 700.000 ±1.000, got 800.000
+     the reveal did not replay: 0
+RESULT passed=184 failed=7
+
+=== Quit to Main Menu leaves the game paused
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+FAIL test_session.test_quitting_to_the_main_menu_unpauses_and_keeps_the_save
+     the main menu is paused
+RESULT passed=190 failed=1
+
+=== a new game leaves the old state
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+RESULT passed=191 failed=0
+
+=== the original defect: the connections are back in the scene and not in the code
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+RESULT passed=191 failed=0
+export_check exit=1
+export-linux: created
+export-linux: FAILED: the exported game showed no prompt beside the boat
+
+=== control again: no change
+[doctest] test cases:  83 |  83 passed | 0 failed | 0 skipped
+RESULT passed=191 failed=0
+
+=== not caught: an unknown controller gets Xbox's letter, Quit to Main Menu forgets the device, a new game leaves the old state

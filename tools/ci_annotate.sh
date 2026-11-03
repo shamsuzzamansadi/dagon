@@ -40,10 +40,19 @@ case "$group" in
 		;;
 	entry)
 		notice check-art build/logs/check-art.log '^CHECK_ART'
-		notice smoke-entry-scene build/logs/godot/smoke.stdout "Completed load for: 'res://scenes/level/shore.tscn'"
+		notice smoke-entry-scene build/logs/godot/smoke.stdout "Completed load for: 'res://scenes/ui/title.tscn'"
+		notice smoke-game-prompt build/logs/godot/smoke_game.stdout "dagon: prompt:"
 		notice smoke-greybox-scene build/logs/godot/smoke_greybox.stdout "Completed load for: 'res://scenes/level/level.tscn'"
 		exit_of smoke-greybox-exit build/logs/godot/smoke_greybox.exit
-		notice exported-entry-scene "build/logs/export/run-$platform.all" "Completed load for: 'res://scenes/level/shore.tscn'"
+		notice exported-entry-scene "build/logs/export/run-$platform.all" "Completed load for: 'res://scenes/ui/title.tscn'"
+		notice exported-new-game-prompt "build/logs/export/run-$platform-new-game.all" "dagon: prompt:"
+		notice exported-continue "build/logs/export/run-$platform-continue.all" "dagon: session start"
+		notice exported-pack-integration "build/logs/export/integration-$platform-pack.stdout" '^RESULT'
+		exit_of exported-pack-integration-exit "build/logs/export/integration-$platform-pack.exit"
+		notice exported-pack-first-failed-test "build/logs/export/integration-$platform-pack.stdout" '^FAIL'
+		notice user-dir-probe build/logs/user-dir-probe.log '^USER_DIR_PROBE'
+		notice first-failed-test build/logs/godot/integration.stdout '^FAIL'
+		notice first-failure-detail build/logs/godot/integration.stdout '^     '
 		;;
 esac
 exit 0

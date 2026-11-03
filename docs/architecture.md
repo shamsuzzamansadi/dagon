@@ -15,9 +15,8 @@ and it is not built**.
    parallax (`Parallax2D`), audio buses, tweens, scene reload. C++ adds only
    behaviour Godot does not have.
 2. **State lives in the level scene.** There are no autoloads and no
-   singletons. Restart is `SceneTree::reload_current_scene()`, which rebuilds
-   every piece of state from scratch. From M3, restart replaces the world under a small
-   session node instead, which rebuilds it the same way (§5, GameSession). The only state that
+   singletons. Restart rebuilds every piece of state from scratch, by
+   replacing the world under a small session node rather than reloading the scene (§5, GameSession). The only state that
    outlives a scene or the application is in two files, settings and one save slot (§5, Persistence).
 3. **Wiring happens in the editor.** References are exported node properties.
    Events are Godot signals connected in the `.tscn`. No event bus, no
@@ -78,9 +77,9 @@ Player                 PlayerController (CharacterBody2D)  layer=Player  mask=Wo
 ### 4.2 `scenes/level/level.tscn` (the whole game, 4 acts)
 
 *This is the plan for M3 onward. Today there are two scenes with the same collision, spawn and
-camera limits: `scenes/level/shore.tscn`, the main scene (art to x = 640, greybox beyond), and
-`scenes/level/level.tscn`, the greybox development and test scene, which is not exported. Which one
-grows into this tree is settled when M2 starts ([D20](decisions.md)).*
+camera limits: `scenes/level/shore.tscn`, the world that `game.tscn` plays in (art to x = 640, greybox beyond), and
+`scenes/level/level.tscn`, the greybox movement test scene, which is not exported. M2 builds in `shore.tscn`
+([D30](decisions.md)), so that is the one growing into this tree.*
 
 ```
 Level                       Node2D
@@ -119,11 +118,11 @@ Level                       Node2D
 └── PauseMenu               CanvasLayer (process_mode = Always) + MenuController
 ```
 
-`title.tscn` (the main menu, and the main scene from M3) and `ending.tscn` are
+`title.tscn` (the main menu, and the main scene) and `ending.tscn` (M3) are
 separate small scenes. Each is a `Control` with a `MenuController`. Flow: Main menu →
-Game → Ending → Main menu. From M3, `game.tscn` holds a `GameSession` with the level as its
-world, and the `PauseMenu` moves up beside it, so the menu survives a restart. The pause menu quits to the
-desktop in M2, and to the main menu as well from M3.
+Game → Ending → Main menu. `game.tscn` holds a `GameSession` with the level as its
+world, and the `PauseMenu` sits beside it, so the menu survives a restart. The pause menu quits to the
+desktop or to the main menu. Quit to Desktop on the main menu exits at once, because there is nothing there to lose.
 `settings_menu.tscn` is instanced by both the pause menu and the main menu. The ending scene
 is assigned to `GameDirector.ending_scene` as a `PackedScene`. No scene path
 is hard-coded in C++.
@@ -242,6 +241,9 @@ so designers tune them in the inspector. Each class implements
   | Unknown `id` | `Ignored` | The adapter calls `push_error` (wiring bug) |
 
 ### GameDirector : Node
+*M2 implements only the session checkpoint and kill plane ([D31](decisions.md)): checkpoint N + 1 activates when
+`story_triggers[N]` is accepted, forward only, with a rejected trigger left armed. The rest of this section is M3.*
+
 - Wraps `core::StoryProgress`. The beats are `Shore → Abyss → Monolith →
   Awakened → Witness → Fleeing → Ended`. Transitions are strictly forward;
   duplicate and out-of-order events are rejected and logged (debug builds).
@@ -366,7 +368,10 @@ This is a guard plus one deferred step, not an event framework.
   Clips can call it through method tracks.
 
 ### Hud : CanvasLayer
-- Shows and hides the prompt label (`Interactable.prompt` + action glyph).
+- Connects itself to the Interactor in code, from the exported `interactor_path` ([D37](decisions.md)). The export drops scene
+  connections that start inside an instanced scene.
+- Shows and hides the prompt label: the button for the device in use, then `Interactable.prompt`. The session tells it
+  which device that is (`set_input_device`), because the Hud pauses with the world and so cannot watch input itself.
 - Shows captions (fade in, hold ~4 s, fade out with a Tween; a new caption
   replaces the old one).
 - Tweens are always created with `Node::create_tween()`, which binds them to
@@ -380,40 +385,55 @@ This is a guard plus one deferred step, not an event framework.
 
 ### MenuController : Control
 - `mode` = Title | Pause | Ending.
+- **Owns the active input device ([D40](decisions.md)),** in `_input`, because it keeps running while paused. It passes the device
+  on to `GameSession`, and from there to the Hud. A disconnection of that device hands back to the keyboard, and a reconnection
+  changes nothing until the controller is used. Going between scenes, it sets the device on the new scene before that scene enters the tree.
 - Bound methods for Button `pressed`: `new_game`, `continue_game`, `resume`,
-  `restart_checkpoint`, `open_settings`, `open_credits`, `quit_to_main_menu` (from M3),
+  `restart_checkpoint`, `open_settings`, `open_controls`, `open_credits`, `quit_to_main_menu`,
   `quit_game`, `back`.
 - In Pause mode it toggles `SceneTree.paused` on the `pause` action. Its
   `process_mode` is Always, so the menu stays responsive while movement, timers and clips
   stop.
 - **Focus:** a control always has focus while a menu is open, for keyboard and gamepad.
-  Returning from a submenu gives focus back to the control that opened it.
+  Returning from a submenu gives focus back to the control that opened it. If focus is ever lost, the next press
+  returns it to a visible control on the active screen, and inside a conflict's choice during a conflict, without
+  changing anything else.
 - **Back** (`ui_cancel`: Esc, gamepad east) closes one level, and the input is marked
   as handled so that one press cannot do two things. At the pause root it resumes. At the main menu
   root it does nothing, so nobody quits by accident. In a confirmation it cancels.
-- **Restart Checkpoint:** in M2 it teleports the player to the active checkpoint and unpauses,
-  because there is no other state to restore yet. From M3 it asks `GameSession` to rebuild the world
-  at the session checkpoint.
+- **Restart Checkpoint** asks `GameSession` to rebuild the world at the session checkpoint.
 - **Quitting** states what will happen (see Persistence), from the pause menu, in both forms.
 - `_ready` applies the saved settings, so they take effect before the player can act.
 - Every scene transition (`new_game`, `continue_game`, `quit_to_main_menu`, and
-  the Director's ending) and `restart_checkpoint` from M3 first call
+  the Director's ending) and `restart_checkpoint` first call
   `dagon::reset_global_state()` (review finding 4). See §7 rule 8.
+
+### Input labels (`src/input_labels.*`, `src/core/controller_labels.*`)
+Stateless, and no class. The plain-C++ half decides a controller's family from the driver's name and USB vendor id, and names
+buttons for each family, so it is unit-tested without Godot. The Godot half asks the `Input` singleton and builds the text for the
+prompt and Controls. Bindings stay positional: Interact is the west button on every controller ([D39](decisions.md)). Only the
+name changes. `DAGON_TEST_CONTROLLER` stands in for the driver's name ([D41](decisions.md)).
 
 ### SettingsMenu : Control (M2)
 - Music volume, effects volume, keyboard bindings, Restore Defaults, Back. The volumes are stored
-  and set on the `Music` and `Effects` buses, and do nothing audible until audio exists.
-- **Rebindable:** keyboard keys for `move_left`, `move_right`, `jump` and `interact`. Gamepad
-  mappings are fixed for the jam.
+  and set on the `Music` and `Effects` buses, and do nothing audible until audio exists. `AudioNote`, a plain
+  `Label` below them, says so. It cannot take focus or clicks, and is removed when audio is connected ([D42](decisions.md)).
+- **Rebindable:** one keyboard key each for `move_left`, `move_right`, `jump` and `interact`
+  ([D32](decisions.md)). Gamepad mappings are fixed for the jam.
 - **No way to get trapped:** the `ui_*` actions and `pause` cannot be rebound, so menu navigation
-  and Back always work, whatever the gameplay bindings are.
+  and Back always work, whatever the gameplay bindings are. The Left and Right arrows stay on movement and Esc
+  stays on pause, and those three cannot be assigned elsewhere. Up and Down can be rebound, and still navigate
+  menus, because menus use their own actions.
 - **Capture:** the next key press becomes the binding. Esc or gamepad Back cancels with no change, and Esc
   cannot be bound. While capturing, the menu consumes all input.
 - **Conflicts:** the row explains which action already has the key and offers Swap or Cancel, so no
   action can end up without a key.
 - Restore Defaults can always be reached from keyboard and gamepad.
+- **If a write fails,** the player is told, the change still applies, and the menu keeps it until a later write
+  succeeds or the player quits. The warning shows for as long as something is unsaved, including on reopening.
+  Capture and conflict text replaces it, and it returns when they end. A good write removes it.
 
-### GameSession : Node (M3)
+### GameSession : Node
 The root of `game.tscn`. Its children are the world, an instance of the level from an exported `PackedScene`, and the
 `PauseMenu`.
 - **It owns one small value, the session checkpoint:** the latest safe checkpoint reached this session, as a
@@ -428,8 +448,9 @@ The root of `game.tscn`. Its children are the world, an instance of the level fr
   director has its checkpoint before it enters the tree.
 - It starts from a value the main menu sets on the new instance, passed with `change_scene_to_node`. With none, as
   when a developer runs the scene directly, it starts at Shore. It never reads the save.
+- It keeps the active input device across world replacement, and gives each new world's Hud the device at once.
 
-### Persistence (settings in M2, save in M3)
+### Persistence
 
 Settings and progress are separate files, so replacing or losing one never affects the other.
 
@@ -531,14 +552,16 @@ Closing the window shows no dialog, and the save on disk stands.
 ## 6. Signal and wiring map
 
 ```
-Interactor.focus_changed ─────────► Hud.show_prompt / hide_prompt
-Interactor.interacted ────────────► Hud.show_caption(target.caption)
+Interactor.focus_changed ─────────► Hud.on_focus_changed (connected in code, Hud._ready, D37)
+Interactor.interacted ────────────► Hud.on_interacted (connected in code, Hud._ready, D37)
+Input.joy_connection_changed ─────► MenuController (connected in code, _ready)
+MenuController ───────────────────► GameSession.set_active_device ► GameDirector ► Hud (direct calls)
 GlyphX.interacted(id) ────────────► PuzzleController.submit(id)
 PuzzleController.solved ──────────► GameDirector.on_puzzle_solved
 StoryTrigger.triggered(id) ───────► GameDirector (connected in code, _ready, from story_triggers)
 Cinematics.animation_finished ────► GameDirector (connected in code, _ready)
 PlayerController.footstep ────────► Footsteps.play
-GameDirector.checkpoint_reached ──► GameSession (connected in code when it creates the world, M3)
+GameDirector.checkpoint_reached ──► GameSession (connected in code when it creates the world)
 ```
 
 The ending no longer depends on `Hud.fade_finished`. The fade is part of the
@@ -552,6 +575,11 @@ All of these except the ones marked "connected in code" are editor
 connections stored in the `.tscn`. An integration test asserts that every expected trigger
 id and connection exists, so a renamed node fails CI instead of failing
 silently.
+
+**A scene connection may not start inside an instanced scene ([D37](decisions.md)).** The text scene keeps it and every test from the
+source sees it, but the export re-packs scenes and silently drops it, unless the instance has Editable Children. Connect those
+in code from an exported path. A connection between a scene's own nodes survives, and the suite on the exported pack ([D38](decisions.md))
+catches any that do not.
 
 ## 7. Ownership and lifetime rules (godot-cpp)
 
@@ -592,8 +620,10 @@ silently.
    - `InputMap` keyboard bindings (M2)
 
    Rules:
-   - `dagon::reset_global_state()` restores all of it to project defaults, then re-applies
-     the player's saved volumes and key bindings, so a scene transition never loses them.
+   - `dagon::reset_global_state()` restores pause, time scale and mouse mode. Volumes and key
+     bindings change only through Settings and are left alone, so a scene transition never loses
+     them, even if they could not be saved ([D33](decisions.md)). `MenuController::_ready` applies the
+     saved ones when a scene loads.
    - It runs before every scene transition, and again (with a debug-build
      warning if anything was dirty) in `GameDirector::_ready`.
    - Rule for presentation: clips must not mutate AudioServer. Low-pass
@@ -605,9 +635,10 @@ silently.
 | Level | What | How | Runs in |
 |---|---|---|---|
 | Unit | `core::step`, `SequencePuzzle`, `StoryProgress`, `save_data`, `settings_data` | doctest, native binary (`scons unit_tests`) | CI Linux + Windows |
-| Extension load | All 11 classes registered, with key methods and signals bound | `godot --headless --script res://tests/check_classes.gd` | CI Linux |
+| Extension load | All classes registered (10 today, 11 when M3 adds `PuzzleController`), with key methods and signals bound | `godot --headless --script res://tests/check_classes.gd` | CI Linux |
 | Integration | M1: spawn and land; walk distance; jump arc; wall stop; teleport contact invalidation (roadmap M1 7f). M2: focus gained and lost; focused object disabled or freed → focus cleared, no crash; double press → 1 event; Interactable `one_shot`; pausing stops gameplay and the menu still responds; focus and one-level Back; rebinding conflicts, capture cancel, defaults, persistence, corrupt settings. M3: puzzle right, wrong, repeated press and reset; trigger re-entry → 1 beat; **outbound crossing of `collapse` → not consumed, fires later in Fleeing**; player already inside the awaited trigger at beat entry → fires; cinematic lock and unlock; **missing clip, looping clip and watchdog timeout → gate open, camera restored, correct control state, `RevealDone` raised once**; **already-overlapping next trigger during finalization → next cinematic keeps its lock and camera**; **duplicate completion/finalization → outcome applied once**; **stale completion (older generation) → no effect on the newer cinematic**; **entering the kill plane while control is locked → recovered after finalization**; flee timeout → Ended; pause → Restart Checkpoint → unpaused; pause → Quit to Main Menu → New Game → unpaused; ending → main menu → New Game → unpaused; restart resets state; **save and restore at each savable beat: correct world, no clip or cue replayed, consumed triggers stay consumed, never stuck**; **saving refused during a cinematic**; **save written by one process and continued by another, in the same unique test directory**; **New Game with a failed write → stays in the menu, old save unchanged and unread**; **autosave failure → Restart Checkpoint returns to the session checkpoint, Continue after a relaunch to the last valid disk save, and the quit text says so**; **every on-disk state an interrupted replacement can leave → a usable save loads, and a corrupt primary never overwrites a valid backup**; **repeated restart → pause reset, no duplicate events, nothing left from the old world**; **every scene that reads files in `_ready` uses the test directory**; missing, corrupt and incompatible saves; New Game confirmation; Continue's text for an Awakened save; wiring check | Hand-rolled headless SceneTree runner (~80 lines, no GUT); rules below | CI Linux |
 | Smoke | Main scene and greybox scene each run 600 frames with no `ERROR:` lines | `--headless --quit-after 600` piped through grep | CI Linux and Windows |
+| Exported pack | The whole integration suite again, on the exported `dagon.pck` (D38). A test of source scenes cannot see what the export changes. | `DAGON_TEST_PACK`, in `tools/export_check.sh` | CI Linux and Windows |
 | Export | Linux and Windows release exports build. The Linux export runs `--quit-after 300` with exit 0 and no errors. | `--export-release` | CI Linux (export); Windows run is manual or on a Windows runner |
 | Manual | Feel, readability, pacing, a full playthrough on Windows and Linux, menus and rebinding on a physical keyboard and controller, quit and relaunch, and audio, which is not complete until a person has heard it in gameplay | Checklist per milestone | Human |
 
@@ -651,7 +682,7 @@ Reports always state which of these levels actually ran.
     subprocess tests and smoke runs. Each test uses its own subdirectory.
   - The test runner refuses to start without that directory.
   - Cleanup deletes only inside a path it has checked is this run's directory, and never through `user://`. A check
-    compares the listing of the real `user://` before and after a run.
+    compares the listing of the real `user://` before and after a run, apart from the engine's own logs.
   - Rebinding tests restore the InputMap.
 - **Assertions use tolerances** (positions ±2 px, velocities ±1 %) and
   **bounded waits**: `wait_until(cond, max_frames)` fails with a message
@@ -701,13 +732,14 @@ dagon/
 │   ├── register_types.{hpp,cpp}
 │   ├── player_controller.{hpp,cpp}  interactor.*  interactable.*  story_trigger.*
 │   ├── puzzle_controller.*  game_director.*  camera_rig.*  hud.*  menu_controller.*
-│   ├── settings_menu.*  game_session.*  storage.*
-│   └── core/  movement.*  sequence_puzzle.*  story_progress.*  save_data.*  settings_data.*
+│   ├── settings_menu.*  game_session.*  storage.*  global_state.*  input_labels.*
+│   └── core/  movement.*  sequence_puzzle.*  story_progress.*  save_data.*  settings_data.*  controller_labels.*
 ├── tests/unit/             # doctest.h (vendored v2.5.3) + test_*.cpp
 ├── project/
 │   ├── project.godot  export_presets.cfg
 │   ├── bin/dagon.gdextension
-│   ├── scenes/{level,player,ui}/   assets/{shore,audio,fonts}/   shaders/
+│   ├── default_bus_layout.tres
+│   ├── scenes/{level,player,ui}/   assets/{shore,ui,audio}/   shaders/
 │   └── tests/              # headless GDScript tests (excluded from export)
 ├── tools/                  # prepare_project.{sh,ps1} (toolchain §5); art/ asset-generation scripts
 ├── docs/                   # this documentation

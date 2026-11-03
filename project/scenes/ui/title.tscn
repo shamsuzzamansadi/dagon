@@ -1,0 +1,248 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="Theme" path="res://assets/ui/theme.tres" id="theme"]
+[ext_resource type="PackedScene" path="res://scenes/ui/settings_menu.tscn" id="1_settings"]
+[ext_resource type="PackedScene" path="res://scenes/level/game.tscn" id="2_game"]
+[ext_resource type="Texture2D" path="res://assets/shore/sky.png" id="3_sky"]
+[ext_resource type="Texture2D" path="res://assets/shore/clouds.png" id="4_clouds"]
+[ext_resource type="Texture2D" path="res://assets/shore/far.png" id="5_far"]
+[ext_resource type="Texture2D" path="res://assets/shore/flats.png" id="6_flats"]
+[ext_resource type="Texture2D" path="res://assets/shore/bank.png" id="7_bank"]
+[ext_resource type="Texture2D" path="res://assets/shore/terrain.png" id="8_terrain"]
+[ext_resource type="Texture2D" path="res://assets/shore/boat.png" id="9_boat"]
+
+[node name="Title" type="MenuController"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("theme")
+mode = 1
+game_scene = ExtResource("2_game")
+main_panel_path = NodePath("Center/Main")
+credits_panel_path = NodePath("Center/Credits")
+confirm_panel_path = NodePath("Center/Confirm")
+controls_panel_path = NodePath("Center/Controls")
+settings_menu_path = NodePath("Settings")
+confirm_cancel_button_path = NodePath("Center/Confirm/Items/Buttons/Cancel")
+confirm_ok_button_path = NodePath("Center/Confirm/Items/Buttons/Ok")
+confirm_message_label_path = NodePath("Center/Confirm/Items/Message")
+controls_title_label_path = NodePath("Center/Controls/Items/Title")
+controls_text_label_path = NodePath("Center/Controls/Items/Text")
+controls_back_button_path = NodePath("Center/Controls/Items/Back")
+first_button_path = NodePath("Center/Main/Panel/Items/NewGame")
+continue_button_path = NodePath("Center/Main/Panel/Items/Continue")
+new_game_button_path = NodePath("Center/Main/Panel/Items/NewGame")
+settings_button_path = NodePath("Center/Main/Panel/Items/Settings")
+controls_button_path = NodePath("Center/Main/Panel/Items/Controls")
+credits_button_path = NodePath("Center/Main/Panel/Items/Credits")
+quit_button_path = NodePath("Center/Main/Panel/Items/Quit")
+credits_back_button_path = NodePath("Center/Credits/Items/Back")
+save_status_label_path = NodePath("Center/Main/Panel/Items/SaveStatus")
+
+[node name="Art" type="Control" parent="."]
+anchors_preset = 0
+mouse_filter = 2
+
+[node name="Sky" type="TextureRect" parent="Art"]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+mouse_filter = 2
+texture = ExtResource("3_sky")
+
+[node name="Clouds" type="TextureRect" parent="Art"]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+mouse_filter = 2
+texture = ExtResource("4_clouds")
+
+[node name="Far" type="TextureRect" parent="Art"]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+mouse_filter = 2
+texture = ExtResource("5_far")
+
+[node name="Flats" type="TextureRect" parent="Art"]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+mouse_filter = 2
+texture = ExtResource("6_flats")
+
+[node name="Bank" type="TextureRect" parent="Art"]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+mouse_filter = 2
+texture = ExtResource("7_bank")
+
+[node name="Terrain" type="TextureRect" parent="Art"]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+mouse_filter = 2
+texture = ExtResource("8_terrain")
+
+[node name="Boat" type="TextureRect" parent="Art"]
+layout_mode = 0
+offset_left = 40.0
+offset_top = 177.0
+mouse_filter = 2
+texture = ExtResource("9_boat")
+
+[node name="Dim" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.0392, 0.0549, 0.0941, 0.35)
+
+[node name="Center" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Main" type="VBoxContainer" parent="Center"]
+layout_mode = 2
+
+[node name="Name" type="Label" parent="Center/Main"]
+layout_mode = 2
+text = "DAGON"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="Center/Main"]
+layout_mode = 2
+text = "Beneath the Black Tide"
+horizontal_alignment = 1
+
+[node name="Panel" type="PanelContainer" parent="Center/Main"]
+layout_mode = 2
+
+[node name="Items" type="VBoxContainer" parent="Center/Main/Panel"]
+layout_mode = 2
+
+[node name="NewGame" type="Button" parent="Center/Main/Panel/Items"]
+custom_minimum_size = Vector2(190, 0)
+layout_mode = 2
+text = "New Game"
+
+[node name="Continue" type="Button" parent="Center/Main/Panel/Items"]
+layout_mode = 2
+text = "Continue"
+
+[node name="Settings" type="Button" parent="Center/Main/Panel/Items"]
+layout_mode = 2
+text = "Settings"
+
+[node name="Controls" type="Button" parent="Center/Main/Panel/Items"]
+layout_mode = 2
+text = "Controls"
+
+[node name="Credits" type="Button" parent="Center/Main/Panel/Items"]
+layout_mode = 2
+text = "Credits"
+
+[node name="Quit" type="Button" parent="Center/Main/Panel/Items"]
+layout_mode = 2
+text = "Quit to Desktop"
+
+[node name="SaveStatus" type="Label" parent="Center/Main/Panel/Items"]
+layout_mode = 2
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Confirm" type="PanelContainer" parent="Center"]
+visible = false
+layout_mode = 2
+
+[node name="Items" type="VBoxContainer" parent="Center/Confirm"]
+layout_mode = 2
+
+[node name="Message" type="Label" parent="Center/Confirm/Items"]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Buttons" type="HBoxContainer" parent="Center/Confirm/Items"]
+layout_mode = 2
+alignment = 1
+
+[node name="Cancel" type="Button" parent="Center/Confirm/Items/Buttons"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "Cancel"
+
+[node name="Ok" type="Button" parent="Center/Confirm/Items/Buttons"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "Quit"
+
+[node name="Controls" type="PanelContainer" parent="Center"]
+visible = false
+layout_mode = 2
+
+[node name="Items" type="VBoxContainer" parent="Center/Controls"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Center/Controls/Items"]
+layout_mode = 2
+text = "Controls"
+horizontal_alignment = 1
+
+[node name="Text" type="Label" parent="Center/Controls/Items"]
+custom_minimum_size = Vector2(390, 0)
+layout_mode = 2
+autowrap_mode = 2
+
+[node name="Back" type="Button" parent="Center/Controls/Items"]
+layout_mode = 2
+text = "Back"
+
+[node name="Credits" type="PanelContainer" parent="Center"]
+visible = false
+layout_mode = 2
+
+[node name="Items" type="VBoxContainer" parent="Center/Credits"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Center/Credits/Items"]
+layout_mode = 2
+text = "Credits"
+horizontal_alignment = 1
+
+[node name="Text" type="Label" parent="Center/Credits/Items"]
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+text = "DAGON: Beneath the Black Tide, for GitHub Game Off 2026.\n\nMade by shamsuzzamansadi, who directed, decided and playtested. The code, tests, pixel art scripts and text were written with AI assistance from Claude (Anthropic). ChatGPT (OpenAI) acted as an independent reviewer. No image generators or third-party art.\n\nBased on \"Dagon\" by H. P. Lovecraft (1919), in the public domain.\n\nMade with Godot Engine, (c) Godot Engine contributors, MIT License, and godot-cpp, MIT License.\n\nCode: MIT License. Original assets: CC BY 4.0."
+autowrap_mode = 2
+
+[node name="Back" type="Button" parent="Center/Credits/Items"]
+layout_mode = 2
+text = "Back"
+
+[node name="Settings" parent="." instance=ExtResource("1_settings")]
+visible = false
+layout_mode = 1
+
+[connection signal="pressed" from="Center/Main/Panel/Items/NewGame" to="." method="new_game"]
+[connection signal="pressed" from="Center/Main/Panel/Items/Continue" to="." method="continue_game"]
+[connection signal="pressed" from="Center/Main/Panel/Items/Settings" to="." method="open_settings"]
+[connection signal="pressed" from="Center/Main/Panel/Items/Controls" to="." method="open_controls"]
+[connection signal="pressed" from="Center/Main/Panel/Items/Credits" to="." method="open_credits"]
+[connection signal="pressed" from="Center/Main/Panel/Items/Quit" to="." method="quit_now"]
+[connection signal="pressed" from="Center/Credits/Items/Back" to="." method="back"]
+[connection signal="pressed" from="Center/Confirm/Items/Buttons/Cancel" to="." method="cancel_confirm"]
+[connection signal="pressed" from="Center/Confirm/Items/Buttons/Ok" to="." method="confirm"]
+[connection signal="pressed" from="Center/Controls/Items/Back" to="." method="back"]

@@ -10,8 +10,19 @@ const SUITES: Array[Script] = [
 	preload("res://tests/test_movement.gd"),
 	preload("res://tests/test_level.gd"),
 	preload("res://tests/test_shore.gd"),
+	preload("res://tests/test_interaction.gd"),
+	preload("res://tests/test_director.gd"),
+	preload("res://tests/test_pause_menu.gd"),
+	preload("res://tests/test_settings.gd"),
+	preload("res://tests/test_session.gd"),
+	preload("res://tests/test_title.gd"),
+	preload("res://tests/test_controller.gd"),
 ]
-const REQUIRED_CLASSES: Array[String] = ["PlayerController", "CameraRig"]
+const REQUIRED_CLASSES: Array[String] = ["PlayerController", "CameraRig", "Interactable", "Interactor", "StoryTrigger", "Hud", "GameDirector", "GameSession", "MenuController", "SettingsMenu"]
+const STORAGE_VARIABLE := "DAGON_STORAGE_DIR"
+const STORAGE_MARKER := "dagon-test-"
+## Set by tools/export_check.sh. Export rewrites scenes, so the same tests also run on what actually ships.
+const PACK_VARIABLE := "DAGON_TEST_PACK"
 
 ## Watchdog in rendered frames, so a broken await cannot hang the run forever.
 const MAX_FRAMES := 40000
@@ -52,7 +63,39 @@ func _process(_delta: float) -> bool:
 	return false
 
 
+## The player's real files, apart from the engine's own logs. A run must leave this unchanged.
+func _player_files(path: String, found: Array[String]) -> Array[String]:
+	var directory := DirAccess.open(path)
+	if directory == null:
+		return found
+	for file_name in directory.get_files():
+		var file_path := path.path_join(file_name)
+		found.append("%s %d %d" % [file_path, FileAccess.get_size(file_path), FileAccess.get_modified_time(file_path)])
+	for folder in directory.get_directories():
+		if folder != "logs" and folder != "shader_cache":
+			_player_files(path.path_join(folder), found)
+	return found
+
+
 func _run() -> void:
+	# Scenes read settings in _ready, so a run with no test directory could load or overwrite a player's.
+	if not OS.get_environment(STORAGE_VARIABLE).contains(STORAGE_MARKER):
+		print("FAIL %s must name a %s* directory; tools/run_godot_checks.sh creates one" % [STORAGE_VARIABLE, STORAGE_MARKER])
+		print("RESULT passed=0 failed=1")
+		quit(1)
+		return
+	var empty_list: Array[String] = []
+	var player_files_before := _player_files(OS.get_user_data_dir(), empty_list)
+
+	var pack := OS.get_environment(PACK_VARIABLE)
+	if not pack.is_empty():
+		if not ProjectSettings.load_resource_pack(pack, true):
+			print("FAIL could not mount %s" % pack)
+			print("RESULT passed=0 failed=1")
+			quit(1)
+			return
+		print("PACK mounted %s" % pack)
+
 	for class_id in REQUIRED_CLASSES:
 		if not ClassDB.class_exists(class_id):
 			print("FAIL class %s is not registered; the extension did not load" % class_id)
@@ -83,6 +126,10 @@ func _run() -> void:
 				print("FAIL %s.%s" % [suite_name, test_name])
 				for failure in harness.failures:
 					print("     %s" % failure)
+	var after_list: Array[String] = []
+	if _player_files(OS.get_user_data_dir(), after_list) != player_files_before:
+		failed += 1
+		print("FAIL the test run changed the player's real files in %s" % OS.get_user_data_dir())
 	OS.remove_logger(_trap)
 	print("RESULT passed=%d failed=%d" % [passed, failed])
 	quit(0 if failed == 0 and passed > 0 else 1)

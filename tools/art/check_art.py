@@ -18,6 +18,7 @@ from palette import ALLOWED, rgba
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 OUT = ROOT / "project" / "assets" / "shore"
 SCENE = ROOT / "project" / "scenes" / "level" / "shore.tscn"
+UI_OUT = ROOT / "project" / "assets" / "ui"
 # light.png is a light mask, not artwork: its values multiply the lantern colour.
 ARTWORK = ["sky", "clouds", "far", "glints", "flats", "bank", "terrain", "foreground", "fish", "boat", "sailor"]
 IDLE_FRAMES = 8
@@ -83,7 +84,12 @@ def main():
         off_palette = {c for _, c in image.getcolors(1 << 24) if c[3] != 0 and c not in ALLOWED}
         if off_palette:
             problems.append(f"{name}.png has {len(off_palette)} colours outside the palette")
-    print(f"palette: checked {len(ARTWORK)} images against {len(ALLOWED)} colours")
+    # The font atlas is white by design: the theme colours it from the palette.
+    for name in ["slider_grabber", "slider_grabber_focus"]:
+        image = Image.open(UI_OUT / f"{name}.png").convert("RGBA")
+        if {c for _, c in image.getcolors(1 << 24) if c[3] != 0} - ALLOWED:
+            problems.append(f"{name}.png has colours outside the palette")
+    print(f"palette: checked {len(ARTWORK) + 2} images against {len(ALLOWED)} colours")
 
     # Each foot's sole has its own colour, so its position can be read from the shipped pixels.
     sheet = Image.open(OUT / "sailor.png").convert("RGBA")

@@ -1,4 +1,4 @@
-"""Writes every Shore asset into project/assets/shore/.
+"""Writes every Shore asset into project/assets/shore/, and the UI's into project/assets/ui/.
 
 Run from anywhere (needs Pillow): python tools/art/generate.py
 Output is deterministic, so running it again changes nothing unless the scripts changed.
@@ -12,9 +12,11 @@ from PIL import Image
 import gen_boat
 import gen_sailor
 import gen_shore
+import gen_ui
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 OUT = ROOT / "project" / "assets" / "shore"
+UI_OUT = ROOT / "project" / "assets" / "ui"
 RES = "res://assets/shore"
 
 GLINT_TOP = gen_shore.HORIZON
@@ -109,7 +111,8 @@ def main():
     write_sailor()
     write_glints()
     write_light()
-    print(f"Wrote assets to {OUT}")
+    gen_ui.write_all(UI_OUT)
+    print(f"Wrote assets to {OUT} and {UI_OUT}")
 
 
 if __name__ == "__main__":

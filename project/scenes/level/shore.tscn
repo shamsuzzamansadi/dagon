@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=18 format=3]
 
 [ext_resource type="Texture2D" path="res://assets/shore/sky.png" id="1_sky"]
 [ext_resource type="Texture2D" path="res://assets/shore/clouds.png" id="2_clouds"]
@@ -11,6 +11,19 @@
 [ext_resource type="Texture2D" path="res://assets/shore/fish.png" id="9_fish"]
 [ext_resource type="PackedScene" path="res://scenes/player/sailor_player.tscn" id="10_player"]
 [ext_resource type="Texture2D" path="res://assets/shore/foreground.png" id="11_foreground"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="12_hud"]
+
+[sub_resource type="RectangleShape2D" id="lifeboat_shape"]
+size = Vector2(112, 28)
+
+[sub_resource type="RectangleShape2D" id="fish_shape"]
+size = Vector2(20, 10)
+
+[sub_resource type="RectangleShape2D" id="enter_abyss_shape"]
+size = Vector2(10, 80)
+
+[sub_resource type="RectangleShape2D" id="kill_plane_shape"]
+size = Vector2(1800, 100)
 
 [node name="Shore" type="Node2D"]
 
@@ -128,3 +141,67 @@ light_mask = 2
 position = Vector2(0, -220)
 texture = ExtResource("11_foreground")
 centered = false
+
+[node name="Props" type="Node2D" parent="."]
+
+[node name="Lifeboat" type="Interactable" parent="Props"]
+position = Vector2(96, -14)
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+interaction_id = &"lifeboat"
+caption = "The lifeboat lies on bare seabed. The sea has drawn back farther than any tide."
+
+[node name="Shape" type="CollisionShape2D" parent="Props/Lifeboat"]
+shape = SubResource("lifeboat_shape")
+
+[node name="FishNearRock" type="Interactable" parent="Props"]
+position = Vector2(189, -3)
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+interaction_id = &"fish"
+caption = "Dead fish, rotting where the water left them. They have not been dry for long."
+
+[node name="Shape" type="CollisionShape2D" parent="Props/FishNearRock"]
+shape = SubResource("fish_shape")
+
+[node name="Triggers" type="Node2D" parent="."]
+
+[node name="EnterAbyss" type="StoryTrigger" parent="Triggers"]
+position = Vector2(735, -30)
+collision_layer = 8
+collision_mask = 2
+monitorable = false
+trigger_id = &"enter_abyss"
+
+[node name="Shape" type="CollisionShape2D" parent="Triggers/EnterAbyss"]
+shape = SubResource("enter_abyss_shape")
+
+[node name="KillPlane" type="StoryTrigger" parent="Triggers"]
+position = Vector2(700, 130)
+collision_layer = 8
+collision_mask = 2
+monitorable = false
+trigger_id = &"out_of_bounds"
+
+[node name="Shape" type="CollisionShape2D" parent="Triggers/KillPlane"]
+shape = SubResource("kill_plane_shape")
+
+[node name="Checkpoints" type="Node2D" parent="."]
+
+[node name="Shore" type="Marker2D" parent="Checkpoints"]
+position = Vector2(150, -1)
+
+[node name="PastTheTrench" type="Marker2D" parent="Checkpoints"]
+position = Vector2(750, -1)
+
+[node name="GameDirector" type="GameDirector" parent="."]
+player_path = NodePath("../Player")
+hud_path = NodePath("../Hud")
+kill_plane_path = NodePath("../Triggers/KillPlane")
+checkpoints = [NodePath("../Checkpoints/Shore"), NodePath("../Checkpoints/PastTheTrench")]
+story_triggers = [NodePath("../Triggers/EnterAbyss")]
+
+[node name="Hud" parent="." instance=ExtResource("12_hud")]
+interactor_path = NodePath("../Player/Interactor")
