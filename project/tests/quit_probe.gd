@@ -7,14 +7,15 @@ func _initialize() -> void:
 
 
 func _run() -> void:
-	var scene: Node = (load("res://scenes/level/shore.tscn") as PackedScene).instantiate()
+	var scene: Node = (load("res://scenes/level/game.tscn") as PackedScene).instantiate()
 	root.add_child(scene)
 	await physics_frame
 	var menu: Control = scene.get_node("PauseLayer/PauseMenu")
 	menu.open()
+	menu.ask_quit_to_desktop()
 	await physics_frame
-	print("PROBE confirm_quit called")
-	menu.confirm_quit()
+	print("PROBE confirm called")
+	menu.confirm()
 	for i in 60:
 		await process_frame
 	print("PROBE still running")

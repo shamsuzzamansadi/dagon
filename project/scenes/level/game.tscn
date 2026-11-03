@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/level/shore.tscn" id="1_world"]
+[ext_resource type="PackedScene" path="res://scenes/ui/pause_menu.tscn" id="2_pause_menu"]
+
+[node name="Game" type="GameSession"]
+world_scene = ExtResource("1_world")
+director_path = NodePath("GameDirector")
+menu_path = NodePath("PauseLayer/PauseMenu")
+
+[node name="PauseLayer" type="CanvasLayer" parent="."]
+layer = 10
+
+[node name="PauseMenu" parent="PauseLayer" instance=ExtResource("2_pause_menu")]
+session_path = NodePath("../..")
+title_scene_path = "res://scenes/ui/title.tscn"

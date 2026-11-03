@@ -1,7 +1,7 @@
 extends RefCounted
 ## Tests of the settings menu, key rebinding and the settings file, each in its own test directory.
 
-const SHORE := "res://scenes/level/shore.tscn"
+const GAME := "res://scenes/level/game.tscn"
 const MENU := "PauseLayer/PauseMenu"
 const ITEMS := "PauseLayer/PauseMenu/Settings/Center/Panel/Items/"
 const SETTINGS_FILE := "settings.cfg"
@@ -10,8 +10,8 @@ const INTERACT := 3
 
 
 func _setup(h) -> CharacterBody2D:
-	await h.load_fixture(SHORE)
-	var player: CharacterBody2D = h.fixture.get_node("Player")
+	await h.load_fixture(GAME)
+	var player: CharacterBody2D = h.fixture.get_node("World/Player")
 	await h.landed_on_floor(player)
 	return player
 
@@ -318,7 +318,7 @@ func test_the_prompt_names_a_rebound_key(h) -> void:
 	settings.back()
 	h.fixture.get_node(MENU).resume()
 	await h.steps(2)
-	var prompt: Label = h.fixture.get_node("Hud/Prompt")
+	var prompt: Label = h.fixture.get_node("World/Hud/Prompt")
 	h.check(prompt.text == "[U] Examine", "the prompt reads '%s'" % prompt.text)
 
 
@@ -343,7 +343,7 @@ func test_damaged_files_fall_back_to_defaults_without_errors(h) -> void:
 	}
 	for case_name in cases:
 		h.write_storage_file(SETTINGS_FILE, cases[case_name])
-		await h.load_fixture(SHORE)
+		await h.load_fixture(GAME)
 		h.check(_keys_of("jump") == [KEY_SPACE], "%s: jump is bound to %s" % [case_name, str(_keys_of("jump"))])
 		h.check(KEY_ESCAPE in _keys_of("pause"), "%s: the pause key is gone" % case_name)
 		h.check(FileAccess.get_file_as_bytes(h.storage_dir.path_join(SETTINGS_FILE)) == cases[case_name], "%s: loading changed the file" % case_name)
@@ -560,28 +560,28 @@ func test_quitting_with_unsaved_settings_does_not_claim_they_are_kept(h) -> void
 	await _setup(h)
 	var settings := await _open(h)
 	var menu: Control = h.fixture.get_node(MENU)
-	var message: Label = menu.get_node("Center/QuitConfirm/Items/Message")
+	var message: Label = menu.get_node("Center/Confirm/Items/Message")
 	settings.back()
-	menu.ask_quit()
+	menu.ask_quit_to_desktop()
 	h.check(message.text.contains("settings are kept"), "the normal message reads '%s'" % message.text)
-	menu.cancel_quit()
+	menu.cancel_confirm()
 
 	_block_writes(h)
 	menu.open_settings()
 	await h.steps(1)
 	settings.set_music_volume(0.5)
 	settings.back()
-	menu.ask_quit()
+	menu.ask_quit_to_desktop()
 	h.check(not message.text.contains("settings are kept"), "it claims unsaved settings are kept: '%s'" % message.text)
-	h.check(message.text.contains("could not be saved"), "it does not mention the failed save: '%s'" % message.text)
-	menu.cancel_quit()
+	h.check(message.text.contains("settings could not be saved"), "it does not mention the failed save: '%s'" % message.text)
+	menu.cancel_confirm()
 
 	_allow_writes(h)
 	menu.open_settings()
 	await h.steps(1)
 	settings.set_music_volume(0.4)
 	settings.back()
-	menu.ask_quit()
+	menu.ask_quit_to_desktop()
 	h.check(message.text.contains("settings are kept"), "the message did not recover: '%s'" % message.text)
 
 
@@ -618,7 +618,7 @@ func test_up_and_down_can_be_rebound_and_the_menu_still_works(h) -> void:
 	await h.tap_key(KEY_ESCAPE)
 	h.check(menu.is_open() and not settings.visible, "Esc did not close only Settings")
 	await h.tap_key(KEY_DOWN)
-	h.check(_focus(h) == menu.get_node("Center/Main/Items/Quit"), "Down did not move focus in the main menu: %s" % _focus(h))
+	h.check(_focus(h) == menu.get_node("Center/Main/Items/Controls"), "Down did not move focus in the main menu: %s" % _focus(h))
 	await h.tap_key(KEY_ESCAPE)
 	h.check(not menu.is_open() and not h.tree.paused, "Esc did not resume")
 
@@ -627,6 +627,34 @@ func test_up_and_down_can_be_rebound_and_the_menu_still_works(h) -> void:
 	await h.tap_key(KEY_UP)
 	await h.steps(2)
 	h.check(jumps[0] == 1, "Up did not jump in the game")
+
+
+## Measured on Windows with a Bangla layout: the layout puts Bengali letters on A, D and E, which the
+## game's font cannot draw. The key is still named, by its position on a US keyboard.
+func test_a_key_is_named_even_when_the_font_cannot_draw_the_layout_letter(h) -> void:
+	await _setup(h)
+	var settings := await _open(h)
+	var cases := [
+		[KEY_A, 0x09BE, "A", "Bangla on A"],
+		[KEY_D, 0x09A1, "D", "Bangla on D"],
+		[KEY_E, 0x09C0, "E", "Bangla on E"],
+		[KEY_E, KEY_E, "E", "English"],
+		[KEY_Y, KEY_Z, "Z", "German swaps Y and Z"],
+		[KEY_SEMICOLON, 0x00D6, "\u00d6", "German O-umlaut"],
+		[KEY_SPACE, KEY_SPACE, "Space", "a named key"],
+		[KEY_E, KEY_NONE, "E", "no layout information"],
+	]
+	for entry in cases:
+		var shown: String = settings.describe_key(entry[0], entry[1])
+		h.check(shown == entry[2], "%s reads '%s', expected '%s'" % [entry[3], shown, entry[2]])
+
+
+func test_the_font_can_draw_every_ascii_key_name(h) -> void:
+	await _setup(h)
+	var label: Label = h.fixture.get_node(ITEMS + "Message")
+	var font := label.get_theme_font("font")
+	for code in range(33, 127):
+		h.check(font.has_char(code), "the font lacks '%s'" % char(code))
 
 
 func test_settings_survive_a_relaunch(h) -> void:

@@ -16,8 +16,9 @@ rm -rf "$out"
 mkdir -p "$out"
 . "$root/tools/test_storage.sh"
 
-# The scene the game must start in.
-scene="res://scenes/level/shore.tscn"
+# The scene the game must start in, and the world it plays in.
+scene="res://scenes/ui/title.tscn"
+world="res://scenes/level/shore.tscn"
 stem="dagon"
 case "$platform" in
 	linux)
@@ -73,23 +74,61 @@ if [ "$host_can_run" = "no" ]; then
 	exit 0
 fi
 
-log_path="$logs/run-$platform.log"
-log_arg="$log_path"
-if command -v cygpath > /dev/null 2>&1; then
-	log_arg="$(cygpath -w "$log_path")"
-fi
-rm -f "$log_path"
-"$binary" --headless --verbose --quit-after 300 --log-file "$log_arg" \
-	> "$logs/run-$platform.stdout" 2> "$logs/run-$platform.stderr"
-code=$?
-echo "$code" > "$logs/run-$platform.exit"
-[ "$code" -eq 0 ] || fail "exported game exit=$code"
+# run_exported <name> [environment assignment]: runs the exported game headless and collects its output.
+run_exported() {
+	name="$1"
+	log_path="$logs/$name.log"
+	log_arg="$log_path"
+	if command -v cygpath > /dev/null 2>&1; then
+		log_arg="$(cygpath -w "$log_path")"
+	fi
+	rm -f "$log_path"
+	env DAGON_AUTOSTART="${2:-}" "$binary" --headless --verbose --quit-after 300 --log-file "$log_arg" \
+		> "$logs/$name.stdout" 2> "$logs/$name.stderr"
+	code=$?
+	echo "$code" > "$logs/$name.exit"
+	[ "$code" -eq 0 ] || fail "$name: exported game exit=$code"
+	cat "$logs/$name.stdout" "$logs/$name.stderr" "$log_path" > "$logs/$name.all" 2> /dev/null
+	if grep -E "^(ERROR|SCRIPT ERROR|USER ERROR)|Cannot get class" "$logs/$name.all" > "$logs/$name.errors"; then
+		fail "$name: ERROR lines in the exported game's output"
+	fi
+}
 
-cat "$logs/run-$platform.stdout" "$logs/run-$platform.stderr" "$log_path" > "$logs/run-$platform.all" 2> /dev/null
-if grep -E "^(ERROR|SCRIPT ERROR|USER ERROR)|Cannot get class" "$logs/run-$platform.all" > "$logs/run-$platform.errors"; then
-	fail "ERROR lines in the exported game's output"
+# The exported game, with nothing done to it: it must start in the main menu.
+run_exported "run-$platform"
+all="$logs/run-$platform.all"
+grep -q "dagon: extension initialized build=release" "$all" || fail "no proof that the release library loaded"
+grep -q "Completed load for: '$scene'" "$all" || fail "it did not start in $scene"
+grep -h "dagon: extension initialized" "$all" | sort -u
+
+# New Game in the exported game. This is the build that ships, so a prompt here means the whole path works.
+run_exported "run-$platform-new-game" new_game
+all="$logs/run-$platform-new-game.all"
+grep -q "Completed load for: '$world'" "$all" || fail "New Game did not load $world"
+grep -q "dagon: session start beat=0 persisted=0" "$all" || fail "New Game did not start a session at the first checkpoint"
+grep -q "dagon: introduction shown" "$all" || fail "New Game did not show the introduction"
+grep -q "dagon: prompt: \[E\] Examine" "$all" || fail "the exported game showed no prompt beside the boat"
+save_file="$test_storage_dir/save.dat"
+grep -q "beat=shore" "$save_file" 2> /dev/null || fail "New Game wrote no save in the exported game"
+
+# A new process, on that save: Continue in the exported game.
+run_exported "run-$platform-continue" continue
+all="$logs/run-$platform-continue.all"
+grep -q "dagon: session start beat=0 persisted=0" "$all" || fail "Continue did not start from the save"
+echo "export-$platform: new game and continue ran"
+
+# Export rewrites scenes, so the integration tests also run on the exported pack.
+pack_arg="$pack"
+if command -v cygpath > /dev/null 2>&1; then
+	pack_arg="$(cygpath -m "$pack")"
 fi
-grep -q "dagon: extension initialized build=release" "$logs/run-$platform.all" || fail "no proof that the release library loaded"
-grep -q "Completed load for: '$scene'" "$logs/run-$platform.all" || fail "it did not start in $scene"
-grep -h "dagon: extension initialized" "$logs/run-$platform.all" | sort -u
+rm -f "$test_storage_dir/save.dat" "$test_storage_dir/save.bak" "$test_storage_dir/settings.cfg"
+DAGON_TEST_PACK="$pack_arg" "$godot" --headless --path "$root/project" --fixed-fps 60 --script res://tests/run_tests.gd \
+	> "$logs/integration-$platform-pack.stdout" 2> "$logs/integration-$platform-pack.stderr"
+code=$?
+echo "$code" > "$logs/integration-$platform-pack.exit"
+grep -q "^PACK mounted" "$logs/integration-$platform-pack.stdout" || fail "the exported pack was not mounted for the tests"
+grep -E "^(FAIL|     |RESULT)" "$logs/integration-$platform-pack.stdout" | grep -vE "^     +\[" | head -40
+[ "$code" -eq 0 ] || fail "integration tests failed on the exported pack"
+grep -qE "^RESULT passed=[0-9]+ failed=0" "$logs/integration-$platform-pack.stdout" || fail "no clean result from the exported pack"
 echo "export-$platform: ran exit=0"

@@ -14,10 +14,14 @@ const SUITES: Array[Script] = [
 	preload("res://tests/test_director.gd"),
 	preload("res://tests/test_pause_menu.gd"),
 	preload("res://tests/test_settings.gd"),
+	preload("res://tests/test_session.gd"),
+	preload("res://tests/test_title.gd"),
 ]
-const REQUIRED_CLASSES: Array[String] = ["PlayerController", "CameraRig", "Interactable", "Interactor", "StoryTrigger", "Hud", "GameDirector", "MenuController", "SettingsMenu"]
+const REQUIRED_CLASSES: Array[String] = ["PlayerController", "CameraRig", "Interactable", "Interactor", "StoryTrigger", "Hud", "GameDirector", "GameSession", "MenuController", "SettingsMenu"]
 const STORAGE_VARIABLE := "DAGON_STORAGE_DIR"
 const STORAGE_MARKER := "dagon-test-"
+## Set by tools/export_check.sh. Export rewrites scenes, so the same tests also run on what actually ships.
+const PACK_VARIABLE := "DAGON_TEST_PACK"
 
 ## Watchdog in rendered frames, so a broken await cannot hang the run forever.
 const MAX_FRAMES := 40000
@@ -81,6 +85,15 @@ func _run() -> void:
 		return
 	var empty_list: Array[String] = []
 	var player_files_before := _player_files(OS.get_user_data_dir(), empty_list)
+
+	var pack := OS.get_environment(PACK_VARIABLE)
+	if not pack.is_empty():
+		if not ProjectSettings.load_resource_pack(pack, true):
+			print("FAIL could not mount %s" % pack)
+			print("RESULT passed=0 failed=1")
+			quit(1)
+			return
+		print("PACK mounted %s" % pack)
 
 	for class_id in REQUIRED_CLASSES:
 		if not ClassDB.class_exists(class_id):

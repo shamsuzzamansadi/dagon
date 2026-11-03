@@ -16,7 +16,7 @@ namespace dagon {
 
 namespace {
 
-const char *const SAVE_FAILED_MESSAGE = "Could not save settings. They last until you quit.";
+const char *const SAVE_FAILED_MESSAGE = "Could not save settings. They may be lost when you leave.";
 
 } // namespace
 
@@ -31,6 +31,7 @@ void SettingsMenu::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_effects_volume", "value"), &SettingsMenu::set_effects_volume);
 	ClassDB::bind_method(D_METHOD("is_capturing"), &SettingsMenu::is_capturing);
 	ClassDB::bind_method(D_METHOD("has_conflict"), &SettingsMenu::has_conflict);
+	ClassDB::bind_method(D_METHOD("describe_key", "key", "layout_label"), &SettingsMenu::describe_key);
 
 #define DAGON_BIND_PATH(m_name)                                                             \
 	ClassDB::bind_method(D_METHOD("set_" #m_name, "path"), &SettingsMenu::set_##m_name);    \
@@ -156,12 +157,12 @@ void SettingsMenu::capture_key(int p_key) {
 			finish_capture();
 			break;
 		case core::AssignResult::Reserved:
-			set_message(storage::key_name(p_key) + " is kept for the game. Press another key, or Esc to cancel.");
+			set_message(key_label(p_key) + " is kept for the game. Press another key, or Esc to cancel.");
 			break;
 		case core::AssignResult::Conflict:
 			conflict_other_ = assignment.other;
 			state_ = State::Conflict;
-			set_message(storage::key_name(p_key) + " is already " + action_label(conflict_other_) + ". Swap them?");
+			set_message(key_label(p_key) + " is already " + action_label(conflict_other_) + ". Swap them?");
 			set_conflict_row_visible(true);
 			if (Button *button = swap_button_.get()) {
 				button->grab_focus();
@@ -246,9 +247,19 @@ void SettingsMenu::refresh_controls() {
 	}
 	for (std::size_t i = 0; i < key_buttons_.size(); i++) {
 		if (Button *button = key_buttons_[i].get()) {
-			button->set_text(storage::key_name(settings_.keys[i]));
+			button->set_text(key_label(settings_.keys[i]));
 		}
 	}
+}
+
+String SettingsMenu::key_label(int p_key) const {
+	const Label *label = message_label_.get();
+	return storage::key_name(p_key, label != nullptr ? label->get_theme_font("font") : Ref<Font>());
+}
+
+String SettingsMenu::describe_key(int p_key, int p_layout_label) const {
+	const Label *label = message_label_.get();
+	return storage::displayed_key_name(p_key, p_layout_label, label != nullptr ? label->get_theme_font("font") : Ref<Font>());
 }
 
 void SettingsMenu::set_message(const String &p_text) {

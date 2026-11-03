@@ -4,9 +4,22 @@
 
 [node name="Hud" type="Hud"]
 layer = 5
+notice_label_path = NodePath("Notice")
 prompt_label_path = NodePath("Prompt")
 caption_label_path = NodePath("Caption")
 fade_rect_path = NodePath("Fade")
+
+[node name="Notice" type="Label" parent="."]
+visible = false
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_top = 6.0
+offset_bottom = 20.0
+grow_horizontal = 2
+theme = ExtResource("theme")
+theme_type_variation = &"CaptionLabel"
+horizontal_alignment = 1
 
 [node name="Prompt" type="Label" parent="."]
 visible = false

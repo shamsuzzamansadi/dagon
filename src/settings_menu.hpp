@@ -40,6 +40,8 @@ public:
 	bool is_capturing() const { return state_ == State::Capturing; }
 	bool has_conflict() const { return state_ == State::Conflict; }
 	bool has_unsaved_changes() const { return unsaved_; }
+	// What a key is called on screen, given the letter a keyboard layout puts on it.
+	godot::String describe_key(int p_key, int p_layout_label) const;
 
 	void set_music_slider_path(const godot::NodePath &p_value) { music_slider_path_ = p_value; }
 	godot::NodePath get_music_slider_path() const { return music_slider_path_; }
@@ -70,6 +72,7 @@ private:
 	void commit();
 	void refresh_controls();
 	void show_idle_message();
+	godot::String key_label(int p_key) const;
 	void set_message(const godot::String &p_text);
 	void set_conflict_row_visible(bool p_visible);
 	godot::String action_label(core::GameAction p_action) const;

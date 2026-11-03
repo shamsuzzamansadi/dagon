@@ -10,6 +10,8 @@
 #include <godot_cpp/classes/property_tweener.hpp>
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/core/error_macros.hpp>
+#include <godot_cpp/core/print_string.hpp>
+#include <godot_cpp/variant/callable.hpp>
 
 #include <cmath>
 
@@ -20,6 +22,7 @@ namespace dagon {
 namespace {
 
 constexpr float CAPTION_FADE_SECONDS = 0.25f;
+constexpr float NOTICE_HOLD_SECONDS = 2.5f;
 constexpr double STICK_MOVED = 0.5;
 const char *const GAMEPAD_INTERACT_LABEL = "X";
 
@@ -30,9 +33,16 @@ void Hud::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("on_interacted", "target"), &Hud::on_interacted);
 	ClassDB::bind_method(D_METHOD("show_caption", "text"), &Hud::show_caption);
 	ClassDB::bind_method(D_METHOD("hide_caption"), &Hud::hide_caption);
+	ClassDB::bind_method(D_METHOD("show_notice", "text"), &Hud::show_notice);
 	ClassDB::bind_method(D_METHOD("fade_to_black", "seconds"), &Hud::fade_to_black);
 	ClassDB::bind_method(D_METHOD("fade_from_black", "seconds"), &Hud::fade_from_black);
 
+	ClassDB::bind_method(D_METHOD("set_interactor_path", "path"), &Hud::set_interactor_path);
+	ClassDB::bind_method(D_METHOD("get_interactor_path"), &Hud::get_interactor_path);
+	ADD_PROPERTY(PropertyInfo(Variant::NODE_PATH, "interactor_path", PROPERTY_HINT_NODE_PATH_VALID_TYPES, "Interactor"), "set_interactor_path", "get_interactor_path");
+	ClassDB::bind_method(D_METHOD("set_notice_label_path", "path"), &Hud::set_notice_label_path);
+	ClassDB::bind_method(D_METHOD("get_notice_label_path"), &Hud::get_notice_label_path);
+	ADD_PROPERTY(PropertyInfo(Variant::NODE_PATH, "notice_label_path", PROPERTY_HINT_NODE_PATH_VALID_TYPES, "Label"), "set_notice_label_path", "get_notice_label_path");
 	ClassDB::bind_method(D_METHOD("set_prompt_label_path", "path"), &Hud::set_prompt_label_path);
 	ClassDB::bind_method(D_METHOD("get_prompt_label_path"), &Hud::get_prompt_label_path);
 	ADD_PROPERTY(PropertyInfo(Variant::NODE_PATH, "prompt_label_path", PROPERTY_HINT_NODE_PATH_VALID_TYPES, "Label"), "set_prompt_label_path", "get_prompt_label_path");
@@ -56,9 +66,20 @@ void Hud::_ready() {
 	prompt_label_.set(get_node<Label>(prompt_label_path_));
 	caption_label_.set(get_node<Label>(caption_label_path_));
 	fade_rect_.set(get_node<ColorRect>(fade_rect_path_));
-	if (prompt_label_.get() == nullptr || caption_label_.get() == nullptr || fade_rect_.get() == nullptr) {
+	notice_label_.set(get_node<Label>(notice_label_path_));
+	if (prompt_label_.get() == nullptr || caption_label_.get() == nullptr || fade_rect_.get() == nullptr || notice_label_.get() == nullptr) {
 		ERR_PRINT("Hud: a label or the fade rect path is not set; part of the HUD will not show.");
 	}
+
+	// In code, not in the scene: the interactor is inside an instanced scene, and a scene connection
+	// from there loads from text but is silently dropped whenever the scene is packed, as export does.
+	Interactor *interactor = interactor_path_.is_empty() ? nullptr : get_node<Interactor>(interactor_path_);
+	if (interactor == nullptr) {
+		ERR_PRINT("Hud: interactor_path does not point to an Interactor; prompts and captions will not show.");
+		return;
+	}
+	interactor->connect("focus_changed", Callable(this, "on_focus_changed"));
+	interactor->connect("interacted", Callable(this, "on_interacted"));
 }
 
 void Hud::_notification(int p_what) {
@@ -102,9 +123,11 @@ void Hud::refresh_prompt() {
 		label->hide();
 		return;
 	}
-	const String key = using_gamepad_ ? String(GAMEPAD_INTERACT_LABEL) : storage::key_name(storage::current_key("interact"));
+	const String key = using_gamepad_ ? String(GAMEPAD_INTERACT_LABEL) : storage::key_name(storage::current_key("interact"), label->get_theme_font("font"));
 	label->set_text(String("[") + key + "] " + prompt_text_);
 	label->show();
+	// Positive proof for the export check, which cannot see the screen.
+	print_verbose("dagon: prompt: ", label->get_text());
 }
 
 void Hud::on_interacted(Object *p_target) {
@@ -141,6 +164,29 @@ void Hud::hide_caption() {
 
 void Hud::on_caption_finished() {
 	if (Label *label = caption_label_.get()) {
+		label->hide();
+	}
+}
+
+void Hud::show_notice(const String &p_text) {
+	Label *label = notice_label_.get();
+	if (label == nullptr) {
+		return;
+	}
+	if (notice_tween_.is_valid()) {
+		notice_tween_->kill();
+	}
+	label->set_text(p_text);
+	label->set_modulate(Color(1, 1, 1, 1));
+	label->show();
+	notice_tween_ = create_tween();
+	notice_tween_->tween_interval(NOTICE_HOLD_SECONDS);
+	notice_tween_->tween_property(label, "modulate:a", 0.0, CAPTION_FADE_SECONDS);
+	notice_tween_->tween_callback(callable_mp(this, &Hud::on_notice_finished));
+}
+
+void Hud::on_notice_finished() {
+	if (Label *label = notice_label_.get()) {
 		label->hide();
 	}
 }

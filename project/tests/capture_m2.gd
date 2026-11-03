@@ -43,7 +43,7 @@ func _send_action(action: String) -> void:
 
 
 func _run() -> void:
-	var scene: Node = (load("res://scenes/level/shore.tscn") as PackedScene).instantiate()
+	var scene: Node = (load("res://scenes/level/game.tscn") as PackedScene).instantiate()
 	_probe = StepProbe.new()
 	root.add_child(scene)
 	root.add_child(_probe)

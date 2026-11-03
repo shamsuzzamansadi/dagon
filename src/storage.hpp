@@ -1,7 +1,9 @@
 #pragma once
 
+#include "core/save_data.hpp"
 #include "core/settings_data.hpp"
 
+#include <godot_cpp/classes/font.hpp>
 #include <godot_cpp/variant/string.hpp>
 
 #include <string>
@@ -24,8 +26,25 @@ bool save_settings(const core::Settings &p_settings);
 // Sets the audio bus volumes and the InputMap. Safe to call any number of times.
 void apply_settings(const core::Settings &p_settings);
 
-// The action's rebindable key, for showing in the UI.
-godot::String key_name(int p_key);
+// What the save slot holds, for the main menu. The session never reads it.
+struct LoadedSave {
+	core::SaveStatus status = core::SaveStatus::Missing;
+	core::SaveData save;
+	bool from_backup = false;
+	bool any_file = false;
+};
+
+// Tries the save, then its backup. Never changes a file.
+LoadedSave load_game();
+
+// Once a valid save exists, at least one valid file stays on disk at every moment, and a corrupt
+// save never replaces a valid backup. Returns true only when the new save is in place.
+bool save_game(const core::SaveData &p_save);
+
+// A key's name, for showing in the UI: the letter on the player's own layout if the font can draw it,
+// otherwise the key's name on a US keyboard.
+godot::String key_name(int p_key, const godot::Ref<godot::Font> &p_font);
+godot::String displayed_key_name(int p_key, int p_layout_label, const godot::Ref<godot::Font> &p_font);
 int current_key(const godot::StringName &p_action);
 
 } // namespace dagon::storage

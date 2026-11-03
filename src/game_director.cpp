@@ -6,6 +6,8 @@
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/core/error_macros.hpp>
 
+#include <optional>
+
 using namespace godot;
 
 namespace dagon {
@@ -13,6 +15,10 @@ namespace dagon {
 void GameDirector::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("restart_checkpoint"), &GameDirector::restart_checkpoint);
 	ClassDB::bind_method(D_METHOD("get_active_checkpoint"), &GameDirector::get_active_checkpoint);
+	ClassDB::bind_method(D_METHOD("set_start_beat", "beat"), &GameDirector::set_start_beat);
+	ClassDB::bind_method(D_METHOD("get_start_beat"), &GameDirector::get_start_beat);
+	ClassDB::bind_method(D_METHOD("fade_in"), &GameDirector::fade_in);
+	ClassDB::bind_method(D_METHOD("show_notice", "text"), &GameDirector::show_notice);
 
 	ClassDB::bind_method(D_METHOD("set_player_path", "path"), &GameDirector::set_player_path);
 	ClassDB::bind_method(D_METHOD("get_player_path"), &GameDirector::get_player_path);
@@ -80,6 +86,35 @@ void GameDirector::_ready() {
 			ERR_PRINT("GameDirector: kill_plane_path does not point to a StoryTrigger.");
 		}
 	}
+
+	restore_start_beat();
+}
+
+void GameDirector::restore_start_beat() {
+	const core::Beat beat = static_cast<core::Beat>(start_beat_);
+	if (!progress_.restore(beat)) {
+		ERR_PRINT("GameDirector: the start beat may not be restored; starting at the first checkpoint.");
+		return;
+	}
+	// Each outcome is applied directly. Nothing is emitted, so no event can replay.
+	for (const NodeRef<StoryTrigger> &reference : story_triggers_) {
+		StoryTrigger *trigger = reference.get();
+		if (trigger == nullptr) {
+			continue;
+		}
+		const String id = trigger->get_trigger_id();
+		const std::optional<core::Event> event = core::event_for_trigger(id.utf8().get_data());
+		if (event.has_value() && static_cast<int>(core::beat_after(*event)) <= start_beat_) {
+			trigger->set_enabled(false);
+		}
+	}
+	PlayerController *player = player_.get();
+	const std::size_t index = static_cast<std::size_t>(start_beat_);
+	if (start_beat_ > 0 && player != nullptr && index < checkpoints_.size()) {
+		if (const Marker2D *checkpoint = checkpoints_[index].get()) {
+			player->teleport(checkpoint->get_global_position());
+		}
+	}
 }
 
 PackedStringArray GameDirector::_get_configuration_warnings() const {
@@ -94,18 +129,23 @@ PackedStringArray GameDirector::_get_configuration_warnings() const {
 }
 
 void GameDirector::on_story_trigger(const StringName &p_trigger_id) {
-	// Forward only. Anything but the next trigger is rejected, changes nothing and stays armed.
-	const std::size_t next = static_cast<std::size_t>(active_checkpoint_);
-	if (next >= story_triggers_.size() || next + 1 >= checkpoints_.size()) {
+	const String id = p_trigger_id;
+	const std::optional<core::Event> event = core::event_for_trigger(id.utf8().get_data());
+	if (!event.has_value()) {
 		return;
 	}
-	StoryTrigger *trigger = story_triggers_[next].get();
-	if (trigger == nullptr || trigger->get_trigger_id() != p_trigger_id) {
+	// A rejected event changes nothing, and its trigger stays armed.
+	const std::optional<core::Beat> beat = progress_.apply(*event);
+	if (!beat.has_value()) {
 		return;
 	}
-	trigger->set_enabled(false);
-	active_checkpoint_++;
-	emit_signal("checkpoint_reached", active_checkpoint_);
+	for (const NodeRef<StoryTrigger> &reference : story_triggers_) {
+		StoryTrigger *trigger = reference.get();
+		if (trigger != nullptr && trigger->get_trigger_id() == p_trigger_id) {
+			trigger->set_enabled(false);
+		}
+	}
+	emit_signal("checkpoint_reached", static_cast<int>(*beat));
 }
 
 void GameDirector::on_out_of_bounds(const StringName &p_trigger_id) {
@@ -115,19 +155,32 @@ void GameDirector::on_out_of_bounds(const StringName &p_trigger_id) {
 
 void GameDirector::restart_checkpoint() {
 	PlayerController *player = player_.get();
-	if (player == nullptr || static_cast<std::size_t>(active_checkpoint_) >= checkpoints_.size()) {
+	const std::size_t index = static_cast<std::size_t>(get_active_checkpoint());
+	if (player == nullptr || index >= checkpoints_.size()) {
 		return;
 	}
-	const Marker2D *checkpoint = checkpoints_[static_cast<std::size_t>(active_checkpoint_)].get();
+	const Marker2D *checkpoint = checkpoints_[index].get();
 	if (checkpoint == nullptr) {
 		return;
 	}
 	player->teleport(checkpoint->get_global_position());
 	if (Hud *hud = hud_.get()) {
 		hud->hide_caption();
+	}
+	fade_in();
+	emit_signal("player_respawned");
+}
+
+void GameDirector::fade_in() {
+	if (Hud *hud = hud_.get()) {
 		hud->fade_from_black(RESPAWN_FADE_SECONDS);
 	}
-	emit_signal("player_respawned");
+}
+
+void GameDirector::show_notice(const String &p_text) {
+	if (Hud *hud = hud_.get()) {
+		hud->show_notice(p_text);
+	}
 }
 
 } // namespace dagon

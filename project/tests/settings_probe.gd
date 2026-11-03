@@ -7,7 +7,7 @@ func _initialize() -> void:
 
 
 func _run() -> void:
-	var scene: Node = (load("res://scenes/level/shore.tscn") as PackedScene).instantiate()
+	var scene: Node = (load("res://scenes/level/game.tscn") as PackedScene).instantiate()
 	root.add_child(scene)
 	await physics_frame
 	var keys := []

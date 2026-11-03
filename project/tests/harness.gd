@@ -50,9 +50,32 @@ func load_fixture(path: String) -> Node:
 	return fixture
 
 
+## For a scene that changes scene: the tree only replaces its current scene.
+func load_main_fixture(path: String) -> Node:
+	fixture = (load(path) as PackedScene).instantiate()
+	probe = StepProbe.new()
+	tree.root.add_child(fixture)
+	tree.current_scene = fixture
+	tree.root.add_child(probe)
+	await steps(1)
+	return fixture
+
+
+## Waits for a scene change to finish, and returns the new scene.
+func wait_for_scene(type_name: String) -> Node:
+	await wait_until(func() -> bool: return is_instance_valid(tree.current_scene) and tree.current_scene.is_class(type_name) and tree.current_scene.is_node_ready(), 60, "the scene to change to %s" % type_name)
+	fixture = tree.current_scene
+	await steps(1)
+	return fixture
+
+
 func unload_fixture() -> void:
 	release_all_actions()
 	tree.paused = false
+	Engine.time_scale = 1.0
+	if is_instance_valid(tree.current_scene) and tree.current_scene != fixture:
+		tree.current_scene.queue_free()
+	tree.current_scene = null
 	InputMap.load_from_project_settings()
 	for bus in ["Music", "Effects"]:
 		var index := AudioServer.get_bus_index(bus)
