@@ -6,7 +6,7 @@ Everything here is the developer's. **None of it is a physical keyboard or contr
 |---|---|---|
 | [breakage-at-3426d3b.txt](breakage-at-3426d3b.txt) | **57 deliberate breakages, all 57 caught,** with controls before and after | `3426d3b` |
 | [breakage-at-8da9a2e.txt](breakage-at-8da9a2e.txt) | The earlier run: 43, with 3 not caught. It begins with a note on how my tooling disturbed it. Superseded | `8da9a2e` |
-| [fresh-clone-at-3426d3b.txt](fresh-clone-at-3426d3b.txt) | A fresh clone from GitHub, following the README, with the suite repeated ten times. **Partial: still running when committed, at 7 of 10 repeats** | `3426d3b` |
+| [fresh-clone-at-3426d3b.txt](fresh-clone-at-3426d3b.txt) | A fresh clone from GitHub, following the README, with the suite repeated **10 of 10 clean** | `3426d3b` |
 | [fresh-clone-at-79981ea-incomplete.txt](fresh-clone-at-79981ea-incomplete.txt) | **Incomplete:** stopped after repeat 5 of 10. Superseded | `79981ea` |
 | [windows-run-summary.txt](windows-run-summary.txt) | Text output of four scripted runs of the final Windows build, and a focused test of the old key | `3426d3b` |
 | [windows/](windows/) | Screenshots of run 2, all viewed. Real GPU, real window size | `3426d3b` |

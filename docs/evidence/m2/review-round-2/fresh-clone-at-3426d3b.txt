@@ -1,4 +1,5 @@
-PARTIAL. This check was still running when this file was committed, at 7 of 10 repeats. The rest, and the Linux export check, had not finished.
+Fresh clone from GitHub at 3426d3b, following the README. Ubuntu 24.04.5, GCC 13.3.0, Godot 4.7.2. Complete.
+The RESULT line after the export is the integration suite on the exported Linux pack.
 
 commit 3426d3bb5289c35a7a694235c6f750f777acaad3
 debug build exit=0 warnings=0
@@ -23,3 +24,12 @@ repeat 4: RESULT passed=195 failed=0
 repeat 5: RESULT passed=195 failed=0 
 repeat 6: RESULT passed=195 failed=0 
 repeat 7: RESULT passed=195 failed=0 
+repeat 8: RESULT passed=195 failed=0 
+repeat 9: RESULT passed=195 failed=0 
+repeat 10: RESULT passed=195 failed=0 
+clean repeats: 10 of 10
+export-linux: created
+export-linux: new game and continue ran
+RESULT passed=195 failed=0
+export-linux: ran exit=0
+finished

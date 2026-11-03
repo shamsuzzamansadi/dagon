@@ -361,7 +361,7 @@ temporary file, with a backup taken only from a valid primary. Witness, Fleeing 
 | Check | Result | Who ran it |
 |---|---|---|
 | CI run [41682543058](https://github.com/shamsuzzamansadi/dagon/actions/runs/41682543058), Windows with MSVC 19.44.35229, Linux with g++ 11.4.0 | **83 unit test cases pass, and 195 integration tests pass from source and again on the exported pack,** on both. Extension load with 10 classes and 0 problems, smoke on each scene, art check with 0 problems, the real storage probe, and release exports that start on the main menu and run New Game and Continue: all pass | CI |
-| Fresh clone from GitHub, following the README, Ubuntu 24.04, GCC 13.3.0, Godot 4.7.2 | **Still running when this was committed.** It builds with no compiler warnings. 83 test cases and 994 assertions pass, and so do all 195 integration tests. The art check finds 0 problems, and the art regenerates identically. The suite's repeats had reached 7 of 10, all clean. The ten repeats and the Linux export check had not finished, so this line is not yet a complete result. | Developer |
+| Fresh clone from GitHub, following the README, Ubuntu 24.04, GCC 13.3.0, Godot 4.7.2 | Builds with no compiler warnings. 83 test cases and 994 assertions pass, and so do all 195 integration tests. The art check finds 0 problems, and the art regenerates identically. The suite repeated **10 of 10 clean.** The Linux release export starts on the main menu, runs New Game and Continue, and passes all 195 on its pack. [Full output](../evidence/m2/review-round-2/fresh-clone-at-3426d3b.txt) | Developer |
 
 **By suite:** movement 15, greybox 10, Shore 22, interaction 10, director and HUD 14, pause menu 18, settings 37, session 21, main menu 25, controller 23.
 
