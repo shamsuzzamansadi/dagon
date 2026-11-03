@@ -416,7 +416,8 @@ name changes. `DAGON_TEST_CONTROLLER` stands in for the driver's name ([D41](dec
 
 ### SettingsMenu : Control (M2)
 - Music volume, effects volume, keyboard bindings, Restore Defaults, Back. The volumes are stored
-  and set on the `Music` and `Effects` buses, and do nothing audible until audio exists.
+  and set on the `Music` and `Effects` buses, and do nothing audible until audio exists. `AudioNote`, a plain
+  `Label` below them, says so. It cannot take focus or clicks, and is removed when audio is connected ([D42](decisions.md)).
 - **Rebindable:** one keyboard key each for `move_left`, `move_right`, `jump` and `interact`
   ([D32](decisions.md)). Gamepad mappings are fixed for the jam.
 - **No way to get trapped:** the `ui_*` actions and `pause` cannot be rebound, so menu navigation

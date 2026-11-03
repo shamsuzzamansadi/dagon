@@ -8,7 +8,8 @@ under the ocean. Godot 4.7 with gameplay in C++20 through GDExtension.
 merged.** On `main`, the game opens on the Shore, in its accepted art direction: a sailor you can walk and jump with, on exposed
 seabed beside a stranded boat, with the sea far off. The artwork stops at the cliff opening, a known boundary: past it, the level
 carries on as unfinished greybox. The M2 branch adds a main menu, New Game, Continue from one checkpoint save, Controls, Credits,
-examining things, a pause menu, settings and key rebinding, and controller labels. There is no story, puzzle or audio yet. See
+examining things, a pause menu, settings and key rebinding, and controller labels. Volume controls and buses are prepared, but
+there is no story, puzzle or audio yet. See
 [docs/roadmap.md](docs/roadmap.md) and [docs/shore-preview.md](docs/shore-preview.md).
 
 ## Play the current build
@@ -41,7 +42,8 @@ The controller columns are the same physical buttons, by position. The prompt an
 device you are using, and an unrecognized controller is described by position.
 
 In Settings you can change the keyboard keys for walking, jumping and examining. The Left and Right arrows always move
-and Esc always pauses. Controller buttons are fixed.
+and Esc always pauses. Controller buttons are fixed. The Music and Effects sliders are saved and set on their own buses, ready
+for the audio planned in M4 and M5. This build has no audio yet, and Settings says so.
 
 All of this is checked by automated tests with simulated input for each layout. In human tests, A, D, the Left and Right arrows and
 Space have worked, and the owner reports that the Xbox controller controls they tried worked. Other Xbox actions and all

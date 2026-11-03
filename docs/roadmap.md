@@ -91,7 +91,8 @@ documents. No dimension-switching mechanic, no wider scope ([jam.md](jam.md) §4
   while the menu stays responsive.
 - Keyboard and gamepad menu navigation, reliable focus, and a usable Back/Cancel action.
 - Basic persistent settings, saved separately from game progress: music volume, effects volume and key
-  bindings. The volumes are prepared here and connected when audio exists (M4).
+  bindings. M2 delivers volume controls and buses prepared, not audio. They are connected when audio exists (M4), and until
+  then Settings says "This build has no audio yet." ([D42](decisions.md)).
 - Keyboard rebinding for gameplay actions. Conflicts are explained, defaults can be restored, and menu
   navigation and Back cannot be rebound, so nobody can trap themselves.
 
@@ -157,7 +158,8 @@ for later beats stay in M3,** as those beats arrive.
   the cliff opening.
 - Deliver a compact event-to-sound list and show the mix in gameplay. Check loop seams, abrupt transitions,
   clipping, repeated-trigger stacking and whether important cues stay audible.
-- Connect the music and effects volume settings prepared in M2.
+- Connect the music and effects volume settings prepared in M2. **When audio is connected, remove the temporary Settings note,
+  "This build has no audio yet.", and its tests** ([D42](decisions.md)).
 - **Audio is not marked complete until a person has heard it in gameplay.** Automated checks cannot do this.
 
 ### M6 verification

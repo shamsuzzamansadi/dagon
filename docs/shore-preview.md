@@ -1,7 +1,7 @@
 # The Shore artwork
 
 The accepted art direction, and what the standard build opens. It began as a bounded art test on branch
-`preview/shore-art`. On 2026-11-02 the owner accepted its overall direction: the sailor, wooden boat,
+`preview/shore-art`, since merged into `main` and deleted. On 2026-11-02 the owner accepted its overall direction: the sailor, wooden boat,
 moonlit sky, coastal palette and environment ([D19](decisions.md)).
 
 **This is not M4, and accepting the direction closes no other check.** The full first M4 deliverable remains open.

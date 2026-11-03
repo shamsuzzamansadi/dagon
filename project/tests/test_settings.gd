@@ -7,6 +7,7 @@ const ITEMS := "PauseLayer/PauseMenu/Settings/Center/Panel/Items/"
 const SETTINGS_FILE := "settings.cfg"
 const JUMP := 2
 const INTERACT := 3
+const AUDIO_NOTE := "This build has no audio yet."
 
 
 func _setup(h) -> CharacterBody2D:
@@ -590,6 +591,99 @@ func test_the_settings_screen_says_exactly_which_keys_are_kept(h) -> void:
 	await _open(h)
 	var note: String = h.fixture.get_node(ITEMS + "Note").text
 	h.check(note == "Left/Right arrows always move. Esc always pauses.", "the note reads '%s'" % note)
+
+
+## The note is temporary (D42). Remove it, and these tests, when audio is connected.
+func _check_audio_note(h, settings: Control, where: String) -> void:
+	var panel: Control = settings.get_node("Center/Panel")
+	var items: Control = panel.get_node("Items")
+	var note: Label = items.get_node("AudioNote")
+	h.check(note.text == AUDIO_NOTE, "%s: the note reads '%s'" % [where, note.text])
+	h.check(note.is_visible_in_tree(), "%s: the note is not showing" % where)
+	h.check(note.get_line_count() == 1 and note.get_visible_line_count() == 1, "%s: the note takes %d lines, %d showing" % [where, note.get_line_count(), note.get_visible_line_count()])
+	var text_size: Vector2 = note.get_theme_font("font").get_string_size(note.text, HORIZONTAL_ALIGNMENT_LEFT, -1, note.get_theme_font_size("font_size"))
+	h.check(text_size.x <= note.size.x and text_size.y <= note.size.y, "%s: the text is %s in a label of %s" % [where, text_size, note.size])
+	h.check(items.get_global_rect().encloses(note.get_global_rect()), "%s: the note is outside its panel" % where)
+	h.check(settings.get_viewport_rect().encloses(panel.get_global_rect()), "%s: the panel is clipped: %s" % [where, panel.get_global_rect()])
+	h.check(note.get_index() == items.get_node("Effects").get_index() + 1, "%s: the note is not directly below the volumes" % where)
+	h.check(note.focus_mode == Control.FOCUS_NONE, "%s: the note can take focus" % where)
+	h.check(note.mouse_filter == Control.MOUSE_FILTER_IGNORE, "%s: the note can take clicks" % where)
+
+
+func test_the_audio_note_shows_and_fits_in_both_menus(h) -> void:
+	await _setup(h)
+	_check_audio_note(h, await _open(h), "the pause menu")
+	await h.unload_fixture()
+	var title: Control = await h.load_main_fixture("res://scenes/ui/title.tscn")
+	await h.steps(3)
+	title.open_settings()
+	await h.steps(2)
+	_check_audio_note(h, title.get_node("Settings"), "the main menu")
+
+
+## Capture, refusal and conflict text make the panel taller. The longest device name makes that text longest.
+func test_the_audio_note_and_all_of_settings_fit_in_every_state(h) -> void:
+	h.use_controller("Generic USB Joystick")
+	await _setup(h)
+	var settings := await _open(h)
+	await h.tap_pad(JOY_BUTTON_DPAD_DOWN)
+	var message: Label = h.fixture.get_node(ITEMS + "Message")
+	var states := {
+		"capture": func() -> void: settings.begin_capture(JUMP),
+		"refused": func() -> void: await h.tap_key(KEY_LEFT),
+		"conflict": func() -> void: await h.tap_key(KEY_E),
+		"cancelled": func() -> void: settings.cancel_conflict(),
+	}
+	for state: String in states:
+		await states[state].call()
+		await h.steps(2)
+		_check_audio_note(h, settings, state)
+		h.check(message.get_visible_line_count() == message.get_line_count(), "%s: only %d of %d message lines show" % [state, message.get_visible_line_count(), message.get_line_count()])
+		if state == "refused":
+			h.check(message.text.contains("right face button"), "this state did not use the longest name: '%s'" % message.text)
+		if state == "conflict":
+			h.check(settings.has_conflict(), "the conflict state was not reached")
+	_block_writes(h)
+	settings.set_music_volume(0.5)
+	await h.steps(2)
+	h.check(message.text.contains("Could not save"), "the failed-save state was not reached: '%s'" % message.text)
+	_check_audio_note(h, settings, "failed save")
+	_allow_writes(h)
+
+
+func test_the_audio_note_never_takes_focus_from_keys_or_a_controller(h) -> void:
+	h.use_controller("Xbox Series Controller")
+	await _setup(h)
+	await _open(h)
+	var note: Control = h.fixture.get_node(ITEMS + "AudioNote")
+	var viewport: Viewport = note.get_viewport()
+	var rows := ["Music/Slider", "Effects/Slider", "MoveLeft/Key", "MoveRight/Key", "Jump/Key", "Interact/Key", "RestoreDefaults", "Back"]
+	var devices := {
+		"arrow keys": [func() -> void: await h.tap_key(KEY_DOWN), func() -> void: await h.tap_key(KEY_UP)],
+		"D-pad": [func() -> void: await h.tap_pad(JOY_BUTTON_DPAD_DOWN), func() -> void: await h.tap_pad(JOY_BUTTON_DPAD_UP)],
+	}
+	for device: String in devices:
+		for direction in 2:
+			var walk := rows.duplicate()
+			if direction == 1:
+				walk.reverse()
+			for path: String in walk:
+				h.check(h.fixture.get_node(ITEMS + path).has_focus(), "%s, way %d: %s does not have focus, %s does" % [device, direction, path, viewport.gui_get_focus_owner()])
+				h.check(viewport.gui_get_focus_owner() != note, "%s: the note has focus" % device)
+				await devices[device][direction].call()
+
+	# Back on the first row, the stick crosses the note too, by the same path as the D-pad.
+	var effects: Control = h.fixture.get_node(ITEMS + "Effects/Slider")
+	effects.grab_focus()
+	var down := InputEventJoypadMotion.new()
+	down.axis = JOY_AXIS_LEFT_Y
+	down.axis_value = 1.0
+	await h.send_between_ticks(down)
+	h.check(_key_button(h, "MoveLeft").has_focus(), "the stick moved focus from Effects to %s" % viewport.gui_get_focus_owner())
+	var rest := InputEventJoypadMotion.new()
+	rest.axis = JOY_AXIS_LEFT_Y
+	rest.axis_value = 0.0
+	await h.send_between_ticks(rest)
 
 
 func test_up_and_down_can_be_rebound_and_the_menu_still_works(h) -> void:

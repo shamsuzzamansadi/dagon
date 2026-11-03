@@ -354,6 +354,16 @@ func test_the_device_carries_through_the_main_menu_new_game_and_back(h) -> void:
 	menu.ask_quit_to_main_menu()
 	menu.confirm()
 	var title: Node = await h.wait_for_scene("MenuController")
+	# Controls list every connected controller whichever device is active, so they cannot show this. A key capture names the active device's button.
+	h.check(title.get_active_device() == 0, "the main menu reports device %d" % title.get_active_device())
+	title.open_settings()
+	await h.steps(1)
+	title.get_node("Settings").begin_capture(2)
+	var capture: String = title.get_node("Settings/Center/Panel/Items/Message").text
+	h.check(capture.contains(LAYOUTS[XBOX]["cancel"]), "the main menu forgot the controller: '%s'" % capture)
+	title.back()
+	title.back()
+	await h.steps(1)
 	title.open_controls()
 	h.check(title.get_node("Center/Controls/Items/Text").text.contains("Xbox controller"), "the main menu forgot the controller")
 

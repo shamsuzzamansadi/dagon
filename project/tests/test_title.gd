@@ -160,6 +160,25 @@ func test_new_game_with_no_save_saves_first_then_starts_with_the_introduction(h)
 	h.check(not text.contains("controller"), "the short introduction lists a device not in use: %s" % text)
 
 
+## Every way into the game starts from a clean slate, whatever was left behind.
+func test_starting_a_game_clears_a_time_scale_and_a_pause_left_behind(h) -> void:
+	for start: String in ["new_game", "continue_game"]:
+		if start == "continue_game":
+			_write(h, SAVE_FILE, ABYSS_SAVE)
+		var title := await _setup(h)
+		Engine.time_scale = 0.5
+		h.tree.paused = true
+		title.call(start)
+		var was_paused: bool = h.tree.paused
+		var time_scale: float = Engine.time_scale
+		h.tree.paused = false
+		Engine.time_scale = 1.0
+		h.check(not was_paused, "%s: still paused" % start)
+		h.check_near(time_scale, 1.0, 0.0, "%s: the time scale" % start)
+		await h.wait_for_scene("GameSession")
+		await h.unload_fixture()
+
+
 func test_beginning_with_the_jump_key_starts_play_without_jumping(h) -> void:
 	await _setup(h)
 	await h.tap_key(KEY_ENTER)

@@ -164,7 +164,8 @@ game music. Nothing is purchased or commissioned without the owner's approval.
 event-to-sound list and a demonstration of the mix in gameplay, checked for loop seams, abrupt
 transitions, clipping, repeated-trigger stacking, and whether important cues stay audible. The
 transition beyond the Shore must also be coherent in sound. Separate music and effects volume settings
-are prepared in M2 and connected when audio exists (§11).
+are prepared in M2 and connected when audio exists (§11). Until then, Settings says "This build has no audio yet."
+That note is removed when audio is connected.
 
 **Audio is not marked complete until a person has heard it in gameplay.**
 
@@ -266,7 +267,7 @@ this document excluded it before.
 | Screen | Options | Milestone |
 |---|---|---|
 | Pause | Resume, Restart Checkpoint, Settings, Controls, Quit to Main Menu, Quit to Desktop | M2 |
-| Settings | Music volume, effects volume, keyboard bindings, Restore Defaults, Back | M2 |
+| Settings | Music volume, effects volume, keyboard bindings, Restore Defaults, Back, and a temporary note that there is no audio yet | M2 |
 | Main menu, on launch | New Game, Continue, Settings, Controls, Credits, Quit to Desktop | M2 |
 | Controls | Movement, jumping, examining, pausing and menus, on keyboard with the current keys and on controller. Starting a new game shows a short version for the device in use | M2 |
 | Credits | Attribution and licenses, from the project's records | M2 |
@@ -285,7 +286,7 @@ rebound, so nobody can lock themselves out. The Up and Down arrows can be reboun
 mappings are fixed for the jam.
 
 **Settings** persist between runs and are stored separately from game progress. The volumes do nothing audible
-until audio exists.
+until audio exists, and a short note in Settings says so until then.
 
 **One checkpoint save slot.**
 - Continue restores the last safe checkpoint, including after the application has been closed and reopened.

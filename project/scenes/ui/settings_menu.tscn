@@ -68,6 +68,12 @@ max_value = 1.0
 step = 0.1
 value = 1.0
 
+[node name="AudioNote" type="Label" parent="Center/Panel/Items"]
+custom_minimum_size = Vector2(232, 0)
+layout_mode = 2
+text = "This build has no audio yet."
+autowrap_mode = 2
+
 [node name="MoveLeft" type="HBoxContainer" parent="Center/Panel/Items"]
 layout_mode = 2
 
