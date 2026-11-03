@@ -390,7 +390,9 @@ This is a guard plus one deferred step, not an event framework.
   `process_mode` is Always, so the menu stays responsive while movement, timers and clips
   stop.
 - **Focus:** a control always has focus while a menu is open, for keyboard and gamepad.
-  Returning from a submenu gives focus back to the control that opened it.
+  Returning from a submenu gives focus back to the control that opened it. If focus is ever lost, the next press
+  returns it to a visible control on the active screen, and inside a conflict's choice during a conflict, without
+  changing anything else.
 - **Back** (`ui_cancel`: Esc, gamepad east) closes one level, and the input is marked
   as handled so that one press cannot do two things. At the pause root it resumes. At the main menu
   root it does nothing, so nobody quits by accident. In a confirmation it cancels.
@@ -409,15 +411,17 @@ This is a guard plus one deferred step, not an event framework.
 - **Rebindable:** one keyboard key each for `move_left`, `move_right`, `jump` and `interact`
   ([D32](decisions.md)). Gamepad mappings are fixed for the jam.
 - **No way to get trapped:** the `ui_*` actions and `pause` cannot be rebound, so menu navigation
-  and Back always work, whatever the gameplay bindings are. The arrow keys stay on movement and Esc stays
-  on pause, and neither can be assigned elsewhere.
+  and Back always work, whatever the gameplay bindings are. The Left and Right arrows stay on movement and Esc
+  stays on pause, and those three cannot be assigned elsewhere. Up and Down can be rebound, and still navigate
+  menus, because menus use their own actions.
 - **Capture:** the next key press becomes the binding. Esc or gamepad Back cancels with no change, and Esc
   cannot be bound. While capturing, the menu consumes all input.
 - **Conflicts:** the row explains which action already has the key and offers Swap or Cancel, so no
   action can end up without a key.
 - Restore Defaults can always be reached from keyboard and gamepad.
 - **If a write fails,** the player is told, the change still applies, and the menu keeps it until a later write
-  succeeds or the player quits.
+  succeeds or the player quits. The warning shows for as long as something is unsaved, including on reopening.
+  Capture and conflict text replaces it, and it returns when they end. A good write removes it.
 
 ### GameSession : Node (M3)
 The root of `game.tscn`. Its children are the world, an instance of the level from an exported `PackedScene`, and the

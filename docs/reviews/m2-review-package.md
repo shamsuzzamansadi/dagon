@@ -1,21 +1,26 @@
 # M2 Review Package
 
-**To:** ChatGPT (independent reviewer), and the owner for the manual checks. **Date:** 2026-11-02.
-**Status: implemented on branch `m2/interaction-and-usability`, at the M2 review gate, not merged. M2 is not accepted.**
-No review or rerun of this implementation is reported yet. Please state which checks you rerun and which rely on the
-supplied CI evidence.
+**To:** ChatGPT (independent reviewer), and the owner for the manual checks. **Date:** 2026-11-03.
+**Status: implemented on branch `m2/interaction-and-usability`, review round 1 corrected (§10), at the M2 review gate, not merged.
+M2 is not accepted:** that waits on the focused follow-up review and the owner's manual checks (§8). Please state which checks you
+rerun and which rely on the supplied CI evidence.
 
 - **Repository:** https://github.com/shamsuzzamansadi/dagon, branch `m2/interaction-and-usability`
 - **Base:** `main` at `6c7eae2`, where M1 is accepted with documented deferrals
 - **Commits:** `c1f1ca6` implements M2, `23511f0` names failed tests in CI annotations, `6ea0509` fixes a focus bug and
-  corrects a test, then a commit adds the CI storage probe. Later commits change only documents.
+  corrects a test, `9748394` adds the CI storage probe, `37f26fd` adds this package, and **`24882e3` corrects review round 1**. Later
+  commits change only documents.
 
 **Who has verified what:**
 
 | Result | Who ran it |
 |---|---|
-| 58 unit test cases, 107 integration tests, extension load, smoke on both scenes, release exports, Linux and MSVC | **CI and the developer** (§3). Not independently rerun. |
-| Deliberate breakage | **Developer** (§4) |
+| 58 native unit test cases (856 assertions) and the art check, at `37f26fd` | **Independently rerun by the reviewer** |
+| The M2 source, scenes, tests, storage paths and CI configuration, at `37f26fd` | **Reviewed by the reviewer,** with the findings in §10 |
+| CI run 41454712313 succeeded for `37f26fd` on both platforms | **Checked by the reviewer** through the GitHub API |
+| Godot integration tests, extension load, smoke, rendering and release exports | **CI and the developer** (§3, §10). Not rerun by the reviewer, because Godot was unavailable. |
+| The review round 1 fixes at `24882e3` | **CI and the developer** (§10). Not yet reviewed. |
+| Deliberate breakage | **Developer** (§4, §10) |
 | The screens, from scripted captures with software rendering | **Developer** |
 | Physical keyboard, physical controller, real GPU, how any of it feels | **Nobody yet** (§7) |
 
@@ -62,6 +67,8 @@ restore yet, so it does not rebuild the world. From M3 it does (`GameSession`).
 
 ## 3. Results
 
+**The latest results are in §10.** This section records the first complete run, before review round 1.
+
 CI run [41453463059](https://github.com/shamsuzzamansadi/dagon/actions/runs/41453463059), commit `6ea0509`:
 
 | Check | Linux (g++ 11.4.0) | Windows (MSVC 19.44.35229) |
@@ -104,8 +111,8 @@ then its test was corrected and it is now caught.** Not exercised: the read-back
 
 ## 6. For your judgment
 
-1. **One rebindable key per action (D32).** The arrow keys and Esc are kept, and cannot be assigned elsewhere. This makes
-   lockout and unbound actions impossible by construction, at the cost of some flexibility.
+1. **One rebindable key per action (D32).** The Left and Right arrows and Esc are kept, and cannot be assigned elsewhere.
+   This makes lockout and unbound actions impossible by construction, at the cost of some flexibility. Up and Down stay free.
 2. **`GameDirector` starts in M2 (D31),** with only the session checkpoint and kill plane, so no temporary class is needed.
 3. **`reset_global_state()` leaves settings alone (D33).** This narrows architecture §7 rule 8, which said it would
    re-apply them. Nothing else may change them, so the reset has nothing to undo.
@@ -123,33 +130,30 @@ then its test was corrected and it is now caught.** Not exercised: the read-back
 - **Slider focus** is a brighter grabber and track, quieter than the button outline. Whether that is clear enough is a
   manual check.
 - **UI styling** is functional, not the M4 pass. Interactable rim highlights (GDD §3) are deferred to M4.
-- **Mouse:** buttons respond to it, but no test covers it, because the requirement was keyboard and gamepad.
+- **Mouse:** buttons respond to it, and one test covers a click on empty space. The requirement was keyboard and gamepad.
 
 ## 8. Manual test checklist (owner)
 
-**First, note which build you are testing:** the run ID or commit, from the Actions page you downloaded it from. Later
-milestones identify the exact artifact, as D29 requires. Expected throughout: no audio, and art ending at the cliff opening.
+**First, note which build you are testing:** the run ID or commit, from the Actions page you downloaded it from, as D29 requires.
+Expected throughout: no audio, and art ending at the cliff opening.
 
-1. **Start:** the game opens beside the boat with `[E] Examine` showing.
-2. **Examine:** press E. A caption appears and fades after about 4 seconds, and you can keep walking meanwhile. Walk right to
-   the fish by the rock and press E there.
-3. **Pause:** press Esc. The sailor and the sea stop, and Resume is highlighted. Esc again resumes.
-4. **Menu navigation:** pause, move with the arrow keys, choose with Enter or Space. Can you always tell what is highlighted,
-   including on the volume sliders?
-5. **Resume with Space:** choose Resume by pressing Space. The sailor should not jump.
-6. **Rebind:** pause, Settings. Choose Jump and press J. Resume: J jumps and Space does not.
-7. **Conflict:** in Settings, choose Interact and press J. It should say J is already Jump, and offer Swap or Cancel. Swap,
-   resume, and check that the prompt beside the boat now names the new key.
-8. **Lockout:** in Settings, choose Jump and press Left Arrow. It should refuse, and Esc should cancel.
-9. **Persistence:** rebind something, then pause and Quit to Desktop. It should ask first, with Cancel highlighted, and say
-   progress is not saved. Quit, relaunch, and check that the binding is still there.
-10. **Restore Defaults:** Settings, Restore Defaults. A, D, Space and E should work again.
-11. **Checkpoint:** walk right through the cleft and past the trench. Pause, Restart Checkpoint: you return just past the
-    trench, unpaused. In a fresh launch, before going that far, it returns you to the boat.
+1. **Focus:** pause, then click empty space and the panel title with the mouse. The highlight should stay put, and the arrow keys
+   should keep working. In Settings, click a slider, then carry on with the arrow keys. Can you always tell what is highlighted,
+   including on the sliders? *Losing focus outright has no ordinary trigger, so its recovery is covered by automated tests only (§10).*
+2. **Rebinding:** in Settings, set Jump to J. Resume: J jumps and Space does not. Set Jump to the Up arrow: the Up arrow still moves up
+   in menus, and jumps in the game.
+3. **Conflicts:** set Interact to the key Jump has. It should name the clash and offer Swap or Cancel. Swap, and check that the prompt
+   beside the boat names the new key.
+4. **Lockout:** try setting Jump to the Left arrow, then the Right arrow. Both should be refused, and Esc should cancel.
+5. **Persistence after relaunch:** rebind something, pause, Quit to Desktop. It should ask first, with Cancel highlighted, and say
+   progress is not saved. Quit, relaunch: the binding should still be there. Then Restore Defaults: A, D, Space and E work again.
+6. **Resume without jumping:** pause, then choose Resume by pressing Space. The sailor should not jump.
+7. **Checkpoint restart:** Restart Checkpoint returns you to the boat, unpaused. Walk through the cleft and past the trench, then
+   Restart Checkpoint again: you return just past the trench.
 
-**Please report:** the build, anything confusing or wrong, and how the menus and captions read on your display. A controller
-is optional here (Start, D-pad, south and east buttons, and `[X]` in the prompt), since physical gamepad testing stays deferred
-to M6. Reporting the renderer is also optional: start the game with `--log-file playtest.log` and find `Using Device`.
+**Please report:** the build, anything confusing or wrong, and how the menus and captions read on your display. Physical gamepad
+testing and native Linux GPU validation stay deferred to M6, so a controller is optional here. Reporting the renderer is also
+optional: start the game with `--log-file playtest.log` and find `Using Device`.
 
 ## 9. Carried to M3
 
@@ -161,3 +165,42 @@ to M6. Reporting the renderer is also optional: start the game with `--log-file 
 - `GameDirector` gains `StoryProgress` and the session checkpoint moves to `GameSession`. Overlap re-checks after a beat are
   M3 too, since M2's layout has no trigger inside another.
 - `storage::replace_file` gains the backup rules for saves.
+
+## 10. Review round 1
+
+**Reported by the reviewer (ChatGPT) on `37f26fd`, relayed by the owner.** The findings came from source inspection, not from
+running the engine. Each was reproduced with a regression test before anything was changed
+([before the fixes](../evidence/m2/review-round-1/before-the-fixes.txt): 9 tests failing on the unfixed code).
+
+| Finding | Reproduced? | Fix | Regression tests |
+|---|---|---|---|
+| **1. Settings focus recovery** used a hidden main-menu button | **Yes, and worse than described.** The engine releases focus from a hidden control at once, so focus stayed empty and could never come back anywhere in Settings or a conflict. | Recovery follows the active screen. Settings returns to a visible control, and a conflict returns to Swap without ending it. Nothing pending is reset. | `test_focus_lost_in_settings_comes_back_to_a_usable_control`, `test_focus_lost_in_a_conflict_comes_back_inside_the_choice`, `test_losing_focus_during_a_capture_changes_nothing`, `test_recovering_focus_keeps_unsaved_settings`, and two more in the pause menu suite |
+| **2. Save-status feedback:** a stale warning after a good write, and none on reopening | **Yes, both.** The same fault also hid the warning when a capture or conflict was cancelled, or an unchanged key chosen. | The warning shows exactly while something is unsaved. Capture and conflict text replaces it, and it returns when they end. | `test_a_good_write_removes_the_warning_on_the_same_screen`, `test_reopening_with_unsaved_changes_still_says_so`, `test_instructions_replace_the_warning_and_it_returns_afterwards` |
+| **3. Reserved-key wording** said "arrow keys", but only Left, Right and Esc are reserved | **Wording only.** `test_up_and_down_can_be_rebound_and_the_menu_still_works` passed on the unfixed code, so no behaviour needed changing, and no key was newly reserved. | The screen says "Left/Right arrows always move. Esc always pauses." D32, the GDD, the architecture and the README match. | That test, and `test_the_settings_screen_says_exactly_which_keys_are_kept` |
+
+**Found while fixing these, in the same family, and also fixed:**
+- The quit confirmation always said "Your settings are kept", even after a failed save. It now says otherwise.
+  `test_quitting_with_unsaved_settings_does_not_claim_they_are_kept`
+- "Defaults restored." stayed on screen after a later change, and a restore after an earlier failure needed care to report
+  correctly. `test_restore_defaults_reports_what_really_happened`
+
+**Nothing was disproved, but one correction to my own reasoning:** my code comment said a mouse click on empty space drops focus. Measured on
+4.7.2, it does not, and focus stays where it was. `test_clicking_empty_space_keeps_focus_and_the_keyboard_working` records that, and
+the comment is corrected. So finding 1 is real whenever focus is lost, but I found no ordinary way for a player to lose it: this is a
+defensive recovery. That is why the manual checklist cannot trigger it directly.
+
+**Can the new tests fail?** [10 deliberate breakages](../evidence/m2/review-round-1/breakage-of-the-fixes.txt), one at a time, including
+each original bug put back: all 10 were caught, and the control passed before and after.
+
+**Results at `24882e3`:**
+
+| Check | Result | Who ran it |
+|---|---|---|
+| CI run [41630751633](https://github.com/shamsuzzamansadi/dagon/actions/runs/41630751633), Windows with MSVC 19.44.35229, Linux with g++ 11.4.0 | 58 unit test cases and **121 integration tests** pass on both. Smoke on both scenes, art check, the real storage probe, and release exports starting in `shore.tscn`, headless: all pass. | CI |
+| Fresh clone of the commit, Ubuntu 24.04, GCC 13.3.0, Godot 4.7.2 | The same tests pass, and the integration suite repeated **10 of 10 clean** | Developer |
+
+**By suite now:** movement 15, greybox 10, Shore 22, interaction 10, director and HUD 15, pause menu 17, settings 32.
+
+**The reviewer has not reviewed these fixes, rerun the Godot tests, or accepted M2.** M2 acceptance stays pending the focused follow-up
+review and the owner's manual checks (§8).
+

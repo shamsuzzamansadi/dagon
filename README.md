@@ -35,11 +35,11 @@ The game opens in a 1440×810 window. To quit, close the window, or use the paus
 | Pause | Esc | Start |
 | Menus: move, choose, back | Arrow keys, Enter or Space, Esc | D-pad or left stick, south button, east button (B / Circle) |
 
-In Settings you can change the keyboard keys for walking, jumping and examining. The arrow keys always move and Esc
-always pauses.
+In Settings you can change the keyboard keys for walking, jumping and examining. The Left and Right arrows always move
+and Esc always pauses.
 
-These are checked by automated tests with simulated input. A, D, the arrow keys and Space have also worked in a
-human test. Physical controllers are untested so far, and testing them is deferred to M6, before release.
+These are checked by automated tests with simulated input. A, D, the Left and Right arrows and Space have also worked in
+a human test. Physical controllers are untested so far, and testing them is deferred to M6, before release.
 
 ## Scenes
 

@@ -274,8 +274,9 @@ Pausing stops gameplay while the menu stays responsive.
 
 **Rebinding.** One keyboard key for each gameplay action can be changed. If a key is already in use, the game says
 which action has it and lets the player swap or cancel, so no action is left without a key. Restore Defaults is
-always reachable. Menu navigation, Back, the Esc pause key and the arrow keys for movement cannot be rebound, so
-nobody can lock themselves out. Gamepad mappings are fixed for the jam.
+always reachable. Menu navigation, Back, the Esc pause key and the Left and Right arrows for movement cannot be
+rebound, so nobody can lock themselves out. The Up and Down arrows can be rebound, and still navigate menus. Gamepad
+mappings are fixed for the jam.
 
 **Settings** persist between runs and are stored separately from game progress. The volumes do nothing audible
 until audio exists.

@@ -1,0 +1,39 @@
+The new regression tests run against the unfixed code at 37f26fd, before any fix. Linux, GCC 13.3.0, Godot 4.7.2.
+Only the tests had changed: the extension library was the one built from 37f26fd.
+
+integration: FAILED exit=1
+FAIL test_settings.test_focus_lost_in_settings_comes_back_to_a_usable_control
+     after Down key, focus is on <Object#null>
+     after D-pad, focus is on <Object#null>
+     after Enter, focus is on <Object#null>
+     after south button, focus is on <Object#null>
+     recovered to <Object#null>
+     the recovered slider after a press left: expected 0.900 ±0.001, got 1.000
+     focus did not move on: <Object#null>
+FAIL test_settings.test_focus_lost_in_a_conflict_comes_back_inside_the_choice
+     after Down key, focus is on <Object#null>
+     after D-pad, focus is on <Object#null>
+     after Enter, focus is on <Object#null>
+     after south button, focus is on <Object#null>
+     recovered to <Object#null>
+     the recovered Swap did nothing
+     the recovered Swap did not swap
+FAIL test_settings.test_losing_focus_during_a_capture_changes_nothing
+     after the capture, focus is on <Object#null>
+FAIL test_settings.test_a_good_write_removes_the_warning_on_the_same_screen
+     the warning stayed after a good write: 'Could not save settings. They last until you quit.'
+FAIL test_settings.test_reopening_with_unsaved_changes_still_says_so
+     reopening hid the warning: ''
+     restarting hid the warning: ''
+FAIL test_settings.test_instructions_replace_the_warning_and_it_returns_afterwards
+     cancelling a capture hid the warning: ''
+     cancelling a conflict hid the warning: ''
+     an unchanged key hid the warning: ''
+FAIL test_settings.test_restore_defaults_reports_what_really_happened
+     the confirmation outlived a later change: 'Defaults restored.'
+FAIL test_settings.test_quitting_with_unsaved_settings_does_not_claim_they_are_kept
+     it claims unsaved settings are kept: 'Quit to desktop? This version does not save your progress. Your settings are kept.'
+     it does not mention the failed save: 'Quit to desktop? This version does not save your progress. Your settings are kept.'
+FAIL test_settings.test_the_settings_screen_says_exactly_which_keys_are_kept
+     the note reads 'The arrow keys always move. Esc always pauses.'
+RESULT passed=111 failed=9

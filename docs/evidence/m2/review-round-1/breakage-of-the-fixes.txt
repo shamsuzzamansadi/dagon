@@ -1,0 +1,102 @@
+Deliberate breakage of the review round 1 fixes, at 24882e3, in a scratch clone, with user:// redirected. One change at a time.
+
+=== control: no change
+RESULT passed=121 failed=0
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped
+
+=== the original bug: recovery ignores the Settings screen
+FAIL test_settings.test_focus_lost_in_settings_comes_back_to_a_usable_control
+     after Down key, focus is on <Object#null>
+     after D-pad, focus is on <Object#null>
+     after Enter, focus is on <Object#null>
+     after south button, focus is on <Object#null>
+     recovered to <Object#null>
+     the recovered slider after a press left: expected 0.900 ±0.001, got 1.000
+     focus did not move on: <Object#null>
+FAIL test_settings.test_focus_lost_in_a_conflict_comes_back_inside_the_choice
+     after Down key, focus is on <Object#null>
+     after D-pad, focus is on <Object#null>
+     after Enter, focus is on <Object#null>
+     after south button, focus is on <Object#null>
+     recovered to <Object#null>
+     the recovered Swap did nothing
+     the recovered Swap did not swap
+FAIL test_settings.test_losing_focus_during_a_capture_changes_nothing
+     after the capture, focus is on <Object#null>
+RESULT passed=118 failed=3
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped
+
+=== recovery escapes a conflict's choice
+FAIL test_settings.test_focus_lost_in_a_conflict_comes_back_inside_the_choice
+     after Down key, focus is on Slider:<HSlider#964136273451>
+     after D-pad, focus is on Slider:<HSlider#964136273451>
+     after Enter, focus is on Slider:<HSlider#964136273451>
+     after south button, focus is on Slider:<HSlider#964136273451>
+     recovered to Slider:<HSlider#964136273451>
+     the recovered Swap did nothing
+     the recovered Swap did not swap
+RESULT passed=120 failed=1
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped
+
+=== the original bug: a good write keeps the warning
+FAIL test_settings.test_a_failed_write_is_reported_and_the_change_still_applies
+     the failure message stayed after a good write: 'Could not save settings. They last until you quit.'
+FAIL test_settings.test_a_good_write_removes_the_warning_on_the_same_screen
+     the warning stayed after a good write: 'Could not save settings. They last until you quit.'
+FAIL test_settings.test_instructions_replace_the_warning_and_it_returns_afterwards
+     a change during a conflict wiped its explanation: 'Could not save settings. They last until you quit.'
+FAIL test_settings.test_restore_defaults_reports_what_really_happened
+     the confirmation outlived a later change: 'Defaults restored.'
+RESULT passed=117 failed=4
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped
+
+=== the original bug: reopening hides the warning
+FAIL test_settings.test_reopening_with_unsaved_changes_still_says_so
+     reopening hid the warning: ''
+     restarting hid the warning: ''
+RESULT passed=120 failed=1
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped
+
+=== ending a capture hides the warning
+FAIL test_settings.test_instructions_replace_the_warning_and_it_returns_afterwards
+     cancelling a capture hid the warning: ''
+     an unchanged key hid the warning: ''
+RESULT passed=120 failed=1
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped
+
+=== a change wipes a conflict's explanation
+FAIL test_settings.test_instructions_replace_the_warning_and_it_returns_afterwards
+     a change during a conflict wiped its explanation: 'Could not save settings. They last until you quit.'
+RESULT passed=120 failed=1
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped
+
+=== Restore Defaults claims success after a failed write
+FAIL test_settings.test_restore_defaults_reports_what_really_happened
+     a failed restore was not reported: 'Defaults restored.'
+RESULT passed=120 failed=1
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped
+
+=== the original bug: quitting always claims settings are kept
+FAIL test_settings.test_quitting_with_unsaved_settings_does_not_claim_they_are_kept
+     it claims unsaved settings are kept: 'Quit to desktop? This version does not save your progress. Your settings are kept.'
+     it does not mention the failed save: 'Quit to desktop? This version does not save your progress. Your settings are kept.'
+RESULT passed=120 failed=1
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped
+
+=== Up is reserved as well
+FAIL test_settings.test_up_and_down_can_be_rebound_and_the_menu_still_works
+     Up was not accepted: [32]
+     the rows did not update
+     Up did not jump in the game
+RESULT passed=120 failed=1
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped
+
+=== the screen says the arrow keys again
+FAIL test_settings.test_the_settings_screen_says_exactly_which_keys_are_kept
+     the note reads 'The arrow keys always move. Esc always pauses.'
+RESULT passed=120 failed=1
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped
+
+=== control again: no change
+RESULT passed=121 failed=0
+[doctest] test cases:  58 |  58 passed | 0 failed | 0 skipped
