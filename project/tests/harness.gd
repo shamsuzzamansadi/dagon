@@ -15,6 +15,7 @@ var probe: Node
 var failures: PackedStringArray = []
 var storage_dir: String
 var _run_storage_dir: String
+var _expected_errors := {}
 
 
 func _init(p_tree: SceneTree) -> void:
@@ -87,18 +88,29 @@ func wait_for_scene(type_name: String, max_steps := 60) -> Node:
 	return fixture
 
 
-## For a test that sets out to produce an engine error: nothing it logs reaches the console or the runner's
-## trap until this ends, so keep it narrow, and check the failure some other way.
-func quiet_errors() -> void:
-	Engine.print_error_messages = false
+## For a test that sets out to cause an engine error. The runner fails a test on any error it logs, except one whose
+## text contains this. It also fails the test if no such error ever came, so a test cannot expect something by habit.
+func expect_error(text: String) -> void:
+	_expected_errors[text] = false
 
 
-func loud_errors() -> void:
-	Engine.print_error_messages = true
+func accepts_error(error: String) -> bool:
+	for text: String in _expected_errors:
+		if error.contains(text):
+			_expected_errors[text] = true
+			return true
+	return false
+
+
+func unseen_expected_errors() -> Array[String]:
+	var unseen: Array[String] = []
+	for text: String in _expected_errors:
+		if not _expected_errors[text]:
+			unseen.append(text)
+	return unseen
 
 
 func unload_fixture() -> void:
-	loud_errors()
 	release_all_actions()
 	tree.paused = false
 	Engine.time_scale = 1.0

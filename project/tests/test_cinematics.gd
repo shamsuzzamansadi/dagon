@@ -1,6 +1,6 @@
 extends RefCounted
 ## The cinematic contract, architecture §5 and §8, on a small arena whose clips last a quarter of a second.
-## A test that meets a broken clip checks the Director's report, as the engine's own error line is silenced for it.
+## A test that meets a broken clip names the error it expects, and any other error still fails it.
 
 const ARENA := "res://tests/fixtures/story_arena.tscn"
 const SHORE := 0
@@ -304,11 +304,10 @@ func _check_awaken_recovered(h, how: String) -> void:
 	director.contract_error.connect(func(message: String) -> void: errors.append(message))
 	director.checkpoint_reached.connect(func(beat: int) -> void: saved.append(beat))
 	_break_clip(h, &"monolith_awaken", how)
-	h.quiet_errors()
+	h.expect_error(_reason(how))
 	_solve(h)
 	await _finish_clip(h)
 	await _settle(h)
-	h.loud_errors()
 	h.check(errors.size() == 1 and errors[0].contains(_reason(how)), "%s: reported %s" % [how, str(errors)])
 	h.check(director.get_beat() == AWAKENED, "%s: beat %d" % [how, director.get_beat()])
 	h.check(_gate(h).collision_layer == 0, "%s: the gate stayed solid" % how)
@@ -349,11 +348,10 @@ func _check_reveal_recovered(h, how: String) -> void:
 	var beats := _log_beats(h)
 	director.contract_error.connect(func(message: String) -> void: errors.append(message))
 	_break_clip(h, &"dagon_reveal", how)
-	h.quiet_errors()
+	h.expect_error(_reason(how))
 	await h.stand_at(_player(h), Vector2(WITNESS_X, -2))
 	await _finish_clip(h)
 	await _settle(h)
-	h.loud_errors()
 	h.check(errors.size() == 1 and errors[0].contains(_reason(how)), "%s: reported %s" % [how, str(errors)])
 	h.check(beats == [WITNESS, FLEEING], "%s: beats ran %s" % [how, str(beats)])
 	h.check(_player(h).is_control_enabled(), "%s: control stayed locked" % how)
@@ -384,10 +382,9 @@ func _check_collapse_recovered(h, how: String) -> void:
 	var errors := []
 	_director(h).contract_error.connect(func(message: String) -> void: errors.append(message))
 	_break_clip(h, &"collapse", how)
-	h.quiet_errors()
+	h.expect_error(_reason(how))
 	_player(h).teleport(Vector2(COLLAPSE_X, -2))
 	var ending: Node = await h.wait_for_scene("MenuController", 240)
-	h.loud_errors()
 	h.check(errors.size() == 1 and errors[0].contains(_reason(how)), "%s: reported %s" % [how, str(errors)])
 	h.check(ending.get_node_or_null("Center/Card") != null, "%s: the scene after the collapse is %s" % [how, ending.name])
 	h.check(not h.tree.paused, "%s: the ending is paused" % how)
@@ -413,10 +410,9 @@ func test_a_scene_with_no_clip_player_at_all_still_progresses(h) -> void:
 	await h.load_with(arena)
 	var errors := []
 	director.contract_error.connect(func(message: String) -> void: errors.append(message))
-	h.quiet_errors()
+	h.expect_error("missing")
 	_solve(h)
 	await _settle(h)
-	h.loud_errors()
 	h.check(errors.size() == 1, "reported %s" % str(errors))
 	h.check(director.get_beat() == AWAKENED, "beat %d" % director.get_beat())
 	h.check(_gate(h).collision_layer == 0, "the gate stayed solid")
@@ -431,9 +427,8 @@ func test_the_watchdog_stops_a_stuck_clip_so_its_method_track_cannot_move_the_ca
 	var clips := _clips(h)
 	h.check(director.start_cinematic(&"late_aim"), "the clip did not start")
 	clips.speed_scale = 0.0
-	h.quiet_errors()
+	h.expect_error("deadline")
 	await _finish_clip(h)
-	h.loud_errors()
 	h.check(errors.size() == 1, "reported %s" % str(errors))
 	h.check(not clips.is_playing(), "the watchdog left the clip playing")
 	clips.speed_scale = 1.0
@@ -449,9 +444,8 @@ func test_the_watchdog_waits_for_the_clips_own_length_plus_the_margin(h) -> void
 	# 0.25 s of clip and 2 s of margin: 135 frames.
 	await h.steps(125)
 	h.check(director.is_cinematic_active(), "the watchdog fired early")
-	h.quiet_errors()
+	h.expect_error("deadline")
 	await h.steps(20)
-	h.loud_errors()
 	h.check(not director.is_cinematic_active(), "the watchdog did not fire")
 
 
@@ -466,9 +460,8 @@ func test_starting_a_cinematic_during_one_is_refused_and_leaves_it_untouched(h) 
 	h.check(director.start_cinematic(&"side_show"), "the first did not start")
 	var generation: int = director.get_generation()
 	await h.steps(2)
-	h.quiet_errors()
+	h.expect_error("refused")
 	h.check(not director.start_cinematic(&"late_aim"), "the second was not refused")
-	h.loud_errors()
 	h.check(errors.size() == 1, "reported %s" % str(errors))
 	h.check(director.is_cinematic_active() and director.get_active_clip() == &"side_show", "the active one is now '%s'" % director.get_active_clip())
 	h.check(director.get_generation() == generation, "the generation moved")
@@ -582,9 +575,8 @@ func test_a_second_pending_event_is_a_reported_logic_error(h) -> void:
 	director.contract_error.connect(func(message: String) -> void: errors.append(message))
 	director.start_cinematic(&"side_show")
 	director.on_puzzle_solved()
-	h.quiet_errors()
+	h.expect_error("pending")
 	director.on_puzzle_solved()
-	h.loud_errors()
 	h.check(errors.size() == 1 and errors[0].contains("pending"), "reported %s" % str(errors))
 	await h.wait_until(func() -> bool: return beats == [AWAKENED], 30, "the one pending event to apply")
 	await _finish_clip(h)

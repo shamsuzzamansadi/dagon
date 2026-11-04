@@ -227,9 +227,8 @@ func test_an_unknown_id_is_a_reported_wiring_bug_with_no_effect(h) -> void:
 	puzzle.submit(&"glyph_wave")
 	puzzle.failed.connect(func() -> void: trap.append("failed"))
 	puzzle.step_accepted.connect(func(_index: int) -> void: trap.append("accepted"))
-	h.quiet_errors()
+	h.expect_error("not in the solution")
 	puzzle.submit(&"not_a_stone")
-	h.loud_errors()
 	h.check(trap.is_empty(), "an unknown id gave %s" % str(trap))
 	h.check(puzzle.get_progress() == 1 and not puzzle.is_rejecting(), "an unknown id changed the attempt")
 
@@ -292,10 +291,9 @@ func test_the_mural_reads_differently_before_and_after_and_a_missing_clip_change
 	clips.remove_animation_library(&"")
 	library.remove_animation(&"monolith_awaken")
 	clips.add_animation_library(&"", library)
-	h.quiet_errors()
+	h.expect_error("missing")
 	for id in [&"glyph_wave", &"glyph_kneel", &"glyph_eye"]:
 		_puzzle(h).submit(id)
-	h.loud_errors()
 	await h.steps(2)
 	h.check(mural.caption.contains("swimmer"), "the second caption reads '%s'" % mural.caption)
 	h.check(mural.caption != before, "the caption did not change")

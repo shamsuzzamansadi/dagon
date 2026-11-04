@@ -261,8 +261,7 @@ so designers tune them in the inspector. Each class implements
 - **Exports (additional):** `flee_timeout` (s, default 12), `kill_plane_path`, `puzzle_path`, `mural_path`, `mural_solved_caption`, and
   `awakened_visuals` (what the Awakened beat shows, such as the lit mural).
 - **Signals:** `checkpoint_reached(index)` for savable beats only, once finalized. `beat_changed`, `cinematic_started`,
-  `cinematic_finalized`, `overlap_rechecked`, `player_respawned`. `contract_error` repeats each `push_error` of this contract, so a test can see one
-  with the engine's own error line silenced.
+  `cinematic_finalized`, `overlap_rechecked`, `player_respawned`. `contract_error` repeats each `push_error` of this contract, so a test can count them and read what they say.
 - **Inputs:**
   - `triggered` from every node in `story_triggers`. The Director connects
     these itself in `_ready`, because it already holds the list.
@@ -669,8 +668,8 @@ catches any that do not.
 Reports always state which of these levels actually ran.
 
 **Headless integration-test rules (review round 2, item 7):**
-- **A test that sets out to produce an engine error** silences it with `h.quiet_errors()`, because the runner fails a test on any logged error, and checks the
-  Director's `contract_error` signal or the outcome instead. The window stays narrow, as it hides everything else too.
+- **A test that sets out to cause an engine error** names it with `h.expect_error(text)`, because the runner fails a test on any logged error. Any other error still fails it, and so does
+  expecting one that never comes. `tools/run_godot_checks.sh` ignores only those messages, and only in the integration step.
 - **Fixed physics tick:** `physics/common/physics_ticks_per_second = 60` in
   `project.godot`, run with `--fixed-fps 60`, and a test asserts both the tick
   rate and that one probe step equals one physics tick. Neither is claimed to

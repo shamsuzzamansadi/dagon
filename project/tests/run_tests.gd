@@ -122,7 +122,10 @@ func _run() -> void:
 			await instance.call(test_name, harness)
 			await harness.unload_fixture()
 			for error in _trap.take():
-				harness.fail("logged error: %s" % error)
+				if not harness.accepts_error(error):
+					harness.fail("logged error: %s" % error)
+			for text in harness.unseen_expected_errors():
+				harness.fail("expected an error that never came: %s" % text)
 			if harness.failures.is_empty():
 				passed += 1
 				print("PASS %s.%s" % [suite_name, test_name])
