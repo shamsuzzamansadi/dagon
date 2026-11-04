@@ -700,7 +700,7 @@ tracks/2/keys = {
 "times": PackedFloat32Array(2, 3.5, 5, 6.5, 8, 9.5),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
 "update": 0,
-"values": [Vector2(0, 0), Vector2(0, 2), Vector2(0, 0), Vector2(0, 2), Vector2(0, 0), Vector2(0, 2)]
+"values": [Vector2(0, 0), Vector2(0, 4), Vector2(0, 0), Vector2(0, 4), Vector2(0, 0), Vector2(0, 4)]
 }
 tracks/3/type = "value"
 tracks/3/imported = false
@@ -908,6 +908,10 @@ scroll_scale = Vector2(0.5, 1)
 color = Color(0.06, 0.08, 0.115, 1)
 polygon = PackedVector2Array(610, 60, 610, -22, 660, -30, 720, -34, 800, -34, 860, -28, 910, -20, 910, 60)
 
+[node name="Haze" type="Polygon2D" parent="RitualLayer"]
+color = Color(0.2, 0.27, 0.3, 1)
+polygon = PackedVector2Array(650, -28, 655, -66, 690, -86, 740, -94, 800, -88, 845, -70, 862, -28)
+
 [node name="Stone1" type="Polygon2D" parent="RitualLayer"]
 color = Color(0.03, 0.04, 0.07, 1)
 polygon = PackedVector2Array(672, -32, 671, -42.5, 674, -47, 679, -47, 680, -41, 680, -32)
@@ -942,24 +946,24 @@ visible = false
 [node name="Kneeling" type="Node2D" parent="RitualLayer/Figures"]
 
 [node name="Figure1" type="Polygon2D" parent="RitualLayer/Figures/Kneeling"]
-color = Color(0.03, 0.04, 0.07, 1)
-polygon = PackedVector2Array(684.8, -35.8, 684.8, -38, 687.8, -38, 690, -42.5, 692.2, -44.8, 695.2, -45.5, 696, -42.5, 693.8, -40.2, 691.5, -38.8, 690, -35.8)
+color = Color(0.01, 0.015, 0.03, 1)
+polygon = PackedVector2Array(682.6, -36.5, 682.6, -39.6, 686.9, -39.6, 690, -45.9, 693.1, -49, 697.4, -50.1, 698.4, -45.9, 695.2, -42.8, 692.1, -40.6, 690, -36.5)
 
 [node name="Figure2" type="Polygon2D" parent="RitualLayer/Figures/Kneeling"]
-color = Color(0.03, 0.04, 0.07, 1)
-polygon = PackedVector2Array(706.8, -35.8, 706.8, -38, 709.8, -38, 712, -42.5, 714.2, -44.8, 717.2, -45.5, 718, -42.5, 715.8, -40.2, 713.5, -38.8, 712, -35.8)
+color = Color(0.01, 0.015, 0.03, 1)
+polygon = PackedVector2Array(704.6, -36.5, 704.6, -39.6, 708.9, -39.6, 712, -45.9, 715.1, -49, 719.4, -50.1, 720.4, -45.9, 717.2, -42.8, 714.1, -40.6, 712, -36.5)
 
 [node name="Figure3" type="Polygon2D" parent="RitualLayer/Figures/Kneeling"]
-color = Color(0.03, 0.04, 0.07, 1)
-polygon = PackedVector2Array(773.2, -35.8, 773.2, -38, 770.2, -38, 768, -42.5, 765.8, -44.8, 762.8, -45.5, 762, -42.5, 764.2, -40.2, 766.5, -38.8, 768, -35.8)
+color = Color(0.01, 0.015, 0.03, 1)
+polygon = PackedVector2Array(775.4, -36.5, 775.4, -39.6, 771.1, -39.6, 768, -45.9, 764.9, -49, 760.6, -50.1, 759.6, -45.9, 762.8, -42.8, 765.9, -40.6, 768, -36.5)
 
 [node name="Figure4" type="Polygon2D" parent="RitualLayer/Figures/Kneeling"]
-color = Color(0.03, 0.04, 0.07, 1)
-polygon = PackedVector2Array(795.2, -35.8, 795.2, -38, 792.2, -38, 790, -42.5, 787.8, -44.8, 784.8, -45.5, 784, -42.5, 786.2, -40.2, 788.5, -38.8, 790, -35.8)
+color = Color(0.01, 0.015, 0.03, 1)
+polygon = PackedVector2Array(797.4, -36.5, 797.4, -39.6, 793.1, -39.6, 790, -45.9, 786.9, -49, 782.6, -50.1, 781.6, -45.9, 784.8, -42.8, 787.9, -40.6, 790, -36.5)
 
 [node name="Watcher" type="Polygon2D" parent="RitualLayer/Figures"]
-color = Color(0.03, 0.04, 0.07, 1)
-polygon = PackedVector2Array(824.5, -29, 824.5, -42.8, 823.4, -46.2, 825.7, -50.8, 830.3, -50.8, 832.6, -46.2, 831.5, -42.8, 831.5, -29)
+color = Color(0.01, 0.015, 0.03, 1)
+polygon = PackedVector2Array(821.5, -28, 821.5, -46, 820, -50.5, 823, -56.5, 829, -56.5, 832, -50.5, 830.5, -46, 830.5, -28)
 
 [node name="Trench" type="Node2D" parent="."]
 
@@ -1030,12 +1034,12 @@ polygon = PackedVector2Array(-360, 260, -345, -110, -300, -175, -235, -205, -150
 [node name="Head" type="Polygon2D" parent="Dagon"]
 visible = false
 color = Color(0.012, 0.018, 0.035, 1)
-polygon = PackedVector2Array(-125, -258, -142, -300, -132, -345, -92, -385, -30, -405, 32, -400, 84, -370, 110, -325, 106, -285, 76, -262, 30, -246, -46, -242, -98, -248)
+polygon = PackedVector2Array(82, -262, 84, -300, 44, -360, -20, -385, -90, -378, -150, -345, -182, -314, -192, -296, -172, -270, -110, -252, -40, -246, 40, -250)
 
 [node name="Crest" type="Polygon2D" parent="Dagon"]
 visible = false
 color = Color(0.012, 0.018, 0.035, 1)
-polygon = PackedVector2Array(-74, -392, -64, -440, -42, -402, -22, -456, 4, -408, 30, -446, 46, -396)
+polygon = PackedVector2Array(-60, -382, -54, -428, -32, -381, -14, -442, 4, -378, 24, -440, 40, -362, 66, -416, 74, -330, 106, -384, 96, -285, 70, -300)
 
 [node name="Arm" type="Polygon2D" parent="Dagon"]
 visible = false
@@ -1049,15 +1053,19 @@ visible = false
 
 [node name="Brow" type="Polygon2D" parent="Dagon/Rims"]
 color = Color(0.42, 0.62, 0.6, 1)
-polygon = PackedVector2Array(-140, -302, -130, -345, -90, -385, -30, -405, -28, -400, -86, -380, -124, -342, -134, -302)
+polygon = PackedVector2Array(-150, -345, -90, -378, -20, -385, -18, -381, -88, -373, -146, -341)
 
 [node name="Jaw" type="Polygon2D" parent="Dagon/Rims"]
 color = Color(0.42, 0.62, 0.6, 1)
-polygon = PackedVector2Array(-98, -248, -46, -242, 30, -246, 30, -243, -46, -239, -98, -245)
+polygon = PackedVector2Array(-182, -314, -120, -305, -60, -300, -60, -297, -120, -301, -180, -310)
 
 [node name="Gills" type="Polygon2D" parent="Dagon/Rims"]
 color = Color(0.42, 0.62, 0.6, 1)
-polygon = PackedVector2Array(62, -326, 72, -300, 69, -298, 58, -324)
+polygon = PackedVector2Array(24, -335, 34, -296, 31, -294, 20, -333)
+
+[node name="GillsBack" type="Polygon2D" parent="Dagon/Rims"]
+color = Color(0.42, 0.62, 0.6, 1)
+polygon = PackedVector2Array(44, -330, 54, -298, 51, -296, 40, -328)
 
 [node name="Shoulder" type="Polygon2D" parent="Dagon/Rims"]
 color = Color(0.42, 0.62, 0.6, 1)
@@ -1071,12 +1079,12 @@ polygon = PackedVector2Array(-432, -266, -440, -268, -436, -254, -438, -240, -43
 [node name="Eye" type="Polygon2D" parent="Dagon"]
 visible = false
 color = Color(0.5, 0.92, 0.78, 1)
-polygon = PackedVector2Array(-92, -330, -68, -345, -40, -345, -22, -330, -40, -320, -68, -320)
+polygon = PackedVector2Array(-112, -347, -96, -357, -78, -354, -68, -344, -82, -337, -100, -338)
 
 [node name="Pupil" type="Polygon2D" parent="Dagon"]
 visible = false
 color = Color(0.012, 0.018, 0.035, 1)
-polygon = PackedVector2Array(-62, -342, -50, -342, -50, -322, -62, -322)
+polygon = PackedVector2Array(-94, -355, -88, -355, -88, -338, -94, -338)
 
 [node name="Terrain" type="StaticBody2D" parent="."]
 collision_layer = 1

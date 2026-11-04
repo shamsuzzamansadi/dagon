@@ -98,16 +98,21 @@ void Hud::_notification(int p_what) {
 }
 
 // The same press that examines also cuts a line short. Hud comes after the player in the tree, so it sees the press
-// first. It lets one through only if that press would start something else, and otherwise uses it up, so that
-// skipping can never examine, and a press at something that cannot interrupt only ever skips.
+// first. It lets one through if that press is a move in the game, such as a stone, or if it would start another
+// optional line. Otherwise it uses it up, so that skipping can never examine, and a press at something optional during
+// a story moment only ever skips.
 void Hud::_unhandled_input(const Ref<InputEvent> &p_event) {
 	if (Engine::get_singleton()->is_editor_hint() || !speaking_ || !p_event->is_action_pressed("interact")) {
 		return;
 	}
 	const Interactor *interactor = interactor_.get();
 	const Interactable *focus = interactor != nullptr ? interactor->get_focus() : nullptr;
-	if (focus != nullptr && focus->is_available() && focus->get_line_id() != current_line_ && current_priority_ == core::LinePriority::Optional) {
-		return;
+	if (focus != nullptr && focus->is_available()) {
+		const bool is_a_move_in_the_game = focus->get_line_id().is_empty();
+		const bool starts_another_optional_line = focus->get_line_id() != current_line_ && current_priority_ == core::LinePriority::Optional;
+		if (is_a_move_in_the_game || starts_another_optional_line) {
+			return;
+		}
 	}
 	print_verbose("dagon: line skipped: ", current_line_);
 	hide_caption();
@@ -122,6 +127,9 @@ void Hud::set_input_device(int p_device) {
 void Hud::on_focus_changed(Object *p_target) {
 	const Interactable *target = Object::cast_to<Interactable>(p_target);
 	prompt_text_ = target != nullptr ? target->get_prompt() : String();
+	if (target != nullptr && !target->get_line_id().is_empty()) {
+		print_verbose("dagon: focus: ", target->get_line_id());
+	}
 	refresh_prompt();
 }
 

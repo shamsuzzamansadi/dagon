@@ -275,6 +275,18 @@ func test_during_a_story_moment_a_press_only_skips_and_never_examines(h) -> void
 	h.check(examined[0] == 1, "the next press did not examine")
 
 
+## A stone is a move in the game, not something optional: speech must never swallow it. Found by the exported route.
+func test_a_stone_press_during_a_story_line_still_presses_the_stone(h) -> void:
+	await _world(h, MONOLITH)
+	var puzzle: Node = h.fixture.get_node("Monolith/Puzzle")
+	await h.stand_at(_player(h), Vector2(4170, -2))
+	_hud(h).say(STORY_LINE)
+	await h.tap_key(KEY_E)
+	h.check(puzzle.get_progress() == 1, "speech swallowed the press: progress %d" % puzzle.get_progress())
+	h.check(_caption(h).text == "The stone lights, and holds.", "the caption reads '%s'" % _caption(h).text)
+	h.check(not _hud(h).is_speaking(), "the story line went on under the stone's response")
+
+
 func test_during_a_cinematic_a_press_skips_the_line_and_cannot_reach_a_stone(h) -> void:
 	await _world(h, MONOLITH)
 	var puzzle: Node = h.fixture.get_node("Monolith/Puzzle")
@@ -491,6 +503,7 @@ func test_a_keyboard_player_gets_nothing(h) -> void:
 	session.set_active_device(-1)
 	session.get_director().haptic_cue(&"reveal")
 	h.check(_vibration(h) == Vector2.ZERO, "a keyboard player's cue vibrated: %s" % _vibration(h))
+	h.check(Input.get_joy_vibration_strength(-1) == Vector2.ZERO, "a cue reached the keyboard's device number")
 
 
 func test_the_setting_switches_it_off(h) -> void:
@@ -526,6 +539,22 @@ func test_changing_device_stops_it_on_the_old_controller(h) -> void:
 	session.get_director().haptic_cue(&"reveal")
 	session.set_active_device(-1)
 	h.check(_vibration(h) == Vector2.ZERO, "the old controller kept vibrating")
+
+
+## By emitting the engine's signal, as a test cannot unplug anything. The physical check is in the owner's list.
+func test_a_disconnect_stops_it_and_hands_back_to_the_keyboard(h) -> void:
+	h.use_controller("Xbox Wireless Controller")
+	var session: Node = (load(GAME) as PackedScene).instantiate()
+	await h.load_with(session)
+	var menu: Control = session.get_node("PauseLayer/PauseMenu")
+	menu.set_active_device(DEVICE)
+	session.get_director().haptic_cue(&"reveal")
+	h.check(_vibration(h).length() > 0.1, "no vibration")
+	Input.joy_connection_changed.emit(DEVICE, false)
+	h.check(_vibration(h) == Vector2.ZERO, "a disconnect did not stop it")
+	h.check(session.get_active_device() == -1, "the session still has device %d" % session.get_active_device())
+	session.get_director().haptic_cue(&"reveal")
+	h.check(_vibration(h) == Vector2.ZERO, "a cue reached the controller that left")
 
 
 func test_restarting_stops_it(h) -> void:

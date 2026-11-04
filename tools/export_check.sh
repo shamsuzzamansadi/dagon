@@ -61,6 +61,8 @@ if grep -aq "scenes/level/level\.tscn" "$pack"; then
 fi
 grep -aq "assets/shore/" "$pack" || fail "the Shore art is missing from $stem.pck"
 grep -aq "assets/ui/" "$pack" || fail "the UI assets are missing from $stem.pck"
+grep -aq "narration/script.txt" "$pack" || fail "the narration script is missing from $stem.pck"
+grep -aq "assets/narration/" "$pack" || fail "the narration samples are missing from $stem.pck"
 echo "export-$platform: created"
 ls -la "$out"
 

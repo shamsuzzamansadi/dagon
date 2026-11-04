@@ -140,14 +140,14 @@ jobs:
           xvfb-run -a -s "-screen 0 1440x810x24 +extension GLX" sh -c \
             'python3 tools/route_check.py build/export/linux/dagon.x86_64 build/logs/route --display "$DISPLAY" --shots build/logs/route/shots' 2>&1 | tee build/logs/route.log
           test "${PIPESTATUS[0]}" -eq 0
-          grep -q "^ROUTE_RESULT runs=3 failed=0" build/logs/route.log
+          grep -q "^ROUTE_RESULT runs=4 failed=0" build/logs/route.log
 
       - name: Play the exported build from New Game to the ending (Windows)
         if: ${{ matrix.ships && matrix.platform == 'windows' }}
         run: |
           python tools/route_check.py build/export/windows/dagon.exe build/logs/route --windows-ci 2>&1 | tee build/logs/route.log
           test "${PIPESTATUS[0]}" -eq 0
-          grep -q "^ROUTE_RESULT runs=3 failed=0" build/logs/route.log
+          grep -q "^ROUTE_RESULT runs=4 failed=0" build/logs/route.log
 
       # Every other check redirects storage. This one uses the real user folder of this throwaway runner.
       - name: Check the player's storage path
