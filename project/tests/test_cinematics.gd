@@ -69,6 +69,11 @@ func _break_clip(h, clip: StringName, how: String) -> void:
 			_clips(h).speed_scale = 0.0
 
 
+## What the Director must say for each failure. The watchdog would rescue the others anyway, so this is what tells them apart.
+func _reason(how: String) -> String:
+	return {"missing": "missing", "looping": "loops", "linear_ping_pong": "loops", "stuck": "deadline"}[how]
+
+
 func _log_beats(h) -> Array:
 	var beats := []
 	_director(h).beat_changed.connect(func(beat: int) -> void: beats.append(beat))
@@ -304,7 +309,7 @@ func _check_awaken_recovered(h, how: String) -> void:
 	await _finish_clip(h)
 	await _settle(h)
 	h.loud_errors()
-	h.check(errors.size() == 1, "%s: reported %s" % [how, str(errors)])
+	h.check(errors.size() == 1 and errors[0].contains(_reason(how)), "%s: reported %s" % [how, str(errors)])
 	h.check(director.get_beat() == AWAKENED, "%s: beat %d" % [how, director.get_beat()])
 	h.check(_gate(h).collision_layer == 0, "%s: the gate stayed solid" % how)
 	h.check(not _gate(h).visible, "%s: the gate stayed visible" % how)
@@ -349,7 +354,7 @@ func _check_reveal_recovered(h, how: String) -> void:
 	await _finish_clip(h)
 	await _settle(h)
 	h.loud_errors()
-	h.check(errors.size() == 1, "%s: reported %s" % [how, str(errors)])
+	h.check(errors.size() == 1 and errors[0].contains(_reason(how)), "%s: reported %s" % [how, str(errors)])
 	h.check(beats == [WITNESS, FLEEING], "%s: beats ran %s" % [how, str(beats)])
 	h.check(_player(h).is_control_enabled(), "%s: control stayed locked" % how)
 	_check_camera_is_back(h, how)
@@ -376,11 +381,14 @@ func _check_collapse_recovered(h, how: String) -> void:
 	await _finish_clip(h)
 	await _settle(h)
 	h.check(_director(h).get_beat() == FLEEING, "%s: not fleeing" % how)
+	var errors := []
+	_director(h).contract_error.connect(func(message: String) -> void: errors.append(message))
 	_break_clip(h, &"collapse", how)
 	h.quiet_errors()
 	_player(h).teleport(Vector2(COLLAPSE_X, -2))
 	var ending: Node = await h.wait_for_scene("MenuController", 240)
 	h.loud_errors()
+	h.check(errors.size() == 1 and errors[0].contains(_reason(how)), "%s: reported %s" % [how, str(errors)])
 	h.check(ending.get_node_or_null("Center/Card") != null, "%s: the scene after the collapse is %s" % [how, ending.name])
 	h.check(not h.tree.paused, "%s: the ending is paused" % how)
 
