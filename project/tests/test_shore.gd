@@ -14,6 +14,14 @@ func _scene_path() -> String:
 	return SHORE
 
 
+func _end_wall_x() -> float:
+	return 4520.0
+
+
+func _limit_right() -> int:
+	return 4544
+
+
 func _sprite(player: Node) -> AnimatedSprite2D:
 	return player.get_node("Visual/Sailor")
 
@@ -54,14 +62,19 @@ func test_shore_keeps_movement_tuning_and_body(h) -> void:
 	greybox.free()
 
 
-## The whole M1 test level is still here, not just the part with art.
-func test_shore_has_the_whole_greybox_level(h) -> void:
+## M1's level is still here, point for point, up to the end of its steps. The acts carry on from there.
+func test_shore_keeps_the_greybox_level_up_to_where_the_acts_carry_on(h) -> void:
+	const COMMON_POINTS := 21
 	var shore: Node = (load(SHORE) as PackedScene).instantiate()
 	var level: Node = (load(LEVEL) as PackedScene).instantiate()
-	h.check(shore.get_node("Terrain/Ground").polygon == level.get_node("Terrain/Ground").polygon, "collision differs from the greybox")
+	var shore_polygon: PackedVector2Array = shore.get_node("Terrain/Ground").polygon
+	var level_polygon: PackedVector2Array = level.get_node("Terrain/Ground").polygon
+	h.check(level_polygon[COMMON_POINTS - 1] == Vector2(980, 0), "the common part ends at %s" % level_polygon[COMMON_POINTS - 1])
+	h.check(shore_polygon.slice(0, COMMON_POINTS) == level_polygon.slice(0, COMMON_POINTS), "collision differs from the greybox before x = 980")
 	h.check(shore.get_node("Player").position == level.get_node("Player").position, "spawn point differs from the greybox")
-	for limit in ["limit_left", "limit_top", "limit_right", "limit_bottom"]:
+	for limit in ["limit_left", "limit_top", "limit_bottom"]:
 		h.check(shore.get_node("CameraRig").get(limit) == level.get_node("CameraRig").get(limit), "%s differs from the greybox" % limit)
+	h.check(shore.get_node("CameraRig").limit_right == _limit_right(), "limit_right is %d" % shore.get_node("CameraRig").limit_right)
 	shore.free()
 	level.free()
 

@@ -11,8 +11,8 @@ const EXPECTED := {
 	},
 	"CameraRig": {
 		"base": "Camera2D",
-		"properties": ["target_path", "look_ahead", "vertical_offset", "pixel_lock", "lock_speed"],
-		"methods": [],
+		"properties": ["target_path", "look_ahead", "vertical_offset", "pixel_lock", "lock_speed", "max_shake", "trauma_decay"],
+		"methods": ["get_target", "aim_at", "add_trauma", "get_trauma", "restore_view"],
 		"signals": [],
 	},
 	"Interactable": {
@@ -39,22 +39,28 @@ const EXPECTED := {
 		"methods": ["on_focus_changed", "on_interacted", "show_caption", "hide_caption", "show_notice", "set_input_device", "fade_to_black", "fade_from_black"],
 		"signals": ["fade_finished"],
 	},
+	"PuzzleController": {
+		"base": "Node",
+		"properties": ["solution", "reset_delay", "indicators", "stones"],
+		"methods": ["submit", "reset", "is_solved", "is_rejecting", "get_progress", "restore_solved"],
+		"signals": ["step_accepted", "failed", "solved"],
+	},
 	"GameDirector": {
 		"base": "Node",
-		"properties": ["player_path", "hud_path", "kill_plane_path", "checkpoints", "story_triggers"],
-		"methods": ["restart_checkpoint", "get_active_checkpoint", "set_start_beat", "get_start_beat", "fade_in", "show_notice"],
-		"signals": ["checkpoint_reached", "player_respawned"],
+		"properties": ["player_path", "hud_path", "kill_plane_path", "camera_rig_path", "atmosphere_path", "cinematics_path", "monolith_gate_path", "puzzle_path", "mural_path", "mural_solved_caption", "awakened_visuals", "checkpoints", "story_triggers", "ending_scene", "flee_timeout"],
+		"methods": ["restart_checkpoint", "get_active_checkpoint", "get_beat", "is_safe_to_save", "is_in_final_sequence", "set_start_beat", "get_start_beat", "fade_in", "show_notice", "on_puzzle_solved", "start_cinematic", "finalize_cinematic", "is_cinematic_active", "get_generation", "get_active_clip", "has_pending_event", "is_recovery_pending", "get_flee_elapsed"],
+		"signals": ["checkpoint_reached", "player_respawned", "beat_changed", "cinematic_started", "cinematic_finalized", "overlap_rechecked", "contract_error"],
 	},
 	"GameSession": {
 		"base": "Node",
 		"properties": ["world_scene", "director_path", "menu_path"],
-		"methods": ["set_start", "set_active_device", "get_active_device", "restart_checkpoint", "retry_save", "is_checkpoint_saved", "has_any_save", "get_session_beat", "get_persisted_beat", "get_world", "get_director"],
+		"methods": ["set_start", "set_active_device", "get_active_device", "restart_checkpoint", "retry_save", "is_checkpoint_saved", "has_any_save", "is_in_final_sequence", "get_session_beat", "get_persisted_beat", "get_world", "get_director"],
 		"signals": [],
 	},
 	"MenuController": {
 		"base": "Control",
 		"properties": ["mode", "game_scene", "title_scene_path", "session_path", "main_panel_path", "confirm_panel_path", "controls_panel_path", "credits_panel_path", "settings_menu_path", "first_button_path", "continue_button_path", "new_game_button_path", "settings_button_path", "controls_button_path", "credits_button_path", "quit_button_path", "quit_to_menu_button_path", "confirm_cancel_button_path", "confirm_ok_button_path", "confirm_message_label_path", "controls_title_label_path", "controls_text_label_path", "controls_back_button_path", "credits_back_button_path", "save_status_label_path"],
-		"methods": ["set_active_device", "get_active_device", "is_open", "open", "resume", "restart_checkpoint", "ask_quit_to_desktop", "ask_quit_to_main_menu", "show_intro", "new_game", "continue_game", "open_credits", "quit_now", "refresh_save_status", "open_settings", "open_controls", "confirm", "cancel_confirm", "back"],
+		"methods": ["set_active_device", "get_active_device", "is_open", "open", "resume", "restart_checkpoint", "ask_quit_to_desktop", "ask_quit_to_main_menu", "show_intro", "new_game", "continue_game", "open_credits", "quit_now", "quit_to_main_menu", "refresh_save_status", "open_settings", "open_controls", "confirm", "cancel_confirm", "back"],
 		"signals": [],
 	},
 	"SettingsMenu": {

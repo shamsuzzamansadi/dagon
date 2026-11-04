@@ -1,0 +1,278 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://tests/fixtures/movement_arena.tscn" id="1_arena"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="2_hud"]
+[ext_resource type="PackedScene" path="res://scenes/ui/ending.tscn" id="3_ending"]
+
+[sub_resource type="RectangleShape2D" id="trigger_shape"]
+size = Vector2(10, 60)
+
+[sub_resource type="RectangleShape2D" id="kill_shape"]
+size = Vector2(2000, 100)
+
+[sub_resource type="RectangleShape2D" id="gate_shape"]
+size = Vector2(16, 300)
+
+[sub_resource type="RectangleShape2D" id="mural_shape"]
+size = Vector2(20, 20)
+
+[sub_resource type="Animation" id="clip_awaken"]
+resource_name = "monolith_awaken"
+length = 0.25
+tracks/0/type = "method"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("CameraRig")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.02, 0.04),
+"transitions": PackedFloat32Array(1, 1),
+"values": [{
+"args": [NodePath("../Mark")],
+"method": &"aim_at"
+}, {
+"args": [0.5],
+"method": &"add_trauma"
+}]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("CameraRig:zoom")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.02, 0.25),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(0.8, 0.8), Vector2(0.6, 0.6)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("CameraRig:limit_top")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.02),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [-900]
+}
+
+[sub_resource type="Animation" id="clip_reveal"]
+resource_name = "dagon_reveal"
+length = 0.25
+tracks/0/type = "method"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("CameraRig")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.02, 0.04),
+"transitions": PackedFloat32Array(1, 1),
+"values": [{
+"args": [NodePath("../Mark")],
+"method": &"aim_at"
+}, {
+"args": [0.5],
+"method": &"add_trauma"
+}]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("CameraRig:zoom")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.02, 0.25),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(0.7, 0.7), Vector2(0.5, 0.5)]
+}
+
+[sub_resource type="Animation" id="clip_collapse"]
+resource_name = "collapse"
+length = 0.25
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("CameraRig:zoom")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.02),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [Vector2(0.9, 0.9)]
+}
+
+[sub_resource type="Animation" id="clip_side_show"]
+resource_name = "side_show"
+length = 0.25
+tracks/0/type = "method"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("CameraRig")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.02),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [NodePath("../Mark")],
+"method": &"aim_at"
+}]
+}
+
+[sub_resource type="Animation" id="clip_late_aim"]
+resource_name = "late_aim"
+length = 0.5
+tracks/0/type = "method"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("CameraRig")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.4),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [NodePath("../Mark")],
+"method": &"aim_at"
+}]
+}
+
+[sub_resource type="AnimationLibrary" id="library"]
+_data = {
+&"collapse": SubResource("clip_collapse"),
+&"dagon_reveal": SubResource("clip_reveal"),
+&"late_aim": SubResource("clip_late_aim"),
+&"monolith_awaken": SubResource("clip_awaken"),
+&"side_show": SubResource("clip_side_show")
+}
+
+[node name="StoryArena" instance=ExtResource("1_arena")]
+
+[node name="Mark" type="Marker2D" parent="."]
+position = Vector2(600, -100)
+
+[node name="CameraRig" type="CameraRig" parent="."]
+limit_left = 0
+limit_top = -220
+limit_right = 1000
+limit_bottom = 50
+target_path = NodePath("../Player")
+
+[node name="EnterAbyss" type="StoryTrigger" parent="."]
+position = Vector2(300, -30)
+collision_layer = 8
+collision_mask = 2
+monitorable = false
+trigger_id = &"enter_abyss"
+
+[node name="Shape" type="CollisionShape2D" parent="EnterAbyss"]
+shape = SubResource("trigger_shape")
+
+[node name="ReachMonolith" type="StoryTrigger" parent="."]
+position = Vector2(500, -30)
+collision_layer = 8
+collision_mask = 2
+monitorable = false
+trigger_id = &"reach_monolith"
+
+[node name="Shape" type="CollisionShape2D" parent="ReachMonolith"]
+shape = SubResource("trigger_shape")
+
+[node name="Collapse" type="StoryTrigger" parent="."]
+position = Vector2(620, -30)
+collision_layer = 8
+collision_mask = 2
+monitorable = false
+trigger_id = &"collapse"
+
+[node name="Shape" type="CollisionShape2D" parent="Collapse"]
+shape = SubResource("trigger_shape")
+
+[node name="Witness" type="StoryTrigger" parent="."]
+position = Vector2(860, -30)
+collision_layer = 8
+collision_mask = 2
+monitorable = false
+trigger_id = &"witness"
+
+[node name="Shape" type="CollisionShape2D" parent="Witness"]
+shape = SubResource("trigger_shape")
+
+[node name="KillPlane" type="StoryTrigger" parent="."]
+position = Vector2(500, 200)
+collision_layer = 8
+collision_mask = 2
+monitorable = false
+trigger_id = &"out_of_bounds"
+
+[node name="Shape" type="CollisionShape2D" parent="KillPlane"]
+shape = SubResource("kill_shape")
+
+[node name="Checkpoint0" type="Marker2D" parent="."]
+position = Vector2(100, -2)
+
+[node name="Checkpoint1" type="Marker2D" parent="."]
+position = Vector2(350, -2)
+
+[node name="Checkpoint2" type="Marker2D" parent="."]
+position = Vector2(550, -2)
+
+[node name="Checkpoint3" type="Marker2D" parent="."]
+position = Vector2(760, -2)
+
+[node name="Mural" type="Interactable" parent="."]
+position = Vector2(560, -14)
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+interaction_id = &"mural"
+caption = "before"
+
+[node name="Shape" type="CollisionShape2D" parent="Mural"]
+shape = SubResource("mural_shape")
+
+[node name="MuralLit" type="Node2D" parent="."]
+visible = false
+
+[node name="Puzzle" type="PuzzleController" parent="."]
+solution = PackedStringArray("one")
+
+[node name="Gate" type="StaticBody2D" parent="."]
+position = Vector2(800, -150)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape2D" parent="Gate"]
+shape = SubResource("gate_shape")
+
+[node name="Hud" parent="." instance=ExtResource("2_hud")]
+interactor_path = NodePath("../Player/Interactor")
+
+[node name="Cinematics" type="AnimationPlayer" parent="."]
+libraries/ = SubResource("library")
+
+[node name="GameDirector" type="GameDirector" parent="."]
+player_path = NodePath("../Player")
+hud_path = NodePath("../Hud")
+kill_plane_path = NodePath("../KillPlane")
+camera_rig_path = NodePath("../CameraRig")
+cinematics_path = NodePath("../Cinematics")
+monolith_gate_path = NodePath("../Gate")
+puzzle_path = NodePath("../Puzzle")
+mural_path = NodePath("../Mural")
+checkpoints = [NodePath("../Checkpoint0"), NodePath("../Checkpoint1"), NodePath("../Checkpoint2"), NodePath("../Checkpoint3")]
+story_triggers = [NodePath("../EnterAbyss"), NodePath("../ReachMonolith"), NodePath("../Witness"), NodePath("../Collapse")]
+awakened_visuals = [NodePath("../MuralLit")]
+mural_solved_caption = "after"
+ending_scene = ExtResource("3_ending")
+
+[connection signal="solved" from="Puzzle" to="GameDirector" method="on_puzzle_solved"]

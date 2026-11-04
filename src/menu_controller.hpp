@@ -25,6 +25,7 @@ public:
 	enum Mode {
 		MODE_PAUSE,
 		MODE_TITLE,
+		MODE_ENDING,
 	};
 
 	void _ready() override;
@@ -53,6 +54,9 @@ public:
 	void open_credits();
 	void quit_now();
 	void refresh_save_status();
+
+	// Ending, and the pause menu's confirmed Quit to Main Menu.
+	void quit_to_main_menu();
 
 	// Both.
 	void open_settings();
@@ -126,7 +130,6 @@ private:
 	void autostart();
 	void ask_confirm(ConfirmAction p_action, const godot::String &p_message, const godot::String &p_ok_text);
 	godot::String quit_message(ConfirmAction p_action);
-	void quit_to_main_menu();
 	void write_new_game();
 	void start_session(core::Beat p_beat, bool p_show_intro);
 	godot::Control *panel(const NodeRef<godot::Control> &p_panel) const { return p_panel.get(); }

@@ -17,15 +17,20 @@ const SUITES: Array[Script] = [
 	preload("res://tests/test_session.gd"),
 	preload("res://tests/test_title.gd"),
 	preload("res://tests/test_controller.gd"),
+	preload("res://tests/test_cinematics.gd"),
+	preload("res://tests/test_puzzle.gd"),
+	preload("res://tests/test_world.gd"),
+	preload("res://tests/test_restore.gd"),
+	preload("res://tests/test_route.gd"),
 ]
-const REQUIRED_CLASSES: Array[String] = ["PlayerController", "CameraRig", "Interactable", "Interactor", "StoryTrigger", "Hud", "GameDirector", "GameSession", "MenuController", "SettingsMenu"]
+const REQUIRED_CLASSES: Array[String] = ["PlayerController", "CameraRig", "Interactable", "Interactor", "StoryTrigger", "Hud", "PuzzleController", "GameDirector", "GameSession", "MenuController", "SettingsMenu"]
 const STORAGE_VARIABLE := "DAGON_STORAGE_DIR"
 const STORAGE_MARKER := "dagon-test-"
 ## Set by tools/export_check.sh. Export rewrites scenes, so the same tests also run on what actually ships.
 const PACK_VARIABLE := "DAGON_TEST_PACK"
 
 ## Watchdog in rendered frames, so a broken await cannot hang the run forever.
-const MAX_FRAMES := 40000
+const MAX_FRAMES := 400000
 
 ## A GDScript runtime error silently aborts the running test function, which
 ## would otherwise count as a pass. Any engine or script error fails the test.

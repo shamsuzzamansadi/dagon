@@ -1,0 +1,9 @@
+A idle, into: moved at frame 10 -> ["entered@13"] inside_now=1
+B idle, out of: moved at frame 18 -> ["exited@21"] inside_now=0
+C physics, into: moved at frame 27 -> ["entered@29"] inside_now=1
+D physics, out of: moved at frame 36 -> ["exited@38"] inside_now=0
+E near, physics, not inside: moved at frame 45 -> [] inside_now=0
+F short hop into, physics: moved at frame 54 -> ["entered@56"] inside_now=1
+G short hop out of, physics: moved at frame 63 -> ["exited@65"] inside_now=0
+H short hop into, idle: moved at frame 71 -> ["entered@74"] inside_now=1
+I short hop out of, idle: moved at frame 79 -> ["exited@82"] inside_now=0

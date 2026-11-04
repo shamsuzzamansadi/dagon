@@ -11,6 +11,20 @@ func _scene_path() -> String:
 	return LEVEL
 
 
+## Where the first stretch of the walk ends, the same in both scenes.
+func _act1_end_x() -> float:
+	return WALL_RIGHT
+
+
+## The solid wall at the far end of this scene.
+func _end_wall_x() -> float:
+	return WALL_RIGHT
+
+
+func _limit_right() -> int:
+	return LIMIT_RIGHT
+
+
 func _setup(h) -> CharacterBody2D:
 	await h.load_fixture(_scene_path())
 	return h.fixture.get_node("Player")
@@ -49,7 +63,7 @@ func test_level_loads_with_player_and_camera(h) -> void:
 func test_act1_can_be_crossed_in_both_directions(h) -> void:
 	var player: CharacterBody2D = await _setup(h)
 	await h.landed_on_floor(player)
-	var reached_end: bool = await _traverse(h, player, "move_right", func() -> bool: return player.global_position.x > WALL_RIGHT - 20.0, 1800)
+	var reached_end: bool = await _traverse(h, player, "move_right", func() -> bool: return player.global_position.x > _act1_end_x() - 20.0, 1800)
 	h.check(reached_end, "stuck going right at x=%.1f" % player.global_position.x)
 	var reached_start: bool = await _traverse(h, player, "move_left", func() -> bool: return player.global_position.x < WALL_LEFT + 20.0, 1800)
 	h.check(reached_start, "stuck going left at x=%.1f" % player.global_position.x)
@@ -107,9 +121,9 @@ func test_camera_stays_inside_level_limits(h) -> void:
 	await h.steps(240)
 	h.check_near(camera.get_screen_center_position().x, half_width, 2.0, "camera center at the left limit")
 
-	player.teleport(Vector2(WALL_RIGHT - 10.0, -2))
+	player.teleport(Vector2(_end_wall_x() - 10.0, -2))
 	await h.steps(240)
-	h.check_near(camera.get_screen_center_position().x, LIMIT_RIGHT - half_width, 2.0, "camera center at the right limit")
+	h.check_near(camera.get_screen_center_position().x, _limit_right() - half_width, 2.0, "camera center at the right limit")
 
 
 ## Where the character lands on screen. With snap_2d_transforms_to_pixel the renderer rounds the

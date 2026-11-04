@@ -26,6 +26,7 @@ const char *const REPLACE_SAVE_MESSAGE = "Start a new game? This replaces your s
 const char *const REPLACE_DAMAGED_SAVE_MESSAGE = "Start a new game? This replaces the save that cannot be used.";
 const char *const NEW_GAME_FAILED_MESSAGE = "Could not create a new save, so the game did not start. Your existing save was not changed.";
 const char *const QUIT_SAVED_MESSAGE = "Continue resumes from your last saved checkpoint. Anything since then is not kept.";
+const char *const QUIT_FINAL_SEQUENCE_MESSAGE = "Continue resumes before the final sequence, which will play again.";
 const char *const QUIT_NOT_SAVED_MESSAGE = "Your latest checkpoint could not be saved. Continue resumes from your earlier save.";
 const char *const QUIT_NO_SAVE_MESSAGE = "Your progress could not be saved, so there is nothing to continue.";
 const char *const QUIT_SETTINGS_KEPT = " Your settings are kept.";
@@ -38,6 +39,7 @@ const char *const AUTOSTART_VARIABLE = "DAGON_AUTOSTART";
 void MenuController::_bind_methods() {
 	BIND_ENUM_CONSTANT(MODE_PAUSE);
 	BIND_ENUM_CONSTANT(MODE_TITLE);
+	BIND_ENUM_CONSTANT(MODE_ENDING);
 
 	ClassDB::bind_method(D_METHOD("is_open"), &MenuController::is_open);
 	ClassDB::bind_method(D_METHOD("open"), &MenuController::open);
@@ -50,6 +52,7 @@ void MenuController::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("continue_game"), &MenuController::continue_game);
 	ClassDB::bind_method(D_METHOD("open_credits"), &MenuController::open_credits);
 	ClassDB::bind_method(D_METHOD("quit_now"), &MenuController::quit_now);
+	ClassDB::bind_method(D_METHOD("quit_to_main_menu"), &MenuController::quit_to_main_menu);
 	ClassDB::bind_method(D_METHOD("refresh_save_status"), &MenuController::refresh_save_status);
 	ClassDB::bind_method(D_METHOD("open_settings"), &MenuController::open_settings);
 	ClassDB::bind_method(D_METHOD("open_controls"), &MenuController::open_controls);
@@ -62,7 +65,7 @@ void MenuController::_bind_methods() {
 
 	ClassDB::bind_method(D_METHOD("set_mode", "mode"), &MenuController::set_mode);
 	ClassDB::bind_method(D_METHOD("get_mode"), &MenuController::get_mode);
-	ADD_PROPERTY(PropertyInfo(Variant::INT, "mode", PROPERTY_HINT_ENUM, "Pause,Title"), "set_mode", "get_mode");
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "mode", PROPERTY_HINT_ENUM, "Pause,Title,Ending"), "set_mode", "get_mode");
 	ClassDB::bind_method(D_METHOD("set_game_scene", "scene"), &MenuController::set_game_scene);
 	ClassDB::bind_method(D_METHOD("get_game_scene"), &MenuController::get_game_scene);
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "game_scene", PROPERTY_HINT_RESOURCE_TYPE, "PackedScene"), "set_game_scene", "get_game_scene");
@@ -110,15 +113,21 @@ void MenuController::_ready() {
 
 	session_.set(session_path_.is_empty() ? nullptr : get_node<GameSession>(session_path_));
 	main_panel_.set(get_node<Control>(main_panel_path_));
-	confirm_panel_.set(get_node<Control>(confirm_panel_path_));
-	controls_panel_.set(get_node<Control>(controls_panel_path_));
-	settings_menu_.set(get_node<SettingsMenu>(settings_menu_path_));
-	confirm_message_label_.set(get_node<Label>(confirm_message_label_path_));
-	if (main_panel_.get() == nullptr || confirm_panel_.get() == nullptr || controls_panel_.get() == nullptr || settings_menu_.get() == nullptr) {
+	// The ending has only its card and the credits.
+	if (mode_ != MODE_ENDING) {
+		confirm_panel_.set(get_node<Control>(confirm_panel_path_));
+		controls_panel_.set(get_node<Control>(controls_panel_path_));
+		settings_menu_.set(get_node<SettingsMenu>(settings_menu_path_));
+		confirm_message_label_.set(get_node<Label>(confirm_message_label_path_));
+	}
+	if (main_panel_.get() == nullptr || (mode_ != MODE_ENDING && (confirm_panel_.get() == nullptr || controls_panel_.get() == nullptr || settings_menu_.get() == nullptr))) {
 		ERR_PRINT("MenuController: a panel path is not set; the menu cannot open.");
+		main_panel_.set(nullptr);
 		return;
 	}
-	settings_menu_.get()->connect("closed", callable_mp(this, &MenuController::on_settings_closed));
+	if (SettingsMenu *settings = settings_menu_.get()) {
+		settings->connect("closed", callable_mp(this, &MenuController::on_settings_closed));
+	}
 
 	Input *input = Input::get_singleton();
 	input->connect("joy_connection_changed", callable_mp(this, &MenuController::on_joy_connection_changed));
@@ -126,9 +135,16 @@ void MenuController::_ready() {
 	for (int i = 0; i < controllers.size(); i++) {
 		input_labels::log_controller(controllers[i]);
 	}
-	settings_menu_.get()->set_cancel_label(input_labels::back_label(active_device_));
+	if (SettingsMenu *settings = settings_menu_.get()) {
+		settings->set_cancel_label(input_labels::back_label(active_device_));
+	}
 
-	if (mode_ == MODE_TITLE) {
+	if (mode_ == MODE_ENDING) {
+		credits_panel_.set(get_node<Control>(credits_panel_path_));
+		show_screen(Screen::Main);
+		focus_path(first_button_path_);
+		print_verbose("dagon: ending card shown");
+	} else if (mode_ == MODE_TITLE) {
 		credits_panel_.set(get_node<Control>(credits_panel_path_));
 		save_status_label_.set(get_node<Label>(save_status_label_path_));
 		continue_button_.set(get_node<Button>(continue_button_path_));
@@ -218,9 +234,15 @@ void MenuController::show_screen(Screen p_screen) {
 	screen_ = p_screen;
 	set_visible(p_screen != Screen::Closed);
 	main_panel_.get()->set_visible(p_screen == Screen::Main);
-	confirm_panel_.get()->set_visible(p_screen == Screen::Confirm);
-	controls_panel_.get()->set_visible(p_screen == Screen::Controls);
-	settings_menu_.get()->set_visible(p_screen == Screen::Settings);
+	if (Control *confirm = confirm_panel_.get()) {
+		confirm->set_visible(p_screen == Screen::Confirm);
+	}
+	if (Control *controls = controls_panel_.get()) {
+		controls->set_visible(p_screen == Screen::Controls);
+	}
+	if (SettingsMenu *settings = settings_menu_.get()) {
+		settings->set_visible(p_screen == Screen::Settings);
+	}
 	if (Control *credits = credits_panel_.get()) {
 		credits->set_visible(p_screen == Screen::Credits);
 	}
@@ -341,7 +363,7 @@ String MenuController::quit_message(ConfirmAction p_action) {
 		return message;
 	}
 	if (session->retry_save()) {
-		message += QUIT_SAVED_MESSAGE;
+		message += session->is_in_final_sequence() ? QUIT_FINAL_SEQUENCE_MESSAGE : QUIT_SAVED_MESSAGE;
 	} else {
 		message += session->has_any_save() ? QUIT_NOT_SAVED_MESSAGE : QUIT_NO_SAVE_MESSAGE;
 	}

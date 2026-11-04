@@ -67,15 +67,38 @@ func load_main_fixture(path: String) -> Node:
 	return fixture
 
 
+## A world or a session, built with its start value in place before it enters the tree, as the game builds them.
+func load_with(node: Node, as_main := false) -> Node:
+	fixture = node
+	probe = StepProbe.new()
+	tree.root.add_child(probe)
+	tree.root.add_child(node)
+	if as_main:
+		tree.current_scene = node
+	await steps(1)
+	return node
+
+
 ## Waits for a scene change to finish, and returns the new scene.
-func wait_for_scene(type_name: String) -> Node:
-	await wait_until(func() -> bool: return is_instance_valid(tree.current_scene) and tree.current_scene.is_class(type_name) and tree.current_scene.is_node_ready(), 60, "the scene to change to %s" % type_name)
+func wait_for_scene(type_name: String, max_steps := 60) -> Node:
+	await wait_until(func() -> bool: return is_instance_valid(tree.current_scene) and tree.current_scene.is_class(type_name) and tree.current_scene.is_node_ready(), max_steps, "the scene to change to %s" % type_name)
 	fixture = tree.current_scene
 	await steps(1)
 	return fixture
 
 
+## For a test that sets out to produce an engine error: nothing it logs reaches the console or the runner's
+## trap until this ends, so keep it narrow, and check the failure some other way.
+func quiet_errors() -> void:
+	Engine.print_error_messages = false
+
+
+func loud_errors() -> void:
+	Engine.print_error_messages = true
+
+
 func unload_fixture() -> void:
+	loud_errors()
 	release_all_actions()
 	tree.paused = false
 	Engine.time_scale = 1.0

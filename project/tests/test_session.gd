@@ -153,6 +153,8 @@ func test_saved_checkpoints_name_real_markers(h) -> void:
 	var director: Node = h.fixture.get_director()
 	h.check(director.get_node(director.checkpoints[0]).name == &"Shore", "checkpoint 0 is %s" % director.get_node(director.checkpoints[0]).name)
 	h.check(director.get_node(director.checkpoints[1]).name == &"PastTheTrench", "checkpoint 1 is %s" % director.get_node(director.checkpoints[1]).name)
+	h.check(director.get_node(director.checkpoints[2]).name == &"Monolith", "checkpoint 2 is %s" % director.get_node(director.checkpoints[2]).name)
+	h.check(director.get_node(director.checkpoints[3]).name == &"Awakened", "checkpoint 3 is %s" % director.get_node(director.checkpoints[3]).name)
 	var world: Node = (load("res://scenes/level/shore.tscn") as PackedScene).instantiate()
 	h.check(world.get_node("Player").position == world.get_node("Checkpoints/Shore").position, "the spawn point is not the shore checkpoint")
 	world.free()
@@ -288,7 +290,7 @@ func test_restarting_clears_a_time_scale_and_a_pause_left_behind(h) -> void:
 
 func _final_sequence_session(h) -> Node:
 	var session: Node = ClassDB.instantiate("GameSession")
-	session.world_scene = load("res://tests/fixtures/director_arena.tscn")
+	session.world_scene = load("res://tests/fixtures/story_arena.tscn")
 	session.director_path = NodePath("GameDirector")
 	session.set_start(3, true, false)
 	h.fixture = session
@@ -304,10 +306,13 @@ func test_the_final_sequence_is_not_a_checkpoint_and_replays_after_a_restart(h) 
 	_write(h, SAVE_FILE, "unchanged")
 	var session := await _final_sequence_session(h)
 	var player: CharacterBody2D = session.get_world().get_node("Player")
-	var reached := []
-	session.get_director().checkpoint_reached.connect(func(beat: int) -> void: reached.append(beat))
-	await h.stand_at(player, Vector2(800, -2))
-	h.check(reached == [4], "the director reached %s" % str(reached))
+	var beats := []
+	var saved := []
+	session.get_director().beat_changed.connect(func(beat: int) -> void: beats.append(beat))
+	session.get_director().checkpoint_reached.connect(func(beat: int) -> void: saved.append(beat))
+	await h.stand_at(player, Vector2(860, -2))
+	h.check(beats == [4, 5], "the director reached %s" % str(beats))
+	h.check(saved.is_empty(), "the final sequence reached checkpoints %s" % str(saved))
 	h.check(session.get_session_beat() == 3, "the session adopted beat %d" % session.get_session_beat())
 	h.check(session.get_persisted_beat() == 3, "the persisted beat is %d" % session.get_persisted_beat())
 	h.check(h.read_storage_file(SAVE_FILE) == "unchanged", "the final sequence wrote a save")
@@ -315,13 +320,13 @@ func test_the_final_sequence_is_not_a_checkpoint_and_replays_after_a_restart(h) 
 	session.restart_checkpoint()
 	await h.steps(30)
 	var world: Node = session.get_world()
-	h.check(world.get_node("TriggerWitness").enabled, "the reveal's trigger is not armed again")
-	h.check(not world.get_node("TriggerA").enabled and not world.get_node("TriggerB").enabled, "an earlier trigger came back")
-	h.check_near(world.get_node("Player").global_position.x, 700.0, 1.0, "x after restarting")
-	var again := [0]
-	session.get_director().checkpoint_reached.connect(func(_beat: int) -> void: again[0] += 1)
-	await h.stand_at(world.get_node("Player"), Vector2(800, -2))
-	h.check(again[0] == 1, "the reveal did not replay: %d" % again[0])
+	h.check(world.get_node("Witness").enabled, "the reveal's trigger is not armed again")
+	h.check(not world.get_node("EnterAbyss").enabled and not world.get_node("ReachMonolith").enabled, "an earlier trigger came back")
+	h.check_near(world.get_node("Player").global_position.x, 760.0, 1.0, "x after restarting")
+	var again := []
+	session.get_director().beat_changed.connect(func(beat: int) -> void: again.append(beat))
+	await h.stand_at(world.get_node("Player"), Vector2(860, -2))
+	h.check(again == [4, 5], "the reveal did not replay: %s" % str(again))
 
 
 func test_writing_keeps_the_old_save_as_the_backup(h) -> void:

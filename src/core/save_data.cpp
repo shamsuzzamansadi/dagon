@@ -2,9 +2,7 @@
 
 #include "core/text_fields.hpp"
 
-#include <array>
 #include <optional>
-#include <utility>
 
 namespace dagon::core {
 
@@ -14,34 +12,6 @@ constexpr int SAVE_VERSION = 1;
 constexpr std::string_view VERSION_FIELD = "dagon_save";
 constexpr std::string_view BEAT_FIELD = "beat";
 constexpr std::string_view CHECKPOINT_FIELD = "checkpoint";
-
-constexpr std::array<std::pair<std::string_view, Beat>, 7> BEAT_NAMES = { {
-		{ "shore", Beat::Shore },
-		{ "abyss", Beat::Abyss },
-		{ "monolith", Beat::Monolith },
-		{ "awakened", Beat::Awakened },
-		{ "witness", Beat::Witness },
-		{ "fleeing", Beat::Fleeing },
-		{ "ended", Beat::Ended },
-} };
-
-std::string_view beat_name(Beat p_beat) {
-	for (const auto &entry : BEAT_NAMES) {
-		if (entry.second == p_beat) {
-			return entry.first;
-		}
-	}
-	return {};
-}
-
-std::optional<Beat> beat_from_name(std::string_view p_name) {
-	for (const auto &entry : BEAT_NAMES) {
-		if (entry.first == p_name) {
-			return entry.second;
-		}
-	}
-	return std::nullopt;
-}
 
 ParsedSave rejected(SaveStatus p_status) {
 	ParsedSave parsed;
@@ -113,10 +83,6 @@ ParsedSave parse_save(std::string_view p_text) {
 	if (!beat.has_value() || !is_savable(*beat) || *checkpoint_text != checkpoint_id(*beat)) {
 		return rejected(SaveStatus::Corrupt);
 	}
-	if (static_cast<int>(*beat) > static_cast<int>(LAST_BUILT_BEAT)) {
-		return rejected(SaveStatus::Incompatible);
-	}
-
 	ParsedSave parsed;
 	parsed.save.beat = *beat;
 	return parsed;

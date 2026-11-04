@@ -6,6 +6,7 @@
 #include "interactor.hpp"
 #include "menu_controller.hpp"
 #include "player_controller.hpp"
+#include "puzzle_controller.hpp"
 #include "settings_menu.hpp"
 #include "story_trigger.hpp"
 
@@ -50,6 +51,7 @@ void initialize_dagon(ModuleInitializationLevel p_level) {
 	GDREGISTER_CLASS(dagon::Interactor);
 	GDREGISTER_CLASS(dagon::StoryTrigger);
 	GDREGISTER_CLASS(dagon::Hud);
+	GDREGISTER_CLASS(dagon::PuzzleController);
 	GDREGISTER_CLASS(dagon::GameDirector);
 	GDREGISTER_CLASS(dagon::GameSession);
 	GDREGISTER_CLASS(dagon::SettingsMenu);
