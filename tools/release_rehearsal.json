@@ -1,0 +1,16 @@
+{
+  "version": "v0.1.0-pre-alpha.0",
+  "milestone": "",
+  "state": "candidate",
+  "summary": "A rehearsal of the packaging workflow. Version .0 can never be published.",
+  "owner_acceptance": {
+    "status": "pending",
+    "record": "none",
+    "build": "none",
+    "fingerprint": "",
+    "scope": "None: this is a rehearsal."
+  },
+  "criteria": {},
+  "known_limitations": ["This is a rehearsal of the packaging workflow, and not a build for anyone to play."],
+  "deferred": []
+}

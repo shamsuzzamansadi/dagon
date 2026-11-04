@@ -1,0 +1,137 @@
+# Decides, packages and publishes a milestone prerelease from the commit CI has just tested. Called only by ci.yml,
+# after its checks, so the packages are the very files that run built and tested. See docs/release.md.
+name: Release
+
+on:
+  workflow_call:
+    inputs:
+      ci-result:
+        type: string
+        required: true
+      rehearse:
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    runs-on: ubuntu-22.04
+    outputs:
+      version: ${{ steps.gate.outputs.version }}
+      record: ${{ steps.gate.outputs.record }}
+      publish: ${{ steps.gate.outputs.publish }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Evaluate the release gates
+        id: gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CI_RESULT: ${{ inputs.ci-result }}
+          REHEARSE: ${{ inputs.rehearse && '--rehearse' || '' }}
+        run: python tools/release_gate.py evaluate --ci-result "$CI_RESULT" $REHEARSE
+
+  package:
+    needs: gate
+    if: ${{ needs.gate.outputs.version != '' }}
+    name: package-${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - platform: linux
+            os: ubuntu-22.04
+          - platform: windows
+            os: windows-2022
+    defaults:
+      run:
+        shell: bash
+    env:
+      VERSION: ${{ needs.gate.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Fetch the exact export this run tested
+        uses: actions/download-artifact@v8
+        with:
+          name: dagon-${{ matrix.platform }}
+          path: export
+      - name: Package
+        run: python tools/package_release.py package --platform ${{ matrix.platform }} --version "$VERSION" --export-dir export --out packages
+      - name: Smoke-test the package itself
+        run: python tools/package_release.py smoke --platform ${{ matrix.platform }} --package packages/dagon-*
+      - uses: actions/upload-artifact@v7
+        with:
+          name: release-package-${{ matrix.platform }}
+          path: packages/
+          retention-days: 14
+
+  prepare:
+    needs: [gate, package]
+    runs-on: ubuntu-22.04
+    env:
+      VERSION: ${{ needs.gate.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: release-package-*
+          path: packages
+          merge-multiple: true
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: logs-*
+          path: logs
+      - name: Prepare the notes, checksums and provenance
+        env:
+          RECORD: ${{ needs.gate.outputs.record }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          COMMIT: ${{ github.sha }}
+        run: python tools/release_gate.py prepare --record "$RECORD" --packages packages --logs logs --out prepared --commit "$COMMIT" --run-url "$RUN_URL"
+      # The publish job cannot run in a rehearsal, so this runs its first check, with this job's read-only token.
+      - name: Rehearse the publisher's first check
+        if: ${{ inputs.rehearse }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.gate.outputs.version }}
+        run: python tools/release_gate.py preflight --version "$VERSION"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: release-candidate-${{ needs.gate.outputs.version }}
+          path: prepared/
+          retention-days: 14
+
+  publish:
+    needs: [gate, prepare]
+    if: ${{ needs.gate.outputs.publish == 'true' && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-22.04
+    # The only job that can write. One publication runs at a time, and a queued one is never cancelled by a running one.
+    permissions:
+      contents: write
+    concurrency:
+      group: release-publication
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v8
+        with:
+          name: release-candidate-${{ needs.gate.outputs.version }}
+          path: prepared
+      - name: Publish the prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.gate.outputs.version }}
+          COMMIT: ${{ github.sha }}
+        run: sh tools/publish_release.sh "$VERSION" "$COMMIT" prepared

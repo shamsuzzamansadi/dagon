@@ -1,16 +1,17 @@
 #!/usr/bin/env sh
-# Publishes CI evidence as annotations. Usage: tools/ci_annotate.sh <build|tests> <platform>
+# Publishes CI evidence as annotations. Usage: tools/ci_annotate.sh <build|tests|entry> <platform> [job name]
 # Reporting only: always exits 0, so it cannot mask or cause a job failure.
 group="$1"
 platform="$2"
+job="${3:-$2}"
 
 notice() { # notice <title> <file> <pattern>
 	line="$(grep -hE "$3" "$2" 2> /dev/null | head -n 1 | tr -d '\r')"
-	echo "::notice title=$platform $1::${line:-missing}"
+	echo "::notice title=$job $1::${line:-missing}"
 }
 
 exit_of() { # exit_of <title> <file>
-	echo "::notice title=$platform $1::exit=$(cat "$2" 2> /dev/null | tr -d '\r' || true)"
+	echo "::notice title=$job $1::exit=$(cat "$2" 2> /dev/null | tr -d '\r' || true)"
 }
 
 case "$group" in

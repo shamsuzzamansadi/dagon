@@ -1,0 +1,114 @@
+Deliberate breakage of the release tools and workflow rules, one change at a time, each on its own scratch copy.
+A change is caught if tools/test_release_tools.py fails.
+
+control: exit 0, OK
+
+caught     | CI failure no longer blocks | FAIL: test_a_skipped_or_cancelled_ci_is_not_success and 1 more
+caught     | owner acceptance is not required | FAIL: test_a_candidate_with_open_gates_reports_them_without_failing and 2 more
+caught     | the acceptance record need not exist | FAIL: test_acceptance_needs_a_record_that_exists
+caught     | the build tested need not be stated | ERROR: test_a_candidate_is_packaged_and_never_published_even_with_every_gate_passed and 17 more
+caught     | the acceptance scope need not be stated | ERROR: test_a_candidate_is_packaged_and_never_published_even_with_every_gate_passed and 17 more
+caught     | a changed fingerprint keeps the acceptance | FAIL: test_a_changed_workflow_blocks_a_record_asking_to_publish and 1 more
+caught     | project tests void the acceptance | FAIL: test_acceptance_survives_documents_tests_release_tools_and_the_record_itself
+caught     | documents void the acceptance | FAIL: test_nothing_published_yet_goes_ahead and 2 more
+caught     | the release record voids the acceptance | FAIL: test_nothing_published_yet_goes_ahead and 1 more
+caught     | the release gate voids the acceptance | FAIL: test_acceptance_survives_documents_tests_release_tools_and_the_record_itself
+caught     | src is left out of the acceptance | FAIL: test_acceptance_survives_a_squash and 2 more
+caught     | project is left out of the acceptance | FAIL: test_every_game_build_and_export_input_voids_the_acceptance and 2 more
+caught     | SConstruct is left out of the acceptance | FAIL: test_every_game_build_and_export_input_voids_the_acceptance
+caught     | methods.py is left out of the acceptance | FAIL: test_every_game_build_and_export_input_voids_the_acceptance
+caught     | godot-cpp is left out of the acceptance | FAIL: test_a_new_godot_cpp_version_voids_the_acceptance
+caught     | .gitmodules is left out of the acceptance | FAIL: test_every_game_build_and_export_input_voids_the_acceptance
+caught     | .gitattributes is left out of the acceptance | FAIL: test_every_game_build_and_export_input_voids_the_acceptance
+caught     | .github/workflows is left out of the acceptance | FAIL: test_a_changed_workflow_blocks_a_record_asking_to_publish and 2 more
+caught     | tools/run_godot_checks.sh is left out of the acceptance | FAIL: test_every_game_build_and_export_input_voids_the_acceptance
+caught     | tools/export_check.sh is left out of the acceptance | FAIL: test_every_game_build_and_export_input_voids_the_acceptance
+caught     | tools/prepare_project.sh is left out of the acceptance | FAIL: test_every_game_build_and_export_input_voids_the_acceptance
+caught     | tools/test_storage.sh is left out of the acceptance | FAIL: test_every_game_build_and_export_input_voids_the_acceptance
+caught     | tools/package_release.py is left out of the acceptance | FAIL: test_every_game_build_and_export_input_voids_the_acceptance
+caught     | tools/install_godot.sh is left out of the acceptance | FAIL: test_every_game_build_and_export_input_voids_the_acceptance
+caught     | tools/install_export_templates.sh is left out of the acceptance | FAIL: test_every_game_build_and_export_input_voids_the_acceptance
+caught     | tools/extract_templates.py is left out of the acceptance | FAIL: test_every_game_build_and_export_input_voids_the_acceptance
+caught     | a deferred criterion counts as met | FAIL: test_a_deferred_check_is_not_a_pass
+caught     | a missing criterion counts as met | FAIL: test_a_missing_criterion_is_not_a_pass
+caught     | a criterion needs no evidence | FAIL: test_a_met_criterion_needs_evidence_that_exists
+caught     | known limitations are optional | FAIL: test_known_limitations_must_be_documented
+caught     | a release candidate may leave checks deferred | FAIL: test_a_release_candidate_cannot_leave_checks_deferred
+caught     | any base version is accepted for a label | FAIL: test_stable_and_mislabelled_versions_are_refused
+caught     | an unauthorized label is accepted | ERROR: test_stable_and_mislabelled_versions_are_refused
+caught     | a stable version is accepted | FAIL: test_a_rehearsal_can_never_be_published and 1 more
+caught     | version .0 is publishable | FAIL: test_a_rehearsal_can_never_be_published and 1 more
+caught     | a tag with no release is ignored, and it publishes again | FAIL: test_a_real_tag_with_no_release_fails_and_names_the_tag and 3 more
+caught     | a published release with no tag is ignored | FAIL: test_a_release_with_no_tag_is_a_blocker
+caught     | a tag alone counts as a complete release | ERROR: test_a_tag_with_no_published_release_is_a_blocker_in_every_state and 6 more
+caught     | a moved tag is accepted | FAIL: test_a_release_whose_tag_moved_is_a_blocker and 1 more
+caught     | a branch is accepted as a target | FAIL: test_a_release_with_a_branch_for_its_target_is_a_blocker
+caught     | a release with no tag is accepted | FAIL: test_a_release_with_no_tag_is_a_blocker
+caught     | a full release is accepted as a prerelease | FAIL: test_a_release_that_is_not_a_prerelease_is_a_blocker
+caught     | a draft is accepted as published | FAIL: test_a_release_marked_as_a_draft_is_a_blocker
+caught     | a release for another tag is accepted | FAIL: test_a_release_named_for_another_tag_is_a_blocker
+caught     | a release missing files is accepted | FAIL: test_an_incomplete_publication_is_a_blocker and 1 more
+caught     | an unfinished upload counts as uploaded | FAIL: test_an_upload_that_never_finished_is_a_blocker
+caught     | the notes file is not required on a release | FAIL: test_an_incomplete_publication_is_a_blocker
+caught     | an inconsistent release does not fail the gate | FAIL: test_a_real_tag_with_no_release_fails_and_names_the_tag and 12 more
+caught     | HTTP 401, 403 and 500 read as absent | FAIL: test_an_api_failure_stops_everything_and_says_so and 10 more
+caught     | a failed connection or unreadable answer reads as absent | FAIL: test_an_answer_it_cannot_read_is_unknown
+caught     | a missing token is sent anyway, and its 404 reads as absent | FAIL: test_no_token_is_unknown
+caught     | a repository it cannot see reads as no releases | FAIL: test_a_failed_login_is_unknown and 1 more
+caught     | a failed page of releases ends the list quietly | FAIL: test_a_page_that_is_not_there_is_unknown_and_does_not_end_the_list
+caught     | the list of releases stops at one page | FAIL: test_a_failed_page_is_unknown and 2 more
+caught     | a tag listing failure reads as no tags | FAIL: test_a_tag_listing_failure_stops_everything_and_says_so
+caught     | an annotated tag is compared by its tag object | FAIL: test_an_annotated_tag_is_compared_by_its_commit
+caught     | an unanswered question does not fail the gate | FAIL: test_a_tag_listing_failure_stops_everything_and_says_so and 3 more
+caught     | an unanswered question still packages | FAIL: test_a_tag_listing_failure_stops_everything_and_says_so and 3 more
+caught     | preflight removes a draft even when a tag exists | FAIL: test_a_tag_with_only_a_draft_is_a_blocker_and_nothing_is_removed
+caught     | preflight removes a draft beside a published release | FAIL: test_preflight_says_skip_for_a_complete_release and 4 more
+caught     | preflight reads an unknown draft flag as a draft | FAIL: test_a_release_that_does_not_say_whether_it_is_a_draft_is_a_blocker
+caught     | preflight skips an inconsistent release | ERROR: test_a_tag_with_only_a_draft_is_a_blocker_and_nothing_is_removed and 2 more
+caught     | preflight says nothing fails when it cannot tell | FAIL: test_preflight_fails_and_gives_no_decision_when_it_cannot_tell and 1 more
+caught     | a published release can be deleted as a draft | FAIL: test_a_published_release_is_never_deleted
+caught     | verify does not compare with the tested commit | FAIL: test_verify_after_publishing and 1 more
+caught     | verify passes when it cannot tell | FAIL: test_verify_after_publishing
+caught     | two requested releases are allowed | FAIL: test_two_requested_releases_stop_both
+caught     | a candidate is published | FAIL: test_a_candidate_is_packaged_and_never_published_even_with_every_gate_passed and 1 more
+caught     | a planned record is treated as requested | FAIL: test_a_planned_record_reports_what_remains_and_does_nothing
+caught     | a failed CI still packages | FAIL: test_failed_ci_blocks_and_packages_nothing
+caught     | a rehearsal can publish | FAIL: test_a_rehearsal_can_never_be_published
+caught     | a second package per OS is allowed | FAIL: test_more_than_one_package_per_os_is_refused
+caught     | provenance may lack a compiler | FAIL: test_a_missing_compiler_stops_the_release and 2 more
+caught     | deferred checks are left out of the notes | ERROR: test_notes_state_the_commit_limits_and_what_was_not_tested
+caught     | the notes always claim acceptance | FAIL: test_notes_claim_acceptance_only_when_it_covers_this_build and 2 more
+caught     | the notes ignore a changed fingerprint | FAIL: test_notes_claim_acceptance_only_when_it_covers_this_build
+caught     | a rehearsal cannot be prepared | ERROR: test_the_rehearsal_record_can_be_prepared
+caught     | the Linux binary loses its executable bit | ERROR: test_smoke_passes_on_a_game_that_gives_every_proof and 3 more
+caught     | tar timestamps vary | FAIL: test_a_package_has_the_same_bytes_whenever_it_is_made and 2 more
+caught     | the gzip header holds the time | FAIL: test_a_package_has_the_same_bytes_whenever_it_is_made and 1 more
+caught     | the gzip header holds a file name | FAIL: test_the_gzip_header_holds_no_time_and_no_file_name
+caught     | the zip timestamps vary | FAIL: test_timestamps_inside_a_package_are_fixed
+caught     | an incomplete export is packaged | FAIL: test_an_incomplete_or_extra_export_is_refused
+caught     | the license is left out | FAIL: test_a_package_holds_the_export_and_the_license_and_credits
+caught     | smoke ignores the exit code | FAIL: test_smoke_fails_on_an_exit_code_or_a_logged_error
+caught     | smoke ignores logged errors | FAIL: test_smoke_fails_on_an_exit_code_or_a_logged_error
+caught     | smoke needs no proof | ERROR: test_smoke_fails_when_any_proof_is_missing and 1 more
+caught     | smoke skips the release library | ERROR: test_smoke_fails_when_any_proof_is_missing and 1 more
+caught     | smoke skips the prompt | ERROR: test_smoke_fails_when_any_proof_is_missing and 1 more
+caught     | the publisher publishes straight away | ERROR: test_the_publisher_never_forces_or_moves_anything
+caught     | the publisher does not check uploads | ERROR: test_the_publisher_never_forces_or_moves_anything
+caught     | the publisher hides a preflight failure | FAIL: test_the_publisher_never_forces_or_moves_anything
+caught     | the publisher deletes a release itself | FAIL: test_the_publisher_never_forces_or_moves_anything
+caught     | the publisher does not verify afterwards | ERROR: test_the_publisher_never_forces_or_moves_anything
+caught     | the publisher runs no preflight | ERROR: test_the_publisher_never_forces_or_moves_anything
+caught     | the gate has no token to ask with | FAIL: test_the_gate_asks_github_with_a_read_only_token
+caught     | publish can run from any branch | FAIL: test_only_the_publish_job_can_write_and_only_from_main
+caught     | publish can run off any event | FAIL: test_only_the_publish_job_can_write_and_only_from_main
+caught     | publish ignores the gate | FAIL: test_only_the_publish_job_can_write_and_only_from_main
+caught     | publication is not serialized | FAIL: test_publication_is_serialized_and_never_cancelled
+caught     | every job can write | FAIL: test_only_the_publish_job_can_write_and_only_from_main
+caught     | a stored secret is used | FAIL: test_no_secret_but_the_runs_own_token and 1 more
+caught     | Clang's build ships | FAIL: test_the_three_compilers_must_pass_and_clang_never_ships
+caught     | a compiler failure is ignored | FAIL: test_the_three_compilers_must_pass_and_clang_never_ships
+caught     | the export uploads from every job | FAIL: test_the_three_compilers_must_pass_and_clang_never_ships
+
+control again: exit 0, OK
+
+105 changes, 105 caught, not caught: none

@@ -150,6 +150,18 @@ for later beats stay in M3,** as those beats arrive.
 - New Game's confirmation defaults to Cancel, Continue is unavailable without a usable save, and a failed write
   shows no "saved" notice.
 
+### Milestone prereleases (owner, 2026-11-03, D45)
+
+Each is a GitHub prerelease, published when its gates pass, and not because a milestone number was reached. [release.md](release.md) has the workflow.
+
+| Milestone | Version | Promise, or the earlier label is retained |
+|---|---|---|
+| M3 | `v0.1.0-pre-alpha.1` | A usable playable slice, with working controls, interactions, checkpoint persistence and clearly documented limitations |
+| M5 | `v0.2.0-alpha.1` | The intended game is playable from beginning to end, with its principal gameplay and audio connected |
+| M7 | `v0.3.0-rc.1` | Intended scope complete, no known release-blocking defects, and final acceptance checks passed |
+
+**Not under this authorization:** itch.io, the jam submission, and anything labelled stable or 1.0.
+
 ### M4 and M5 audio and transition
 
 - Keep the planned original environmental audio and footsteps and object sounds (M4), and story-trigger cues
