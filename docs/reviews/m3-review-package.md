@@ -263,6 +263,8 @@ Tests are in `project/tests/test_cinematics.gd` unless named. The middle column 
 
 ## 6. Test results
 
+**Green CI is technical evidence. It does not show that the game is engaging, looks right or sounds right, and those concerns stay open** (§8, §12).
+
 **At `2ce855a`, CI run [41818800097](https://github.com/shamsuzzamansadi/dagon/actions/runs/41818800097):**
 
 | Check | Linux, g++ 11.4.0 | Linux, Clang 18.1.3 | Windows, MSVC 19.44.35229 |
@@ -278,6 +280,8 @@ Tests are in `project/tests/test_cinematics.gd` unless named. The middle column 
 | No warnings in the project's own code | Pass | Pass | Pass |
 | Release tools and records | Pass, in `release-tools` | | |
 
+The same checks passed again on `506a8f8`, which adds only documents and evidence: runs [41828833074](https://github.com/shamsuzzamansadi/dagon/actions/runs/41828833074) (push) and [41828841443](https://github.com/shamsuzzamansadi/dagon/actions/runs/41828841443) (pull request).
+
 **By suite:** test_cinematics 49, test_controller 23, test_director 14, test_interaction 10, test_level 10, test_movement 15, test_narration 42, test_narrative 40, test_pause_menu 18, test_puzzle 15, test_restore 19, test_route 10, test_session 21, test_settings 37, test_shore 22, test_title 25, test_world 15.
 
 **Can the tests fail?** [Last pass](../evidence/m3/breakage.txt). Simulated input only, one change at a time, with each worker's control passing before and after.
@@ -288,9 +292,9 @@ Tests are in `project/tests/test_cinematics.gd` unless named. The middle column 
 - **A last focused pass at `2ce855a`, for what the 4 left open and for the changes since: 19 entries, 17 caught, 2 not caught.**
   - **Now caught, as the two gaps the last pass left open:** "The voice goes on into the credits", which had no test, and "A background event replays on every crossing", whose test crossed back while the clip was still playing, which hid the bug.
   - **Caught, for the changes since:** rock that never comes down, cannot be seen, cannot be stood on, is too high to hop, blocks the way from the start, lands where a run could be under it, or is drawn away from where it collides. A tablet readable from the wrong level. The second shelf getting its near rock back. A sea that never rises, comes after the fade, or stops short. A mural whose fragments lose the order.
-  - **Still not caught, 2, and I read both as changing nothing that can be observed. They are my reading, not a proof:** "The gate changes in a physics callback, not deferred": on Godot 4.7.2 this logged no error and behaved the same, so the deferred call is a precaution, which the rock's collision also uses. "Restoring leaves the atmosphere clip running": the clip has already been sought to its end, so it stops by itself a frame later. No test can tell them apart from the real code, and I have not added a test that would only pin the implementation.
+  - **Still not caught, 2, and I read both as changing nothing that can be observed. They are my reading, not a proof:** "The gate changes in a physics callback, not deferred": on Godot 4.7.2 this logged no error and behaved the same, so the deferred call is a precaution, which the rock's collision also uses. "Restoring leaves the atmosphere clip running": the clip has already been sought to its end, so it stops by itself a frame later. I found no test that would tell them apart from the real code without only pinning the implementation, so I added none.
 
-**A broad repeat was not run at the final commit.** The owner asked for broad repeats only when changes or failures justify them. Since `35ff084`, the only game code that changed is one method and one call in `GameDirector`, plus the scene. **So the 54 caught at `35ff084` rest on that commit, not on the final one.** The contract's tests still pass at the final commit.
+**A broad repeat was not run at the final commit.** The owner asked for broad repeats only when changes or failures justify them. Since `35ff084`, the game code gained one method, its call and one node path in `GameDirector`. The scene changed too, and the route driver now hops during the flee. **So the 54 caught at `35ff084` rest on that commit, not on the final one.** The contract's tests still pass at the final commit.
 
 **Fresh clone from GitHub, following the README, at `2ce855a`** (developer, Ubuntu 24.04 under WSL2, GCC 13.3.0, Godot 4.7.2): [full output](../evidence/m3/fresh-clone.txt). Builds and unit tests clean. 10 of 10 repeats of the integration suite passed, each with 385 tests. Exported route passed, 4 runs, flee timing out at 13.21 s of wall clock on this slower, software-rendered machine. The tests hold the game's own clock to 12 s. Tracked files changed afterwards: 0.
 
@@ -385,7 +389,6 @@ Tests are in `project/tests/test_cinematics.gd` unless named. The middle column 
 **For the reviewer's judgment:**
 
 0. **D67–D69:** do these stay inside M3's approved scope, as I have judged? Is moving the tablets off the ground a fair reading of "small route choices", given that it replaces part of D56?
-
 1. **D49:** is 3 frames right as a fixed number? It is measured on 4.7.2, and a test fails if the engine's latency changes.
 2. **D50:** the Ended outcome is applied in the deferred step, one flush after the finalizer. Is anything lost?
 3. **D60:** `Hud` takes the press before `Interactor` by tree order alone. Is that too quiet a dependency? A test fails if it breaks.

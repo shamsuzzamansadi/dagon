@@ -2,7 +2,7 @@
 
 Changing task state only. The lasting rules are in [AGENTS.md](../AGENTS.md). **Check this against `git log`, the pull request and CI before relying on it.**
 
-**Last updated:** 2026-11-04, during the resumed M3 task.
+**Last updated:** 2026-11-04, at the M3 review handoff.
 
 ## Where things are
 
@@ -23,9 +23,9 @@ Changing task state only. The lasting rules are in [AGENTS.md](../AGENTS.md). **
 
 **Not to reopen:** the release engineering work, which is complete and accepted.
 
-## Owner feedback on the current build
+## Owner feedback, on the latest build they played
 
-Recorded in full in [evidence/m3/owner-playtest-2026-11-04.md](evidence/m3/owner-playtest-2026-11-04.md). **The build is NOT owner-accepted.** In short: improved, but not yet a sufficiently engaging game. Very linear, and can be completed in under three minutes. Examine captions and props have not added enough meaningful activity. Cave and later art visibly unfinished. Music and sound insufficient. **The narration sounds noticeably synthetic and is not an approved final voice.** The reveal, escape and ending need a stronger payoff.
+Recorded in full in [evidence/m3/owner-playtest-2026-11-04.md](evidence/m3/owner-playtest-2026-11-04.md). **M3 is NOT owner-accepted.** That build came before `2ce855a`. In short: improved, but not yet a sufficiently engaging game. Very linear, and can be completed in under three minutes. Examine captions and props have not added enough meaningful activity. Cave and later art visibly unfinished. Music and sound insufficient. **The narration sounds noticeably synthetic and is not an approved final voice.** The reveal, escape and ending need a stronger payoff.
 
 ChatGPT inspected sampled video frames, but did not listen to the audio.
 
@@ -37,9 +37,12 @@ Everything in the approved scope above has been built. After the owner's playtes
 
 **The tested code and the build to play are `2ce855a`,** fingerprint `sha256:8645ded9104896405f1df83694c40cf22321ba63b1287f925a2118adf9f18c2e`. Later commits add only documents and evidence.
 
+**The exact Windows build for the owner's playtest:** [`dagon-windows`, artifact 13316306928](https://github.com/shamsuzzamansadi/dagon/actions/runs/41818800097/artifacts/13316306928), from run `41818800097`, zip SHA-256 `d293bf4758f20fad1c39eb0765a67eec252ef77634968be4c07c24b32df1b566`.
+
 | Result | Commit | Who | Outcome |
 |---|---|---|---|
 | CI run `41818800097`: GCC, Clang, MSVC, exported pack, exported route on Linux and Windows, release tools | `2ce855a` | CI | **Green.** 120 native cases, 385 integration tests. Release job skipped, as it should be. Logs and builds expire 2027-02-02 |
+| CI runs `41828833074` (push) and `41828841443` (pull request): the same checks | `506a8f8`, documents and evidence only | CI | **Green.** Same counts. Pull request #3 names the CI of any later documents-only commit |
 | Fresh clone by the README, with 10 repeats of the suite and the exported route | `2ce855a` | Developer, scripted, software rendering | All pass. No tracked files changed. `evidence/m3/fresh-clone.txt` |
 | Focused deliberate breakage, 19 entries | `2ce855a` | Developer, scripted | 17 caught, 2 not. `evidence/m3/breakage.txt` |
 | Focused deliberate breakage, 58 entries. The pass the limit interrupted the reading of | `35ff084` | Developer, scripted | 54 caught, 4 not. `evidence/m3/breakage-focused-at-35ff084.txt` |
@@ -59,7 +62,7 @@ Everything in the approved scope above has been built. After the owner's playtes
 
 - **Engagement:** see the owner's feedback, and the package §12. One real thing to work out in the whole game. A proposal is written. Not started, and it needs a decision.
 - **Art and sound:** nothing past the Shore is production art, and only three voice samples sound. M4 and M5.
-- **GitHub began refusing this machine's SSH key** during the resumed session (`Permission denied (publickey)`), having accepted it minutes earlier. The cause is not established. Clones whose `origin` is that SSH remote cannot push or fetch through it. The HTTPS URL with the logged-in `gh` as credential helper works, but `gh`'s token has no `workflow` scope, so a commit that changes `.github/workflows` needs the SSH route or the owner.
+- **GitHub refused this machine's SSH key for a while** on 2026-11-04 (`Permission denied (publickey)`), then accepted it again later the same day. The cause is not established, so it may recur. If it does, pushing to the HTTPS URL with the logged-in `gh` as credential helper works, but `gh`'s token has no `workflow` scope, so a commit that changes `.github/workflows` needs SSH or the owner.
 
 ## Remaining work
 
