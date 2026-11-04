@@ -14,6 +14,9 @@ failures=0
 . "$root/tools/test_storage.sh"
 
 # step <name> <required-stdout-pattern or ""> <args...>
+# Errors the integration tests set out to cause. The test runner's own trap fails a test on any error it did not name.
+tested_errors='^ERROR: (GameDirector: (cinematic|more than one event)|PuzzleController: a stone submitted|Hud: no line in the script|haptics: there is no cue)'
+expected_errors='^$'
 step() {
 	name="$1"
 	required="$2"
@@ -24,7 +27,7 @@ step() {
 	result="ok"
 	if [ "$code" -ne 0 ]; then
 		result="FAILED exit=$code"
-	elif grep -E "^(ERROR|SCRIPT ERROR|USER ERROR)|Parse Error|Cannot get class" "$logs/$name.stdout" "$logs/$name.stderr" > "$logs/$name.errors"; then
+	elif grep -hE "^(ERROR|SCRIPT ERROR|USER ERROR)|Parse Error|Cannot get class" "$logs/$name.stdout" "$logs/$name.stderr" | grep -vE "$expected_errors" > "$logs/$name.errors"; then
 		result="FAILED: ERROR lines in output"
 	elif [ -n "$required" ] && ! grep -qE "$required" "$logs/$name.stdout"; then
 		result="FAILED: missing '$required'"
@@ -44,7 +47,9 @@ sh "$root/tools/prepare_project.sh"
 
 step import "" --import
 step check_classes "^CHECK_CLASSES classes=[0-9]+ problems=0" --script res://tests/check_classes.gd
+expected_errors="$tested_errors"
 step integration "^RESULT passed=[0-9]+ failed=0" --fixed-fps 60 --script res://tests/run_tests.gd
+expected_errors='^$'
 step smoke "dagon: extension initialized" --verbose --fixed-fps 60 --quit-after 600
 step smoke_greybox "dagon: extension initialized" --verbose --fixed-fps 60 --quit-after 600 res://scenes/level/level.tscn
 step smoke_game "dagon: prompt: \\[E\\] Examine" --verbose --fixed-fps 60 --quit-after 600 res://scenes/level/game.tscn

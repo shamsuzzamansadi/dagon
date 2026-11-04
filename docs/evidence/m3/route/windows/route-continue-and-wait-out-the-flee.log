@@ -1,0 +1,23 @@
+    0.20  dagon: extension initialized build=release compiler=MSVC 194435229 __cplusplus=202002
+    0.27  dagon: save status=0 backup=false
+    0.92  dagon: session start beat=3 persisted=3
+    3.39  dagon: beat=witness
+    3.39  dagon: cinematic start clip=dagon_reveal generation=1
+    8.00  dagon: line: story.reveal voiced=false seconds=4.0
+    8.00  dagon: caption: It was no ridge. It had been beside me the whole way.
+   15.63  dagon: line: story.run voiced=false seconds=4.0
+   15.63  dagon: caption: Its head turned. I ran.
+   17.41  dagon: cinematic finalized clip=dagon_reveal generation=1
+   17.41  dagon: beat=fleeing
+   29.37  dagon: beat=ended
+   29.37  the flee timed out after 11.96 s of wall clock
+   29.37  dagon: cinematic start clip=collapse generation=2
+   35.35  dagon: cinematic finalized clip=collapse generation=2
+   35.35  dagon: ending
+   35.35  dagon: ending card shown
+   35.35  dagon: ending line: ending.found voiced=false
+   35.89  dagon: ending line: ending.listen voiced=false
+   36.52  dagon: ending line: ending.innsmouth voiced=true
+   37.16  dagon: ending line: ending.rising voiced=false
+   38.67  dagon: save status=0 backup=false
+   40.58  exit 0

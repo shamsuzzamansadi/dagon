@@ -85,7 +85,6 @@ func test_unusable_saves_are_explained_and_nothing_is_changed(h) -> void:
 		"a mismatched checkpoint": ["dagon_save=1\nbeat=abyss\ncheckpoint=Shore\n".to_utf8_buffer(), "damaged"],
 		"the final sequence": ["dagon_save=1\nbeat=witness\ncheckpoint=\n".to_utf8_buffer(), "damaged"],
 		"another version": ["dagon_save=99\nbeat=shore\ncheckpoint=Shore\n".to_utf8_buffer(), "another version"],
-		"a beat this build lacks": ["dagon_save=1\nbeat=monolith\ncheckpoint=Monolith\n".to_utf8_buffer(), "another version"],
 	}
 	for case_name in cases:
 		h.write_storage_file(SAVE_FILE, cases[case_name][0])

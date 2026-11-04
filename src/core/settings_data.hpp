@@ -30,6 +30,9 @@ inline constexpr int KEY_CODE_RIGHT = 4194321;
 struct Settings {
 	float music_volume = 1.0f;
 	float effects_volume = 1.0f;
+	float narration_volume = 1.0f;
+	bool subtitles = true;
+	bool vibration = true;
 	std::array<int, GAME_ACTION_COUNT> keys = { KEY_CODE_A, KEY_CODE_D, KEY_CODE_SPACE, KEY_CODE_E };
 };
 

@@ -1,0 +1,1099 @@
+Deliberate breakage, focused, at commit 35ff084: the owner's update, and the gaps from the first pass. One change at a time, in scratch clones with isolated storage. Simulated input only.
+
+caught              1 failing  An optional line interrupts a story moment
+caught              1 failing  Asking for the same line restarts it
+caught              8 failing  A story moment cannot replace what is being said
+caught              0 failing  A voiced caption ends as the voice does, with no margin
+caught              1 failing  Text gets no reading time
+caught              0 failing  A damaged script line is guessed at
+caught              8 failing  The voice outlives its caption
+caught              2 failing  Skipping also examines
+caught              5 failing  A press at something else only skips
+caught              2 failing  A press during a story moment examines
+caught              1 failing  Speech swallows a press at a stone
+caught              1 failing  Subtitles off hides text lines too
+caught              1 failing  The subtitle setting is ignored
+caught              4 failing  Feedback waits behind what is being said
+caught              1 failing  A fall leaves the line going
+caught             21 failing  A prop ignores its line
+caught              1 failing  The voice is not on the Narration bus
+caught             10 failing  The Monolith line is said on restore too
+caught              3 failing  Continue skips the rest of the epilogue
+caught              1 failing  The epilogue never moves on by itself
+NOT CAUGHT          0 failing  The voice goes on into the credits
+caught              1 failing  Moving on in the epilogue leaves the last line speaking
+caught              2 failing  The narration volume sets no bus
+caught              1 failing  The subtitle switch never reaches the game
+caught              1 failing  The vibration switch never reaches the game
+caught              1 failing  The subtitle switch is not saved
+caught              1 failing  Toggling subtitles does nothing
+caught              1 failing  Restore Defaults leaves vibration off
+caught              1 failing  Vibration ignores the setting
+caught              1 failing  A keyboard player's cue vibrates
+caught              1 failing  A cue lasts far too long
+caught              1 failing  A cue is far too strong
+caught              1 failing  Pausing leaves it vibrating
+caught              2 failing  Leaving the world leaves it vibrating
+caught              2 failing  Changing device leaves the old one vibrating
+caught              8 failing  A cinematic has lost its cue
+NOT CAUGHT          0 failing  A background event replays on every crossing
+caught              1 failing  A background event runs during a cinematic
+caught              1 failing  A restored world replays what is behind it
+caught              1 failing  The sailor does not turn back
+caught              5 failing  The ritual has left the director's triggers
+caught              3 failing  The shelf cannot be stood on
+caught              1 failing  The relief can be read from the shelf above
+caught            223 failing  A prop names a line that is not in the script
+caught              1 failing  The hand is drawn behind the monolith
+caught              1 failing  The hand misses the monolith
+caught              3 failing  The epilogue loses Innsmouth
+caught              1 failing  A wrong stone leaves the prompts up during the lockout
+caught              1 failing  Solved stones keep reacting
+caught              1 failing  The flee awaits no trigger
+caught              4 failing  A looping clip is played
+NOT CAUGHT          0 failing  The gate changes in a physics callback, not deferred
+caught              2 failing  The scene changes inside the finalizer, not deferred
+NOT CAUGHT          0 failing  Restoring leaves the atmosphere clip running
+caught              1 failing  The lockout runs on while paused
+caught              1 failing  The flee timer and watchdog run on while paused
+caught              1 failing  Clips run on while paused
+caught              1 failing  A polygon crosses itself and is silently not drawn
+
+commit 35ff084, 58 breakages: {'caught': 54, 'NOT CAUGHT': 4}
+
+---- Full output of each worker, with its control before and after
+
+########## worker 0
+=== control: no change
+[doctest] test cases:  120 |  120 passed | 0 failed | 0 skipped
+RESULT passed=372 failed=0
+
+=== Asking for the same line restarts it
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=371 failed=1
+
+=== Text gets no reading time
+tests/unit/test_narration.cpp:92: ERROR: CHECK( line_seconds(150, 0.0, 4.0) == doctest::Approx(10.0) ) is NOT correct!
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=371 failed=1
+
+=== A press during a story moment examines
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=370 failed=2
+
+=== Feedback waits behind what is being said
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=368 failed=4
+
+=== The voice is not on the Narration bus
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=371 failed=1
+
+=== The voice goes on into the credits
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=372 failed=0
+NOT CAUGHT
+
+=== The vibration switch never reaches the game
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=371 failed=1
+
+=== Vibration ignores the setting
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=371 failed=1
+
+=== Pausing leaves it vibrating
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=371 failed=1
+
+=== A background event runs during a cinematic
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=371 failed=1
+
+=== The shelf cannot be stood on
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=369 failed=3
+
+=== The hand misses the monolith
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=371 failed=1
+
+=== The flee awaits no trigger
+FAIL test_cinematics.test_a_player_still_inside_collapse_when_the_flee_begins_ends_it_at_once
+     timed out after 8 steps waiting for the recheck to find the player in collapse
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+RESULT passed=371 failed=1
+
+=== The scene changes inside the finalizer, not deferred
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=370 failed=2
+
+=== A polygon crosses itself and is silently not drawn
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=371 failed=1
+
+=== control after, worker 0
+[doctest] test cases:  120 |  120 passed | 0 failed | 0 skipped
+RESULT passed=372 failed=0
+
+########## worker 1
+=== control: no change
+[doctest] test cases:  120 |  120 passed | 0 failed | 0 skipped
+RESULT passed=372 failed=0
+
+=== An optional line interrupts a story moment
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=371 failed=1
+
+=== A damaged script line is guessed at
+tests/unit/test_narration.cpp:29: ERROR: CHECK( parse_narration_script("just some words\n").problems == 1 ) is NOT correct!
+tests/unit/test_narration.cpp:32: ERROR: CHECK( parse_narration_script("a|story\n").problems == 1 ) is NOT correct!
+tests/unit/test_narration.cpp:44: ERROR: CHECK( parse_narration_script(std::string("\x00\xff\xfe\x01\n", 5)).problems == 1 ) is NOT correct!
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=372 failed=0
+
+=== A press at something else only skips
+FAIL test_session.test_examine_works_through_normal_play_at_the_boat_and_the_fish
+     pressing E at the fish shows 'The lifeboat lies on bare seabed. The sea has drawn back farther than any tide.'
+FAIL test_session.test_examine_follows_a_rebound_key_at_the_boat_and_the_fish
+     the new key at the fish shows 'The lifeboat lies on bare seabed. The sea has drawn back farther than any tide.'
+FAIL test_controller.test_examine_works_with_a_controller_at_the_boat_and_the_fish
+     Xbox Series Controller: west at the fish shows 'The lifeboat lies on bare seabed. The sea has drawn back farther than any tide.'
+     PS5 Controller: west at the fish shows 'The lifeboat lies on bare seabed. The sea has drawn back farther than any tide.'
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+RESULT passed=367 failed=5
+
+=== The subtitle setting is ignored
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=371 failed=1
+
+=== The Monolith line is said on restore too
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=362 failed=10
+
+=== The narration volume sets no bus
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=370 failed=2
+
+=== Toggling subtitles does nothing
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=371 failed=1
+
+=== A cue lasts far too long
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=371 failed=1
+
+=== Changing device leaves the old one vibrating
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=370 failed=2
+
+=== The sailor does not turn back
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=371 failed=1
+
+=== A prop names a line that is not in the script
+       [0] load_fixture (res://tests/harness.gd:54)
+       [1] _setup (res://tests/test_level.gd:29)
+       [2] test_shore_shows_the_sailor_not_the_placeholder (res://tests/test_shore.gd:49)
+       [3] _run (res://tests/run_tests.gd:129)
+       [4] unload_fixture (res://tests/harness.gd:135)
+FAIL test_shore.test_shore_shows_the_sailor_not_the_placeholder
+     logged error: src/narration.cpp:37 line_text: narration: no line in the script has the id 'abyss.print'. 
+       [0] load_fixture (res://tests/harness.gd:54)
+       [1] _setup (res://tests/test_level.gd:29)
+       [2] test_shore_keeps_movement_tuning_and_body (res://tests/test_shore.gd:56)
+       [3] _run (res://tests/run_tests.gd:129)
+       [4] unload_fixture (res://tests/harness.gd:135)
+FAIL test_shore.test_shore_keeps_movement_tuning_and_body
+     logged error: src/narration.cpp:37 line_text: narration: no line in the script has the id 'abyss.print'. 
+RESULT passed=149 failed=223
+
+=== A wrong stone leaves the prompts up during the lockout
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=371 failed=1
+
+=== The gate changes in a physics callback, not deferred
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=372 failed=0
+NOT CAUGHT
+
+=== The flee timer and watchdog run on while paused
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=371 failed=1
+
+=== control after, worker 1
+[doctest] test cases:  120 |  120 passed | 0 failed | 0 skipped
+RESULT passed=372 failed=0
+
+########## worker 2
+=== control: no change
+[doctest] test cases:  120 |  120 passed | 0 failed | 0 skipped
+RESULT passed=372 failed=0
+
+=== A story moment cannot replace what is being said
+tests/unit/test_narration.cpp:74: ERROR: CHECK( decide_line(true, "a", LinePriority::Optional, "b", LinePriority::Optional) == LineDecision::Start ) is NOT correct!
+tests/unit/test_narration.cpp:79: ERROR: CHECK( decide_line(true, "a", LinePriority::Optional, "b", LinePriority::Story) == LineDecision::Start ) is NOT correct!
+tests/unit/test_narration.cpp:80: ERROR: CHECK( decide_line(true, "a", LinePriority::Story, "b", LinePriority::Story) == LineDecision::Start ) is NOT correct!
+FAIL test_session.test_examine_works_through_normal_play_at_the_boat_and_the_fish
+     pressing E at the fish shows 'The lifeboat lies on bare seabed. The sea has drawn back farther than any tide.'
+FAIL test_session.test_examine_follows_a_rebound_key_at_the_boat_and_the_fish
+     the new key at the fish shows 'The lifeboat lies on bare seabed. The sea has drawn back farther than any tide.'
+FAIL test_controller.test_examine_works_with_a_controller_at_the_boat_and_the_fish
+     Xbox Series Controller: west at the fish shows 'The lifeboat lies on bare seabed. The sea has drawn back farther than any tide.'
+     PS5 Controller: west at the fish shows 'The lifeboat lies on bare seabed. The sea has drawn back farther than any tide.'
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+RESULT passed=364 failed=8
+
+=== The voice outlives its caption
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=364 failed=8
+
+=== Speech swallows a press at a stone
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=371 failed=1
+
+=== A fall leaves the line going
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=371 failed=1
+
+=== The epilogue never moves on by itself
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=371 failed=1
+
+=== The subtitle switch never reaches the game
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=371 failed=1
+
+=== Restore Defaults leaves vibration off
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=371 failed=1
+
+=== A cue is far too strong
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=371 failed=1
+
+=== A cinematic has lost its cue
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=364 failed=8
+
+=== A background event replays on every crossing
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=372 failed=0
+NOT CAUGHT
+
+=== The ritual has left the director's triggers
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=367 failed=5
+
+=== The hand is drawn behind the monolith
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=371 failed=1
+
+=== Solved stones keep reacting
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=371 failed=1
+
+=== Restoring leaves the atmosphere clip running
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=372 failed=0
+NOT CAUGHT
+
+=== control after, worker 2
+[doctest] test cases:  120 |  120 passed | 0 failed | 0 skipped
+RESULT passed=372 failed=0
+
+########## worker 3
+=== control: no change
+[doctest] test cases:  120 |  120 passed | 0 failed | 0 skipped
+RESULT passed=372 failed=0
+
+=== A voiced caption ends as the voice does, with no margin
+tests/unit/test_narration.cpp:84: ERROR: CHECK( line_seconds(30, 5.0, 4.0) == doctest::Approx(5.8) ) is NOT correct!
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=372 failed=0
+
+=== Skipping also examines
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=370 failed=2
+
+=== Subtitles off hides text lines too
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=371 failed=1
+
+=== A prop ignores its line
+FAIL test_director.test_every_scene_connection_is_in_place
+     Lifeboat has no id or caption
+     FishNearRock has no id or caption
+     FossilA has no id or caption
+     TabletWave has no id or caption
+     FossilB has no id or caption
+     TabletKneel has no id or caption
+     Footprint has no id or caption
+     TabletEye has no id or caption
+     Talisman has no id or caption
+     CaveCarving has no id or caption
+     Relief has no id or caption
+     Cairn has no id or caption
+     Statue has no id or caption
+RESULT passed=351 failed=21
+
+=== Continue skips the rest of the epilogue
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+
+=== Moving on in the epilogue leaves the last line speaking
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=371 failed=1
+
+=== The subtitle switch is not saved
+tests/unit/test_settings_data.cpp:36: ERROR: CHECK_FALSE( parsed.settings.subtitles ) is NOT correct!
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=371 failed=1
+
+=== A keyboard player's cue vibrates
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=371 failed=1
+
+=== Leaving the world leaves it vibrating
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=370 failed=2
+
+=== A restored world replays what is behind it
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=371 failed=1
+
+=== The relief can be read from the shelf above
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=371 failed=1
+
+=== The epilogue loses Innsmouth
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=369 failed=3
+
+=== A looping clip is played
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+FAIL test_cinematics.test_a_looping_awaken_clip_is_refused_and_recovers
+     looping: reported ["GameDirector: cinematic \'monolith_awaken\' passed its deadline."]
+     logged error: src/game_director.cpp:703 report_contract_error: GameDirector: cinematic 'monolith_awaken' passed its deadline. 
+     expected an error that never came: loops
+FAIL test_cinematics.test_a_ping_pong_awaken_clip_is_refused_and_recovers
+     linear_ping_pong: reported ["GameDirector: cinematic \'monolith_awaken\' passed its deadline."]
+     logged error: src/game_director.cpp:703 report_contract_error: GameDirector: cinematic 'monolith_awaken' passed its deadline. 
+     expected an error that never came: loops
+RESULT passed=368 failed=4
+
+=== The lockout runs on while paused
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=371 failed=1
+
+=== Clips run on while paused
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=371 failed=1
+
+=== control after, worker 3
+[doctest] test cases:  120 |  120 passed | 0 failed | 0 skipped
+RESULT passed=372 failed=0
+

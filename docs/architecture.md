@@ -5,8 +5,10 @@ Status: Phase A, **conditionally approved** by the independent reviewer
 and the remaining validation are tracked in [decisions.md](decisions.md).
 Toolchain: see
 [toolchain.md](toolchain.md). The menu, settings and save design in §5 ([D26](decisions.md))
-came after that approval. It is **approved for implementation, with the reviewer's corrections included below,
-and it is not built**.
+came after that approval, and was approved for implementation with the reviewer's corrections included below.
+
+**Status: M1 and M2 are accepted. M3 is implemented, awaiting independent review, and not accepted by the owner.** Where M3 measured or chose
+something this design left open, the section says so, and [decisions.md](decisions.md) §8 lists each one.
 
 ## 1. Principles
 
@@ -76,10 +78,13 @@ Player                 PlayerController (CharacterBody2D)  layer=Player  mask=Wo
 
 ### 4.2 `scenes/level/level.tscn` (the whole game, 4 acts)
 
-*This is the plan for M3 onward. Today there are two scenes with the same collision, spawn and
-camera limits: `scenes/level/shore.tscn`, the world that `game.tscn` plays in (art to x = 640, greybox beyond), and
-`scenes/level/level.tscn`, the greybox movement test scene, which is not exported. M2 builds in `shore.tscn`
-([D30](decisions.md)), so that is the one growing into this tree.*
+*Built in M3 as `scenes/level/shore.tscn`, the world that `game.tscn` plays in ([D30](decisions.md)), with the accepted art to
+x = 640 and greybox beyond. The file keeps its name, because tests, tools and the Shore art refer to it. `scenes/level/level.tscn` is still the
+M1 movement test scene, not exported, and it matches the world's collision only as far as x = 980 ([D48](decisions.md)).*
+
+*The tree below is the design. As built: `GameDirector` is the world's last child, so every node it refers to is ready first. There is one
+`FarRidges` parallax layer, a nearer `RitualLayer`, and no `MidRocks`, `Audio` or post-FX, which belong to M4 and M5. `Dagon` and `Trench` are plain nodes in world space, and
+a far ridge that is part of `Dagon` stands in for the parallax. The stones' indicators are `Polygon2D`s, not lights. A `Background` AnimationPlayer holds the background events, and `Ledges` the two shelves. The `Voice` player is in `hud.tscn`. The act layout is in [D48](decisions.md) and [D56](decisions.md).*
 
 ```
 Level                       Node2D
@@ -118,9 +123,9 @@ Level                       Node2D
 └── PauseMenu               CanvasLayer (process_mode = Always) + MenuController
 ```
 
-`title.tscn` (the main menu, and the main scene) and `ending.tscn` (M3) are
+`title.tscn` (the main menu, and the main scene) and `ending.tscn` are
 separate small scenes. Each is a `Control` with a `MenuController`. Flow: Main menu →
-Game → Ending → Main menu. `game.tscn` holds a `GameSession` with the level as its
+Game → Ending (the epilogue, then the credits) → Main menu. `game.tscn` holds a `GameSession` with the level as its
 world, and the `PauseMenu` sits beside it, so the menu survives a restart. The pause menu quits to the
 desktop or to the main menu. Quit to Desktop on the main menu exits at once, because there is nothing there to lose.
 `settings_menu.tscn` is instanced by both the pause menu and the main menu. The ending scene
@@ -223,13 +228,18 @@ so designers tune them in the inspector. Each class implements
 - Wraps `core::SequencePuzzle`.
 - **Exports:** `solution` (`PackedStringArray` of interaction ids),
   `reset_delay` (1.0 s), `indicators` (array of node paths to lights or sprites,
-  in solution order).
+  in solution order), `stones` (array of paths to the `Interactable`s).
 - **API:** `submit(id: StringName)`. Glyph `Interactable.interacted` connects
-  here in the editor. Also `reset()` and `is_solved()`.
+  here in the editor. Also `reset()`, `is_solved()`, and `restore_solved()`, which goes
+  straight to the stable state, emits nothing, and works before `_ready`.
 - **Signals:** `step_accepted(index)`, `failed`, `solved`.
 - States: `Idle → Progress(n) → Solved`. A wrong input enters `Rejecting`
   (ignores input for `reset_delay`) and then returns to `Idle`. `Solved` is
   terminal and ignores everything after it.
+- **Time** accumulates in `_process`, so the lockout stops while the game is paused.
+- **Feedback without audio:** the lit stones, and captions connected to `Hud.show_caption` in the scene, with their text as
+  bound arguments. A stone's own caption stays empty, or it would replace that text. The stones are disabled during the lockout, so
+  the prompt goes away and comes back with them. After solving they stay disabled.
 - `core::SequencePuzzle::submit(id)` returns:
 
   | Situation | Result | Effect |
@@ -241,9 +251,6 @@ so designers tune them in the inspector. Each class implements
   | Unknown `id` | `Ignored` | The adapter calls `push_error` (wiring bug) |
 
 ### GameDirector : Node
-*M2 implements only the session checkpoint and kill plane ([D31](decisions.md)): checkpoint N + 1 activates when
-`story_triggers[N]` is accepted, forward only, with a rejected trigger left armed. The rest of this section is M3.*
-
 - Wraps `core::StoryProgress`. The beats are `Shore → Abyss → Monolith →
   Awakened → Witness → Fleeing → Ended`. Transitions are strictly forward;
   duplicate and out-of-order events are rejected and logged (debug builds).
@@ -251,7 +258,10 @@ so designers tune them in the inspector. Each class implements
   `cinematics` (AnimationPlayer), `story_triggers` (array of StoryTrigger
   paths), `checkpoints` (array of Marker2D paths), `monolith_gate`
   (CollisionObject2D), `ending_scene` (`PackedScene`).
-- **Exports (additional):** `flee_timeout` (s, default 12).
+- **Exports (additional):** `flee_timeout` (s, default 12), `kill_plane_path`, `puzzle_path`, `mural_path`, `mural_solved_line`, `background_path`,
+  `background_triggers`, and `awakened_visuals` (what the Awakened beat shows, such as the lit mural).
+- **Signals:** `checkpoint_reached(index)` for savable beats only, once finalized. `beat_changed`, `cinematic_started`,
+  `cinematic_finalized`, `overlap_rechecked`, `background_event_started`, `player_respawned`. `contract_error` repeats each `push_error` of this contract, so a test can count them and read what they say.
 - **Inputs:**
   - `triggered` from every node in `story_triggers`. The Director connects
     these itself in `_ready`, because it already holds the list.
@@ -266,11 +276,11 @@ only, and nothing a clip does can be required for progress.
 |---|---|---|---|---|
 | Shore | (start) | Checkpoint 0 | `beat_shore` | — |
 | Abyss | `enter_abyss` trigger | Checkpoint 1 | `beat_abyss` | — |
-| Monolith | `reach_monolith` trigger | Checkpoint 2 | `beat_monolith` | — |
+| Monolith | `reach_monolith` trigger | Checkpoint 2 | `beat_monolith`, and the line `monolith.first`, on the way in only | — |
 | Awakened | `PuzzleSolved` | Checkpoint 3. **Open the gate:** gate `collision_layer = 0`, deferred. | glow, rumble, gate visual | `monolith_awaken` |
 | Witness | `witness` trigger | Control locked | Dagon rises | `dagon_reveal` |
-| Fleeing | `RevealDone`, raised by the reveal's finalizer **on every exit path**: normal completion, missing clip, looping clip refused, watchdog | Control unlocked. Start the flee timer. | `beat_fleeing`: shake, roar (fire-and-forget) | — |
-| Ended | `collapse` trigger **or** `FleeTimeout` | Control locked. After the collapse cinematic: `reset_global_state()`, then `change_scene_to_packed(ending_scene)` | fade to black, inside the clip | `collapse` |
+| Fleeing | `RevealDone`, raised by the reveal's finalizer **on every exit path**: normal completion, missing clip, looping clip refused, watchdog | Control unlocked. Start the flee timer. The sailor turns to face left, as the cue to run. **Rock comes down across the way back:** `Rockfall` gets its collision layer, deferred, and shows. The clip only drops it into view, so it is there with no clip. | `beat_fleeing`: shake, roar (fire-and-forget) | — |
+| Ended | `collapse` trigger **or** `FleeTimeout` | Control locked. After the collapse cinematic: `reset_global_state()`, then the scene changes to `ending_scene`, from the deferred step ([D50](decisions.md)) | fade to black, inside the clip | `collapse` |
 
 **Flee behaviour (single ending):**
 - After the reveal, the way right (towards the trench) is a solid rock wall,
@@ -314,19 +324,24 @@ only, and nothing a clip does can be required for progress.
      call runs after the current one, in the same frame's deferred flush. It
      does **not** wait for a new physics frame.
 - **`_after_cinematic(clip)`** runs in this order:
+  0. If it is no longer in the tree, it does nothing. If the beat is Ended, it changes scene and stops ([D50](decisions.md)).
   1. If `clip == dagon_reveal`, process `RevealDone`.
   2. Process the pending internal event, if any.
   3. **Overlap checks wait for fresh physics data.** The Director records
      `recheck_after = Engine::get_physics_frames()`. Its own
      `_physics_process` runs the checks once
-     `Engine::get_physics_frames() >= recheck_after + 2`, which guarantees at
+     `Engine::get_physics_frames() >= recheck_after + 3`, which guarantees at
      least one completed physics step and an up-to-date overlap list. The
      checks are:
      - the current beat's awaited trigger, via `is_player_inside()`;
      - the pending out-of-bounds recovery (below).
 
-  Each step stops if it started a new cinematic. Exact frame arithmetic is
-  verified in M3.
+  Each step stops if it started a new cinematic.
+
+  **The frame arithmetic, measured in M3 ([D49](decisions.md)).** This design first said `+ 2`. On 4.7.2, a body moved in the physics phase of
+  frame F is in the overlap list at F + 2, but one moved in the idle phase of F, which is where a clip ends, is only there at F + 3, because that
+  frame's server step has already gone by. So `+ 2` was one frame short for the case that matters most, and two tests failed on it. Measurements:
+  [overlap-latency.txt](evidence/m3/overlap-latency.txt).
 
 **Events during a cinematic:** while a cinematic is active, `process_event`
 does not touch `StoryProgress`.
@@ -347,9 +362,11 @@ This is a guard plus one deferred step, not an event framework.
   player who is already standing in it.
 - Example: crossing the `collapse` trigger on the way out (beat = Monolith)
   is rejected and consumes nothing. It fires on the return (beat = Fleeing).
+- A puzzle solved before its beat, which the layout should make impossible, is rejected like anything else, and the
+  recheck on entering the Monolith beat takes it up, so nobody is left with a solved puzzle and a story that cannot move.
 - `out_of_bounds` is not a story event and is never consumed.
   - Outside cinematics, it calls `player.teleport(active checkpoint)`
-    immediately.
+    immediately. The active checkpoint of the final sequence is the Awakened one.
   - **During a cinematic it is not lost (M3 follow-up).** Gravity still
     applies, so the player can fall into the kill plane while control is
     locked. The Director sets `recovery_pending = true`.
@@ -363,9 +380,11 @@ This is a guard plus one deferred step, not an event framework.
   apart and flicker on screen. Position smoothing would defeat it and is not used; `lock_speed`
   slides the look-ahead ([D22](decisions.md)). The level limits use Camera2D's built-in limits.
 - `set_target(Node2D)` lets cinematic clips retarget the camera to a
-  `CameraMarks` marker. Clips also key `zoom` directly.
-- Screen shake: `add_trauma(amount)` gives a decaying, noise-driven `offset`.
-  Clips can call it through method tracks.
+  `CameraMarks` marker, and clips reach it through `aim_at(path)`, since a method track can hold a path.
+  Clips also key `zoom` and the limits directly.
+- Screen shake: `add_trauma(amount)` gives a decaying `offset` in whole pixels, from two sines, which is enough for a greybox.
+  Clips can call it through method tracks. It stops while the game is paused.
+- `restore_view(target)` puts the target, zoom, limits and shake back as the scene set them, whatever a clip left behind.
 
 ### Hud : CanvasLayer
 - Connects itself to the Interactor in code, from the exported `interactor_path` ([D37](decisions.md)). The export drops scene
@@ -407,6 +426,32 @@ This is a guard plus one deferred step, not an event framework.
 - Every scene transition (`new_game`, `continue_game`, `quit_to_main_menu`, and
   the Director's ending) and `restart_checkpoint` first call
   `dagon::reset_global_state()` (review finding 4). See §7 rule 8.
+
+### Narration (`src/narration.*`, `src/core/narration.*`, in `Hud` and `MenuController`)
+**One script, `project/narration/script.txt`:** each line is `id|optional or story|words`. The game shows those words and `tools/audio/make_narration.py` speaks them, so they cannot drift apart. An `Interactable` names a `line_id`, and takes its caption from the script. A line's audio, if it has any, is `res://assets/narration/<id>.ogg`. A line with no file is a text line, so nothing depends on audio being there.
+
+**Rules, in plain C++ and unit-tested:**
+- `decide_line`: there is no queue. Nothing speaking: start. The same line: ignored, never restarted. A story line replaces anything. An optional line replaces an optional one, and is dropped during a story line.
+- `line_seconds`: a caption lasts through its audio and 0.8 s, and never less than its reading time at 15 characters a second. With no audio, the reading time, and never less than the minimum.
+
+**`Hud::say(id)`** does both together, on a child `AudioStreamPlayer` on the `Narration` bus. `hide_caption` stops both. **`show_caption(text)`** is for feedback the player has just caused, such as a stone's response: it replaces anything, and is not a line. Time runs on a tween bound to the Hud, and the player pauses with it, so a pause holds both, and leaving the world stops both.
+
+**Skipping:** the `interact` action. `Hud::_unhandled_input` runs before the Interactor's, as it comes later in the tree. If something is being said, the press is used up as a skip, unless it would start a different optional line on something else in reach, in which case it passes through and replaces it. So a skip can never also examine.
+
+**Subtitles off** hides only a line that is really being heard. Text lines, feedback, prompts and the epilogue's card always show.
+
+**Who starts a line:** the player, by examining. A clip's method track at its moment (`Hud.say`), which cannot happen on restore, as no clip plays then. And `GameDirector` on the way into the Monolith beat only, which a restored world does not pass through. **So restoring speaks nothing.**
+
+**The epilogue:** `MenuController` in Ending mode shows `ending_lines` one at a time on the card, each with its audio if any, moving on by itself after `line_seconds`. Continue moves on at once, and goes to the credits after the last, so nobody is made to wait.
+
+### Controller vibration (`src/haptics.*`)
+Stateless, with three named cues, each under a second. `GameDirector::haptic_cue(name)` plays one on the device in use, if it is a controller and the setting is on, and clips call it through a method track at their moment. **It alone stops them,** on `NOTIFICATION_PAUSED`, on a change of device, and on leaving the tree, and a cue is never resumed. A new cue replaces the last, as `Input` holds one per device. A paused or stopped clip cannot reach its key, so a stale cue cannot fire. Tests read `Input.get_joy_vibration_strength`, which proves requests only, and says nothing about feel or hardware.
+
+### Background events (`GameDirector`, `Background` AnimationPlayer)
+Presentation only. A `StoryTrigger` in `background_triggers`, whose id names a clip on `Background`, plays it once in this world, and is spent. **Nothing depends on one, and no state is saved.** During a cinematic, or while another is playing, the trigger stays armed for the next crossing.
+- **A world rebuilt at or after a trigger's `spent_from_beat`** treats it as already past, and it never plays. All three are set to the Monolith.
+- **So after Restart or Continue:** at the Shore or Abyss, they lie ahead and play when reached, once. At the Monolith or later, never.
+- They are built to be seen without precise timing. The ritual lasts 13 s and starts in the right half of the view, and a test holds a walking player to at least 6 s with its watcher on screen.
 
 ### Input labels (`src/input_labels.*`, `src/core/controller_labels.*`)
 Stateless, and no class. The plain-C++ half decides a controller's family from the driver's name and USB vendor id, and names
@@ -481,13 +526,15 @@ state. The checkpoint id is the stable name of its `Marker2D`, and must be the o
 | Shore | Yes, by New Game | Checkpoint 0 |
 | Abyss | Yes | Checkpoint 1, with `enter_abyss` consumed |
 | Monolith | Yes | Checkpoint 2, with `reach_monolith` also consumed |
-| Awakened | Yes, once `monolith_awaken` has finalized | Checkpoint 3, with the puzzle solved, stones lit, the mural's second caption and the gate open |
+| Awakened | Yes, once `monolith_awaken` has finalized | Checkpoint 3, with the puzzle solved, stones lit and inert, the mural lit with its second caption and the gate open |
 | Witness, Fleeing, Ended | Never | The Awakened save. An unfinished reveal or escape replays ([D27](decisions.md)). |
 
 - A save is written only with no active cinematic and with control enabled. Closing during a cinematic
   returns to the previous checkpoint.
 - A solved puzzle follows from the beat, and a partial attempt is not kept. Any one-shot outcome must follow from
   the beat too, or the format gains a field and a new version.
+- **M3 did not change the format, so it is still version 1** ([D52](decisions.md)). What changed is which beats exist: an M2 save still loads, and a build
+  from before M3 reads an M3 save at Monolith or Awakened as "from another version".
 - The Awakened save stays after the ending. Whenever the save's beat is Awakened, the main menu says Continue resumes
   before the final sequence. No "finished" state exists, so nothing implies a post-ending world.
 
@@ -558,6 +605,7 @@ Input.joy_connection_changed ─────► MenuController (connected in cod
 MenuController ───────────────────► GameSession.set_active_device ► GameDirector ► Hud (direct calls)
 GlyphX.interacted(id) ────────────► PuzzleController.submit(id)
 PuzzleController.solved ──────────► GameDirector.on_puzzle_solved
+PuzzleController.step_accepted, failed, solved ► Hud.show_caption (bound text, in the scene)
 StoryTrigger.triggered(id) ───────► GameDirector (connected in code, _ready, from story_triggers)
 Cinematics.animation_finished ────► GameDirector (connected in code, _ready)
 PlayerController.footstep ────────► Footsteps.play
@@ -618,6 +666,8 @@ catches any that do not.
    - `Input` mouse mode
    - `Engine.time_scale`
    - `InputMap` keyboard bindings (M2)
+   - The subtitle and vibration switches, as metadata on the `Engine` singleton (M3). Set only by `apply_settings`, like the volumes
+   - Controller vibration (M3). Stopped by `GameDirector`, as above, and not by `reset_global_state`, as it alone knows the device
 
    Rules:
    - `dagon::reset_global_state()` restores pause, time scale and mouse mode. Volumes and key
@@ -634,17 +684,20 @@ catches any that do not.
 
 | Level | What | How | Runs in |
 |---|---|---|---|
-| Unit | `core::step`, `SequencePuzzle`, `StoryProgress`, `save_data`, `settings_data` | doctest, native binary (`scons unit_tests`) | CI Linux + Windows |
-| Extension load | All classes registered (10 today, 11 when M3 adds `PuzzleController`), with key methods and signals bound | `godot --headless --script res://tests/check_classes.gd` | CI Linux |
+| Unit | `core::step`, `SequencePuzzle`, `StoryProgress`, `save_data`, `settings_data`, `narration` | doctest, native binary (`scons unit_tests`) | CI Linux + Windows |
+| Extension load | All 11 classes registered, with key methods and signals bound | `godot --headless --script res://tests/check_classes.gd` | CI Linux |
 | Integration | M1: spawn and land; walk distance; jump arc; wall stop; teleport contact invalidation (roadmap M1 7f). M2: focus gained and lost; focused object disabled or freed → focus cleared, no crash; double press → 1 event; Interactable `one_shot`; pausing stops gameplay and the menu still responds; focus and one-level Back; rebinding conflicts, capture cancel, defaults, persistence, corrupt settings. M3: puzzle right, wrong, repeated press and reset; trigger re-entry → 1 beat; **outbound crossing of `collapse` → not consumed, fires later in Fleeing**; player already inside the awaited trigger at beat entry → fires; cinematic lock and unlock; **missing clip, looping clip and watchdog timeout → gate open, camera restored, correct control state, `RevealDone` raised once**; **already-overlapping next trigger during finalization → next cinematic keeps its lock and camera**; **duplicate completion/finalization → outcome applied once**; **stale completion (older generation) → no effect on the newer cinematic**; **entering the kill plane while control is locked → recovered after finalization**; flee timeout → Ended; pause → Restart Checkpoint → unpaused; pause → Quit to Main Menu → New Game → unpaused; ending → main menu → New Game → unpaused; restart resets state; **save and restore at each savable beat: correct world, no clip or cue replayed, consumed triggers stay consumed, never stuck**; **saving refused during a cinematic**; **save written by one process and continued by another, in the same unique test directory**; **New Game with a failed write → stays in the menu, old save unchanged and unread**; **autosave failure → Restart Checkpoint returns to the session checkpoint, Continue after a relaunch to the last valid disk save, and the quit text says so**; **every on-disk state an interrupted replacement can leave → a usable save loads, and a corrupt primary never overwrites a valid backup**; **repeated restart → pause reset, no duplicate events, nothing left from the old world**; **every scene that reads files in `_ready` uses the test directory**; missing, corrupt and incompatible saves; New Game confirmation; Continue's text for an Awakened save; wiring check | Hand-rolled headless SceneTree runner (~80 lines, no GUT); rules below | CI Linux |
 | Smoke | Main scene and greybox scene each run 600 frames with no `ERROR:` lines | `--headless --quit-after 600` piped through grep | CI Linux and Windows |
 | Exported pack | The whole integration suite again, on the exported `dagon.pck` (D38). A test of source scenes cannot see what the export changes. | `DAGON_TEST_PACK`, in `tools/export_check.sh` | CI Linux and Windows |
+| Exported route | The release build as shipped, in its own window, played from New Game to the ending and back to the main menu with real window-system keys: reading everything on the way, then directly, then by waiting out the flee, and Continue afterwards. It reports time per act. It reads what a player sees from `--verbose`, and has no code of its own in the build ([D51](decisions.md)). | `tools/route_check.py` | CI Linux, under Xvfb, with XTEST keys. CI Windows, with window messages |
 | Export | Linux and Windows release exports build. The Linux export runs `--quit-after 300` with exit 0 and no errors. | `--export-release` | CI Linux (export); Windows run is manual or on a Windows runner |
 | Manual | Feel, readability, pacing, a full playthrough on Windows and Linux, menus and rebinding on a physical keyboard and controller, quit and relaunch, and audio, which is not complete until a person has heard it in gameplay | Checklist per milestone | Human |
 
 Reports always state which of these levels actually ran.
 
 **Headless integration-test rules (review round 2, item 7):**
+- **A test that sets out to cause an engine error** names it with `h.expect_error(text)`, because the runner fails a test on any logged error. Any other error still fails it, and so does
+  expecting one that never comes. `tools/run_godot_checks.sh` ignores only those messages, and only in the integration step.
 - **Fixed physics tick:** `physics/common/physics_ticks_per_second = 60` in
   `project.godot`, run with `--fixed-fps 60`, and a test asserts both the tick
   rate and that one probe step equals one physics tick. Neither is claimed to
@@ -718,7 +771,7 @@ Reports always state which of these levels actually ran.
   are pinned by commit SHA.
 - No compiled binaries are committed. `project/bin/*/` is gitignored, and only
   `dagon.gdextension` is tracked.
-- `ci.yml` uploads the standard builds, which open the Shore, as the artifacts `dagon-windows`
+- `ci.yml` uploads the standard builds, which open the main menu, as the artifacts `dagon-windows`
   and `dagon-linux`.
 
 ## 10. Repository layout

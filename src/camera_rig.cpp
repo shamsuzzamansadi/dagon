@@ -6,6 +6,7 @@
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/core/error_macros.hpp>
 
+#include <algorithm>
 #include <cmath>
 
 using namespace godot;
@@ -13,6 +14,12 @@ using namespace godot;
 namespace dagon {
 
 void CameraRig::_bind_methods() {
+	ClassDB::bind_method(D_METHOD("get_target"), &CameraRig::get_target);
+	ClassDB::bind_method(D_METHOD("aim_at", "path"), &CameraRig::aim_at);
+	ClassDB::bind_method(D_METHOD("add_trauma", "amount"), &CameraRig::add_trauma);
+	ClassDB::bind_method(D_METHOD("get_trauma"), &CameraRig::get_trauma);
+	ClassDB::bind_method(D_METHOD("restore_view", "target"), &CameraRig::restore_view);
+
 	ClassDB::bind_method(D_METHOD("set_target_path", "path"), &CameraRig::set_target_path);
 	ClassDB::bind_method(D_METHOD("get_target_path"), &CameraRig::get_target_path);
 	ADD_PROPERTY(PropertyInfo(Variant::NODE_PATH, "target_path", PROPERTY_HINT_NODE_PATH_VALID_TYPES, "Node2D"), "set_target_path", "get_target_path");
@@ -32,12 +39,25 @@ void CameraRig::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_lock_speed", "value"), &CameraRig::set_lock_speed);
 	ClassDB::bind_method(D_METHOD("get_lock_speed"), &CameraRig::get_lock_speed);
 	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "lock_speed"), "set_lock_speed", "get_lock_speed");
+
+	ClassDB::bind_method(D_METHOD("set_max_shake", "value"), &CameraRig::set_max_shake);
+	ClassDB::bind_method(D_METHOD("get_max_shake"), &CameraRig::get_max_shake);
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "max_shake"), "set_max_shake", "get_max_shake");
+
+	ClassDB::bind_method(D_METHOD("set_trauma_decay", "value"), &CameraRig::set_trauma_decay);
+	ClassDB::bind_method(D_METHOD("get_trauma_decay"), &CameraRig::get_trauma_decay);
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "trauma_decay"), "set_trauma_decay", "get_trauma_decay");
 }
 
 void CameraRig::_ready() {
 	if (Engine::get_singleton()->is_editor_hint()) {
 		return;
 	}
+	default_zoom_ = get_zoom();
+	default_limit_left_ = get_limit(SIDE_LEFT);
+	default_limit_top_ = get_limit(SIDE_TOP);
+	default_limit_right_ = get_limit(SIDE_RIGHT);
+	default_limit_bottom_ = get_limit(SIDE_BOTTOM);
 	Node2D *target = target_path_.is_empty() ? nullptr : get_node<Node2D>(target_path_);
 	if (target == nullptr) {
 		ERR_PRINT("CameraRig: target_path does not point to a Node2D; the camera will not follow.");
@@ -57,6 +77,7 @@ void CameraRig::_process(double p_delta) {
 	if (Engine::get_singleton()->is_editor_hint()) {
 		return;
 	}
+	update_shake(static_cast<float>(p_delta));
 	const Node2D *target = target_.get();
 	if (target == nullptr) {
 		return;
@@ -66,6 +87,48 @@ void CameraRig::_process(double p_delta) {
 	} else {
 		set_global_position(target->get_global_position() + desired_offset(*target));
 	}
+}
+
+void CameraRig::set_target(Node2D *p_target) {
+	target_.set(p_target);
+	if (p_target != nullptr) {
+		locked_offset_ = desired_offset(*p_target);
+	}
+}
+
+void CameraRig::aim_at(const NodePath &p_path) {
+	Node2D *target = get_node<Node2D>(p_path);
+	if (target == nullptr) {
+		ERR_PRINT("CameraRig: aim_at was given a path that does not point to a Node2D.");
+		return;
+	}
+	set_target(target);
+}
+
+void CameraRig::add_trauma(float p_amount) {
+	trauma_ = std::clamp(trauma_ + p_amount, 0.0f, 1.0f);
+}
+
+void CameraRig::restore_view(Node2D *p_target) {
+	set_target(p_target);
+	set_zoom(default_zoom_);
+	set_limit(SIDE_LEFT, default_limit_left_);
+	set_limit(SIDE_TOP, default_limit_top_);
+	set_limit(SIDE_RIGHT, default_limit_right_);
+	set_limit(SIDE_BOTTOM, default_limit_bottom_);
+	trauma_ = 0.0f;
+	set_offset(Vector2());
+}
+
+// Whole pixels, as everything else on screen is. The shake is its square, so a small amount stays small.
+void CameraRig::update_shake(float p_delta) {
+	if (trauma_ <= 0.0f) {
+		return;
+	}
+	trauma_ = std::max(trauma_ - trauma_decay_ * p_delta, 0.0f);
+	shake_time_ += p_delta;
+	const float amount = trauma_ * trauma_ * max_shake_;
+	set_offset(Vector2(std::round(amount * std::sin(shake_time_ * 37.0f)), std::round(amount * std::sin(shake_time_ * 53.0f + 1.0f))));
 }
 
 PackedStringArray CameraRig::_get_configuration_warnings() const {

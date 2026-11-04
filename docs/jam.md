@@ -69,13 +69,13 @@ making what the design already contains legible to the player. M1 may proceed.
 | **Interpretive** | The glyph sequence restores the mural's meaning, turning apparent ruins into evidence of worship. | **Before solving:** examining the mural gives a caption describing eroded, meaningless carvings, and the mural is dim and fragmentary. **After solving:** the same mural, examined in the same place, is lit and readable, and its caption describes figures bowing to a vast swimmer. The player's own action caused that change. | The existing puzzle and mural Interactable. One caption swap on the Awakened beat, plus the existing `monolith_awaken` clip | M3 (caption swap, greybox lit state), M5 (final art) |
 | **Perceptual** | The reveal changes the player's understanding of the landscape and their own scale; exploration becomes escape. | The camera pulls back far enough to make the sailor tiny. What read as a far ridge or background shape turns out to be part of the creature. The direction of travel reverses: the player walked right for the whole game and must now run left, back over ground that means something different. | Existing `dagon_reveal` camera framing, the Dagon parallax layer, the existing Fleeing beat | M3 (framing, flee), M5 (final reveal) |
 
-**What exists now and what is planned (2026-11-02).** Only part of the physical shift is in the game.
+**What exists now and what is planned (updated 2026-11-04).** M3 is implemented, awaiting independent review, and not accepted by the owner, who found it not yet engaging enough ([record](evidence/m3/owner-playtest-2026-11-04.md)).
 
 | Shift | In the standard build today | Still planned |
 |---|---|---|
-| Physical | The exposed seabed on the Shore: wet flats, the sea far beyond the stranded boat, dead fish | Examine captions, fossils, rib arch, drained trench, and all ambience (M3, M4) |
-| Interpretive | Nothing | Tablets, mural, puzzle and caption swap (M3); final art and sound (M5) |
-| Perceptual | Nothing | Camera pull-back, the reveal, and the turn from exploration to escape (M3, M5) |
+| Physical | The exposed seabed on the Shore: wet flats, the sea far beyond the stranded boat, dead fish. **M3:** examine captions, fossils, rib arch, in greybox | Drained trench, and all ambience (M4) |
+| Interpretive | **M3, in greybox:** tablets, mural, puzzle and caption swap | Final art and sound (M5) |
+| Perceptual | **M3, in greybox:** the camera pull-back, a far ridge that becomes part of the creature, and the turn from exploration to escape | The final reveal (M5) |
 
 **Explicitly not added:** dimension switching, alternate physics, a new player
 verb, a new puzzle system, another ending. The optional perception shaders stay
@@ -106,7 +106,7 @@ The submission page should state this interpretation in one or two sentences
 | Placeholder art and audio | Silhouette polygons and shaders made in the editor or by scripts, and procedurally generated audio, produced with AI assistance | First playable |
 | Shore art | Pixel art drawn by Python scripts written and tuned with AI assistance (Claude), under the owner's direction, who accepted the art direction. No image generators or third-party art | Shipped in the standard build (`docs/shore-preview.md`) |
 | UI font and text | An original pixel font drawn by a Python script, and menu, controls, credits and caption text, written with AI assistance (Claude) under the owner's direction | M2 |
-| Audio | None yet. Direction and provenance rules in GDD §7: state accurately how each sound was made, and never describe stock or generated audio as personally recorded or composed | M4 onward |
+| Audio | Three narration samples, as an **AI-generated voice** (Kokoro-82M, Apache-2.0, stock voice, run locally: [record](evidence/m3/narration/README.md)), kept for voice direction, and not an approved voice. Otherwise none yet. Direction and provenance rules in GDD §7: state accurately how each sound was made, and never describe stock or generated audio as personally recorded or composed | M3 samples; M4 onward |
 | Final assets | Decided before M4 | Each asset's provenance (human, AI-assisted, or third-party CC0/OFL) recorded in `CREDITS.md` |
 
 On the submission form, choose the option that most accurately matches this

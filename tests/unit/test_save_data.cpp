@@ -16,8 +16,8 @@ SaveData save_at(Beat p_beat) {
 
 } // namespace
 
-TEST_CASE("every beat this build has survives a round trip through the file format") {
-	for (const Beat beat : { Beat::Shore, Beat::Abyss }) {
+TEST_CASE("every savable beat survives a round trip through the file format") {
+	for (const Beat beat : { Beat::Shore, Beat::Abyss, Beat::Monolith, Beat::Awakened }) {
 		const ParsedSave parsed = parse_save(serialize_save(save_at(beat)));
 		CHECK(parsed.status == SaveStatus::Ok);
 		CHECK(parsed.save.beat == beat);
@@ -80,9 +80,22 @@ TEST_CASE("another version is incompatible, not corrupt") {
 	CHECK(parse_save("dagon_save=0\n").status == SaveStatus::Incompatible);
 }
 
-TEST_CASE("a beat this build has no content for is incompatible") {
-	CHECK(parse_save("dagon_save=1\nbeat=monolith\ncheckpoint=Monolith\n").status == SaveStatus::Incompatible);
-	CHECK(parse_save("dagon_save=1\nbeat=awakened\ncheckpoint=Awakened\n").status == SaveStatus::Incompatible);
+TEST_CASE("the format is unchanged since M2, so its saves still load") {
+	CHECK(parse_save("dagon_save=1\nbeat=shore\ncheckpoint=Shore\n").save.beat == Beat::Shore);
+	CHECK(parse_save("dagon_save=1\nbeat=abyss\ncheckpoint=PastTheTrench\n").save.beat == Beat::Abyss);
+}
+
+TEST_CASE("the later beats are written and read back with their own checkpoints") {
+	CHECK(serialize_save(save_at(Beat::Monolith)) == "dagon_save=1\nbeat=monolith\ncheckpoint=Monolith\n");
+	CHECK(serialize_save(save_at(Beat::Awakened)) == "dagon_save=1\nbeat=awakened\ncheckpoint=Awakened\n");
+	CHECK(parse_save("dagon_save=1\nbeat=monolith\ncheckpoint=Monolith\n").status == SaveStatus::Ok);
+	CHECK(parse_save("dagon_save=1\nbeat=awakened\ncheckpoint=Awakened\n").status == SaveStatus::Ok);
+	CHECK(parse_save("dagon_save=1\nbeat=awakened\ncheckpoint=Monolith\n").status == SaveStatus::Corrupt);
+}
+
+TEST_CASE("a partial puzzle attempt or a position cannot be smuggled into a save") {
+	CHECK(parse_save("dagon_save=1\nbeat=monolith\ncheckpoint=Monolith\nprogress=2\n").status == SaveStatus::Corrupt);
+	CHECK(parse_save("dagon_save=1\nbeat=awakened\ncheckpoint=Awakened\nx=4000\n").status == SaveStatus::Corrupt);
 }
 
 TEST_CASE("the final sequence can never be loaded from a save") {
@@ -101,6 +114,7 @@ TEST_CASE("a rejected save never hands back progress") {
 TEST_CASE("the menu explains each state of the slot") {
 	CHECK(continue_note(Beat::Shore).find("shore") != std::string::npos);
 	CHECK(continue_note(Beat::Abyss).find("trench") != std::string::npos);
+	CHECK(continue_note(Beat::Monolith).find("monolith") != std::string::npos);
 	CHECK(continue_note(Beat::Awakened).find("before the final sequence") != std::string::npos);
 	CHECK(unusable_save_note(SaveStatus::Missing).find("No saved game") != std::string::npos);
 	CHECK(unusable_save_note(SaveStatus::Corrupt).find("damaged") != std::string::npos);

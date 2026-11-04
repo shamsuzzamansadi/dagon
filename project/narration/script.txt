@@ -1,0 +1,40 @@
+# Every spoken line and its caption, in one place. The game shows these words, and tools/audio/make_narration.py speaks them.
+# Each line: id|optional or story|words. A line with no project/assets/narration/<id>.ogg is a text line.
+# story: an essential moment, which nothing optional may delay or cover. optional: what the player chose to examine.
+
+# The Shore
+shore.boat|optional|The lifeboat lies on bare seabed. The sea has drawn back farther than any tide.
+shore.fish|optional|Dead fish, rotting where the water left them. They have not been dry for long.
+shore.talisman|optional|Something small, half sunk in the mud. An eye, cut above a line of waves. It is heavier than it should be, and someone wore it smooth.
+
+# The cave, and what can be seen from its far end
+cave.carving|optional|The same eye. The same waves, cut deep into the rock. It isn't worn. Someone has kept it clean.
+abyss.ritual|story|Figures, far off among the stones. Kneeling, all of them. All but one.
+
+# The Exposed Abyss
+abyss.fossil_a|optional|A spine as long as the boat, with too many ribs. Nothing in any sea I know was built like this.
+abyss.tablet_wave|optional|A slab, cut with rising lines. "The waters rose first..."
+abyss.fossil_b|optional|A skull, under the great ribs. The jaw is wider than I am tall. It faces inland, the way I am walking.
+abyss.tablet_kneel|optional|A second slab. A figure, bent double. "...and they bowed..."
+abyss.footprint|optional|A print in the mud, still wet at the edges. Webbed. I could lie down inside it.
+abyss.relief|optional|Down here, out of the wind, a long procession cut into the rock. They are all walking toward the water.
+abyss.cairn|optional|Stones stacked with care, looking back the way I came. Someone has sat here, and watched.
+abyss.watcher|story|Upright, on the ridge. I looked again, and there was only the ridge.
+abyss.tablet_eye|optional|A third slab. An open eye. "...and He saw them."
+
+# The Monolith
+canyon.statue|optional|A stone figure on its knees, hands raised, its head all wrong. It is looking at something far larger than I am.
+monolith.first|story|The canyon opens, and then there is only that. I do not know who could have raised it.
+mural.before|optional|Worn carvings, broken by the years. Water, perhaps. A bent shape. Something round. Ruins, and nothing more.
+mural.after|optional|Lit now, and whole. Rows of figures, bowing to a vast swimmer rising from the water, and over it, that eye. These were never ruins.
+story.awakened|story|The stones answered. Somewhere behind the rock, something gave way.
+
+# The Witness
+story.reveal|story|It was no ridge. It had been beside me the whole way.
+story.run|story|Its head turned. I ran.
+
+# The epilogue
+ending.found|story|They found me in the shallows, they say, a long way from any wreck. They tell me the sea never left. There was no shore, no stone, no tide drawn back.
+ending.listen|story|I have stopped arguing. At night I listen to the water, and what moves under it.
+ending.innsmouth|story|Last spring, at Innsmouth, I saw a bracelet in a shop window. That eye, above those waves. The man behind the counter asked how far out I had been. I did not tell him. He did not seem to need telling.
+ending.rising|story|Those figures bowed for a reason. Whatever rose that night did not rise for me, and I do not think it has finished rising.

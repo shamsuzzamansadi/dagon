@@ -10,6 +10,8 @@ config/description="A short cinematic horror game about a sailor on a seabed tha
 run/main_scene="res://scenes/ui/title.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 boot_splash/show_image=false
+; The game prints nothing without --verbose. With it, tools/route_check.py reads each line as it happens.
+run/flush_stdout_on_print=true
 
 [display]
 

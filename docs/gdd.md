@@ -65,6 +65,23 @@ checkpoint.
 There is one ending (MVP). The epilogue text is original and written in the
 first-person, after-the-fact voice of the source.
 
+**Status (M3): the route is built in greybox, implemented, awaiting independent review, and not accepted by the owner.** Target times are for the finished game. The greybox is
+far shorter, because timing is set later by adding content, not walking (risk R11). Where each thing stands: [roadmap](roadmap.md), [M3 package](reviews/m3-review-package.md).
+
+**Connections through the route (owner, 2026-11-04).** One mark, an eye above a line of waves, runs through the whole game, and nothing needs it to be noticed:
+
+| Where | What is there | If it is missed |
+|---|---|---|
+| The Shore | A **talisman**, washed up beyond the fish, with the mark on it. One prop and one caption, and nothing is collected | Nothing is lost |
+| The cave beyond the entrance | The same mark, **cut into the wall** and kept clean | Nothing is lost |
+| Where the cave opens | A **distant ritual:** kneeling figures among stones around the mark, and one standing figure that turns and moves off. About 13 seconds, at a distance, and never a threat. The stones stay when the figures have gone | The stones are still there. No clue depends on it |
+| The first shelf (Act II) | A **route choice with a stake.** Below: a recess, with a procession carved walking to the sea, **and the second tablet.** Above: a cairn looking back the way you came, and a **watcher** on the far ridge, seen only from there | Both rejoin. The second tablet can be gone back for, or the order worked out without it |
+| The second shelf (Act III) | **A slab seen from below, with no way up on this side.** Walk under it, find the rock at the far end, and come back along the shelf to **the third tablet,** past a kneeling statue with its head wrong. Below: the quicker way. On either, a **figure crosses** the canyon ahead | The way on is open. The third tablet can be gone back for, or the order worked out without it |
+| The three tablets | **The first on the way, the second in the recess, the third on the shelf,** so that where you go decides what you know. "A third slab" tells a player who missed one that there is one to go back for | The mural's fragments show the order, and trial and error always finishes the puzzle (§5) |
+| The monolith | Statues kneeling at its foot, and the mural. **Solving changes the mural in picture and caption:** a vast swimmer, rows of figures bowing, and the mark above them, with the statues' eyes lit | |
+| The reveal | The far ridge seen from the monolith on turns out to be the creature's shoulder | |
+| The epilogue | The mark again, in a shop window in **Innsmouth,** years on, suggesting a larger world. Our addition, which needs no knowledge of Lovecraft | |
+
 **The perceptual shift in Act IV.** The camera pulls back until the sailor is
 tiny. A far-background shape the player has walked past turns out to be part of
 the creature. The player has walked right for the whole game and now runs left,
@@ -73,10 +90,10 @@ back over the same ground.
 **Flee rules (still one ending):**
 - The way right is the trench edge, a solid rock wall, so moving the wrong way
   just presses against it.
-- Running left reaches the collapse point in about 8–10 s.
+- Running left reaches the collapse point in about 8–10 s, **hopping over three falls of rock** that come down across the ground he walked in on. They are as high as the rocks he has been hopping onto, and can be crossed either way. Stopping at one costs time, and nothing else.
 - If the player waits or keeps pushing the wrong way, the sailor collapses
   where he stands after 12 s (tunable).
-- Both cases play the same collapse and the same ending.
+- Both cases play the same collapse and the same ending: he falls, **and the sea comes back over him** before the fade ("They found me in the shallows").
 
 ## 5. Monolith puzzle
 
@@ -98,10 +115,12 @@ same place, reads differently:
   vast swimmer. The caption swap is part of the Awakened beat's essential
   outcome, so a missing clip cannot leave the mural unchanged.
 
-**Clues.** The three Act II tablets each show one glyph, with a short examine
+**Clues.** The three tablets each show one glyph, with a short examine
 line ("The waters rose first…", "…and they bowed…", "…and He saw them.").
 The mural's surviving fragments show the same order faintly. A player who
 skipped the tablets can still solve it.
+
+**Where they are.** The first is on the way. The second is in the recess under the first shelf, and cannot be read from above. The third is on the second shelf, reached from its far end, and cannot be read from below. So a route choice decides what the player knows at the stones, and exploring does something beyond adding lore.
 
 **Rules**
 - Press a stone (Interact). Correct next stone: it lights teal with a soft tone.
@@ -124,9 +143,14 @@ skipped the tablets can still solve it.
 |-----|-----------------------|----------|-------------------------|
 | I   | Lifeboat              | no       | Tutorial, situation     |
 | I   | Fish carcass heap     | no       | Wrongness               |
+| I   | Talisman              | no       | The mark, first seen. Nothing is collected |
+| II  | Cave carving          | no       | The mark, kept clean    |
 | II  | Fossil A, Fossil B    | no       | Escalation              |
-| II  | Clue tablets ×3       | no       | Puzzle clues            |
+| II  | Clue tablets ×3, across both routes | no | Puzzle clues |
 | II  | Footprint (webbed)    | no       | Dread                   |
+| II  | Relief, in the recess below the shelf | no | Worship, on the low route |
+| II  | Cairn, on the shelf   | no       | Someone watched, on the high route |
+| III | Kneeling statue, on the shelf | no | Worship, on the high route |
 | III | Mural                 | no       | Text changes after solve |
 | III | Glyph stones ×3       | no       | Puzzle input            |
 
@@ -135,7 +159,7 @@ about 4 s and never pauses the game.
 
 ## 7. Audio direction
 
-**Status: planned. The build has no audio yet.** Direction from the owner, 2026-11-02: original,
+**Status: planned, apart from three narration samples kept for voice direction, which the owner finds noticeably synthetic, so they are not an approved voice.** Music, ambience, footsteps and cues are M4 and M5. Direction from the owner, 2026-11-02: original,
 cohesive audio with a Lovecraftian atmosphere, tied to environments and story triggers.
 
 **Sound communicates the world's change.** Familiar coastal sounds thin out or disappear as unnatural
@@ -164,8 +188,22 @@ game music. Nothing is purchased or commissioned without the owner's approval.
 event-to-sound list and a demonstration of the mix in gameplay, checked for loop seams, abrupt
 transitions, clipping, repeated-trigger stacking, and whether important cues stay audible. The
 transition beyond the Shore must also be coherent in sound. Separate music and effects volume settings
-are prepared in M2 and connected when audio exists (§11). Until then, Settings says "This build has no audio yet."
-That note is removed when audio is connected.
+are prepared in M2 and connected when audio exists (§11). Until then, Settings says "Narration samples only. No music or effects yet."
+That note changes as audio is connected, and goes when all of it is.
+
+### Narration (owner, 2026-11-04)
+
+One English narrator, as the sailor, in the first person: **intimate, restrained and credible,** with fatigue, uncertainty and growing dread carried by phrasing and pauses. Not theatrical, not whispered throughout, and no trailer delivery. It should sound performed and believable, and not like a flat synthetic reader.
+
+**Spoken:** important examine captions, story observations and the epilogue. **Never spoken:** button prompts, checkpoint notices, settings labels or every small interaction. Silence stays.
+
+**Rules, all implemented in M3 ([architecture §5](architecture.md)):** one script, with line IDs, for both voice and caption, so spoken words match the text. A caption stays through its line and a brief margin. **No queue.** A story moment replaces anything, and something optional replaces something optional, but cannot touch a story moment, and is simply dropped. Pressing Examine again skips, and does nothing else. Everything pauses with the game, and stops with the world. A line with no audio is a text line, so nothing depends on a file. Subtitles are on by default, and can be switched off, which only ever hides what can be heard.
+
+**Which voice is the owner's decision.** Three samples are in the build. The rest are generated only once the direction is accepted, and that final production and mix belong to M4 and M5.
+
+### Controller vibration (owner, 2026-11-04)
+
+Brief and restrained, at three moments: the monolith's awakening, the hand coming down in the reveal, and the collapse. On by default, with a switch in Settings. It needs a supported controller, reaches only the controller in use, and stops on pausing, changing device, restarting or leaving, with nothing resumed afterwards. No remapping, and no strength settings.
 
 **Audio is not marked complete until a person has heard it in gameplay.**
 
@@ -260,14 +298,16 @@ levels, custom physics or rendering, multiplayer.
 
 ## 11. Menus, settings and saving
 
-**Status: all of this is implemented in M2, accepted by the owner, for the beats that exist so far.** Added by
+**Status: all of this is implemented. M2 is accepted by the owner for the beats that existed then, and M3 extends saving to every savable beat,
+implemented, awaiting independent review, and not accepted by the owner.** Added by
 the owner on 2026-11-02 and brought forward on 2026-11-03 ([D24, D25, D36](decisions.md)). Saving is an intentional scope change:
 this document excluded it before.
 
 | Screen | Options | Milestone |
 |---|---|---|
 | Pause | Resume, Restart Checkpoint, Settings, Controls, Quit to Main Menu, Quit to Desktop | M2 |
-| Settings | Music volume, effects volume, keyboard bindings, Restore Defaults, Back, and a temporary note that there is no audio yet | M2 |
+| Settings | Music volume, effects volume, keyboard bindings, Restore Defaults, Back, and a note on how far audio has come | M2 |
+| Settings, added | Narration volume, subtitles and controller vibration, each saved | M3 |
 | Main menu, on launch | New Game, Continue, Settings, Controls, Credits, Quit to Desktop | M2 |
 | Controls | Movement, jumping, examining, pausing and menus, on keyboard with the current keys and on controller. Starting a new game shows a short version for the device in use | M2 |
 | Credits | Attribution and licenses, from the project's records | M2 |

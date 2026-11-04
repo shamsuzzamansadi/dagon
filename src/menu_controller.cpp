@@ -1,15 +1,22 @@
 #include "menu_controller.hpp"
 
 #include "game_session.hpp"
+#include "core/narration.hpp"
 #include "global_state.hpp"
+#include "haptics.hpp"
 #include "input_labels.hpp"
+#include "narration.hpp"
 #include "storage.hpp"
 
+#include <godot_cpp/classes/audio_stream.hpp>
 #include <godot_cpp/classes/engine.hpp>
 #include <godot_cpp/classes/input.hpp>
 #include <godot_cpp/classes/os.hpp>
 #include <godot_cpp/classes/resource_loader.hpp>
+#include <godot_cpp/classes/property_tweener.hpp>
 #include <godot_cpp/classes/scene_tree.hpp>
+#include <godot_cpp/classes/text_server.hpp>
+#include <godot_cpp/classes/tween.hpp>
 #include <godot_cpp/classes/viewport.hpp>
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/core/error_macros.hpp>
@@ -26,18 +33,24 @@ const char *const REPLACE_SAVE_MESSAGE = "Start a new game? This replaces your s
 const char *const REPLACE_DAMAGED_SAVE_MESSAGE = "Start a new game? This replaces the save that cannot be used.";
 const char *const NEW_GAME_FAILED_MESSAGE = "Could not create a new save, so the game did not start. Your existing save was not changed.";
 const char *const QUIT_SAVED_MESSAGE = "Continue resumes from your last saved checkpoint. Anything since then is not kept.";
+const char *const QUIT_FINAL_SEQUENCE_MESSAGE = "Continue resumes before the final sequence, which will play again.";
 const char *const QUIT_NOT_SAVED_MESSAGE = "Your latest checkpoint could not be saved. Continue resumes from your earlier save.";
 const char *const QUIT_NO_SAVE_MESSAGE = "Your progress could not be saved, so there is nothing to continue.";
 const char *const QUIT_SETTINGS_KEPT = " Your settings are kept.";
 const char *const QUIT_SETTINGS_LOST = " Your latest settings could not be saved, so they will be lost.";
 // The only way for the export check to reach the game in a build with no input device or script.
 const char *const AUTOSTART_VARIABLE = "DAGON_AUTOSTART";
+constexpr double ENDING_LINE_MINIMUM_SECONDS = 3.0;
+constexpr double ENDING_LINE_PAUSE_SECONDS = 0.7;
+constexpr float ENDING_LINE_FADE_SECONDS = 0.8f;
+constexpr float ENDING_LINE_WIDTH = 400.0f;
 
 } // namespace
 
 void MenuController::_bind_methods() {
 	BIND_ENUM_CONSTANT(MODE_PAUSE);
 	BIND_ENUM_CONSTANT(MODE_TITLE);
+	BIND_ENUM_CONSTANT(MODE_ENDING);
 
 	ClassDB::bind_method(D_METHOD("is_open"), &MenuController::is_open);
 	ClassDB::bind_method(D_METHOD("open"), &MenuController::open);
@@ -50,6 +63,12 @@ void MenuController::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("continue_game"), &MenuController::continue_game);
 	ClassDB::bind_method(D_METHOD("open_credits"), &MenuController::open_credits);
 	ClassDB::bind_method(D_METHOD("quit_now"), &MenuController::quit_now);
+	ClassDB::bind_method(D_METHOD("quit_to_main_menu"), &MenuController::quit_to_main_menu);
+	ClassDB::bind_method(D_METHOD("advance_ending"), &MenuController::advance_ending);
+	ClassDB::bind_method(D_METHOD("get_ending_line"), &MenuController::get_ending_line);
+	ClassDB::bind_method(D_METHOD("set_ending_lines", "ids"), &MenuController::set_ending_lines);
+	ClassDB::bind_method(D_METHOD("get_ending_lines"), &MenuController::get_ending_lines);
+	ADD_PROPERTY(PropertyInfo(Variant::PACKED_STRING_ARRAY, "ending_lines"), "set_ending_lines", "get_ending_lines");
 	ClassDB::bind_method(D_METHOD("refresh_save_status"), &MenuController::refresh_save_status);
 	ClassDB::bind_method(D_METHOD("open_settings"), &MenuController::open_settings);
 	ClassDB::bind_method(D_METHOD("open_controls"), &MenuController::open_controls);
@@ -62,7 +81,7 @@ void MenuController::_bind_methods() {
 
 	ClassDB::bind_method(D_METHOD("set_mode", "mode"), &MenuController::set_mode);
 	ClassDB::bind_method(D_METHOD("get_mode"), &MenuController::get_mode);
-	ADD_PROPERTY(PropertyInfo(Variant::INT, "mode", PROPERTY_HINT_ENUM, "Pause,Title"), "set_mode", "get_mode");
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "mode", PROPERTY_HINT_ENUM, "Pause,Title,Ending"), "set_mode", "get_mode");
 	ClassDB::bind_method(D_METHOD("set_game_scene", "scene"), &MenuController::set_game_scene);
 	ClassDB::bind_method(D_METHOD("get_game_scene"), &MenuController::get_game_scene);
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "game_scene", PROPERTY_HINT_RESOURCE_TYPE, "PackedScene"), "set_game_scene", "get_game_scene");
@@ -98,6 +117,8 @@ void MenuController::_bind_methods() {
 	DAGON_BIND_PATH(controls_back_button_path);
 	DAGON_BIND_PATH(credits_back_button_path);
 	DAGON_BIND_PATH(save_status_label_path);
+	DAGON_BIND_PATH(ending_box_path);
+	DAGON_BIND_PATH(voice_path);
 
 #undef DAGON_BIND_PATH
 }
@@ -110,15 +131,21 @@ void MenuController::_ready() {
 
 	session_.set(session_path_.is_empty() ? nullptr : get_node<GameSession>(session_path_));
 	main_panel_.set(get_node<Control>(main_panel_path_));
-	confirm_panel_.set(get_node<Control>(confirm_panel_path_));
-	controls_panel_.set(get_node<Control>(controls_panel_path_));
-	settings_menu_.set(get_node<SettingsMenu>(settings_menu_path_));
-	confirm_message_label_.set(get_node<Label>(confirm_message_label_path_));
-	if (main_panel_.get() == nullptr || confirm_panel_.get() == nullptr || controls_panel_.get() == nullptr || settings_menu_.get() == nullptr) {
+	// The ending has only its card and the credits.
+	if (mode_ != MODE_ENDING) {
+		confirm_panel_.set(get_node<Control>(confirm_panel_path_));
+		controls_panel_.set(get_node<Control>(controls_panel_path_));
+		settings_menu_.set(get_node<SettingsMenu>(settings_menu_path_));
+		confirm_message_label_.set(get_node<Label>(confirm_message_label_path_));
+	}
+	if (main_panel_.get() == nullptr || (mode_ != MODE_ENDING && (confirm_panel_.get() == nullptr || controls_panel_.get() == nullptr || settings_menu_.get() == nullptr))) {
 		ERR_PRINT("MenuController: a panel path is not set; the menu cannot open.");
+		main_panel_.set(nullptr);
 		return;
 	}
-	settings_menu_.get()->connect("closed", callable_mp(this, &MenuController::on_settings_closed));
+	if (SettingsMenu *settings = settings_menu_.get()) {
+		settings->connect("closed", callable_mp(this, &MenuController::on_settings_closed));
+	}
 
 	Input *input = Input::get_singleton();
 	input->connect("joy_connection_changed", callable_mp(this, &MenuController::on_joy_connection_changed));
@@ -126,9 +153,18 @@ void MenuController::_ready() {
 	for (int i = 0; i < controllers.size(); i++) {
 		input_labels::log_controller(controllers[i]);
 	}
-	settings_menu_.get()->set_cancel_label(input_labels::back_label(active_device_));
+	if (SettingsMenu *settings = settings_menu_.get()) {
+		settings->set_cancel_label(input_labels::back_label(active_device_));
+	}
 
-	if (mode_ == MODE_TITLE) {
+	if (mode_ == MODE_ENDING) {
+		credits_panel_.set(get_node<Control>(credits_panel_path_));
+		voice_.set(voice_path_.is_empty() ? nullptr : get_node<AudioStreamPlayer>(voice_path_));
+		show_screen(Screen::Main);
+		focus_path(first_button_path_);
+		print_verbose("dagon: ending card shown");
+		show_next_ending_line();
+	} else if (mode_ == MODE_TITLE) {
 		credits_panel_.set(get_node<Control>(credits_panel_path_));
 		save_status_label_.set(get_node<Label>(save_status_label_path_));
 		continue_button_.set(get_node<Button>(continue_button_path_));
@@ -141,6 +177,56 @@ void MenuController::_ready() {
 	} else {
 		show_screen(Screen::Closed);
 	}
+}
+
+void MenuController::_process(double p_delta) {
+	if (Engine::get_singleton()->is_editor_hint() || mode_ != MODE_ENDING || screen_ != Screen::Main || ending_line_ + 1 >= ending_lines_.size()) {
+		return;
+	}
+	ending_line_left_ -= p_delta;
+	if (ending_line_left_ <= 0.0) {
+		show_next_ending_line();
+	}
+}
+
+// Each line of the epilogue joins the card when the one before has been said or could be read, whether it has a
+// voice or not. The card is the ending's text, so the subtitle switch does not hide it.
+void MenuController::show_next_ending_line() {
+	if (ending_line_ + 1 >= ending_lines_.size()) {
+		return;
+	}
+	ending_line_++;
+	const StringName id = ending_lines_[ending_line_];
+	const String text = narration::line_text(id);
+	if (Control *box = ending_box_path_.is_empty() ? nullptr : get_node<Control>(ending_box_path_)) {
+		Label *label = memnew(Label);
+		label->set_text(text);
+		label->set_custom_minimum_size(Vector2(ENDING_LINE_WIDTH, 0));
+		label->set_autowrap_mode(TextServer::AUTOWRAP_WORD_SMART);
+		label->set_modulate(Color(1, 1, 1, 0));
+		box->add_child(label);
+		label->create_tween()->tween_property(label, "modulate:a", 1.0, ENDING_LINE_FADE_SECONDS);
+	}
+	const Ref<AudioStream> stream = narration::line_audio(id);
+	AudioStreamPlayer *voice = voice_.get();
+	const bool voiced = stream.is_valid() && voice != nullptr;
+	if (voice != nullptr) {
+		voice->stop();
+	}
+	if (voiced) {
+		voice->set_stream(stream);
+		voice->play();
+	}
+	print_verbose("dagon: ending line: ", id, " voiced=", voiced);
+	ending_line_left_ = core::line_seconds(static_cast<std::size_t>(text.length()), voiced ? stream->get_length() : 0.0, ENDING_LINE_MINIMUM_SECONDS) + ENDING_LINE_PAUSE_SECONDS;
+}
+
+void MenuController::advance_ending() {
+	if (ending_line_ + 1 < ending_lines_.size()) {
+		show_next_ending_line();
+		return;
+	}
+	open_credits();
 }
 
 void MenuController::autostart() {
@@ -218,9 +304,15 @@ void MenuController::show_screen(Screen p_screen) {
 	screen_ = p_screen;
 	set_visible(p_screen != Screen::Closed);
 	main_panel_.get()->set_visible(p_screen == Screen::Main);
-	confirm_panel_.get()->set_visible(p_screen == Screen::Confirm);
-	controls_panel_.get()->set_visible(p_screen == Screen::Controls);
-	settings_menu_.get()->set_visible(p_screen == Screen::Settings);
+	if (Control *confirm = confirm_panel_.get()) {
+		confirm->set_visible(p_screen == Screen::Confirm);
+	}
+	if (Control *controls = controls_panel_.get()) {
+		controls->set_visible(p_screen == Screen::Controls);
+	}
+	if (SettingsMenu *settings = settings_menu_.get()) {
+		settings->set_visible(p_screen == Screen::Settings);
+	}
 	if (Control *credits = credits_panel_.get()) {
 		credits->set_visible(p_screen == Screen::Credits);
 	}
@@ -318,6 +410,9 @@ void MenuController::on_settings_closed() {
 }
 
 void MenuController::open_credits() {
+	if (AudioStreamPlayer *voice = voice_.get()) {
+		voice->stop();
+	}
 	show_screen(Screen::Credits);
 	focus_path(credits_back_button_path_);
 }
@@ -341,7 +436,7 @@ String MenuController::quit_message(ConfirmAction p_action) {
 		return message;
 	}
 	if (session->retry_save()) {
-		message += QUIT_SAVED_MESSAGE;
+		message += session->is_in_final_sequence() ? QUIT_FINAL_SEQUENCE_MESSAGE : QUIT_SAVED_MESSAGE;
 	} else {
 		message += session->has_any_save() ? QUIT_NOT_SAVED_MESSAGE : QUIT_NO_SAVE_MESSAGE;
 	}
@@ -387,6 +482,7 @@ void MenuController::confirm() {
 }
 
 void MenuController::quit_now() {
+	haptics::stop(active_device_);
 	get_tree()->quit();
 }
 

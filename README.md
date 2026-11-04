@@ -4,12 +4,15 @@ A short 2D cinematic horror game for [GitHub Game Off 2026](https://itch.io/jam/
 (theme: SHIFT). A shipwrecked sailor wakes on a stretch of seabed that should be
 under the ocean. Godot 4.7 with gameplay in C++20 through GDExtension.
 
-**Status: M1 and M2 are accepted by the owner, with documented deferrals.** The game opens on a main menu, with New Game, Continue
+**Status: M1 and M2 are accepted by the owner, with documented deferrals. M3 is implemented and awaiting independent review. It is not accepted by the owner, who has played it and finds it improved but not yet engaging enough ([record](docs/evidence/m3/owner-playtest-2026-11-04.md)).** The game opens on a main menu, with New Game, Continue
 from one checkpoint save, Settings with key rebinding, Controls and Credits. Play starts on the Shore, in its accepted art direction: a
 sailor you can walk and jump with, on exposed seabed beside a stranded boat, with the sea far off. You can examine things, pause, and
-use a controller, with buttons named for the device in use. The artwork stops at the cliff opening, a known boundary: past it, the level
-carries on as unfinished greybox. Volume controls and buses are prepared, but there is no story, puzzle or audio yet. See
-[docs/roadmap.md](docs/roadmap.md) and [docs/shore-preview.md](docs/shore-preview.md).
+use a controller, with buttons named for the device in use.
+
+On the M3 branch, the whole route can be played: Shore, Exposed Abyss, Monolith, Witness, the escape and the ending. There are clue tablets, side routes, a distant ritual, a three-stone puzzle, placeholder cinematics,
+a save at each checkpoint, and optional controller vibration. **Past the cliff opening it is all unfinished greybox,** which is a known boundary and not the finished look. The cinematics are placeholders. **Three narration samples are in the game for voice direction. The owner finds them noticeably synthetic, and they are not an approved voice.** the rest of the
+narration is text, and there is no music or effects yet. It is much shorter than the finished game is meant to be. See
+[docs/roadmap.md](docs/roadmap.md), [docs/reviews/m3-review-package.md](docs/reviews/m3-review-package.md) and [docs/shore-preview.md](docs/shore-preview.md).
 
 ## Play the current build
 
@@ -31,7 +34,7 @@ from your last checkpoint. To quit, close the window, or use **Quit to Desktop**
 |---|---|---|---|---|
 | Walk | A / D, ← / → | Left stick, D-pad | Left stick, D-pad | Left stick, D-pad |
 | Jump | Space | A | Cross | Bottom face button |
-| Examine, when a prompt shows | E | X | Square | Left face button |
+| Examine, when a prompt shows. Again, to skip what is being said | E | X | Square | Left face button |
 | Pause | Esc | Menu | Options | Start |
 | Menus: move | Arrow keys | Left stick, D-pad | Left stick, D-pad | Left stick, D-pad |
 | Menus: confirm | Enter, Space | A | Cross | Bottom face button |
@@ -41,8 +44,8 @@ The controller columns are the same physical buttons, by position. The prompt an
 device you are using, and an unrecognized controller is described by position.
 
 In Settings you can change the keyboard keys for walking, jumping and examining. The Left and Right arrows always move
-and Esc always pauses. Controller buttons are fixed. The Music and Effects sliders are saved and set on their own buses, ready
-for the audio planned in M4 and M5. This build has no audio yet, and Settings says so.
+and Esc always pauses. Controller buttons are fixed. Narration has its own volume, and subtitles and controller vibration can each be switched off. They are on by default. The Music and Effects sliders are saved and set on their own buses, ready
+for the audio planned in M4 and M5. The only audio so far is three narration samples, and Settings says so.
 
 All of this is checked by automated tests with simulated input for each layout. In human tests, A, D, the Left and Right arrows and
 Space have worked, and the owner reports that the Xbox controller controls they tried worked, without listing them. Individual Xbox
@@ -55,8 +58,10 @@ which are not targets.
 |---|---|
 | `project/scenes/ui/title.tscn` | **Entry scene:** the main menu, which is what the standard build opens. |
 | `project/scenes/level/game.tscn` | The session: the world, which it can replace, and the pause menu. |
-| `project/scenes/level/shore.tscn` | The world. Art from x = 0 to 640, greybox from there to x = 1400. |
-| `project/scenes/level/level.tscn` | Greybox development and test scene, with the same collision. Not exported. Run it with `godot --path project res://scenes/level/level.tscn`, or open it in the editor. |
+| `project/scenes/level/shore.tscn` | The world: all four acts, despite the name. Art from x = 0 to 640, greybox from there to x = 4544. |
+| `project/scenes/ui/ending.tscn` | The epilogue, line by line, and the credits, which lead back to the main menu. |
+| `project/narration/script.txt` | Every spoken line and its caption, by line ID. The one source for both. |
+| `project/scenes/level/level.tscn` | M1's movement test scene, with the same collision up to x = 980. Not exported. Run it with `godot --path project res://scenes/level/level.tscn`, or open it in the editor. |
 
 The art is regenerated by `python tools/art/generate.py`, which needs Pillow.
 
@@ -114,6 +119,7 @@ GODOT=/path/to/godot sh tools/run_godot_checks.sh    # import, extension load, i
 python tools/art/check_art.py                        # palette, foot sliding, drawn ground on the collision
 sh tools/install_export_templates.sh                 # 1.28 GB download, SHA-512 verified
 GODOT=/path/to/godot sh tools/export_check.sh linux  # or: windows
+python3 tools/route_check.py build/export/linux/dagon.x86_64 build/logs/route --display :77  # on a private X display: docs/toolchain.md
 ```
 
 Logs go to `build/logs/`, with a separate stdout, stderr and exit status for

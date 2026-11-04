@@ -445,6 +445,36 @@ def glints(frame, frames=4):
     return img
 
 
+def talisman():
+    """A carved disc on a rotted cord, half in the mud: an eye above a line of waves. The mark recurs on the way to the monolith."""
+    img = blank(16, 11)
+    # The cord, trailing off to the left.
+    for x, y in ((0, 9), (1, 8), (2, 8), (3, 7), (4, 7)):
+        put(img, x, y, "E2")
+    # The disc.
+    for y, (x0, x1) in enumerate(((7, 11), (6, 12), (5, 13), (5, 13), (5, 13), (5, 13), (5, 13), (6, 12), (7, 11))):
+        for x in range(x0, x1 + 1):
+            put(img, x, y + 1, "C4" if y < 4 else "C3")
+    for x in range(7, 12):
+        put(img, x, 1, "C6")
+    # The eye, then the waves.
+    for x in range(7, 12):
+        put(img, x, 3, "T4")
+    put(img, 6, 4, "T4")
+    put(img, 12, 4, "T4")
+    put(img, 9, 4, "C0")
+    for x in range(7, 12):
+        put(img, x, 5, "T3")
+    for x, y in ((6, 8), (7, 7), (8, 8), (9, 7), (10, 8), (11, 7), (12, 8)):
+        put(img, x, y, "T3")
+    # Mud over its lower edge, so it sits in the ground rather than on it.
+    for x in range(4, 15):
+        put(img, x, 10, "E2")
+    for x in (5, 6, 12, 13):
+        put(img, x, 9, "E2")
+    return img
+
+
 def fish_prop():
     """A dead fish on the sand, for the sense that the sea left suddenly. Used sparingly."""
     img = blank(14, 6)

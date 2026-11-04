@@ -21,6 +21,7 @@ void PlayerController::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("is_control_enabled"), &PlayerController::is_control_enabled);
 	ClassDB::bind_method(D_METHOD("teleport", "position"), &PlayerController::teleport);
 	ClassDB::bind_method(D_METHOD("get_facing"), &PlayerController::get_facing);
+	ClassDB::bind_method(D_METHOD("face", "direction"), &PlayerController::face);
 
 #define DAGON_BIND_FLOAT(m_name)                                                               \
 	ClassDB::bind_method(D_METHOD("set_" #m_name, "value"), &PlayerController::set_##m_name);  \
@@ -209,7 +210,11 @@ void PlayerController::update_facing(float p_axis) {
 	if (p_axis == 0.0f) {
 		return;
 	}
-	const int facing = p_axis > 0.0f ? 1 : -1;
+	face(p_axis > 0.0f ? 1 : -1);
+}
+
+void PlayerController::face(int p_direction) {
+	const int facing = p_direction < 0 ? -1 : 1;
 	if (facing == facing_) {
 		return;
 	}

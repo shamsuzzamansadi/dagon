@@ -200,6 +200,19 @@ the results again, re-run on the real project.
   the web export. Not evaluated. Time-boxed to half a day after M6, and only if
   the jam allows.
 
+## 6a. The exported route ([D51](decisions.md))
+
+`tools/route_check.py` plays the release build as shipped, with keys from the window system. It needs only Python's standard library, and on Linux `xdotool`, a
+private X server, and Mesa for software OpenGL. CI installs `xvfb`, `xdotool`, `libgl1-mesa-dri` and `imagemagick` (for screenshots) on the Linux job. On a machine with a desktop, give it a display of its own:
+
+```sh
+Xvfb :77 -screen 0 1440x810x24 +extension GLX -nolisten tcp &
+python3 tools/route_check.py build/export/linux/dagon.x86_64 build/logs/route --display :77 --shots build/logs/route/shots
+```
+
+**It will not use a desktop by accident:** without `--display` it stops on Linux, and on Windows it runs only with `--windows-ci` on a machine whose `CI` variable is `true`, because it posts keys to a
+real window. Storage goes to its own `dagon-test-*` folder.
+
 ## 7. Useful verified CLI flags (Godot 4.7.2 `--help`)
 
 `--headless`, `--import`, `--script <path>` (editor/debug builds only),

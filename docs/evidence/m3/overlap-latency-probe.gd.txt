@@ -1,0 +1,49 @@
+extends SceneTree
+## Measures how many physics frames pass between moving a body and the overlap list knowing, in 4.7.2.
+var area: Area2D
+var body: CharacterBody2D
+var log := []
+func _initialize():
+	var floor_ := StaticBody2D.new()
+	root.add_child(floor_)
+	area = Area2D.new()
+	area.collision_mask = 2
+	var s := CollisionShape2D.new(); s.shape = RectangleShape2D.new(); s.shape.size = Vector2(40, 40)
+	area.add_child(s); area.position = Vector2(500, 0)
+	root.add_child(area)
+	body = CharacterBody2D.new(); body.collision_layer = 2; body.collision_mask = 0
+	var c := CollisionShape2D.new(); c.shape = CircleShape2D.new(); c.shape.radius = 5
+	body.add_child(c); body.position = Vector2(100, 0)
+	root.add_child(body)
+	area.body_entered.connect(func(_b): log.append("entered@%d" % Engine.get_physics_frames()))
+	area.body_exited.connect(func(_b): log.append("exited@%d" % Engine.get_physics_frames()))
+	_run()
+func _moved(name: String, target: Vector2, frame: int) -> void:
+	log.clear()
+	for i in 8:
+		await physics_frame
+	print(name, ": moved at frame ", frame, " -> ", log, " inside_now=", area.get_overlapping_bodies().size())
+func _run():
+	for i in 10: await physics_frame
+	# A: from process (idle), with the body moved in via position
+	await process_frame
+	var f := Engine.get_physics_frames(); body.global_position = Vector2(500, 0); await _moved("A idle, into", Vector2(500,0), f)
+	await process_frame
+	f = Engine.get_physics_frames(); body.global_position = Vector2(100, 0); await _moved("B idle, out of", Vector2(100,0), f)
+	# C: during physics (after SceneTree.physics_frame, before the server's step)
+	await physics_frame
+	f = Engine.get_physics_frames(); body.global_position = Vector2(500, 0); await _moved("C physics, into", Vector2(500,0), f)
+	await physics_frame
+	f = Engine.get_physics_frames(); body.global_position = Vector2(100, 0); await _moved("D physics, out of", Vector2(100,0), f)
+	# E: moved by velocity through move_and_collide-like path during physics: repeated exit/enter
+	await physics_frame
+	f = Engine.get_physics_frames(); body.global_position = Vector2(470, 0); await _moved("E near, physics, not inside", Vector2(470,0), f)
+	await physics_frame
+	f = Engine.get_physics_frames(); body.global_position = Vector2(482, 0); await _moved("F short hop into, physics", Vector2(482,0), f)
+	await physics_frame
+	f = Engine.get_physics_frames(); body.global_position = Vector2(470, 0); await _moved("G short hop out of, physics", Vector2(470,0), f)
+	await process_frame
+	f = Engine.get_physics_frames(); body.global_position = Vector2(482, 0); await _moved("H short hop into, idle", Vector2(482,0), f)
+	await process_frame
+	f = Engine.get_physics_frames(); body.global_position = Vector2(470, 0); await _moved("I short hop out of, idle", Vector2(470,0), f)
+	quit(0)

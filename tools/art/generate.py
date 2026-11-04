@@ -106,6 +106,7 @@ def main():
     gen_shore.bank().save(OUT / "bank.png")
     gen_shore.terrain().save(OUT / "terrain.png")
     gen_shore.foreground().save(OUT / "foreground.png")
+    gen_shore.talisman().save(OUT / "talisman.png")
     gen_shore.fish_prop().save(OUT / "fish.png")
     gen_boat.draw().save(OUT / "boat.png")
     write_sailor()

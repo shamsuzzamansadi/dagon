@@ -36,6 +36,9 @@ public:
 	bool is_checkpoint_saved() const { return persisted_beat_ == session_beat_; }
 	bool has_any_save() const { return persisted_beat_ >= 0; }
 
+	// Whether quitting now loses a final sequence that will play again.
+	bool is_in_final_sequence() const { return director_.get() != nullptr && director_.get()->is_in_final_sequence(); }
+
 	int get_session_beat() const { return session_beat_; }
 	int get_persisted_beat() const { return persisted_beat_; }
 	godot::Node *get_world() const { return world_.get(); }

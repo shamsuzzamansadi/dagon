@@ -23,8 +23,13 @@ bool replace_file(const godot::String &p_name, const std::string &p_text);
 core::Settings load_settings();
 bool save_settings(const core::Settings &p_settings);
 
-// Sets the audio bus volumes and the InputMap. Safe to call any number of times.
+// Sets the audio bus volumes, the InputMap and the two switches below. Safe to call any number of times.
 void apply_settings(const core::Settings &p_settings);
+
+// The player's switches, as they stand now, including any that could not be saved. Kept on the Engine singleton,
+// as the volumes are on the AudioServer: they change only through Settings (docs/architecture.md §7 rule 8).
+bool subtitles_enabled();
+bool vibration_enabled();
 
 // What the save slot holds, for the main menu. The session never reads it.
 struct LoadedSave {
