@@ -123,8 +123,9 @@ class Game:
         self.started = time.monotonic()
         log_path.unlink(missing_ok=True)
         # The log file, because a Windows GUI build has no stdout to read. The project flushes it on every line.
+        # The dummy audio driver, because a CI runner has no sound card, and the build has no audio yet.
         self.process = subprocess.Popen(
-            [str(binary), "--verbose", "--log-file", str(log_path)], cwd=Path(binary).parent, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+            [str(binary), "--verbose", "--audio-driver", "Dummy", "--log-file", str(log_path)], cwd=Path(binary).parent, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
         )
         threading.Thread(target=self._read, daemon=True).start()
         keys.attach(self.process)

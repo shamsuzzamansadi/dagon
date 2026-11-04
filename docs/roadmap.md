@@ -59,7 +59,18 @@ rebinding and save support are never removed silently (risk R20).
 - [x] **M2: accepted by the owner on 2026-11-03, with documented deferrals** ([record](evidence/m2/owner-acceptance-2026-11-03.md),
   [package](reviews/m2-review-package.md)). The main menu and save moved here from M3 (D36). Audio is volume controls and buses
   prepared, and nothing more (D42). M3–M7 not started.
+- [ ] **M3 Complete gameplay (greybox): implemented, awaiting review and owner acceptance.** Package: [m3-review-package.md](reviews/m3-review-package.md). Not accepted, not merged, and no release has been made. M4–M7 not started.
 - **Every later playtest identifies the exact artifact or run it tested.**
+
+## M3 implementation sequence (recorded 2026-11-04, as the owner asked)
+
+1. Plain-C++ rules: `core::SequencePuzzle`, the flee's second way to Ended, and the awaited-trigger, checkpoint and control rules in `StoryProgress`, with native tests.
+2. Adapters: `PuzzleController`, `CameraRig`'s retargeting, shake and restoration, and `GameDirector`'s whole progression and cinematic contract.
+3. The world: the greybox acts in `shore.tscn`, the placeholder clips, and the Ending scene through `MenuController`.
+4. Saving for Monolith and Awakened through the one restore path, with wording for the final sequence. The format stays as it is.
+5. Regression suites for architecture §8: the contract, the puzzle, the level, restoring each beat, and whole routes played with keys.
+6. `tools/route_check.py`: the shipped build, played to the ending with real window-system keys, in CI on both shipping builds.
+7. Evidence: deliberate breakage, a fresh clone and repeats. Documents and the review package. **Then stop:** no merge, tag, release or M4.
 
 ## Review follow-ups by milestone (Phase A final review, 2026-10-28)
 
@@ -68,9 +79,10 @@ rebinding and save support are never removed silently (risk R20).
 | M1 | Test observation point: `SceneTree.physics_frame` fires *before* node `_physics_process`. Use the `StepProbe` post-step point and **verify** its ordering with a test. | architecture §8 |
 | M1 | Re-collect the import-crash evidence on the real project with `reproduce.sh`-style capture (exit status, stdout and stderr per run). | toolchain §5, evidence README |
 | M2 | Test Interactor delivery and consumption with `Input.parse_input_event()` and `InputEventAction`. `action_press` covers polled input only. | architecture §8 |
-| M3 | `call_deferred` does not wait for a physics frame. Overlap re-checks wait for a completed physics step (`physics_frames >= recorded + 2`). | architecture §5, GameDirector |
-| M3 | Out-of-bounds during a cinematic is kept as `recovery_pending`, then re-checked after finalization. Regression: entering the kill plane while control is locked. | architecture §5 and §8 |
-| M3–M4 | The art ends at x = 640, at a straight edge of the right cliff, and its cleft is a placeholder way through. Replace both as the later environments arrive, in the accepted Shore style. | [shore-preview.md](shore-preview.md) |
+| M3 | `call_deferred` does not wait for a physics frame. Overlap re-checks wait for a completed physics step. **Done, and measured: `recorded + 3`, not `+ 2`** ([D49](decisions.md)). | architecture §5, GameDirector |
+| M3 | Out-of-bounds during a cinematic is kept as `recovery_pending`, then re-checked after finalization. Regression: entering the kill plane while control is locked. **Done.** | architecture §5 and §8 |
+| M4 | The art ends at x = 640, at a straight edge of the right cliff, and its cleft is a placeholder way through. Replace both as the later environments arrive, in the accepted Shore style. M3's greybox runs from there. | [shore-preview.md](shore-preview.md) |
+| M6 | **Timing:** the acts are shorter than the GDD's 10–15 minutes. The scripted route reaches the ending in about 2 minutes without pausing to read, and M3 did not try to pad that with empty walking. Adjust content density, not walking length (R11), once a person has played it. | [M3 package](reviews/m3-review-package.md), GDD §4 |
 | M4 | Sailor animation: stop, turn and landing frames, coat motion, and turning that mirrors the lantern to the other hand. The walk speed stays unchanged: the owner's general feedback so far is positive. | [shore-preview.md](shore-preview.md) |
 | M4 | Rest of the first M4 deliverable: sound, caption and prompt styling, fog and lantern pass, readability on a second display, and the sailor's size on screen. | GDD §8, [shore-preview.md](shore-preview.md) |
 
@@ -113,8 +125,8 @@ documents. No dimension-switching mechanic, no wider scope ([jam.md](jam.md) §4
 done before M2's gate instead, so **no target date moves, and M3 gets lighter by this much.** The cost is one that dates do not
 show: M2 now has more to review, and M3 cannot start until M2 is accepted, so a long review round takes time directly from the
 4-act greybox, which is the part of the game that matters most. If that gate runs past about Nov 9, the first thing to give way is
-the Nov 15 start of M4's polish, by the existing cut order, not the playable loop. Only the Shore and Abyss beats are built, so **the checks below
-for later beats stay in M3,** as those beats arrive.
+the Nov 15 start of M4's polish, by the existing cut order, not the playable loop. Only the Shore and Abyss beats were built then, so **the checks below
+for later beats stayed in M3,** which now has them.
 
 - Main menu on launch: New Game, Continue, Settings, Controls, Credits, Quit to Desktop. It is the main scene.
 - The pause menu gains Controls and Quit to Main Menu.

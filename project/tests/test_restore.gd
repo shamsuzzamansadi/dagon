@@ -275,6 +275,7 @@ func test_witness_fleeing_and_ended_are_never_written_and_restart_replays_them(h
 	await h.tap_key(KEY_ESCAPE)
 	h.check(h.tree.paused, "Esc did not pause the reveal")
 	_menu(session).restart_checkpoint()
+	h.check(not h.tree.paused, "restarting during the reveal left the game paused")
 	await h.steps(30)
 	_check_world(h, session, AWAKENED, "restarted during the reveal")
 	h.check(h.read_storage_file(SAVE_FILE) == SAVES[AWAKENED], "restarting wrote: %s" % h.read_storage_file(SAVE_FILE))
@@ -387,6 +388,34 @@ func test_ordinary_quit_wording_stays_ordinary_before_the_final_sequence(h) -> v
 	_menu(session).ask_quit_to_desktop()
 	h.check(_quit_message(session).contains("last saved checkpoint"), "the quit text reads '%s'" % _quit_message(session))
 	h.check(not _quit_message(session).contains("final sequence"), "the quit text reads '%s'" % _quit_message(session))
+
+
+## Nothing of an abandoned cinematic reaches the next world: no event, no save, no clip, and no callback.
+func test_repeated_restarts_during_a_cinematic_leave_nothing_behind(h) -> void:
+	_write(h, SAVE_FILE, SAVES[MONOLITH])
+	var session := await _session(h, MONOLITH)
+	for i in 3:
+		var puzzle: Node = _world(session).get_node("Monolith/Puzzle")
+		for id in [&"glyph_wave", &"glyph_kneel", &"glyph_eye"]:
+			puzzle.submit(id)
+		await h.steps(5)
+		h.check(session.get_director().is_cinematic_active(), "round %d: no cinematic" % i)
+		await h.tap_key(KEY_ESCAPE)
+		_menu(session).restart_checkpoint()
+		await h.steps(3)
+		h.check(not h.tree.paused, "round %d: paused" % i)
+		h.check(session.get_session_beat() == MONOLITH, "round %d: the session moved to %d" % [i, session.get_session_beat()])
+		h.check(h.tree.root.find_children("*", "GameDirector", true, false).size() == 1, "round %d: more than one director" % i)
+	await h.steps(30)
+	_check_world(h, session, MONOLITH, "after the restarts")
+	h.check(h.read_storage_file(SAVE_FILE) == SAVES[MONOLITH], "the abandoned cinematics saved: %s" % h.read_storage_file(SAVE_FILE))
+	# Long enough for any leftover clip or watchdog of the old worlds to have fired.
+	var finalized := [0]
+	session.get_director().cinematic_finalized.connect(func(_clip: StringName, _generation: int) -> void: finalized[0] += 1)
+	await h.steps(420)
+	h.check(finalized[0] == 0, "a leftover finalized %d times" % finalized[0])
+	h.check(session.get_session_beat() == MONOLITH, "a leftover moved the session to %d" % session.get_session_beat())
+	_check_world(h, session, MONOLITH, "well after the restarts")
 
 
 ## ---- Saves written by other versions ----

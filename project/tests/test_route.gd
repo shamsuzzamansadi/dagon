@@ -208,6 +208,41 @@ func test_pausing_during_the_flee_does_not_use_up_its_time(h) -> void:
 	await h.wait_for_scene("MenuController", 400)
 
 
+## Abandoning a cinematic through the pause menu, and starting over from nothing.
+func test_pause_during_a_cinematic_then_quit_to_the_main_menu_then_new_game_starts_clean(h) -> void:
+	h.write_storage_file(SAVE_FILE, AWAKENED_SAVE.to_utf8_buffer())
+	await _title(h)
+	await h.tap_key(KEY_ENTER)
+	await h.wait_for_scene("GameSession")
+	var route = RoutePlayer.new(h)
+	await h.landed_on_floor(route.player())
+	await route.walk_into_the_reveal()
+	await h.steps(120)
+	h.check(route.director().is_cinematic_active(), "the reveal is not running")
+	h.check(route.world().get_node("CameraRig").zoom != Vector2.ONE, "the reveal did not touch the camera")
+	await h.tap_key(KEY_ESCAPE)
+	h.check(h.tree.paused, "Esc did not pause the reveal")
+	var clips: AnimationPlayer = route.world().get_node("Cinematics")
+	var position := clips.current_animation_position
+	await h.steps(30)
+	h.check(is_equal_approx(clips.current_animation_position, position), "the reveal ran on while paused")
+	route.pause_menu().ask_quit_to_main_menu()
+	await h.steps(1)
+	route.pause_menu().get_node("Center/Confirm/Items/Buttons/Ok").grab_focus()
+	await h.tap_key(KEY_ENTER)
+	var title: Node = await h.wait_for_scene("MenuController")
+	h.check(not h.tree.paused, "the main menu is paused")
+	title.get_node(ITEMS + "NewGame").grab_focus()
+	await h.tap_key(KEY_ENTER)
+	await h.tap_key(KEY_RIGHT)
+	await h.tap_key(KEY_ENTER)
+	await h.wait_for_scene("GameSession")
+	await h.tap_key(KEY_ENTER)
+	var again = RoutePlayer.new(h)
+	await h.landed_on_floor(again.player())
+	_check_clean_start(h, again, "after quitting the reveal")
+
+
 func test_the_ending_has_a_working_controller_route_and_back_does_nothing_at_its_root(h) -> void:
 	var ending: Node = await h.load_main_fixture("res://scenes/ui/ending.tscn")
 	await h.steps(3)
