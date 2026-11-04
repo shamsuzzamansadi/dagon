@@ -403,6 +403,18 @@ func test_the_epilogues_voiced_line_plays_and_moving_on_stops_it(h) -> void:
 	h.check(not voice.playing, "the voice went on into the credits")
 
 
+## The line before the credits has no voice yet, so this goes straight there from one that does.
+func test_opening_the_credits_stops_a_voiced_line(h) -> void:
+	var ending: Node = await h.load_main_fixture("res://scenes/ui/ending.tscn")
+	await h.steps(3)
+	var voice: AudioStreamPlayer = ending.get_node("Voice")
+	await h.tap_key(KEY_ENTER)
+	await h.tap_key(KEY_ENTER)
+	h.check(voice.playing, "the Innsmouth sample is not playing")
+	ending.open_credits()
+	h.check(not voice.playing, "the voice went on into the credits")
+
+
 ## ---- Settings ----
 
 

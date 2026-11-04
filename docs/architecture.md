@@ -83,8 +83,8 @@ x = 640 and greybox beyond. The file keeps its name, because tests, tools and th
 M1 movement test scene, not exported, and it matches the world's collision only as far as x = 980 ([D48](decisions.md)).*
 
 *The tree below is the design. As built: `GameDirector` is the world's last child, so every node it refers to is ready first. There is one
-`FarRidges` parallax layer and no `MidRocks`, `Audio` or post-FX, which belong to M4 and M5. `Dagon` and `Trench` are plain nodes in world space, and
-a far ridge that is part of `Dagon` stands in for the parallax. The stones' indicators are `Polygon2D`s, not lights. The act layout is in [D48](decisions.md).*
+`FarRidges` parallax layer, a nearer `RitualLayer`, and no `MidRocks`, `Audio` or post-FX, which belong to M4 and M5. `Dagon` and `Trench` are plain nodes in world space, and
+a far ridge that is part of `Dagon` stands in for the parallax. The stones' indicators are `Polygon2D`s, not lights. A `Background` AnimationPlayer holds the background events, and `Ledges` the two shelves. The `Voice` player is in `hud.tscn`. The act layout is in [D48](decisions.md) and [D56](decisions.md).*
 
 ```
 Level                       Node2D
@@ -276,7 +276,7 @@ only, and nothing a clip does can be required for progress.
 |---|---|---|---|---|
 | Shore | (start) | Checkpoint 0 | `beat_shore` | — |
 | Abyss | `enter_abyss` trigger | Checkpoint 1 | `beat_abyss` | — |
-| Monolith | `reach_monolith` trigger | Checkpoint 2 | `beat_monolith` | — |
+| Monolith | `reach_monolith` trigger | Checkpoint 2 | `beat_monolith`, and the line `monolith.first`, on the way in only | — |
 | Awakened | `PuzzleSolved` | Checkpoint 3. **Open the gate:** gate `collision_layer = 0`, deferred. | glow, rumble, gate visual | `monolith_awaken` |
 | Witness | `witness` trigger | Control locked | Dagon rises | `dagon_reveal` |
 | Fleeing | `RevealDone`, raised by the reveal's finalizer **on every exit path**: normal completion, missing clip, looping clip refused, watchdog | Control unlocked. Start the flee timer. The sailor turns to face left, as the cue to run. | `beat_fleeing`: shake, roar (fire-and-forget) | — |

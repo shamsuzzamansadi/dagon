@@ -196,6 +196,14 @@ func test_the_ritual_plays_when_the_cave_opens_and_only_once(h) -> void:
 	await h.stand_at(_player(h), Vector2(RITUAL_X - 40.0, -2))
 	await h.stand_at(_player(h), Vector2(RITUAL_X, -2))
 	h.check(started == [&"ritual_tableau"], "walking back over it gave %s" % str(started))
+	# A clip still playing would turn a second crossing away by itself, so this one comes after it has ended.
+	var background: AnimationPlayer = world.get_node("Background")
+	background.seek(background.current_animation_length, true)
+	await h.steps(2)
+	h.check(not background.is_playing(), "the clip did not end")
+	await h.stand_at(_player(h), Vector2(RITUAL_X - 40.0, -2))
+	await h.stand_at(_player(h), Vector2(RITUAL_X, -2))
+	h.check(started == [&"ritual_tableau"], "crossing after it ended gave %s" % str(started))
 
 
 func test_the_ritual_says_its_line_and_is_bounded(h) -> void:

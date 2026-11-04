@@ -141,9 +141,14 @@ skipped the tablets can still solve it.
 |-----|-----------------------|----------|-------------------------|
 | I   | Lifeboat              | no       | Tutorial, situation     |
 | I   | Fish carcass heap     | no       | Wrongness               |
+| I   | Talisman              | no       | The mark, first seen. Nothing is collected |
+| II  | Cave carving          | no       | The mark, kept clean    |
 | II  | Fossil A, Fossil B    | no       | Escalation              |
 | II  | Clue tablets ×3       | no       | Puzzle clues            |
 | II  | Footprint (webbed)    | no       | Dread                   |
+| II  | Relief, in the recess below the shelf | no | Worship, on the low route |
+| II  | Cairn, on the shelf   | no       | Someone watched, on the high route |
+| III | Kneeling statue, on the shelf | no | Worship, on the high route |
 | III | Mural                 | no       | Text changes after solve |
 | III | Glyph stones ×3       | no       | Puzzle input            |
 
