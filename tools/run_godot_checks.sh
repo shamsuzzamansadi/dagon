@@ -15,7 +15,7 @@ failures=0
 
 # step <name> <required-stdout-pattern or ""> <args...>
 # Errors the integration tests set out to cause. The test runner's own trap fails a test on any error it did not name.
-tested_errors='^ERROR: (GameDirector: (cinematic|more than one event)|PuzzleController: a stone submitted)'
+tested_errors='^ERROR: (GameDirector: (cinematic|more than one event)|PuzzleController: a stone submitted|Hud: no line in the script|haptics: there is no cue)'
 expected_errors='^$'
 step() {
 	name="$1"

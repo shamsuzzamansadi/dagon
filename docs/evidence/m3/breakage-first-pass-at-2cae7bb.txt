@@ -1,0 +1,1113 @@
+Deliberate breakage at 2cae7bb, the first full pass, in scratch clones with test storage isolated. One change at a time, then reverted.
+Four workers ran side by side, each on its own clone, so each file section starts with its own control. Simulated input only.
+A change is 'caught' if a unit or integration test fails, or the run stops. This pass found test gaps, and the review package says what became of each.
+
+caught              1 failing  A wrong stone keeps the attempt's progress
+caught              1 failing  A repeated press counts as a wrong stone
+caught              1 failing  Presses during the lockout count
+caught              5 failing  The lockout never ends
+caught              0 failing  Reset can undo a solved puzzle
+caught              1 failing  A wrong stone leaves the lights on
+NOT CAUGHT          0 failing  A wrong stone leaves the prompts up during the lockout
+caught              3 failing  The stones stay usable after the lockout never returns them
+NOT CAUGHT          0 failing  Solved stones keep reacting
+did not compile     0 failing  The lockout's clock ignores a pause by using real time
+caught              7 failing  Restoring leaves the stones dark
+caught              1 failing  An unknown stone goes unreported and is treated as wrong
+caught              6 failing  The flee's timeout does not end the game
+caught              3 failing  A fall during the final sequence has nowhere to return to
+caught              1 failing  Control is given back as soon as the reveal finalizes, before RevealDone
+caught              2 failing  The Witness may be saved
+NOT CAUGHT          0 failing  The flee awaits no trigger
+caught              7 failing  A rejected trigger is consumed
+caught              6 failing  An accepted trigger is not consumed
+caught              1 failing  A trigger during a cinematic moves the story
+caught              1 failing  A trigger during a cinematic is consumed
+caught              1 failing  A second pending event silently replaces the first
+caught              1 failing  A pending event is dropped
+caught              1 failing  No generation guard: a stale finalize ends the newer cinematic
+caught              1 failing  A completion for another clip finalizes this one
+caught              1 failing  A second start replaces the running cinematic
+caught              5 failing  A missing clip is never finalized
+NOT CAUGHT          0 failing  A looping clip is played
+caught              5 failing  The watchdog never fires
+caught              9 failing  The watchdog ignores the margin and fires at the clip's length
+caught              3 failing  Finalizing leaves a stuck clip playing
+caught              4 failing  Finalizing does not put the camera back
+caught              1 failing  Finalizing gives control back whatever the beat
+caught              1 failing  The follow-up runs inside the finalizer, not deferred
+caught              1 failing  A deferred step acts on a world that has left the tree
+caught             30 failing  RevealDone is not raised
+caught              5 failing  The recheck after a cinematic is never scheduled
+caught              2 failing  The recheck on entering a beat is never scheduled
+caught              2 failing  The recheck waits only one frame
+caught              2 failing  The recheck waits two frames, as first designed
+NOT CAUGHT          0 failing  The recheck runs during a newer cinematic
+caught             22 failing  The gate opens only in the clip
+caught             22 failing  The gate is hidden but stays solid
+NOT CAUGHT          0 failing  The gate changes in a physics callback, not deferred
+caught             14 failing  The mural keeps its first caption
+caught             11 failing  The mural is not lit
+caught             12 failing  Fleeing leaves control locked
+caught              6 failing  The flee timer never runs out
+caught              4 failing  The flee's default is 20 seconds
+NOT CAUGHT          0 failing  The flee timer also runs on while paused
+caught              1 failing  The ending leaves a time scale behind
+NOT CAUGHT          0 failing  The scene changes inside the finalizer, not deferred
+caught              1 failing  The ending forgets the active device
+caught              1 failing  A fall while locked is forgotten
+caught              1 failing  The recheck does not look in the kill plane for itself
+caught              1 failing  A fall while locked teleports at once
+caught             22 failing  Restoring plays the awakening again
+caught             16 failing  Restoring forgets the outcomes
+caught             14 failing  Restoring brings spent triggers back
+caught              9 failing  Restoring leaves the atmosphere at the start
+NOT CAUGHT          0 failing  Restoring leaves the atmosphere clip running
+caught             25 failing  Restoring does not teleport
+caught              9 failing  The Awakened save is written as the cinematic starts
+caught             11 failing  The Awakened save is never written
+caught              1 failing  Saving is allowed during a cinematic
+caught              1 failing  The quit text does not mention the final sequence
+caught              5 failing  A monolith save is refused as incompatible
+caught              4 failing  restore_view keeps the clip's zoom
+caught              2 failing  restore_view keeps the clip's limits
+caught              2 failing  restore_view keeps the shake
+caught              2 failing  restore_view keeps the clip's target
+caught              5 failing  A stone is not connected to the puzzle
+caught             10 failing  The puzzle is not connected to the director
+caught              3 failing  A wrong stone shows no caption
+caught             18 failing  The stones' solution is in the wrong order
+caught              2 failing  Collapse is left out of the director's triggers
+caught              2 failing  Collapse sits too near the Witness for the GDD's run
+caught             12 failing  The gate has no collision
+caught             18 failing  A clip's track points at a renamed node
+caught              8 failing  A clip calls a method that does not exist
+caught              7 failing  The collapse clip loops
+caught              4 failing  The crevasse is too deep to climb out of
+caught              3 failing  The ending has no way to the main menu
+caught              0 failing  The ending's Back works at its root and leaves
+
+commit 2cae7bb, 84 breakages: {'caught': 74, 'NOT CAUGHT': 9, 'did not compile': 1}
+
+########## worker 0
+=== control: no change
+[doctest] test cases:  105 |  105 passed | 0 failed | 0 skipped
+RESULT passed=297 failed=0
+
+=== A wrong stone keeps the attempt's progress
+tests/unit/test_sequence_puzzle.cpp:56: ERROR: CHECK( puzzle.progress() == 0 ) is NOT correct!
+tests/unit/test_sequence_puzzle.cpp:117: ERROR: CHECK( puzzle.submit("wave", now) == PuzzleResult::Accepted ) is NOT correct!
+FAIL test_puzzle.test_a_wrong_stone_goes_dark_locks_out_and_then_lets_the_player_try_again
+     progress kept: 1
+RESULT passed=296 failed=1
+RESULT passed=296 failed=1
+
+=== Reset can undo a solved puzzle
+tests/unit/test_sequence_puzzle.cpp:132: ERROR: CHECK( puzzle.is_solved() ) is NOT correct!
+tests/unit/test_sequence_puzzle.cpp:134: ERROR: CHECK( puzzle.is_solved() ) is NOT correct!
+RESULT passed=297 failed=0
+RESULT passed=297 failed=0
+
+=== Solved stones keep reacting
+RESULT passed=297 failed=0
+RESULT passed=297 failed=0
+NOT CAUGHT
+
+=== A fall during the final sequence has nowhere to return to
+tests/unit/test_story_progress.cpp:99: ERROR: CHECK( checkpoint_beat(Beat::Witness) == Beat::Awakened ) is NOT correct!
+tests/unit/test_story_progress.cpp:100: ERROR: CHECK( checkpoint_beat(Beat::Fleeing) == Beat::Awakened ) is NOT correct!
+tests/unit/test_story_progress.cpp:101: ERROR: CHECK( checkpoint_beat(Beat::Ended) == Beat::Awakened ) is NOT correct!
+FAIL test_cinematics.test_falling_during_the_reveal_recovers_after_reveal_done
+     timed out after 20 steps waiting for the recovery
+     x after recovering: expected 760.000 ±1.000, got 400.000
+FAIL test_cinematics.test_outside_a_cinematic_the_kill_plane_recovers_at_once_and_during_the_flee_too
+     respawned 0 times
+     x after falling during the flee: expected 760.000 ±1.000, got 400.000
+FAIL test_restore.test_witness_fleeing_and_ended_are_never_written_and_restart_replays_them
+     the active checkpoint is 5
+RESULT passed=294 failed=3
+RESULT passed=294 failed=3
+
+=== A rejected trigger is consumed
+FAIL test_director.test_a_rejected_trigger_changes_nothing_and_stays_armed
+     a rejected trigger was consumed
+     the rejected trigger did not work when its turn came
+FAIL test_cinematics.test_the_outbound_crossing_of_collapse_is_rejected_and_fires_later_in_fleeing
+     the outbound crossing consumed the trigger
+     a crossing at Awakened consumed the trigger
+     timed out after 20 steps waiting for the return crossing to fire
+FAIL test_cinematics.test_a_player_already_in_the_awaited_trigger_when_a_beat_begins_fires_it
+     timed out after 12 steps waiting for the awaited trigger to fire
+     the beats ran [1]
+FAIL test_cinematics.test_a_rejected_event_is_rejected_everywhere_and_consumes_nothing
+     ReachMonolith was consumed by a rejection
+     Collapse was consumed by a rejection
+     Witness was consumed by a rejection
+RESULT passed=290 failed=7
+
+=== A second pending event silently replaces the first
+FAIL test_cinematics.test_a_second_pending_event_is_a_reported_logic_error
+     reported []
+RESULT passed=296 failed=1
+RESULT passed=296 failed=1
+
+=== A second start replaces the running cinematic
+FAIL test_cinematics.test_starting_a_cinematic_during_one_is_refused_and_leaves_it_untouched
+     the second was not refused
+     the active one is now 'late_aim'
+     the generation moved
+     the player now plays 'late_aim'
+RESULT passed=296 failed=1
+RESULT passed=296 failed=1
+
+=== The watchdog ignores the margin and fires at the clip's length
+FAIL test_cinematics.test_the_watchdog_waits_for_the_clips_own_length_plus_the_margin
+     the watchdog fired early
+     logged error: src/game_director.cpp:626 report_contract_error: GameDirector: cinematic 'side_show' passed its deadline. 
+FAIL test_world.test_running_left_from_the_witness_reaches_collapse_in_eight_to_ten_seconds
+     logged error: src/game_director.cpp:626 report_contract_error: GameDirector: cinematic 'dagon_reveal' passed its deadline. 
+FAIL test_restore.test_from_every_savable_beat_the_keys_alone_reach_the_ending
+     logged error: src/game_director.cpp:626 report_contract_error: GameDirector: cinematic 'dagon_reveal' passed its deadline. 
+     logged error: src/game_director.cpp:626 report_contract_error: GameDirector: cinematic 'dagon_reveal' passed its deadline. 
+     logged error: src/game_director.cpp:626 report_contract_error: GameDirector: cinematic 'dagon_reveal' passed its deadline. 
+     logged error: src/game_director.cpp:626 report_contract_error: GameDirector: cinematic 'dagon_reveal' passed its deadline. 
+FAIL test_restore.test_witness_fleeing_and_ended_are_never_written_and_restart_replays_them
+     logged error: src/game_director.cpp:626 report_contract_error: GameDirector: cinematic 'dagon_reveal' passed its deadline. 
+FAIL test_route.test_the_whole_game_can_be_played_from_new_game_to_the_ending_and_back_to_a_clean_new_game
+     logged error: src/game_director.cpp:626 report_contract_error: GameDirector: cinematic 'dagon_reveal' passed its deadline. 
+RESULT passed=288 failed=9
+
+=== The follow-up runs inside the finalizer, not deferred
+FAIL test_cinematics.test_a_world_replaced_before_its_deferred_step_runs_does_nothing_more
+     a world out of the tree went on to [4, 5]
+RESULT passed=296 failed=1
+RESULT passed=296 failed=1
+
+=== The recheck on entering a beat is never scheduled
+FAIL test_cinematics.test_a_player_already_in_the_awaited_trigger_when_a_beat_begins_fires_it
+     timed out after 12 steps waiting for the awaited trigger to fire
+     the beats ran [1]
+FAIL test_cinematics.test_a_puzzle_solved_before_its_beat_is_taken_up_when_the_beat_begins
+     timed out after 30 steps waiting for the solve to be taken up
+RESULT passed=295 failed=2
+RESULT passed=295 failed=2
+
+=== The gate opens only in the clip
+FAIL test_cinematics.test_a_missing_awaken_clip_still_opens_the_gate_and_returns_control
+     missing: the gate stayed solid
+     missing: the gate stayed visible
+     timed out after 90 steps waiting for the player to walk through the gate (missing)
+FAIL test_cinematics.test_a_looping_awaken_clip_is_refused_and_recovers
+     looping: the gate stayed solid
+     looping: the gate stayed visible
+     timed out after 90 steps waiting for the player to walk through the gate (looping)
+FAIL test_cinematics.test_a_ping_pong_awaken_clip_is_refused_and_recovers
+     linear_ping_pong: the gate stayed solid
+     linear_ping_pong: the gate stayed visible
+     timed out after 90 steps waiting for the player to walk through the gate (linear_ping_pong)
+FAIL test_cinematics.test_a_stuck_awaken_clip_is_ended_by_the_watchdog
+     stuck: the gate stayed solid
+RESULT passed=275 failed=22
+
+=== The mural is not lit
+FAIL test_cinematics.test_a_missing_awaken_clip_still_opens_the_gate_and_returns_control
+     missing: the mural is not lit
+FAIL test_cinematics.test_a_looping_awaken_clip_is_refused_and_recovers
+     looping: the mural is not lit
+FAIL test_cinematics.test_a_ping_pong_awaken_clip_is_refused_and_recovers
+     linear_ping_pong: the mural is not lit
+FAIL test_cinematics.test_a_stuck_awaken_clip_is_ended_by_the_watchdog
+     stuck: the mural is not lit
+FAIL test_puzzle.test_the_mural_reads_differently_before_and_after_and_a_missing_clip_changes_nothing_about_that
+     the mural did not light
+FAIL test_restore.test_every_savable_beat_rebuilds_the_right_world_with_nothing_replayed
+     beat 3: mural lit=false
+FAIL test_restore.test_restart_checkpoint_rebuilds_the_same_world_at_every_beat
+     restarted beat 3: mural lit=false
+RESULT passed=286 failed=11
+
+=== The flee timer also runs on while paused
+RESULT passed=297 failed=0
+RESULT passed=297 failed=0
+NOT CAUGHT
+
+=== A fall while locked is forgotten
+FAIL test_cinematics.test_falling_into_the_kill_plane_while_locked_recovers_after_finalization
+     timed out after 12 steps waiting for the fall to be noticed
+RESULT passed=296 failed=1
+RESULT passed=296 failed=1
+
+=== Restoring forgets the outcomes
+FAIL test_world.test_the_whole_level_can_be_walked_in_both_directions_with_nothing_but_keys
+     stuck going right at x=4285.9
+FAIL test_world.test_running_left_from_the_witness_reaches_collapse_in_eight_to_ten_seconds
+     the run took 16.67 seconds
+     the run is longer than the flee's 12.0 seconds
+FAIL test_restore.test_every_savable_beat_rebuilds_the_right_world_with_nothing_replayed
+     beat 3: solved=false
+     beat 3: progress 0
+     beat 3: GlyphWave lit=false
+     beat 3: GlyphWave enabled=true
+     beat 3: GlyphKneel lit=false
+     beat 3: GlyphKneel enabled=true
+     beat 3: GlyphEye lit=false
+     beat 3: GlyphEye enabled=true
+RESULT passed=281 failed=16
+
+=== The Awakened save is written as the cinematic starts
+FAIL test_cinematics.test_the_beats_run_in_order_each_entered_once
+     checkpoints reached [1, 2, 3, 3]
+FAIL test_cinematics.test_a_missing_awaken_clip_still_opens_the_gate_and_returns_control
+     missing: checkpoints reached [3, 3]
+FAIL test_cinematics.test_a_looping_awaken_clip_is_refused_and_recovers
+     looping: checkpoints reached [3, 3]
+FAIL test_cinematics.test_a_ping_pong_awaken_clip_is_refused_and_recovers
+     linear_ping_pong: checkpoints reached [3, 3]
+FAIL test_cinematics.test_a_stuck_awaken_clip_is_ended_by_the_watchdog
+     stuck: checkpoints reached [3, 3]
+FAIL test_cinematics.test_a_duplicate_completion_applies_the_outcome_once
+     duplicates reached [3, 3]
+FAIL test_restore.test_saving_is_refused_during_a_cinematic_and_works_after_it
+     a save during a cinematic reported success
+RESULT passed=288 failed=9
+
+=== The quit text does not mention the final sequence
+FAIL test_restore.test_quitting_during_the_final_sequence_says_it_will_replay
+     the quit text reads 'Return to the main menu? Continue resumes from your last saved checkpoint. Anything since then is not kept. Your settings are kept.'
+     the quit text reads 'Return to the main menu? Continue resumes from your last saved checkpoint. Anything since then is not kept. Your settings are kept.'
+RESULT passed=296 failed=1
+RESULT passed=296 failed=1
+
+=== restore_view keeps the clip's target
+FAIL test_cinematics.test_a_clip_moves_the_camera_and_finalizing_puts_it_back
+     after the clip: the camera follows Mark:<Marker2D#2423401744019>
+FAIL test_cinematics.test_a_trigger_already_overlapping_during_finalization_starts_a_cinematic_that_keeps_its_lock_and_camera
+     after both: the camera follows Mark:<Marker2D#2554884785887>
+RESULT passed=295 failed=2
+RESULT passed=295 failed=2
+
+=== Collapse sits too near the Witness for the GDD's run
+FAIL test_world.test_nothing_in_a_clip_is_left_out_of_the_acts_and_the_acts_are_in_order
+     out of order along the walk: [735.0, 1130.0, 1320.0, 1880.0, 2380.0, 2600.0, 3240.0, 3620.0, 3660.0, 4100.0, 3898.0, 3990.0, 4250.0, 4300.0, 4420.0]
+FAIL test_restore.test_the_final_sequence_in_one_process_leaves_awakened_for_the_next
+     the last process: Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+RESULT passed=295 failed=2
+RESULT passed=295 failed=2
+
+=== A clip calls a method that does not exist
+FAIL test_puzzle.test_solved_is_terminal_and_the_stones_stop_reacting
+     logged error: core/object/message_queue.cpp:220 _call_function: Error calling deferred method: 'CameraRig::aim_toward': Method not found. 
+FAIL test_world.test_every_clip_track_points_at_something_real
+     monolith_awaken calls aim_toward, which CameraRig lacks
+FAIL test_restore.test_from_every_savable_beat_the_keys_alone_reach_the_ending
+     logged error: core/object/message_queue.cpp:220 _call_function: Error calling deferred method: 'CameraRig::aim_toward': Method not found. 
+     logged error: core/object/message_queue.cpp:220 _call_function: Error calling deferred method: 'CameraRig::aim_toward': Method not found. 
+     logged error: core/object/message_queue.cpp:220 _call_function: Error calling deferred method: 'CameraRig::aim_toward': Method not found. 
+FAIL test_restore.test_saving_is_refused_during_a_cinematic_and_works_after_it
+     logged error: core/object/message_queue.cpp:220 _call_function: Error calling deferred method: 'CameraRig::aim_toward': Method not found. 
+FAIL test_restore.test_the_awakened_save_waits_for_the_cinematic_to_finalize
+     logged error: core/object/message_queue.cpp:220 _call_function: Error calling deferred method: 'CameraRig::aim_toward': Method not found. 
+FAIL test_restore.test_an_autosave_failure_at_awakened_keeps_the_session_checkpoint_and_says_so
+     logged error: core/object/message_queue.cpp:220 _call_function: Error calling deferred method: 'CameraRig::aim_toward': Method not found. 
+RESULT passed=289 failed=8
+
+=== control after, worker 0
+[doctest] test cases:  105 |  105 passed | 0 failed | 0 skipped
+RESULT passed=297 failed=0
+
+########## worker 1
+=== control: no change
+[doctest] test cases:  105 |  105 passed | 0 failed | 0 skipped
+RESULT passed=297 failed=0
+
+=== Presses during the lockout count
+tests/unit/test_sequence_puzzle.cpp:62: ERROR: CHECK( puzzle.submit("wave", 10.0) == PuzzleResult::Ignored ) is NOT correct!
+tests/unit/test_sequence_puzzle.cpp:64: ERROR: CHECK( puzzle.state() == PuzzleState::Rejecting ) is NOT correct!
+tests/unit/test_sequence_puzzle.cpp:65: ERROR: CHECK( puzzle.progress() == 0 ) is NOT correct!
+FAIL test_puzzle.test_a_wrong_stone_goes_dark_locks_out_and_then_lets_the_player_try_again
+     a direct submit during the lockout lit a stone
+     no prompt after the lockout
+     lit after the lockout: ["GlyphWave"]
+     the stones could not be solved after a failure
+RESULT passed=296 failed=1
+RESULT passed=296 failed=1
+
+=== A wrong stone leaves the prompts up during the lockout
+RESULT passed=297 failed=0
+RESULT passed=297 failed=0
+NOT CAUGHT
+
+=== Restoring leaves the stones dark
+FAIL test_restore.test_every_savable_beat_rebuilds_the_right_world_with_nothing_replayed
+     beat 3: GlyphWave lit=false
+     beat 3: GlyphKneel lit=false
+     beat 3: GlyphEye lit=false
+FAIL test_restore.test_restart_checkpoint_rebuilds_the_same_world_at_every_beat
+     restarted beat 3: GlyphWave lit=false
+     restarted beat 3: GlyphKneel lit=false
+     restarted beat 3: GlyphEye lit=false
+FAIL test_restore.test_each_save_continues_from_the_main_menu_with_the_right_wording
+     Continue at beat 3: GlyphWave lit=false
+     Continue at beat 3: GlyphKneel lit=false
+     Continue at beat 3: GlyphEye lit=false
+FAIL test_restore.test_a_good_backup_of_each_beat_restores_it_when_the_primary_is_damaged
+     Continue from a backup at beat 3: GlyphWave lit=false
+RESULT passed=290 failed=7
+
+=== Control is given back as soon as the reveal finalizes, before RevealDone
+tests/unit/test_story_progress.cpp:108: ERROR: CHECK_FALSE( has_player_control(Beat::Witness) ) is NOT correct!
+FAIL test_cinematics.test_the_reveal_keeps_control_locked_right_up_to_reveal_done
+     finalizing the reveal gave [&"dagon_reveal", true, 4]
+RESULT passed=296 failed=1
+RESULT passed=296 failed=1
+
+=== An accepted trigger is not consumed
+FAIL test_director.test_triggers_advance_the_checkpoint_in_order
+     an accepted trigger was not consumed
+FAIL test_cinematics.test_reentering_a_trigger_gives_one_beat
+     the accepted trigger was not consumed
+FAIL test_cinematics.test_the_outbound_crossing_of_collapse_is_rejected_and_fires_later_in_fleeing
+     the accepted crossing was not consumed
+FAIL test_cinematics.test_a_missing_reveal_clip_still_raises_reveal_done_once
+     missing: the reveal's trigger is still armed
+FAIL test_cinematics.test_a_looping_reveal_clip_still_raises_reveal_done_once
+     looping: the reveal's trigger is still armed
+FAIL test_cinematics.test_a_stuck_reveal_clip_still_raises_reveal_done_once
+     stuck: the reveal's trigger is still armed
+RESULT passed=291 failed=6
+RESULT passed=291 failed=6
+
+=== A pending event is dropped
+FAIL test_cinematics.test_a_second_pending_event_is_a_reported_logic_error
+     timed out after 30 steps waiting for the one pending event to apply
+     the beats ran []
+RESULT passed=296 failed=1
+RESULT passed=296 failed=1
+
+=== A missing clip is never finalized
+FAIL test_cinematics.test_a_missing_awaken_clip_still_opens_the_gate_and_returns_control
+     timed out after 300 steps waiting for the cinematic to finish
+     missing: the gate stayed solid
+     missing: the gate stayed visible
+     missing: the mural reads 'before'
+     missing: the mural is not lit
+     missing: control stayed locked
+     missing: checkpoints reached []
+     timed out after 90 steps waiting for the player to walk through the gate (missing)
+FAIL test_cinematics.test_a_missing_reveal_clip_still_raises_reveal_done_once
+     timed out after 300 steps waiting for the cinematic to finish
+     missing: beats ran [4]
+     missing: control stayed locked
+FAIL test_cinematics.test_a_missing_collapse_clip_still_reaches_the_ending
+RESULT passed=292 failed=5
+
+=== Finalizing leaves a stuck clip playing
+FAIL test_cinematics.test_a_stuck_awaken_clip_is_ended_by_the_watchdog
+     stuck: zoom is (0.8, 0.8)
+     stuck: a clip is still playing
+FAIL test_cinematics.test_a_stuck_reveal_clip_still_raises_reveal_done_once
+     stuck: zoom is (0.7, 0.7)
+FAIL test_cinematics.test_the_watchdog_stops_a_stuck_clip_so_its_method_track_cannot_move_the_camera
+     the watchdog left the clip playing
+     the stuck clip moved the camera after finalization
+RESULT passed=294 failed=3
+RESULT passed=294 failed=3
+
+=== A deferred step acts on a world that has left the tree
+FAIL test_cinematics.test_a_world_replaced_before_its_deferred_step_runs_does_nothing_more
+     a world out of the tree went on to [4, 5]
+RESULT passed=296 failed=1
+RESULT passed=296 failed=1
+
+=== The recheck waits only one frame
+FAIL test_cinematics.test_the_recheck_never_trusts_an_overlap_list_from_before_the_physics_step
+     the list is already fresh: this test no longer proves anything
+     a stale overlap list fired the trigger: [3, 4, 5]
+     a stale overlap list consumed the trigger
+FAIL test_cinematics.test_the_recheck_runs_three_physics_frames_after_an_idle_finalization_with_fresh_overlaps
+     rechecked 1 frames after finalizing
+     the recheck at frame 16200 ran before the overlap at 16202
+     the overlap list was still stale at the recheck
+RESULT passed=295 failed=2
+RESULT passed=295 failed=2
+
+=== The gate is hidden but stays solid
+FAIL test_cinematics.test_a_missing_awaken_clip_still_opens_the_gate_and_returns_control
+     missing: the gate stayed solid
+     timed out after 90 steps waiting for the player to walk through the gate (missing)
+FAIL test_cinematics.test_a_looping_awaken_clip_is_refused_and_recovers
+     looping: the gate stayed solid
+     timed out after 90 steps waiting for the player to walk through the gate (looping)
+FAIL test_cinematics.test_a_ping_pong_awaken_clip_is_refused_and_recovers
+     linear_ping_pong: the gate stayed solid
+     timed out after 90 steps waiting for the player to walk through the gate (linear_ping_pong)
+FAIL test_cinematics.test_a_stuck_awaken_clip_is_ended_by_the_watchdog
+     stuck: the gate stayed solid
+     timed out after 90 steps waiting for the player to walk through the gate (stuck)
+FAIL test_cinematics.test_a_scene_with_no_clip_player_at_all_still_progresses
+     the gate stayed solid
+RESULT passed=275 failed=22
+
+=== Fleeing leaves control locked
+FAIL test_cinematics.test_the_reveal_keeps_control_locked_right_up_to_reveal_done
+     the flee did not give control back
+FAIL test_cinematics.test_a_missing_reveal_clip_still_raises_reveal_done_once
+     missing: control stayed locked
+FAIL test_cinematics.test_a_looping_reveal_clip_still_raises_reveal_done_once
+     looping: control stayed locked
+FAIL test_cinematics.test_a_stuck_reveal_clip_still_raises_reveal_done_once
+     stuck: control stayed locked
+FAIL test_cinematics.test_a_trigger_already_overlapping_during_finalization_starts_a_cinematic_that_keeps_its_lock_and_camera
+     control did not come back in the end
+FAIL test_cinematics.test_falling_during_the_reveal_recovers_after_reveal_done
+     control stayed locked
+FAIL test_world.test_running_left_from_the_witness_reaches_collapse_in_eight_to_ten_seconds
+     the run took 16.67 seconds
+RESULT passed=285 failed=12
+
+=== The ending leaves a time scale behind
+FAIL test_cinematics.test_a_time_scale_left_behind_is_cleared_on_the_way_to_the_ending
+     the time scale in the ending: expected 1.000 ±0.000, got 2.000
+RESULT passed=296 failed=1
+RESULT passed=296 failed=1
+
+=== The recheck does not look in the kill plane for itself
+FAIL test_cinematics.test_a_player_still_inside_the_kill_plane_after_finalization_is_recovered
+     timed out after 30 steps waiting for the recheck to find the player in the kill plane
+RESULT passed=296 failed=1
+RESULT passed=296 failed=1
+
+=== Restoring brings spent triggers back
+FAIL test_session.test_starting_at_a_saved_beat_applies_outcomes_without_replaying_them
+     the used trigger was not consumed
+FAIL test_session.test_an_autosave_failure_keeps_the_session_checkpoint_and_says_so
+     the rebuilt world forgot the used trigger
+FAIL test_session.test_the_final_sequence_is_not_a_checkpoint_and_replays_after_a_restart
+     an earlier trigger came back
+FAIL test_title.test_continue_restores_the_saved_checkpoint
+     the used trigger came back
+FAIL test_restore.test_every_savable_beat_rebuilds_the_right_world_with_nothing_replayed
+     beat 1: EnterAbyss enabled=true
+     beat 2: EnterAbyss enabled=true
+     beat 2: ReachMonolith enabled=true
+     beat 3: EnterAbyss enabled=true
+     beat 3: ReachMonolith enabled=true
+RESULT passed=283 failed=14
+
+=== Restoring does not teleport
+FAIL test_pause_menu.test_restart_checkpoint_uses_the_newest_checkpoint_repeatedly
+     x after restart 0: expected 750.000 ±1.000, got 150.000
+     x after restart 1: expected 750.000 ±1.000, got 150.000
+     x after restart 2: expected 750.000 ±1.000, got 150.000
+FAIL test_session.test_starting_at_a_saved_beat_applies_outcomes_without_replaying_them
+     x straight after entering the tree: expected 750.000 ±1.000, got 150.000
+FAIL test_session.test_an_autosave_failure_keeps_the_session_checkpoint_and_says_so
+     x after restarting: expected 750.000 ±1.000, got 150.000
+FAIL test_session.test_restarting_reads_no_file
+     x after restarting: expected 750.000 ±1.000, got 150.000
+FAIL test_session.test_the_final_sequence_is_not_a_checkpoint_and_replays_after_a_restart
+     x after restarting: expected 760.000 ±1.000, got 200.000
+FAIL test_session.test_continue_restores_the_checkpoint_after_quitting_and_relaunching
+     Continue started: Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+RESULT passed=272 failed=25
+
+=== A monolith save is refused as incompatible
+tests/unit/test_save_data.cpp:22: ERROR: CHECK( parsed.status == SaveStatus::Ok ) is NOT correct!
+tests/unit/test_save_data.cpp:23: ERROR: CHECK( parsed.save.beat == beat ) is NOT correct!
+tests/unit/test_save_data.cpp:91: ERROR: CHECK( parse_save("dagon_save=1\nbeat=monolith\ncheckpoint=Monolith\n").status == SaveStatus::Ok ) is NOT correct!
+          at: _player (res://tests/test_restore.gd:60)
+          GDScript backtrace (most recent call first):
+              [0] _player (res://tests/test_restore.gd:60)
+              [1] test_each_save_continues_from_the_main_menu_with_the_right_wording (res://tests/test_restore.gd:205)
+              [2] wait_for_scene (res://tests/harness.gd:87)
+              [3] steps (res://tests/harness.gd:132)
+              [4] _physics_process (res://tests/step_probe.gd:24)
+          at: landed_on_floor (res://tests/harness.gd:148)
+          GDScript backtrace (most recent call first):
+              [0] landed_on_floor (res://tests/harness.gd:148)
+              [1] test_each_save_continues_from_the_main_menu_with_the_right_wording (res://tests/test_restore.gd:205)
+              [2] wait_for_scene (res://tests/harness.gd:87)
+              [3] steps (res://tests/harness.gd:132)
+              [4] _physics_process (res://tests/step_probe.gd:24)
+RESULT passed=292 failed=5
+
+=== restore_view keeps the shake
+FAIL test_cinematics.test_a_clip_moves_the_camera_and_finalizing_puts_it_back
+     after the clip: shake remains: 0.34
+     after the clip: offset is (1.0, -1.0)
+FAIL test_cinematics.test_a_trigger_already_overlapping_during_finalization_starts_a_cinematic_that_keeps_its_lock_and_camera
+     after both: shake remains: 0.55
+     after both: offset is (2.0, -1.0)
+RESULT passed=295 failed=2
+RESULT passed=295 failed=2
+
+=== The stones' solution is in the wrong order
+FAIL test_puzzle.test_the_stones_are_not_in_the_solutions_order_on_the_ground
+     the solution is ["glyph_kneel", "glyph_wave", "glyph_eye"]
+FAIL test_puzzle.test_pressing_the_stones_in_order_lights_each_and_solves_the_puzzle
+     lit after the first: []
+     the caption reads 'The stones grind and go dark.'
+     lit after the second: []
+     progress 0
+     lit after the third: []
+     accepted []
+     solved 0 times
+     not solved
+     the story did not move
+FAIL test_puzzle.test_a_wrong_stone_goes_dark_locks_out_and_then_lets_the_player_try_again
+     lit after the first: []
+RESULT passed=279 failed=18
+
+=== A clip's track points at a renamed node
+     at: _update_caches (scene/animation/animation_mixer.cpp:725)
+FAIL test_puzzle.test_pressing_the_stones_in_order_lights_each_and_solves_the_puzzle
+     logged error: scene/animation/animation_mixer.cpp:725 _update_caches: AnimationMixer (at: shore.tscn): 'monolith_awaken', couldn't resolve track:  'Monolith/GateVisual:position'. This warning can
+     at: _update_caches (scene/animation/animation_mixer.cpp:725)
+FAIL test_puzzle.test_a_wrong_stone_goes_dark_locks_out_and_then_lets_the_player_try_again
+     logged error: scene/animation/animation_mixer.cpp:725 _update_caches: AnimationMixer (at: shore.tscn): 'monolith_awaken', couldn't resolve track:  'Monolith/GateVisual:position'. This warning can
+     at: _update_caches (scene/animation/animation_mixer.cpp:725)
+     at: _update_caches (scene/animation/animation_mixer.cpp:725)
+FAIL test_puzzle.test_every_order_of_stones_that_fails_can_still_go_on_to_solve_it
+     logged error: scene/animation/animation_mixer.cpp:725 _update_caches: AnimationMixer (at: shore.tscn): 'monolith_awaken', couldn't resolve track:  'Monolith/GateVisual:position'. This warning can
+     logged error: scene/animation/animation_mixer.cpp:725 _update_caches: AnimationMixer (at: shore.tscn): 'monolith_awaken', couldn't resolve track:  'Monolith/GateVisual:position'. This warning can
+     at: _update_caches (scene/animation/animation_mixer.cpp:725)
+FAIL test_puzzle.test_solved_is_terminal_and_the_stones_stop_reacting
+     logged error: scene/animation/animation_mixer.cpp:725 _update_caches: AnimationMixer (at: shore.tscn): 'monolith_awaken', couldn't resolve track:  'Monolith/GateVisual:position'. This warning can
+RESULT passed=279 failed=18
+
+=== The ending has no way to the main menu
+       [0] test_the_whole_game_can_be_played_from_new_game_to_the_ending_and_back_to_a_clean_new_game (res://tests/test_route.gd:122)
+       [1] _through_credits_to_main_menu (res://tests/test_route.gd:40)
+       [2] wait_for_scene (res://tests/harness.gd:87)
+       [3] steps (res://tests/harness.gd:132)
+       [4] _physics_process (res://tests/step_probe.gd:24)
+          at: test_the_whole_game_can_be_played_from_new_game_to_the_ending_and_back_to_a_clean_new_game (res://tests/test_route.gd:122)
+          GDScript backtrace (most recent call first):
+              [0] test_the_whole_game_can_be_played_from_new_game_to_the_ending_and_back_to_a_clean_new_game (res://tests/test_route.gd:122)
+              [1] _through_credits_to_main_menu (res://tests/test_route.gd:40)
+              [2] wait_for_scene (res://tests/harness.gd:87)
+              [3] steps (res://tests/harness.gd:132)
+              [4] _physics_process (res://tests/step_probe.gd:24)
+FAIL test_route.test_the_whole_game_can_be_played_from_new_game_to_the_ending_and_back_to_a_clean_new_game
+     not the main menu: Ending
+RESULT passed=294 failed=3
+
+=== control after, worker 1
+[doctest] test cases:  105 |  105 passed | 0 failed | 0 skipped
+RESULT passed=297 failed=0
+
+########## worker 2
+=== control: no change
+[doctest] test cases:  105 |  105 passed | 0 failed | 0 skipped
+RESULT passed=297 failed=0
+
+=== A repeated press counts as a wrong stone
+tests/unit/test_sequence_puzzle.cpp:40: ERROR: CHECK( puzzle.submit("wave", 0.0) == PuzzleResult::Ignored ) is NOT correct!
+tests/unit/test_sequence_puzzle.cpp:41: ERROR: CHECK( puzzle.progress() == 1 ) is NOT correct!
+tests/unit/test_sequence_puzzle.cpp:42: ERROR: CHECK( puzzle.state() == PuzzleState::Progress ) is NOT correct!
+FAIL test_puzzle.test_pressing_a_lit_stone_again_does_nothing_and_costs_nothing
+     timed out after 40 steps waiting for the stone's cooldown
+     a repeated press failed
+     lit: []
+     progress 0
+     an earlier lit stone cost progress: 0
+     an earlier lit stone failed
+RESULT passed=296 failed=1
+RESULT passed=296 failed=1
+
+=== A wrong stone leaves the lights on
+FAIL test_puzzle.test_a_wrong_stone_goes_dark_locks_out_and_then_lets_the_player_try_again
+     lit after a wrong stone: ["GlyphWave"]
+     a direct submit during the lockout lit a stone
+     lit after the lockout: ["GlyphWave"]
+RESULT passed=296 failed=1
+RESULT passed=296 failed=1
+
+=== The lockout's clock ignores a pause by using real time
+DID NOT COMPILE, so this is not a result:
+src/puzzle_controller.cpp:88:23: error: invalid use of incomplete type 'class godot::SceneTree'
+scons: building terminated because of errors.
+
+=== The flee's timeout does not end the game
+tests/unit/test_story_progress.cpp:56: ERROR: CHECK( by_timeout.apply(Event::FleeTimeout) == Beat::Ended ) is NOT correct!
+tests/unit/test_story_progress.cpp:59: ERROR: CHECK_FALSE( by_timeout.apply(Event::Collapse).has_value() ) is NOT correct!
+FAIL test_cinematics.test_the_flee_timer_ends_the_flee_at_its_timeout
+     timed out after 80 steps waiting for the timeout
+     the timeout gave []
+     timed out after 60 steps waiting for the scene to change to MenuController
+FAIL test_cinematics.test_pausing_stops_the_flee_timer
+     timed out after 60 steps waiting for the flee timer to carry on
+     timed out after 60 steps waiting for the scene to change to MenuController
+       [0] _check_ending (res://tests/test_route.gd:27)
+       [1] test_waiting_out_the_flee_reaches_the_same_ending_at_twelve_seconds (res://tests/test_route.gd:167)
+       [2] wait_for_scene (res://tests/harness.gd:87)
+       [3] steps (res://tests/harness.gd:132)
+       [4] _physics_process (res://tests/step_probe.gd:24)
+          at: _check_ending (res://tests/test_route.gd:27)
+          GDScript backtrace (most recent call first):
+RESULT passed=291 failed=6
+
+=== The flee awaits no trigger
+RESULT passed=297 failed=0
+RESULT passed=297 failed=0
+NOT CAUGHT
+
+=== A trigger during a cinematic is consumed
+FAIL test_cinematics.test_a_trigger_during_a_cinematic_is_dropped_unconsumed_and_rechecked_after
+     a dropped trigger was consumed
+     timed out after 12 steps waiting for the recheck to find the trigger
+     the beats ran []
+RESULT passed=296 failed=1
+RESULT passed=296 failed=1
+
+=== A completion for another clip finalizes this one
+FAIL test_cinematics.test_a_completion_for_another_clip_is_ignored
+     another clip's completion ended this one
+RESULT passed=296 failed=1
+RESULT passed=296 failed=1
+
+=== The watchdog never fires
+FAIL test_cinematics.test_a_stuck_awaken_clip_is_ended_by_the_watchdog
+     timed out after 300 steps waiting for the cinematic to finish
+     stuck: reported []
+     stuck: the gate stayed solid
+     stuck: the gate stayed visible
+     stuck: the mural reads 'before'
+     stuck: the mural is not lit
+     stuck: control stayed locked
+     stuck: checkpoints reached []
+     stuck: zoom is (0.8, 0.8)
+     stuck: a clip is still playing
+     timed out after 90 steps waiting for the player to walk through the gate (stuck)
+FAIL test_cinematics.test_a_stuck_reveal_clip_still_raises_reveal_done_once
+     timed out after 300 steps waiting for the cinematic to finish
+RESULT passed=292 failed=5
+
+=== Finalizing gives control back whatever the beat
+FAIL test_cinematics.test_the_reveal_keeps_control_locked_right_up_to_reveal_done
+     finalizing the reveal gave [&"dagon_reveal", true, 4]
+RESULT passed=296 failed=1
+RESULT passed=296 failed=1
+
+=== The recheck after a cinematic is never scheduled
+FAIL test_cinematics.test_a_trigger_during_a_cinematic_is_dropped_unconsumed_and_rechecked_after
+     timed out after 12 steps waiting for the recheck to find the trigger
+     the beats ran []
+FAIL test_cinematics.test_a_trigger_already_overlapping_during_finalization_starts_a_cinematic_that_keeps_its_lock_and_camera
+     timed out after 60 steps waiting for the second cinematic to start
+     the beats ran [3]
+     the first finalizer overwrote the second's lock
+     timed out after 12 steps waiting for the second clip to aim the camera
+     the first finalizer overwrote the second's camera
+     control came back during the second cinematic
+     beat 3 after the second cinematic
+FAIL test_cinematics.test_the_recheck_runs_three_physics_frames_after_an_idle_finalization_with_fresh_overlaps
+     rechecked -16242 frames after finalizing
+     the recheck at frame -1 ran before the overlap at 16244
+RESULT passed=292 failed=5
+
+=== The recheck runs during a newer cinematic
+RESULT passed=297 failed=0
+RESULT passed=297 failed=0
+NOT CAUGHT
+
+=== The mural keeps its first caption
+FAIL test_cinematics.test_a_missing_awaken_clip_still_opens_the_gate_and_returns_control
+     missing: the mural reads 'before'
+FAIL test_cinematics.test_a_looping_awaken_clip_is_refused_and_recovers
+     looping: the mural reads 'before'
+FAIL test_cinematics.test_a_ping_pong_awaken_clip_is_refused_and_recovers
+     linear_ping_pong: the mural reads 'before'
+FAIL test_cinematics.test_a_stuck_awaken_clip_is_ended_by_the_watchdog
+     stuck: the mural reads 'before'
+FAIL test_puzzle.test_the_mural_reads_differently_before_and_after_and_a_missing_clip_changes_nothing_about_that
+     the second caption reads 'Worn carvings, broken by the years. Water, perhaps. A bent shape. Something round. Ruins, and nothing more.'
+     the caption did not change
+FAIL test_restore.test_every_savable_beat_rebuilds_the_right_world_with_nothing_replayed
+     beat 3: the mural reads 'Worn carvings, broken by the years. Water, perhaps. A bent shape. Something round. Ruins, and nothing more.'
+     beat 3: the mural reads 'Worn carvings, broken by the years. Water, perhaps. A bent shape. Something round. Ruins, and nothing more.'
+RESULT passed=283 failed=14
+
+=== The flee's default is 20 seconds
+FAIL test_world.test_the_default_flee_timeout_is_twelve_seconds
+     the flee timeout: expected 12.000 ±0.000, got 20.000
+       [0] _check_ending (res://tests/test_route.gd:27)
+       [1] test_waiting_out_the_flee_reaches_the_same_ending_at_twelve_seconds (res://tests/test_route.gd:167)
+       [2] wait_for_scene (res://tests/harness.gd:87)
+       [3] steps (res://tests/harness.gd:132)
+       [4] _physics_process (res://tests/step_probe.gd:24)
+          at: _check_ending (res://tests/test_route.gd:27)
+          GDScript backtrace (most recent call first):
+              [0] _check_ending (res://tests/test_route.gd:27)
+              [1] test_waiting_out_the_flee_reaches_the_same_ending_at_twelve_seconds (res://tests/test_route.gd:167)
+              [2] wait_for_scene (res://tests/harness.gd:87)
+              [3] steps (res://tests/harness.gd:132)
+              [4] _physics_process (res://tests/step_probe.gd:24)
+RESULT passed=293 failed=4
+
+=== The ending forgets the active device
+FAIL test_route.test_the_device_in_use_carries_through_the_ending_to_the_main_menu
+     the ending has device -1
+RESULT passed=296 failed=1
+RESULT passed=296 failed=1
+
+=== Restoring plays the awakening again
+FAIL test_session.test_the_final_sequence_is_not_a_checkpoint_and_replays_after_a_restart
+     the director reached [4]
+     the final sequence reached checkpoints [3]
+     the final sequence wrote a save
+          at: test_the_reveal_keeps_control_locked_right_up_to_reveal_done (res://tests/test_cinematics.gd:267)
+          GDScript backtrace (most recent call first):
+              [0] test_the_reveal_keeps_control_locked_right_up_to_reveal_done (res://tests/test_cinematics.gd:267)
+              [1] _settle (res://tests/test_cinematics.gd:87)
+              [2] steps (res://tests/harness.gd:132)
+              [3] _physics_process (res://tests/step_probe.gd:24)
+FAIL test_cinematics.test_the_reveal_keeps_control_locked_right_up_to_reveal_done
+     entering the Witness gave [&"monolith_awaken", true, 3]
+     finalizing the reveal gave [4, true]
+     logged error: res://tests/test_cinematics.gd:267 test_the_reveal_keeps_control_locked_right_up_to_reveal_done: Invalid operands 'StringName' and 'int' in operator '=='. 
+RESULT passed=275 failed=22
+
+=== Restoring leaves the atmosphere clip running
+RESULT passed=297 failed=0
+RESULT passed=297 failed=0
+NOT CAUGHT
+
+=== Saving is allowed during a cinematic
+FAIL test_restore.test_saving_is_refused_during_a_cinematic_and_works_after_it
+     a save during a cinematic reported success
+     a cinematic let a save through: dagon_save=1
+     the backup holds: dagon_save=1
+RESULT passed=296 failed=1
+RESULT passed=296 failed=1
+
+=== restore_view keeps the clip's limits
+FAIL test_cinematics.test_a_clip_moves_the_camera_and_finalizing_puts_it_back
+     after the clip: limit_top is -900
+FAIL test_cinematics.test_a_trigger_already_overlapping_during_finalization_starts_a_cinematic_that_keeps_its_lock_and_camera
+     after both: limit_top is -900
+RESULT passed=295 failed=2
+RESULT passed=295 failed=2
+
+=== The puzzle is not connected to the director
+FAIL test_puzzle.test_pressing_the_stones_in_order_lights_each_and_solves_the_puzzle
+     the story did not move
+FAIL test_puzzle.test_the_mural_reads_differently_before_and_after_and_a_missing_clip_changes_nothing_about_that
+     the second caption reads 'Worn carvings, broken by the years. Water, perhaps. A bent shape. Something round. Ruins, and nothing more.'
+     the caption did not change
+     the mural did not light
+FAIL test_world.test_everything_the_director_needs_is_wired
+     the puzzle is not connected to the director
+FAIL test_restore.test_from_every_savable_beat_the_keys_alone_reach_the_ending
+     from beat 0: at 2 before the ledge
+     walking did not arrive, at x=4285.9
+     from beat 0: at 2 after the reveal
+     walking did not arrive, at x=3242.1
+     timed out after 400 steps waiting for the scene to change to MenuController
+RESULT passed=287 failed=10
+
+=== Collapse is left out of the director's triggers
+FAIL test_world.test_everything_the_director_needs_is_wired
+     the triggers are [&"enter_abyss", &"reach_monolith", &"witness"]
+FAIL test_restore.test_the_final_sequence_in_one_process_leaves_awakened_for_the_next
+     the last process: Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+RESULT passed=295 failed=2
+RESULT passed=295 failed=2
+
+=== The collapse clip loops
+FAIL test_world.test_everything_the_director_needs_is_wired
+     collapse loops
+FAIL test_restore.test_from_every_savable_beat_the_keys_alone_reach_the_ending
+     logged error: src/game_director.cpp:626 report_contract_error: GameDirector: cinematic clip 'collapse' loops, so it would never end. 
+     logged error: src/game_director.cpp:626 report_contract_error: GameDirector: cinematic clip 'collapse' loops, so it would never end. 
+     logged error: src/game_director.cpp:626 report_contract_error: GameDirector: cinematic clip 'collapse' loops, so it would never end. 
+     logged error: src/game_director.cpp:626 report_contract_error: GameDirector: cinematic clip 'collapse' loops, so it would never end. 
+          at: director (res://tests/route_player.gd:26)
+          GDScript backtrace (most recent call first):
+              [0] director (res://tests/route_player.gd:26)
+              [1] test_the_whole_game_can_be_played_from_new_game_to_the_ending_and_back_to_a_clean_new_game (res://tests/test_route.gd:113)
+              [2] flee_left (res://tests/route_player.gd:124)
+              [3] walk (res://tests/route_player.gd:63)
+              [4] steps (res://tests/harness.gd:132)
+RESULT passed=290 failed=7
+
+=== The ending's Back works at its root and leaves
+
+=== control after, worker 2
+[doctest] test cases:  105 |  105 passed | 0 failed | 0 skipped
+RESULT passed=297 failed=0
+
+########## worker 3
+=== control: no change
+[doctest] test cases:  105 |  105 passed | 0 failed | 0 skipped
+RESULT passed=297 failed=0
+
+=== The lockout never ends
+tests/unit/test_sequence_puzzle.cpp:67: ERROR: CHECK( puzzle.submit("wave", 11.0) == PuzzleResult::Accepted ) is NOT correct!
+tests/unit/test_sequence_puzzle.cpp:68: ERROR: CHECK( puzzle.progress() == 1 ) is NOT correct!
+tests/unit/test_sequence_puzzle.cpp:77: ERROR: CHECK( puzzle.update(3.0) ) is NOT correct!
+FAIL test_puzzle.test_a_wrong_stone_goes_dark_locks_out_and_then_lets_the_player_try_again
+     timed out after 70 steps waiting for the lockout to end
+     no prompt after the lockout
+     the stones could not be solved after a failure
+FAIL test_puzzle.test_the_lockout_lasts_its_delay_and_stops_while_paused
+     timed out after 10 steps waiting for the lockout to end
+FAIL test_puzzle.test_every_order_of_stones_that_fails_can_still_go_on_to_solve_it
+     not solved after failing with glyph_kneel
+     not solved after failing with glyph_eye
+FAIL test_restore.test_from_every_savable_beat_the_keys_alone_reach_the_ending
+     walking did not arrive, at x=4285.9
+     timed out after 90 steps waiting for the stone 'Press the wave stone' to be ready
+     walking did not arrive, at x=3822.8
+     timed out after 90 steps waiting for the stone 'Press the kneeling stone' to be ready
+RESULT passed=292 failed=5
+
+=== The stones stay usable after the lockout never returns them
+FAIL test_puzzle.test_a_wrong_stone_goes_dark_locks_out_and_then_lets_the_player_try_again
+     no prompt after the lockout
+     the stones could not be solved after a failure
+FAIL test_restore.test_from_every_savable_beat_the_keys_alone_reach_the_ending
+     walking did not arrive, at x=4285.9
+     timed out after 90 steps waiting for the stone 'Press the wave stone' to be ready
+     walking did not arrive, at x=3822.8
+     timed out after 90 steps waiting for the stone 'Press the kneeling stone' to be ready
+     walking did not arrive, at x=4166.8
+     timed out after 90 steps waiting for the stone 'Press the eye stone' to be ready
+     from beat 0: at 2 before the ledge
+     walking did not arrive, at x=4285.9
+     from beat 0: at 2 after the reveal
+     walking did not arrive, at x=3240.6
+RESULT passed=294 failed=3
+
+=== An unknown stone goes unreported and is treated as wrong
+FAIL test_puzzle.test_an_unknown_id_is_a_reported_wiring_bug_with_no_effect
+     an unknown id gave ["failed"]
+RESULT passed=296 failed=1
+RESULT passed=296 failed=1
+
+=== The Witness may be saved
+tests/unit/test_save_data.cpp:104: ERROR: CHECK( parse_save(text).status == SaveStatus::Corrupt ) is NOT correct!
+tests/unit/test_story_progress.cpp:99: ERROR: CHECK( checkpoint_beat(Beat::Witness) == Beat::Awakened ) is NOT correct!
+tests/unit/test_story_progress.cpp:124: ERROR: CHECK_FALSE( is_savable(Beat::Witness) ) is NOT correct!
+FAIL test_title.test_unusable_saves_are_explained_and_nothing_is_changed
+     the final sequence: Continue is enabled
+     the final sequence: the status reads ''
+FAIL test_restore.test_quitting_during_the_final_sequence_says_it_will_replay
+     the quit text reads 'Return to the main menu? Continue resumes from your last saved checkpoint. Anything since then is not kept. Your settings are kept.'
+     the quit text reads 'Return to the main menu? Continue resumes from your last saved checkpoint. Anything since then is not kept. Your settings are kept.'
+RESULT passed=295 failed=2
+RESULT passed=295 failed=2
+
+=== A trigger during a cinematic moves the story
+FAIL test_cinematics.test_a_trigger_during_a_cinematic_is_dropped_unconsumed_and_rechecked_after
+     a trigger moved the story during a cinematic: [2]
+     a dropped trigger was consumed
+RESULT passed=296 failed=1
+RESULT passed=296 failed=1
+
+=== No generation guard: a stale finalize ends the newer cinematic
+FAIL test_cinematics.test_a_stale_completion_has_no_effect_on_a_newer_cinematic
+     a stale finalize ended the newer cinematic
+     a stale finalize gave control back
+     a stale finalize moved the camera
+     a stale finalize stopped the clip
+RESULT passed=296 failed=1
+RESULT passed=296 failed=1
+
+=== A looping clip is played
+RESULT passed=297 failed=0
+RESULT passed=297 failed=0
+NOT CAUGHT
+
+=== Finalizing does not put the camera back
+FAIL test_cinematics.test_a_clip_moves_the_camera_and_finalizing_puts_it_back
+     after the clip: the camera follows Mark:<Marker2D#2423401744019>
+     after the clip: zoom is (0.6, 0.6)
+     after the clip: limit_top is -900
+     after the clip: shake remains: 0.34
+     after the clip: offset is (1.0, -1.0)
+FAIL test_cinematics.test_a_stuck_awaken_clip_is_ended_by_the_watchdog
+     stuck: zoom is (0.8, 0.8)
+FAIL test_cinematics.test_a_stuck_reveal_clip_still_raises_reveal_done_once
+     stuck: zoom is (0.7, 0.7)
+FAIL test_cinematics.test_a_trigger_already_overlapping_during_finalization_starts_a_cinematic_that_keeps_its_lock_and_camera
+     after both: the camera follows Mark:<Marker2D#2554884785887>
+     after both: zoom is (0.5, 0.5)
+     after both: limit_top is -900
+RESULT passed=293 failed=4
+
+=== RevealDone is not raised
+FAIL test_session.test_the_final_sequence_is_not_a_checkpoint_and_replays_after_a_restart
+     the director reached [4]
+     the reveal did not replay: [4]
+FAIL test_cinematics.test_the_beats_run_in_order_each_entered_once
+     beat 4 after the reveal
+     timed out after 20 steps waiting for collapse to fire
+     beats ran [1, 2, 3, 4]
+FAIL test_cinematics.test_the_outbound_crossing_of_collapse_is_rejected_and_fires_later_in_fleeing
+     not fleeing: 4
+     timed out after 20 steps waiting for the return crossing to fire
+     the accepted crossing was not consumed
+          at: test_the_reveal_keeps_control_locked_right_up_to_reveal_done (res://tests/test_cinematics.gd:267)
+          GDScript backtrace (most recent call first):
+              [0] test_the_reveal_keeps_control_locked_right_up_to_reveal_done (res://tests/test_cinematics.gd:267)
+RESULT passed=267 failed=30
+
+=== The recheck waits two frames, as first designed
+FAIL test_cinematics.test_the_recheck_never_trusts_an_overlap_list_from_before_the_physics_step
+     a stale overlap list fired the trigger: [3, 4]
+     a stale overlap list consumed the trigger
+FAIL test_cinematics.test_the_recheck_runs_three_physics_frames_after_an_idle_finalization_with_fresh_overlaps
+     rechecked 2 frames after finalizing
+     the recheck at frame 16188 ran before the overlap at 16189
+     the overlap list was still stale at the recheck
+RESULT passed=295 failed=2
+RESULT passed=295 failed=2
+
+=== The gate changes in a physics callback, not deferred
+RESULT passed=297 failed=0
+RESULT passed=297 failed=0
+NOT CAUGHT
+
+=== The flee timer never runs out
+FAIL test_cinematics.test_the_flee_timer_ends_the_flee_at_its_timeout
+     timed out after 80 steps waiting for the timeout
+     the timeout gave []
+     timed out after 60 steps waiting for the scene to change to MenuController
+FAIL test_cinematics.test_pausing_stops_the_flee_timer
+     timed out after 60 steps waiting for the flee timer to carry on
+     timed out after 60 steps waiting for the scene to change to MenuController
+       [0] _check_ending (res://tests/test_route.gd:27)
+       [1] test_waiting_out_the_flee_reaches_the_same_ending_at_twelve_seconds (res://tests/test_route.gd:167)
+       [2] wait_for_scene (res://tests/harness.gd:87)
+       [3] steps (res://tests/harness.gd:132)
+       [4] _physics_process (res://tests/step_probe.gd:24)
+          at: _check_ending (res://tests/test_route.gd:27)
+          GDScript backtrace (most recent call first):
+RESULT passed=291 failed=6
+
+=== The scene changes inside the finalizer, not deferred
+RESULT passed=297 failed=0
+RESULT passed=297 failed=0
+NOT CAUGHT
+
+=== A fall while locked teleports at once
+FAIL test_cinematics.test_falling_into_the_kill_plane_while_locked_recovers_after_finalization
+     timed out after 12 steps waiting for the fall to be noticed
+     respawned during the cinematic
+RESULT passed=296 failed=1
+RESULT passed=296 failed=1
+
+=== Restoring leaves the atmosphere at the start
+FAIL test_restore.test_every_savable_beat_rebuilds_the_right_world_with_nothing_replayed
+     beat 1: the tint is (1.0, 1.0, 1.0, 1.0)
+     beat 2: the tint is (1.0, 1.0, 1.0, 1.0)
+     beat 3: the tint is (1.0, 1.0, 1.0, 1.0)
+FAIL test_restore.test_restart_checkpoint_rebuilds_the_same_world_at_every_beat
+     restarted beat 1: the tint is (1.0, 1.0, 1.0, 1.0)
+     restarted beat 2: the tint is (1.0, 1.0, 1.0, 1.0)
+     restarted beat 3: the tint is (1.0, 1.0, 1.0, 1.0)
+FAIL test_restore.test_a_partial_attempt_is_not_kept
+     after restarting mid-attempt: the tint is (1.0, 1.0, 1.0, 1.0)
+FAIL test_restore.test_each_save_continues_from_the_main_menu_with_the_right_wording
+     Continue at beat 1: the tint is (1.0, 1.0, 1.0, 1.0)
+     Continue at beat 2: the tint is (1.0, 1.0, 1.0, 1.0)
+     Continue at beat 3: the tint is (1.0, 1.0, 1.0, 1.0)
+RESULT passed=288 failed=9
+
+=== The Awakened save is never written
+FAIL test_cinematics.test_the_beats_run_in_order_each_entered_once
+     checkpoints reached [1, 2]
+FAIL test_cinematics.test_a_missing_awaken_clip_still_opens_the_gate_and_returns_control
+     missing: checkpoints reached []
+FAIL test_cinematics.test_a_looping_awaken_clip_is_refused_and_recovers
+     looping: checkpoints reached []
+FAIL test_cinematics.test_a_ping_pong_awaken_clip_is_refused_and_recovers
+     linear_ping_pong: checkpoints reached []
+FAIL test_cinematics.test_a_stuck_awaken_clip_is_ended_by_the_watchdog
+     stuck: checkpoints reached []
+FAIL test_cinematics.test_a_duplicate_completion_applies_the_outcome_once
+     duplicates reached []
+FAIL test_restore.test_saving_is_refused_during_a_cinematic_and_works_after_it
+     the finalized checkpoint was not saved
+RESULT passed=286 failed=11
+
+=== restore_view keeps the clip's zoom
+FAIL test_cinematics.test_a_clip_moves_the_camera_and_finalizing_puts_it_back
+     after the clip: zoom is (0.6, 0.6)
+FAIL test_cinematics.test_a_stuck_awaken_clip_is_ended_by_the_watchdog
+     stuck: zoom is (0.8, 0.8)
+FAIL test_cinematics.test_a_stuck_reveal_clip_still_raises_reveal_done_once
+     stuck: zoom is (0.7, 0.7)
+FAIL test_cinematics.test_a_trigger_already_overlapping_during_finalization_starts_a_cinematic_that_keeps_its_lock_and_camera
+     after both: zoom is (0.5, 0.5)
+RESULT passed=293 failed=4
+RESULT passed=293 failed=4
+
+=== A stone is not connected to the puzzle
+FAIL test_puzzle.test_pressing_the_stones_in_order_lights_each_and_solves_the_puzzle
+     lit after the third: ["GlyphWave", "GlyphKneel"]
+     accepted [0, 1]
+     solved 0 times
+     not solved
+     the story did not move
+FAIL test_puzzle.test_a_wrong_stone_goes_dark_locks_out_and_then_lets_the_player_try_again
+     failed 0 times
+     lit after a wrong stone: ["GlyphWave"]
+     the caption reads 'The stone lights, and holds.'
+     not locked out
+     progress kept: 1
+     a press during the lockout counted
+     a direct submit during the lockout lit a stone
+RESULT passed=292 failed=5
+
+=== A wrong stone shows no caption
+FAIL test_puzzle.test_a_wrong_stone_goes_dark_locks_out_and_then_lets_the_player_try_again
+     the caption reads 'The stone lights, and holds.'
+FAIL test_restore.test_from_every_savable_beat_the_keys_alone_reach_the_ending
+     a wrong stone shows 'Worn carvings, broken by the years. Water, perhaps. A bent shape. Something round. Ruins, and nothing more.'
+     a wrong stone shows 'Worn carvings, broken by the years. Water, perhaps. A bent shape. Something round. Ruins, and nothing more.'
+     a wrong stone shows 'Worn carvings, broken by the years. Water, perhaps. A bent shape. Something round. Ruins, and nothing more.'
+FAIL test_route.test_the_whole_game_can_be_played_from_new_game_to_the_ending_and_back_to_a_clean_new_game
+     a wrong stone shows 'Worn carvings, broken by the years. Water, perhaps. A bent shape. Something round. Ruins, and nothing more.'
+RESULT passed=294 failed=3
+RESULT passed=294 failed=3
+
+=== The gate has no collision
+FAIL test_world.test_the_gate_blocks_the_way_until_the_puzzle_is_solved
+     the gate starts open
+     the player got past a closed gate, to x=4320.2
+FAIL test_world.test_a_closed_gate_cannot_be_jumped
+     the player jumped the gate, to x=4514.0
+FAIL test_restore.test_every_savable_beat_rebuilds_the_right_world_with_nothing_replayed
+     beat 0: gate layer 0
+     beat 1: gate layer 0
+     beat 2: gate layer 0
+FAIL test_restore.test_restart_checkpoint_rebuilds_the_same_world_at_every_beat
+     restarted beat 0: gate layer 0
+     restarted beat 1: gate layer 0
+     restarted beat 2: gate layer 0
+FAIL test_restore.test_a_partial_attempt_is_not_kept
+RESULT passed=285 failed=12
+
+=== The crevasse is too deep to climb out of
+FAIL test_world.test_the_whole_level_can_be_walked_in_both_directions_with_nothing_but_keys
+     stuck going right at x=2169.9
+     stuck going left at x=2156.1
+FAIL test_world.test_the_crevasse_can_be_hopped_and_a_fall_into_it_can_be_climbed_out_of
+     could not climb out to the right, at x=2169.9
+     could not climb out to the left, at x=2156.1
+FAIL test_restore.test_from_every_savable_beat_the_keys_alone_reach_the_ending
+     walking did not arrive, at x=2169.9
+     timed out after 90 steps waiting for the stone 'Press the kneeling stone' to be ready
+     a wrong stone shows 'Under the great ribs, a skull. Its jaw is wider than I am tall, and it was facing the same way I am walking.'
+     walking did not arrive, at x=2169.9
+     timed out after 90 steps waiting for the stone 'Press the wave stone' to be ready
+     walking did not arrive, at x=2156.1
+     timed out after 90 steps waiting for the stone 'Press the kneeling stone' to be ready
+RESULT passed=293 failed=4
+
+=== control after, worker 3
+[doctest] test cases:  105 |  105 passed | 0 failed | 0 skipped
+RESULT passed=297 failed=0
+
