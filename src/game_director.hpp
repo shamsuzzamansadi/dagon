@@ -37,6 +37,7 @@ public:
 	void _ready() override;
 	void _process(double p_delta) override;
 	void _physics_process(double p_delta) override;
+	void _notification(int p_what);
 	godot::PackedStringArray _get_configuration_warnings() const override;
 
 	// Set before this node enters the tree. The world starts at this beat, with each earlier outcome
@@ -71,6 +72,8 @@ public:
 	void fade_in();
 	void show_notice(const godot::String &p_text);
 	void set_input_device(int p_device);
+	// From a clip's method track, at the moment it belongs to. A paused or stopped clip cannot ask.
+	void haptic_cue(const godot::StringName &p_cue);
 
 	void set_player_path(const godot::NodePath &p_value) { player_path_ = p_value; }
 	godot::NodePath get_player_path() const { return player_path_; }
@@ -94,8 +97,12 @@ public:
 	godot::NodePath get_puzzle_path() const { return puzzle_path_; }
 	void set_mural_path(const godot::NodePath &p_value) { mural_path_ = p_value; }
 	godot::NodePath get_mural_path() const { return mural_path_; }
-	void set_mural_solved_caption(const godot::String &p_value) { mural_solved_caption_ = p_value; }
-	godot::String get_mural_solved_caption() const { return mural_solved_caption_; }
+	void set_mural_solved_line(const godot::StringName &p_value) { mural_solved_line_ = p_value; }
+	godot::StringName get_mural_solved_line() const { return mural_solved_line_; }
+	void set_background_path(const godot::NodePath &p_value) { background_path_ = p_value; }
+	godot::NodePath get_background_path() const { return background_path_; }
+	void set_background_triggers(const godot::Array &p_value) { background_trigger_paths_ = p_value; }
+	godot::Array get_background_triggers() const { return background_trigger_paths_; }
 	void set_awakened_visuals(const godot::Array &p_value) { awakened_visual_paths_ = p_value; }
 	godot::Array get_awakened_visuals() const { return awakened_visual_paths_; }
 	void set_ending_scene(const godot::Ref<godot::PackedScene> &p_value) { ending_scene_ = p_value; }
@@ -121,6 +128,7 @@ private:
 	};
 
 	void on_story_trigger(const godot::StringName &p_trigger_id);
+	void on_background_trigger(const godot::StringName &p_trigger_id);
 	void on_out_of_bounds(const godot::StringName &p_trigger_id);
 	void on_animation_finished(const godot::StringName &p_clip);
 
@@ -154,7 +162,9 @@ private:
 	godot::NodePath monolith_gate_path_;
 	godot::NodePath puzzle_path_;
 	godot::NodePath mural_path_;
-	godot::String mural_solved_caption_;
+	godot::StringName mural_solved_line_;
+	godot::NodePath background_path_;
+	godot::Array background_trigger_paths_;
 	godot::Array awakened_visual_paths_;
 	godot::Ref<godot::PackedScene> ending_scene_;
 	double flee_timeout_ = 12.0;
@@ -165,12 +175,14 @@ private:
 	NodeRef<CameraRig> camera_rig_;
 	NodeRef<godot::AnimationPlayer> atmosphere_;
 	NodeRef<godot::AnimationPlayer> cinematics_;
+	NodeRef<godot::AnimationPlayer> background_;
 	NodeRef<godot::CollisionObject2D> monolith_gate_;
 	NodeRef<PuzzleController> puzzle_;
 	NodeRef<Interactable> mural_;
 	std::vector<NodeRef<godot::CanvasItem>> awakened_visuals_;
 	std::vector<NodeRef<godot::Marker2D>> checkpoints_;
 	std::vector<NodeRef<StoryTrigger>> story_triggers_;
+	std::vector<NodeRef<StoryTrigger>> background_triggers_;
 
 	core::StoryProgress progress_;
 	int start_beat_ = 0;

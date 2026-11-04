@@ -22,6 +22,8 @@ const SUITES: Array[Script] = [
 	preload("res://tests/test_world.gd"),
 	preload("res://tests/test_restore.gd"),
 	preload("res://tests/test_route.gd"),
+	preload("res://tests/test_narration.gd"),
+	preload("res://tests/test_narrative.gd"),
 ]
 const REQUIRED_CLASSES: Array[String] = ["PlayerController", "CameraRig", "Interactable", "Interactor", "StoryTrigger", "Hud", "PuzzleController", "GameDirector", "GameSession", "MenuController", "SettingsMenu"]
 const STORAGE_VARIABLE := "DAGON_STORAGE_DIR"
@@ -111,6 +113,11 @@ func _run() -> void:
 	var passed := 0
 	var failed := 0
 	for suite in SUITES:
+		# A suite that does not compile would otherwise hang the run until the watchdog.
+		if not suite.can_instantiate():
+			failed += 1
+			print("FAIL %s does not compile" % suite.resource_path)
+			continue
 		var instance: RefCounted = suite.new()
 		var suite_name: String = suite.resource_path.get_file().get_basename()
 		for method in instance.get_method_list():

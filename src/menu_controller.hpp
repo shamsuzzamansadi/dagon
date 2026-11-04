@@ -4,12 +4,14 @@
 #include "node_ref.hpp"
 #include "settings_menu.hpp"
 
+#include <godot_cpp/classes/audio_stream_player.hpp>
 #include <godot_cpp/classes/button.hpp>
 #include <godot_cpp/classes/control.hpp>
 #include <godot_cpp/classes/input_event.hpp>
 #include <godot_cpp/classes/label.hpp>
 #include <godot_cpp/classes/packed_scene.hpp>
 #include <godot_cpp/variant/node_path.hpp>
+#include <godot_cpp/variant/packed_string_array.hpp>
 #include <godot_cpp/variant/string.hpp>
 
 namespace dagon {
@@ -29,6 +31,7 @@ public:
 	};
 
 	void _ready() override;
+	void _process(double p_delta) override;
 	void _input(const godot::Ref<godot::InputEvent> &p_event) override;
 	void _unhandled_input(const godot::Ref<godot::InputEvent> &p_event) override;
 
@@ -57,6 +60,9 @@ public:
 
 	// Ending, and the pause menu's confirmed Quit to Main Menu.
 	void quit_to_main_menu();
+	// Ending: the next line of the epilogue, or the credits after the last. Never makes anyone wait.
+	void advance_ending();
+	int get_ending_line() const { return ending_line_; }
 
 	// Both.
 	void open_settings();
@@ -70,6 +76,8 @@ public:
 	int get_mode() const { return mode_; }
 	void set_game_scene(const godot::Ref<godot::PackedScene> &p_value) { game_scene_ = p_value; }
 	godot::Ref<godot::PackedScene> get_game_scene() const { return game_scene_; }
+	void set_ending_lines(const godot::PackedStringArray &p_value) { ending_lines_ = p_value; }
+	godot::PackedStringArray get_ending_lines() const { return ending_lines_; }
 	void set_title_scene_path(const godot::String &p_value) { title_scene_path_ = p_value; }
 	godot::String get_title_scene_path() const { return title_scene_path_; }
 
@@ -99,6 +107,8 @@ public:
 	DAGON_PATH_PROPERTY(controls_back_button_path)
 	DAGON_PATH_PROPERTY(credits_back_button_path)
 	DAGON_PATH_PROPERTY(save_status_label_path)
+	DAGON_PATH_PROPERTY(ending_box_path)
+	DAGON_PATH_PROPERTY(voice_path)
 
 #undef DAGON_PATH_PROPERTY
 
@@ -132,6 +142,7 @@ private:
 	godot::String quit_message(ConfirmAction p_action);
 	void write_new_game();
 	void start_session(core::Beat p_beat, bool p_show_intro);
+	void show_next_ending_line();
 	godot::Control *panel(const NodeRef<godot::Control> &p_panel) const { return p_panel.get(); }
 
 	Mode mode_ = MODE_PAUSE;
@@ -160,6 +171,9 @@ private:
 	godot::NodePath controls_back_button_path_;
 	godot::NodePath credits_back_button_path_;
 	godot::NodePath save_status_label_path_;
+	godot::NodePath ending_box_path_;
+	godot::NodePath voice_path_;
+	godot::PackedStringArray ending_lines_;
 
 	NodeRef<GameSession> session_;
 	NodeRef<godot::Control> main_panel_;
@@ -170,6 +184,9 @@ private:
 	NodeRef<godot::Label> confirm_message_label_;
 	NodeRef<godot::Label> save_status_label_;
 	NodeRef<godot::Button> continue_button_;
+	NodeRef<godot::AudioStreamPlayer> voice_;
+	int ending_line_ = -1;
+	double ending_line_left_ = 0.0;
 	Screen screen_ = Screen::Closed;
 	ConfirmAction confirm_action_ = ConfirmAction::QuitToDesktop;
 	godot::NodePath default_focus_path_;

@@ -165,7 +165,7 @@ func test_back_closes_one_level_and_focus_returns(h) -> void:
 	var settings: Control = h.fixture.get_node("PauseLayer/PauseMenu/Settings")
 	h.check(settings.visible, "Settings did not open")
 	h.check(not h.fixture.get_node("PauseLayer/PauseMenu/Center/Main").visible, "the main panel stayed visible under Settings")
-	h.check(_focus(h) == settings.get_node("Center/Panel/Items/Music/Slider"), "focus in Settings is on %s" % _focus(h))
+	h.check(_focus(h) == settings.get_node("Center/Panel/Items/Columns/Audio/Music/Slider"), "focus in Settings is on %s" % _focus(h))
 	await h.tap_key(KEY_ESCAPE)
 	h.check(_menu(h).is_open(), "one Esc closed the whole menu")
 	h.check(not settings.visible, "Esc did not close Settings")

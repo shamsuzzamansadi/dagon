@@ -115,7 +115,7 @@ func _run() -> void:
 	elif instruction == "play_to_ending":
 		var director: Node = session.get_director()
 		player.teleport(Vector2(WITNESS_X, -2))
-		await _wait_for(func() -> bool: return director.get_beat() == 5, 800)
+		await _wait_for(func() -> bool: return director.get_beat() == 5, 1000)
 		player.teleport(Vector2(COLLAPSE_X, -2))
 		await _wait_for(func() -> bool: return is_instance_valid(current_scene) and current_scene.has_method("open_credits") and current_scene.get_node_or_null("Center/Card") != null, 400)
 		print("PROBE ending reached" if current_scene.get_node_or_null("Center/Card") != null else "PROBE no ending")

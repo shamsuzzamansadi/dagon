@@ -312,7 +312,7 @@ func _check_awaken_recovered(h, how: String) -> void:
 	h.check(director.get_beat() == AWAKENED, "%s: beat %d" % [how, director.get_beat()])
 	h.check(_gate(h).collision_layer == 0, "%s: the gate stayed solid" % how)
 	h.check(not _gate(h).visible, "%s: the gate stayed visible" % how)
-	h.check(h.fixture.get_node("Mural").caption == "after", "%s: the mural reads '%s'" % [how, h.fixture.get_node("Mural").caption])
+	h.check(h.fixture.get_node("Mural").caption.contains("swimmer"), "%s: the mural reads '%s'" % [how, h.fixture.get_node("Mural").caption])
 	h.check(h.fixture.get_node("MuralLit").visible, "%s: the mural is not lit" % how)
 	h.check(_player(h).is_control_enabled(), "%s: control stayed locked" % how)
 	h.check(saved == [AWAKENED], "%s: checkpoints reached %s" % [how, str(saved)])

@@ -22,18 +22,26 @@ func _focus(h) -> Control:
 	return h.tree.root.get_viewport().gui_get_focus_owner()
 
 
+func _ending_lines(ending: Node) -> Array:
+	return ending.get_node("Center/Card/Items/Lines").get_children().map(func(line: Label) -> String: return line.text)
+
+
 func _check_ending(h, ending: Node, what: String) -> void:
 	h.check(ending.get_node_or_null("Center/Card") != null, "%s: the scene is %s" % [what, ending.name])
 	h.check(ending.get_node("Center/Card").visible, "%s: the epilogue is not showing" % what)
-	var text: String = ending.get_node("Center/Card/Items/Text").text
-	h.check(text.contains("the sea never left"), "%s: the epilogue reads '%s'" % [what, text])
+	var lines := _ending_lines(ending)
+	h.check(lines.size() >= 1 and lines[0].contains("the sea never left"), "%s: the epilogue starts '%s'" % [what, lines])
 	h.check(_focus(h) == ending.get_node("Center/Card/Items/Continue"), "%s: focus is on %s" % [what, _focus(h)])
 	h.check(not h.tree.paused, "%s: the ending is paused" % what)
 
 
-## From the epilogue, with the keyboard, to the main menu.
+## From the epilogue, with the keyboard, to the main menu: each press moves on, and nobody has to wait.
 func _through_credits_to_main_menu(h, ending: Node) -> Control:
-	await h.tap_key(KEY_ENTER)
+	var total: int = ending.ending_lines.size()
+	for i in total:
+		h.check(not ending.get_node("Center/Credits").visible, "the credits came after only %d presses" % i)
+		await h.tap_key(KEY_ENTER)
+	h.check(_ending_lines(ending).size() == total or ending.get_node("Center/Credits").visible, "some of the epilogue never showed")
 	h.check(ending.get_node("Center/Credits").visible, "Continue did not show the credits")
 	h.check(_focus(h) == ending.get_node("Center/Credits/Items/MainMenu"), "focus is on %s" % _focus(h))
 	await h.tap_key(KEY_ENTER)
@@ -205,7 +213,7 @@ func test_pausing_during_the_flee_does_not_use_up_its_time(h) -> void:
 	h.check(not h.tree.paused, "Esc did not resume")
 	await h.steps(300)
 	h.check(route.director().get_beat() == 5, "the flee used up paused time")
-	await h.wait_for_scene("MenuController", 400)
+	await h.wait_for_scene("MenuController", 600)
 
 
 ## Abandoning a cinematic through the pause menu, and starting over from nothing.
@@ -217,7 +225,7 @@ func test_pause_during_a_cinematic_then_quit_to_the_main_menu_then_new_game_star
 	var route = RoutePlayer.new(h)
 	await h.landed_on_floor(route.player())
 	await route.walk_into_the_reveal()
-	await h.steps(120)
+	await h.steps(240)
 	h.check(route.director().is_cinematic_active(), "the reveal is not running")
 	h.check(route.world().get_node("CameraRig").zoom != Vector2.ONE, "the reveal did not touch the camera")
 	await h.tap_key(KEY_ESCAPE)
@@ -249,7 +257,8 @@ func test_the_ending_has_a_working_controller_route_and_back_does_nothing_at_its
 	await h.tap_key(KEY_ESCAPE)
 	await h.tap_pad(JOY_BUTTON_B)
 	h.check(ending.get_node("Center/Card").visible and h.tree.current_scene == ending, "Back left the epilogue")
-	await h.tap_pad(JOY_BUTTON_A)
+	for i in ending.ending_lines.size():
+		await h.tap_pad(JOY_BUTTON_A)
 	h.check(ending.get_node("Center/Credits").visible, "the south button did not continue")
 	await h.tap_pad(JOY_BUTTON_B)
 	h.check(ending.get_node("Center/Card").visible, "the east button did not go back from the credits")
@@ -260,22 +269,46 @@ func test_the_ending_has_a_working_controller_route_and_back_does_nothing_at_its
 	h.check(title.get_node_or_null(ITEMS + "NewGame") != null, "the ending led to %s" % title.name)
 
 
+func test_the_epilogue_fills_itself_in_without_anyone_pressing_anything(h) -> void:
+	var ending: Node = await h.load_main_fixture("res://scenes/ui/ending.tscn")
+	await h.steps(3)
+	var total: int = ending.ending_lines.size()
+	h.check(_ending_lines(ending).size() == 1, "the card starts with %d lines" % _ending_lines(ending).size())
+	await h.wait_until(func() -> bool: return _ending_lines(ending).size() == total, 3600, "every line to show")
+	h.check(ending.get_node("Center/Card").visible, "the card went away by itself")
+	h.check(_focus(h) == ending.get_node("Center/Card/Items/Continue"), "focus is on %s" % _focus(h))
+
+
+func test_the_epilogue_names_innsmouth_and_stands_on_its_own(h) -> void:
+	var ending: Node = await h.load_main_fixture("res://scenes/ui/ending.tscn")
+	await h.steps(3)
+	for i in ending.ending_lines.size() - 1:
+		await h.tap_key(KEY_ENTER)
+	var text := " ".join(_ending_lines(ending))
+	for phrase in ["Innsmouth", "That eye, above those waves", "They tell me the sea never left", "finished rising"]:
+		h.check(text.contains(phrase), "the epilogue lacks '%s': %s" % [phrase, text])
+
+
 func test_the_ending_screens_fit_and_their_text_can_be_drawn(h) -> void:
 	var ending: Node = await h.load_main_fixture("res://scenes/ui/ending.tscn")
 	await h.steps(3)
+	for i in ending.ending_lines.size() - 1:
+		await h.tap_key(KEY_ENTER)
+	await h.steps(2)
 	var viewport: Rect2 = ending.get_viewport_rect()
+	h.check(_ending_lines(ending).size() == ending.ending_lines.size(), "not every line showed")
 	h.check(viewport.encloses(ending.get_node("Center/Card").get_global_rect()), "the epilogue is clipped: %s" % ending.get_node("Center/Card").get_global_rect())
+	var font: Font = ending.get_node("Center/Credits/Items/Text").get_theme_font("font")
+	var text: String = "\n".join(_ending_lines(ending))
+	for i in text.length():
+		h.check(text.unicode_at(i) == 10 or text.unicode_at(i) == 32 or font.has_char(text.unicode_at(i)), "the font cannot draw '%s'" % text[i])
 	ending.open_credits()
 	await h.steps(2)
 	h.check(viewport.encloses(ending.get_node("Center/Credits").get_global_rect()), "the credits are clipped: %s" % ending.get_node("Center/Credits").get_global_rect())
 	var title: Node = (load(TITLE) as PackedScene).instantiate()
 	h.check(ending.get_node("Center/Credits/Items/Text").text == title.get_node("Center/Credits/Items/Text").text, "the two credits screens differ")
 	title.free()
-	var font: Font = ending.get_node("Center/Card/Items/Text").get_theme_font("font")
-	var text: String = ending.get_node("Center/Card/Items/Text").text
-	for i in text.length():
-		h.check(text.unicode_at(i) == 10 or text.unicode_at(i) == 32 or font.has_char(text.unicode_at(i)), "the font cannot draw '%s'" % text[i])
-	for pair in [["Center/Card/Items/Continue", ending.open_credits], ["Center/Credits/Items/MainMenu", ending.quit_to_main_menu]]:
+	for pair in [["Center/Card/Items/Continue", ending.advance_ending], ["Center/Credits/Items/MainMenu", ending.quit_to_main_menu]]:
 		h.check(ending.get_node(pair[0]).pressed.is_connected(pair[1]), "%s is not connected" % pair[0])
 
 
@@ -295,7 +328,7 @@ func test_the_device_in_use_carries_through_the_ending_to_the_main_menu(h) -> vo
 	h.send(h.pad_event(JOY_BUTTON_DPAD_RIGHT, false))
 	var ending: Node = await h.wait_for_scene("MenuController", 1200)
 	h.check(ending.get_active_device() == 0, "the ending has device %d" % ending.get_active_device())
-	await h.tap_pad(JOY_BUTTON_A)
-	await h.tap_pad(JOY_BUTTON_A)
+	for i in ending.ending_lines.size() + 1:
+		await h.tap_pad(JOY_BUTTON_A)
 	var title: Node = await h.wait_for_scene("MenuController")
 	h.check(title.get_active_device() == 0, "the main menu has device %d" % title.get_active_device())

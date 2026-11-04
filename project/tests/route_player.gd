@@ -66,6 +66,9 @@ func walk(key: Key, reached: Callable, max_steps: int, examine := false) -> bool
 			if focus != null and focus.is_available() and focus.prompt == "Examine" and not captions.has(focus.interaction_id):
 				h.send(h.key_event(key, false))
 				await h.tap_key(KEY_E)
+				# A story moment being spoken is cut short by the first press, and the second examines.
+				if caption().text != focus.caption or not caption().visible:
+					await h.tap_key(KEY_E)
 				captions[focus.interaction_id] = caption().text
 				h.send(h.key_event(key, true))
 				last_x = body.global_position.x

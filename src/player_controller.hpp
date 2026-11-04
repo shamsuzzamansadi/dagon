@@ -28,6 +28,8 @@ public:
 	void teleport(const godot::Vector2 &p_position);
 
 	int get_facing() const { return facing_; }
+	// Turns the sailor without moving him, as walking that way would. -1 is left, and 1 is right.
+	void face(int p_direction);
 
 	void set_walk_speed(float p_value) { params_.walk_speed = p_value; }
 	float get_walk_speed() const { return params_.walk_speed; }

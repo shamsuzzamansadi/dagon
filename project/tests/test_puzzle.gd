@@ -206,7 +206,7 @@ func test_solved_is_terminal_and_the_stones_stop_reacting(h) -> void:
 	puzzle.step_accepted.connect(func(_index: int) -> void: signals[0] += 1)
 	puzzle.failed.connect(func() -> void: signals[0] += 1)
 	puzzle.solved.connect(func() -> void: signals[0] += 1)
-	await h.wait_until(func() -> bool: return not director.is_cinematic_active(), 400, "the cinematic to finish")
+	await h.wait_until(func() -> bool: return not director.is_cinematic_active(), 600, "the cinematic to finish")
 	for stone_name in ["GlyphWave", "GlyphKneel", "GlyphEye"]:
 		h.check(not _stone(h, stone_name).enabled, "%s still reacts" % stone_name)
 	await h.stand_at(_player(h), Vector2(WAVE_X, -2))

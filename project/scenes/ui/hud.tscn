@@ -8,6 +8,10 @@ notice_label_path = NodePath("Notice")
 prompt_label_path = NodePath("Prompt")
 caption_label_path = NodePath("Caption")
 fade_rect_path = NodePath("Fade")
+voice_path = NodePath("Voice")
+
+[node name="Voice" type="AudioStreamPlayer" parent="."]
+bus = &"Narration"
 
 [node name="Notice" type="Label" parent="."]
 visible = false

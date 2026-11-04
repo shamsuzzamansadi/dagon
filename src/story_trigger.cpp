@@ -19,6 +19,9 @@ void StoryTrigger::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_enabled", "value"), &StoryTrigger::set_enabled);
 	ClassDB::bind_method(D_METHOD("is_enabled"), &StoryTrigger::is_enabled);
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "enabled"), "set_enabled", "is_enabled");
+	ClassDB::bind_method(D_METHOD("set_spent_from_beat", "beat"), &StoryTrigger::set_spent_from_beat);
+	ClassDB::bind_method(D_METHOD("get_spent_from_beat"), &StoryTrigger::get_spent_from_beat);
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "spent_from_beat"), "set_spent_from_beat", "get_spent_from_beat");
 
 	ADD_SIGNAL(MethodInfo("triggered", PropertyInfo(Variant::STRING_NAME, "trigger_id")));
 }

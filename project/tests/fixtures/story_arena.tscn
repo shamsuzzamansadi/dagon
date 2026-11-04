@@ -146,10 +146,52 @@ tracks/0/keys = {
 }]
 }
 
+[sub_resource type="Animation" id="clip_tableau"]
+resource_name = "tableau"
+length = 0.25
+tracks/0/type = "method"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Hud")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.05),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [&"abyss.ritual"],
+"method": &"say"
+}]
+}
+
+[sub_resource type="AnimationLibrary" id="background_library"]
+_data = {
+&"tableau": SubResource("clip_tableau")
+}
+
+[sub_resource type="Animation" id="clip_haptic"]
+resource_name = "haptic"
+length = 0.25
+tracks/0/type = "method"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("GameDirector")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.05),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [&"reveal"],
+"method": &"haptic_cue"
+}]
+}
+
 [sub_resource type="AnimationLibrary" id="library"]
 _data = {
 &"collapse": SubResource("clip_collapse"),
 &"dagon_reveal": SubResource("clip_reveal"),
+&"haptic": SubResource("clip_haptic"),
 &"late_aim": SubResource("clip_late_aim"),
 &"monolith_awaken": SubResource("clip_awaken"),
 &"side_show": SubResource("clip_side_show")
@@ -235,7 +277,7 @@ collision_layer = 4
 collision_mask = 0
 monitoring = false
 interaction_id = &"mural"
-caption = "before"
+line_id = &"mural.before"
 
 [node name="Shape" type="CollisionShape2D" parent="Mural"]
 shape = SubResource("mural_shape")
@@ -260,19 +302,35 @@ interactor_path = NodePath("../Player/Interactor")
 [node name="Cinematics" type="AnimationPlayer" parent="."]
 libraries/ = SubResource("library")
 
+[node name="Background" type="AnimationPlayer" parent="."]
+libraries/ = SubResource("background_library")
+
+[node name="Sight" type="StoryTrigger" parent="."]
+position = Vector2(250, -30)
+collision_layer = 8
+collision_mask = 2
+monitorable = false
+trigger_id = &"tableau"
+spent_from_beat = 2
+
+[node name="Shape" type="CollisionShape2D" parent="Sight"]
+shape = SubResource("trigger_shape")
+
 [node name="GameDirector" type="GameDirector" parent="."]
 player_path = NodePath("../Player")
 hud_path = NodePath("../Hud")
 kill_plane_path = NodePath("../KillPlane")
 camera_rig_path = NodePath("../CameraRig")
 cinematics_path = NodePath("../Cinematics")
+background_path = NodePath("../Background")
+background_triggers = [NodePath("../Sight")]
 monolith_gate_path = NodePath("../Gate")
 puzzle_path = NodePath("../Puzzle")
 mural_path = NodePath("../Mural")
 checkpoints = [NodePath("../Checkpoint0"), NodePath("../Checkpoint1"), NodePath("../Checkpoint2"), NodePath("../Checkpoint3")]
 story_triggers = [NodePath("../EnterAbyss"), NodePath("../ReachMonolith"), NodePath("../Witness"), NodePath("../Collapse")]
 awakened_visuals = [NodePath("../MuralLit")]
-mural_solved_caption = "after"
+mural_solved_line = &"mural.after"
 ending_scene = ExtResource("3_ending")
 
 [connection signal="solved" from="Puzzle" to="GameDirector" method="on_puzzle_solved"]

@@ -283,7 +283,7 @@ func test_witness_fleeing_and_ended_are_never_written_and_restart_replays_them(h
 	# Replays in full, into the flee.
 	director = session.get_director()
 	_player(session).teleport(Vector2(WITNESS_X, -2))
-	await h.wait_until(func() -> bool: return director.get_beat() == FLEEING, 800, "the replayed reveal to end")
+	await h.wait_until(func() -> bool: return director.get_beat() == FLEEING, 1000, "the replayed reveal to end")
 	h.check(h.read_storage_file(SAVE_FILE) == SAVES[AWAKENED], "the flee wrote: %s" % h.read_storage_file(SAVE_FILE))
 	h.check(session.get_session_beat() == AWAKENED, "the session moved to %d" % session.get_session_beat())
 	h.check(director.get_active_checkpoint() == AWAKENED, "the active checkpoint is %d" % director.get_active_checkpoint())

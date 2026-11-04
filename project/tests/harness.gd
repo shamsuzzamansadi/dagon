@@ -119,7 +119,10 @@ func unload_fixture() -> void:
 		tree.current_scene.queue_free()
 	tree.current_scene = null
 	InputMap.load_from_project_settings()
-	for bus in ["Music", "Effects"]:
+	Engine.remove_meta(&"dagon_subtitles")
+	Engine.remove_meta(&"dagon_vibration")
+	Input.stop_joy_vibration(0)
+	for bus in ["Music", "Effects", "Narration"]:
 		var index := AudioServer.get_bus_index(bus)
 		AudioServer.set_bus_mute(index, false)
 		AudioServer.set_bus_volume_db(index, 0.0)

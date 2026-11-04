@@ -20,7 +20,7 @@ OUT = ROOT / "project" / "assets" / "shore"
 SCENE = ROOT / "project" / "scenes" / "level" / "shore.tscn"
 UI_OUT = ROOT / "project" / "assets" / "ui"
 # light.png is a light mask, not artwork: its values multiply the lantern colour.
-ARTWORK = ["sky", "clouds", "far", "glints", "flats", "bank", "terrain", "foreground", "fish", "boat", "sailor"]
+ARTWORK = ["sky", "clouds", "far", "glints", "flats", "bank", "terrain", "foreground", "fish", "boat", "sailor", "talisman"]
 IDLE_FRAMES = 8
 WALK_FRAMES = 8
 # Walkable columns between the feet of the side cliffs, and the space a figure stands in above them.

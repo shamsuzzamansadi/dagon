@@ -7,7 +7,7 @@ const ITEMS := "PauseLayer/PauseMenu/Settings/Center/Panel/Items/"
 const SETTINGS_FILE := "settings.cfg"
 const JUMP := 2
 const INTERACT := 3
-const AUDIO_NOTE := "This build has no audio yet."
+const AUDIO_NOTE := "Narration samples only. No music or effects yet."
 
 
 func _setup(h) -> CharacterBody2D:
@@ -26,7 +26,7 @@ func _open(h) -> Control:
 
 
 func _key_button(h, row: String) -> Button:
-	return h.fixture.get_node(ITEMS + row + "/Key")
+	return h.fixture.get_node(ITEMS + "Columns/Keys/" + row + "/Key")
 
 
 func _message(h) -> String:
@@ -247,7 +247,7 @@ func test_restore_defaults_brings_everything_back(h) -> void:
 	await h.tap_action("ui_accept")
 	h.check(_keys_of("jump") == [KEY_SPACE], "jump is bound to %s" % str(_keys_of("jump")))
 	h.check(_key_button(h, "Jump").text == "Space", "the row reads '%s'" % _key_button(h, "Jump").text)
-	h.check_near(h.fixture.get_node(ITEMS + "Music/Slider").value, 1.0, 0.001, "the music slider")
+	h.check_near(h.fixture.get_node(ITEMS + "Columns/Audio/Music/Slider").value, 1.0, 0.001, "the music slider")
 	h.check_near(AudioServer.get_bus_volume_db(AudioServer.get_bus_index("Music")), 0.0, 0.01, "the Music bus")
 	h.check(_message(h).contains("restored"), "no confirmation: '%s'" % _message(h))
 	h.check(h.read_storage_file(SETTINGS_FILE).contains("key_jump=%d" % KEY_SPACE), "the defaults were not saved")
@@ -256,8 +256,8 @@ func test_restore_defaults_brings_everything_back(h) -> void:
 func test_volumes_reach_their_own_buses(h) -> void:
 	await _setup(h)
 	await _open(h)
-	var music: HSlider = h.fixture.get_node(ITEMS + "Music/Slider")
-	var effects: HSlider = h.fixture.get_node(ITEMS + "Effects/Slider")
+	var music: HSlider = h.fixture.get_node(ITEMS + "Columns/Audio/Music/Slider")
+	var effects: HSlider = h.fixture.get_node(ITEMS + "Columns/Audio/Effects/Slider")
 	var music_bus := AudioServer.get_bus_index("Music")
 	var effects_bus := AudioServer.get_bus_index("Effects")
 	music.value = 0.5
@@ -275,7 +275,7 @@ func test_volumes_reach_their_own_buses(h) -> void:
 func test_a_focused_slider_moves_with_the_keys_and_the_change_is_kept(h) -> void:
 	await _setup(h)
 	await _open(h)
-	var music: HSlider = h.fixture.get_node(ITEMS + "Music/Slider")
+	var music: HSlider = h.fixture.get_node(ITEMS + "Columns/Audio/Music/Slider")
 	h.check(music.has_focus(), "the first control in Settings does not have focus")
 	await h.tap_action("ui_left")
 	h.check_near(music.value, 0.9, 0.001, "the music slider after one press left")
@@ -288,7 +288,7 @@ func test_a_focused_slider_moves_with_the_keys_and_the_change_is_kept(h) -> void
 func test_focus_can_walk_every_row_and_nothing_traps_it(h) -> void:
 	await _setup(h)
 	await _open(h)
-	var expected := ["Music/Slider", "Effects/Slider", "MoveLeft/Key", "MoveRight/Key", "Jump/Key", "Interact/Key", "RestoreDefaults", "Back"]
+	var expected := ["Columns/Audio/Music/Slider", "Columns/Audio/Effects/Slider", "Columns/Audio/Narration/Slider", "Columns/Audio/Subtitles", "Columns/Audio/Vibration", "Columns/Keys/MoveLeft/Key", "Columns/Keys/MoveRight/Key", "Columns/Keys/Jump/Key", "Columns/Keys/Interact/Key", "RestoreDefaults", "Back"]
 	for path in expected:
 		h.check(h.fixture.get_node(ITEMS + path).has_focus(), "going down, %s does not have focus" % path)
 		await h.tap_action("ui_down")
@@ -306,7 +306,7 @@ func test_a_scene_loads_the_saved_settings(h) -> void:
 	h.check_near(AudioServer.get_bus_volume_db(AudioServer.get_bus_index("Music")), linear_to_db(0.5), 0.05, "the Music bus")
 	var settings := await _open(h)
 	h.check(_key_button(h, "Jump").text == "K", "the row reads '%s'" % _key_button(h, "Jump").text)
-	h.check_near(h.fixture.get_node(ITEMS + "Music/Slider").value, 0.5, 0.001, "the music slider")
+	h.check_near(h.fixture.get_node(ITEMS + "Columns/Audio/Music/Slider").value, 0.5, 0.001, "the music slider")
 	settings.back()
 
 
@@ -398,12 +398,12 @@ func test_focus_lost_in_settings_comes_back_to_a_usable_control(h) -> void:
 		h.check(settings.visible and menu.is_open(), "%s changed the screen" % press)
 
 	# What came back has to work: it responds, and focus can move on from it.
-	var music: HSlider = h.fixture.get_node(ITEMS + "Music/Slider")
+	var music: HSlider = h.fixture.get_node(ITEMS + "Columns/Audio/Music/Slider")
 	h.check(music.has_focus(), "recovered to %s" % _focus(h))
 	await h.tap_action("ui_left")
 	h.check_near(music.value, 0.9, 0.001, "the recovered slider after a press left")
 	await h.tap_action("ui_down")
-	h.check(h.fixture.get_node(ITEMS + "Effects/Slider").has_focus(), "focus did not move on: %s" % _focus(h))
+	h.check(h.fixture.get_node(ITEMS + "Columns/Audio/Effects/Slider").has_focus(), "focus did not move on: %s" % _focus(h))
 
 	# Back still closes one level.
 	await h.tap_key(KEY_ESCAPE)
@@ -589,23 +589,21 @@ func test_quitting_with_unsaved_settings_does_not_claim_they_are_kept(h) -> void
 func test_the_settings_screen_says_exactly_which_keys_are_kept(h) -> void:
 	await _setup(h)
 	await _open(h)
-	var note: String = h.fixture.get_node(ITEMS + "Note").text
+	var note: String = h.fixture.get_node(ITEMS + "Columns/Keys/Note").text
 	h.check(note == "Left/Right arrows always move. Esc always pauses.", "the note reads '%s'" % note)
 
 
-## The note is temporary (D42). Remove it, and these tests, when audio is connected.
+## The note says how far audio has come (D42). Replace it, and these tests, when music and effects are connected.
 func _check_audio_note(h, settings: Control, where: String) -> void:
 	var panel: Control = settings.get_node("Center/Panel")
-	var items: Control = panel.get_node("Items")
+	var items: Control = panel.get_node("Items/Columns/Audio")
 	var note: Label = items.get_node("AudioNote")
 	h.check(note.text == AUDIO_NOTE, "%s: the note reads '%s'" % [where, note.text])
 	h.check(note.is_visible_in_tree(), "%s: the note is not showing" % where)
-	h.check(note.get_line_count() == 1 and note.get_visible_line_count() == 1, "%s: the note takes %d lines, %d showing" % [where, note.get_line_count(), note.get_visible_line_count()])
-	var text_size: Vector2 = note.get_theme_font("font").get_string_size(note.text, HORIZONTAL_ALIGNMENT_LEFT, -1, note.get_theme_font_size("font_size"))
-	h.check(text_size.x <= note.size.x and text_size.y <= note.size.y, "%s: the text is %s in a label of %s" % [where, text_size, note.size])
+	h.check(note.get_line_count() <= 2 and note.get_visible_line_count() == note.get_line_count(), "%s: the note takes %d lines, %d showing" % [where, note.get_line_count(), note.get_visible_line_count()])
 	h.check(items.get_global_rect().encloses(note.get_global_rect()), "%s: the note is outside its panel" % where)
 	h.check(settings.get_viewport_rect().encloses(panel.get_global_rect()), "%s: the panel is clipped: %s" % [where, panel.get_global_rect()])
-	h.check(note.get_index() == items.get_node("Effects").get_index() + 1, "%s: the note is not directly below the volumes" % where)
+	h.check(note.get_index() == items.get_node("Narration").get_index() + 1, "%s: the note is not directly below the volumes" % where)
 	h.check(note.focus_mode == Control.FOCUS_NONE, "%s: the note can take focus" % where)
 	h.check(note.mouse_filter == Control.MOUSE_FILTER_IGNORE, "%s: the note can take clicks" % where)
 
@@ -655,9 +653,9 @@ func test_the_audio_note_never_takes_focus_from_keys_or_a_controller(h) -> void:
 	h.use_controller("Xbox Series Controller")
 	await _setup(h)
 	await _open(h)
-	var note: Control = h.fixture.get_node(ITEMS + "AudioNote")
+	var note: Control = h.fixture.get_node(ITEMS + "Columns/Audio/AudioNote")
 	var viewport: Viewport = note.get_viewport()
-	var rows := ["Music/Slider", "Effects/Slider", "MoveLeft/Key", "MoveRight/Key", "Jump/Key", "Interact/Key", "RestoreDefaults", "Back"]
+	var rows := ["Columns/Audio/Music/Slider", "Columns/Audio/Effects/Slider", "Columns/Audio/Narration/Slider", "Columns/Audio/Subtitles", "Columns/Audio/Vibration", "Columns/Keys/MoveLeft/Key", "Columns/Keys/MoveRight/Key", "Columns/Keys/Jump/Key", "Columns/Keys/Interact/Key", "RestoreDefaults", "Back"]
 	var devices := {
 		"arrow keys": [func() -> void: await h.tap_key(KEY_DOWN), func() -> void: await h.tap_key(KEY_UP)],
 		"D-pad": [func() -> void: await h.tap_pad(JOY_BUTTON_DPAD_DOWN), func() -> void: await h.tap_pad(JOY_BUTTON_DPAD_UP)],
@@ -673,13 +671,13 @@ func test_the_audio_note_never_takes_focus_from_keys_or_a_controller(h) -> void:
 				await devices[device][direction].call()
 
 	# Back on the first row, the stick crosses the note too, by the same path as the D-pad.
-	var effects: Control = h.fixture.get_node(ITEMS + "Effects/Slider")
-	effects.grab_focus()
+	var narration: Control = h.fixture.get_node(ITEMS + "Columns/Audio/Narration/Slider")
+	narration.grab_focus()
 	var down := InputEventJoypadMotion.new()
 	down.axis = JOY_AXIS_LEFT_Y
 	down.axis_value = 1.0
 	await h.send_between_ticks(down)
-	h.check(_key_button(h, "MoveLeft").has_focus(), "the stick moved focus from Effects to %s" % viewport.gui_get_focus_owner())
+	h.check(h.fixture.get_node(ITEMS + "Columns/Audio/Subtitles").has_focus(), "the stick moved focus from Narration to %s" % viewport.gui_get_focus_owner())
 	var rest := InputEventJoypadMotion.new()
 	rest.axis = JOY_AXIS_LEFT_Y
 	rest.axis_value = 0.0

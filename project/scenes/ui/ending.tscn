@@ -17,6 +17,12 @@ credits_panel_path = NodePath("Center/Credits")
 first_button_path = NodePath("Center/Card/Items/Continue")
 credits_button_path = NodePath("Center/Card/Items/Continue")
 credits_back_button_path = NodePath("Center/Credits/Items/MainMenu")
+ending_box_path = NodePath("Center/Card/Items/Lines")
+voice_path = NodePath("Voice")
+ending_lines = PackedStringArray("ending.found", "ending.listen", "ending.innsmouth", "ending.rising")
+
+[node name="Voice" type="AudioStreamPlayer" parent="."]
+bus = &"Narration"
 
 [node name="Black" type="ColorRect" parent="."]
 layout_mode = 1
@@ -42,15 +48,9 @@ layout_mode = 2
 [node name="Items" type="VBoxContainer" parent="Center/Card"]
 layout_mode = 2
 
-[node name="Text" type="Label" parent="Center/Card/Items"]
+[node name="Lines" type="VBoxContainer" parent="Center/Card/Items"]
 custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
-text = "They found me in the shallows, they say, a long way from any wreck. They tell me the sea never left. There was no shore, no stone, no tide drawn back.
-
-I have stopped arguing. At night I listen to the water, and what moves under it.
-
-Those figures bowed for a reason. Whatever rose that night did not rise for me, and I do not think it has finished rising."
-autowrap_mode = 2
 
 [node name="Continue" type="Button" parent="Center/Card/Items"]
 layout_mode = 2
@@ -78,5 +78,5 @@ autowrap_mode = 2
 layout_mode = 2
 text = "Main Menu"
 
-[connection signal="pressed" from="Center/Card/Items/Continue" to="." method="open_credits"]
+[connection signal="pressed" from="Center/Card/Items/Continue" to="." method="advance_ending"]
 [connection signal="pressed" from="Center/Credits/Items/MainMenu" to="." method="quit_to_main_menu"]

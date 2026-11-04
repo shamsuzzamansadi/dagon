@@ -10,7 +10,7 @@ const WALL_X := 4520.0
 const ART_END_X := 640.0
 const AWAKENED_BEAT := 3
 ## The font's drawable characters decide what can be written, so all text is checked against it.
-const TEXT_NODES := ["Props/Lifeboat", "Props/FishNearRock", "Props/FossilA", "Props/FossilB", "Props/TabletWave", "Props/TabletKneel", "Props/TabletEye", "Props/Footprint", "Monolith/Mural"]
+const TEXT_NODES := ["Props/Lifeboat", "Props/FishNearRock", "Props/Talisman", "Props/CaveCarving", "Props/FossilA", "Props/FossilB", "Props/TabletWave", "Props/TabletKneel", "Props/TabletEye", "Props/Footprint", "Props/Relief", "Props/Cairn", "Props/Statue", "Monolith/Mural"]
 
 
 func _world(h, beat := 0) -> Node2D:
@@ -173,7 +173,7 @@ func test_everything_the_director_needs_is_wired(h) -> void:
 	for property in ["player_path", "hud_path", "kill_plane_path", "camera_rig_path", "atmosphere_path", "cinematics_path", "monolith_gate_path", "puzzle_path", "mural_path"]:
 		h.check(director.get_node_or_null(director.get(property)) != null, "%s does not resolve" % property)
 	h.check(director.ending_scene != null, "no ending scene")
-	h.check(director.mural_solved_caption.contains("swimmer"), "the second mural caption reads '%s'" % director.mural_solved_caption)
+	h.check(director.mural_solved_line == &"mural.after", "the second mural line is %s" % director.mural_solved_line)
 	for path in director.awakened_visuals:
 		h.check(director.get_node_or_null(path) != null, "%s does not resolve" % path)
 
@@ -276,7 +276,18 @@ func test_every_polygon_in_the_world_can_actually_be_drawn(h) -> void:
 		h.check(not Geometry2D.triangulate_polygon(polygon.polygon).is_empty(), "%s cannot be triangulated" % world.get_path_to(polygon))
 
 
-func test_all_new_text_can_be_drawn_in_the_game_font(h) -> void:
+## Every line of the script, whoever says it. The file is read here as the game reads it, line by line.
+func _script_lines() -> Dictionary:
+	var lines := {}
+	for line in FileAccess.get_file_as_string("res://narration/script.txt").split("\n"):
+		if line.is_empty() or line.begins_with("#"):
+			continue
+		var fields := line.split("|", true, 2)
+		lines[fields[0]] = fields[2]
+	return lines
+
+
+func test_all_text_can_be_drawn_in_the_game_font(h) -> void:
 	var world := await _world(h)
 	var label: Label = world.get_node("Hud/Caption")
 	var font: Font = label.get_theme_font("font")
@@ -284,7 +295,8 @@ func test_all_new_text_can_be_drawn_in_the_game_font(h) -> void:
 	for path in TEXT_NODES:
 		texts.append(world.get_node(path).caption)
 		texts.append(world.get_node(path).prompt)
-	texts.append(world.get_node("GameDirector").mural_solved_caption)
+	for text in _script_lines().values():
+		texts.append(text)
 	for stone_name in ["GlyphWave", "GlyphKneel", "GlyphEye"]:
 		texts.append(world.get_node("Monolith/" + stone_name).prompt)
 	for connection in world.get_node("Monolith/Puzzle").failed.get_connections():
@@ -300,9 +312,9 @@ func test_every_caption_fits_its_line_in_the_hud(h) -> void:
 	var label: Label = world.get_node("Hud/Caption")
 	var font: Font = label.get_theme_font("font")
 	var font_size := label.get_theme_font_size("font_size")
-	var captions: Array[String] = [world.get_node("GameDirector").mural_solved_caption]
-	for path in TEXT_NODES:
-		captions.append(world.get_node(path).caption)
-	for caption in captions:
-		var size: Vector2 = font.get_multiline_string_size(caption, HORIZONTAL_ALIGNMENT_CENTER, label.size.x, font_size)
-		h.check(size.y <= label.size.y + 1.0, "'%s' needs %.0f px of a %.0f px caption" % [caption, size.y, label.size.y])
+	var lines := _script_lines()
+	for id: String in lines:
+		if id.begins_with("ending."):
+			continue
+		var size: Vector2 = font.get_multiline_string_size(lines[id], HORIZONTAL_ALIGNMENT_CENTER, label.size.x, font_size)
+		h.check(size.y <= label.size.y + 1.0, "%s needs %.0f px of a %.0f px caption: %s" % [id, size.y, label.size.y, lines[id]])

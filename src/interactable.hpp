@@ -11,6 +11,7 @@ class Interactable : public godot::Area2D {
 	GDCLASS(Interactable, godot::Area2D)
 
 public:
+	void _ready() override;
 	void _physics_process(double p_delta) override;
 
 	// False if disabled, already consumed or cooling down. On true, emits interacted.
@@ -24,6 +25,11 @@ public:
 	godot::String get_prompt() const { return prompt_; }
 	void set_caption(const godot::String &p_value) { caption_ = p_value; }
 	godot::String get_caption() const { return caption_; }
+	// A line in the narration script. When set, the script holds the words, and caption shows them.
+	void set_line_id(const godot::StringName &p_value) { line_id_ = p_value; }
+	godot::StringName get_line_id() const { return line_id_; }
+	// Moves on to another line of the script, in place.
+	void use_line(const godot::StringName &p_id);
 	void set_one_shot(bool p_value) { one_shot_ = p_value; }
 	bool is_one_shot() const { return one_shot_; }
 	void set_enabled(bool p_value) { enabled_ = p_value; }
@@ -38,6 +44,7 @@ private:
 	godot::StringName interaction_id_;
 	godot::String prompt_ = "Examine";
 	godot::String caption_;
+	godot::StringName line_id_;
 	bool one_shot_ = false;
 	bool enabled_ = true;
 	float cooldown_ = 0.4f;

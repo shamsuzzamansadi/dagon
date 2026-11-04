@@ -1,10 +1,15 @@
 #include "hud.hpp"
 
+#include "core/narration.hpp"
 #include "input_labels.hpp"
 #include "interactable.hpp"
+#include "narration.hpp"
+#include "storage.hpp"
 
 #include <godot_cpp/classes/engine.hpp>
+#include <godot_cpp/classes/audio_stream.hpp>
 #include <godot_cpp/classes/property_tweener.hpp>
+#include <godot_cpp/classes/viewport.hpp>
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/core/error_macros.hpp>
 #include <godot_cpp/core/print_string.hpp>
@@ -26,6 +31,9 @@ void Hud::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("on_interacted", "target"), &Hud::on_interacted);
 	ClassDB::bind_method(D_METHOD("show_caption", "text"), &Hud::show_caption);
 	ClassDB::bind_method(D_METHOD("hide_caption"), &Hud::hide_caption);
+	ClassDB::bind_method(D_METHOD("say", "id"), &Hud::say);
+	ClassDB::bind_method(D_METHOD("is_speaking"), &Hud::is_speaking);
+	ClassDB::bind_method(D_METHOD("get_current_line"), &Hud::get_current_line);
 	ClassDB::bind_method(D_METHOD("show_notice", "text"), &Hud::show_notice);
 	ClassDB::bind_method(D_METHOD("set_input_device", "device"), &Hud::set_input_device);
 	ClassDB::bind_method(D_METHOD("fade_to_black", "seconds"), &Hud::fade_to_black);
@@ -46,6 +54,9 @@ void Hud::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_fade_rect_path", "path"), &Hud::set_fade_rect_path);
 	ClassDB::bind_method(D_METHOD("get_fade_rect_path"), &Hud::get_fade_rect_path);
 	ADD_PROPERTY(PropertyInfo(Variant::NODE_PATH, "fade_rect_path", PROPERTY_HINT_NODE_PATH_VALID_TYPES, "ColorRect"), "set_fade_rect_path", "get_fade_rect_path");
+	ClassDB::bind_method(D_METHOD("set_voice_path", "path"), &Hud::set_voice_path);
+	ClassDB::bind_method(D_METHOD("get_voice_path"), &Hud::get_voice_path);
+	ADD_PROPERTY(PropertyInfo(Variant::NODE_PATH, "voice_path", PROPERTY_HINT_NODE_PATH_VALID_TYPES, "AudioStreamPlayer"), "set_voice_path", "get_voice_path");
 	ClassDB::bind_method(D_METHOD("set_caption_hold_seconds", "value"), &Hud::set_caption_hold_seconds);
 	ClassDB::bind_method(D_METHOD("get_caption_hold_seconds"), &Hud::get_caption_hold_seconds);
 	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "caption_hold_seconds"), "set_caption_hold_seconds", "get_caption_hold_seconds");
@@ -64,6 +75,8 @@ void Hud::_ready() {
 	if (prompt_label_.get() == nullptr || caption_label_.get() == nullptr || fade_rect_.get() == nullptr || notice_label_.get() == nullptr) {
 		ERR_PRINT("Hud: a label or the fade rect path is not set; part of the HUD will not show.");
 	}
+	voice_.set(voice_path_.is_empty() ? nullptr : get_node<AudioStreamPlayer>(voice_path_));
+	script_ = narration::load_script().lines;
 
 	// In code, not in the scene: the interactor is inside an instanced scene, and a scene connection
 	// from there loads from text but is silently dropped whenever the scene is packed, as export does.
@@ -72,6 +85,7 @@ void Hud::_ready() {
 		ERR_PRINT("Hud: interactor_path does not point to an Interactor; prompts and captions will not show.");
 		return;
 	}
+	interactor_.set(interactor);
 	interactor->connect("focus_changed", Callable(this, "on_focus_changed"));
 	interactor->connect("interacted", Callable(this, "on_interacted"));
 }
@@ -81,6 +95,23 @@ void Hud::_notification(int p_what) {
 	if (p_what == NOTIFICATION_UNPAUSED && !Engine::get_singleton()->is_editor_hint()) {
 		refresh_prompt();
 	}
+}
+
+// The same press that examines also cuts a line short. Hud comes after the player in the tree, so it sees the press
+// first. It lets one through only if that press would start something else, and otherwise uses it up, so that
+// skipping can never examine, and a press at something that cannot interrupt only ever skips.
+void Hud::_unhandled_input(const Ref<InputEvent> &p_event) {
+	if (Engine::get_singleton()->is_editor_hint() || !speaking_ || !p_event->is_action_pressed("interact")) {
+		return;
+	}
+	const Interactor *interactor = interactor_.get();
+	const Interactable *focus = interactor != nullptr ? interactor->get_focus() : nullptr;
+	if (focus != nullptr && focus->is_available() && focus->get_line_id() != current_line_ && current_priority_ == core::LinePriority::Optional) {
+		return;
+	}
+	print_verbose("dagon: line skipped: ", current_line_);
+	hide_caption();
+	get_viewport()->set_input_as_handled();
 }
 
 void Hud::set_input_device(int p_device) {
@@ -114,28 +145,72 @@ void Hud::refresh_prompt() {
 
 void Hud::on_interacted(Object *p_target) {
 	const Interactable *target = Object::cast_to<Interactable>(p_target);
-	if (target != nullptr && !target->get_caption().is_empty()) {
+	if (target == nullptr) {
+		return;
+	}
+	if (!target->get_line_id().is_empty()) {
+		say(target->get_line_id());
+	} else if (!target->get_caption().is_empty()) {
 		show_caption(target->get_caption());
 	}
 }
 
 void Hud::show_caption(const String &p_text) {
+	hide_caption();
+	run_caption(p_text, core::line_seconds(static_cast<std::size_t>(p_text.length()), 0.0, caption_hold_seconds_), true);
+}
+
+void Hud::say(const StringName &p_id) {
+	const String id = p_id;
+	const CharString id_text = id.utf8();
+	const core::NarrationLine *line = core::find_line(script_, id_text.get_data());
+	if (line == nullptr) {
+		ERR_PRINT(String("Hud: no line in the script has the id '") + id + "'.");
+		return;
+	}
+	const std::string current = String(current_line_).utf8().get_data();
+	if (core::decide_line(speaking_, current, current_priority_, line->id, line->priority) == core::LineDecision::Ignore) {
+		return;
+	}
+	const core::LinePriority priority = line->priority;
+	const String text = String::utf8(line->text.c_str());
+	hide_caption();
+
+	const Ref<AudioStream> stream = narration::line_audio(p_id);
+	AudioStreamPlayer *voice = voice_.get();
+	const bool voiced = stream.is_valid() && voice != nullptr;
+	if (voiced) {
+		voice->set_stream(stream);
+		voice->play();
+	}
+	speaking_ = true;
+	current_line_ = p_id;
+	current_priority_ = priority;
+	// Subtitles only ever hide what can be heard, so text with no voice always shows.
+	const bool visible = !voiced || storage::subtitles_enabled();
+	const double seconds = core::line_seconds(static_cast<std::size_t>(text.length()), voiced ? stream->get_length() : 0.0, caption_hold_seconds_);
+	print_verbose("dagon: line: ", p_id, " voiced=", voiced, " seconds=", seconds);
+	run_caption(text, seconds, visible);
+}
+
+void Hud::run_caption(const String &p_text, double p_hold_seconds, bool p_visible) {
 	Label *label = caption_label_.get();
 	if (label == nullptr) {
 		return;
 	}
-	if (caption_tween_.is_valid()) {
-		caption_tween_->kill();
-	}
-	label->set_text(p_text);
-	label->set_modulate(Color(1, 1, 1, 0));
-	label->show();
-	// Positive proof, as with the prompt.
-	print_verbose("dagon: caption: ", p_text);
 	caption_tween_ = create_tween();
-	caption_tween_->tween_property(label, "modulate:a", 1.0, CAPTION_FADE_SECONDS);
-	caption_tween_->tween_interval(caption_hold_seconds_);
-	caption_tween_->tween_property(label, "modulate:a", 0.0, CAPTION_FADE_SECONDS);
+	if (p_visible) {
+		label->set_text(p_text);
+		label->set_modulate(Color(1, 1, 1, 0));
+		label->show();
+		// Positive proof, as with the prompt.
+		print_verbose("dagon: caption: ", p_text);
+		caption_tween_->tween_property(label, "modulate:a", 1.0, CAPTION_FADE_SECONDS);
+	}
+	caption_tween_->tween_interval(p_hold_seconds);
+	if (p_visible) {
+		caption_tween_->tween_property(label, "modulate:a", 0.0, CAPTION_FADE_SECONDS);
+	}
 	caption_tween_->tween_callback(callable_mp(this, &Hud::on_caption_finished));
 }
 
@@ -150,6 +225,10 @@ void Hud::on_caption_finished() {
 	if (Label *label = caption_label_.get()) {
 		label->hide();
 	}
+	if (AudioStreamPlayer *voice = voice_.get()) {
+		voice->stop();
+	}
+	speaking_ = false;
 }
 
 void Hud::show_notice(const String &p_text) {

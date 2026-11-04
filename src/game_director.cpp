@@ -1,6 +1,7 @@
 #include "game_director.hpp"
 
 #include "global_state.hpp"
+#include "haptics.hpp"
 #include "menu_controller.hpp"
 
 #include <godot_cpp/classes/animation.hpp>
@@ -19,6 +20,7 @@ namespace {
 const char *const CLIP_AWAKEN = "monolith_awaken";
 const char *const CLIP_REVEAL = "dagon_reveal";
 const char *const CLIP_COLLAPSE = "collapse";
+const char *const LINE_MONOLITH = "monolith.first";
 
 // A clip gets its own length and this long again before the watchdog ends it.
 constexpr double WATCHDOG_MARGIN_SECONDS = 2.0;
@@ -68,6 +70,7 @@ void GameDirector::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("has_pending_event"), &GameDirector::has_pending_event);
 	ClassDB::bind_method(D_METHOD("is_recovery_pending"), &GameDirector::is_recovery_pending);
 	ClassDB::bind_method(D_METHOD("get_flee_elapsed"), &GameDirector::get_flee_elapsed);
+	ClassDB::bind_method(D_METHOD("haptic_cue", "cue"), &GameDirector::haptic_cue);
 
 #define DAGON_BIND_PATH(m_name, m_type)                                                  \
 	ClassDB::bind_method(D_METHOD("set_" #m_name, "path"), &GameDirector::set_##m_name); \
@@ -83,6 +86,7 @@ void GameDirector::_bind_methods() {
 	DAGON_BIND_PATH(monolith_gate_path, "CollisionObject2D");
 	DAGON_BIND_PATH(puzzle_path, "PuzzleController");
 	DAGON_BIND_PATH(mural_path, "Interactable");
+	DAGON_BIND_PATH(background_path, "AnimationPlayer");
 
 #undef DAGON_BIND_PATH
 
@@ -95,9 +99,12 @@ void GameDirector::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_awakened_visuals", "paths"), &GameDirector::set_awakened_visuals);
 	ClassDB::bind_method(D_METHOD("get_awakened_visuals"), &GameDirector::get_awakened_visuals);
 	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "awakened_visuals"), "set_awakened_visuals", "get_awakened_visuals");
-	ClassDB::bind_method(D_METHOD("set_mural_solved_caption", "text"), &GameDirector::set_mural_solved_caption);
-	ClassDB::bind_method(D_METHOD("get_mural_solved_caption"), &GameDirector::get_mural_solved_caption);
-	ADD_PROPERTY(PropertyInfo(Variant::STRING, "mural_solved_caption", PROPERTY_HINT_MULTILINE_TEXT), "set_mural_solved_caption", "get_mural_solved_caption");
+	ClassDB::bind_method(D_METHOD("set_background_triggers", "paths"), &GameDirector::set_background_triggers);
+	ClassDB::bind_method(D_METHOD("get_background_triggers"), &GameDirector::get_background_triggers);
+	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "background_triggers"), "set_background_triggers", "get_background_triggers");
+	ClassDB::bind_method(D_METHOD("set_mural_solved_line", "id"), &GameDirector::set_mural_solved_line);
+	ClassDB::bind_method(D_METHOD("get_mural_solved_line"), &GameDirector::get_mural_solved_line);
+	ADD_PROPERTY(PropertyInfo(Variant::STRING_NAME, "mural_solved_line"), "set_mural_solved_line", "get_mural_solved_line");
 	ClassDB::bind_method(D_METHOD("set_ending_scene", "scene"), &GameDirector::set_ending_scene);
 	ClassDB::bind_method(D_METHOD("get_ending_scene"), &GameDirector::get_ending_scene);
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "ending_scene", PROPERTY_HINT_RESOURCE_TYPE, "PackedScene"), "set_ending_scene", "get_ending_scene");
@@ -112,6 +119,7 @@ void GameDirector::_bind_methods() {
 	ADD_SIGNAL(MethodInfo("cinematic_finalized", PropertyInfo(Variant::STRING_NAME, "clip"), PropertyInfo(Variant::INT, "generation")));
 	ADD_SIGNAL(MethodInfo("overlap_rechecked", PropertyInfo(Variant::INT, "physics_frame")));
 	ADD_SIGNAL(MethodInfo("contract_error", PropertyInfo(Variant::STRING, "message")));
+	ADD_SIGNAL(MethodInfo("background_event_started", PropertyInfo(Variant::STRING_NAME, "event")));
 }
 
 void GameDirector::_ready() {
@@ -135,6 +143,7 @@ void GameDirector::_ready() {
 	camera_rig_.set(camera_rig_path_.is_empty() ? nullptr : get_node<CameraRig>(camera_rig_path_));
 	atmosphere_.set(atmosphere_path_.is_empty() ? nullptr : get_node<AnimationPlayer>(atmosphere_path_));
 	cinematics_.set(cinematics_path_.is_empty() ? nullptr : get_node<AnimationPlayer>(cinematics_path_));
+	background_.set(background_path_.is_empty() ? nullptr : get_node<AnimationPlayer>(background_path_));
 	monolith_gate_.set(monolith_gate_path_.is_empty() ? nullptr : get_node<CollisionObject2D>(monolith_gate_path_));
 	puzzle_.set(puzzle_path_.is_empty() ? nullptr : get_node<PuzzleController>(puzzle_path_));
 	mural_.set(mural_path_.is_empty() ? nullptr : get_node<Interactable>(mural_path_));
@@ -166,6 +175,17 @@ void GameDirector::_ready() {
 			ERR_PRINT("GameDirector: an entry in story_triggers does not point to a StoryTrigger.");
 		}
 		story_triggers_.push_back(trigger);
+	}
+
+	for (int i = 0; i < background_trigger_paths_.size(); i++) {
+		NodeRef<StoryTrigger> trigger;
+		trigger.set(get_node<StoryTrigger>(background_trigger_paths_[i]));
+		if (StoryTrigger *background_trigger = trigger.get()) {
+			background_trigger->connect("triggered", callable_mp(this, &GameDirector::on_background_trigger));
+		} else {
+			ERR_PRINT("GameDirector: an entry in background_triggers does not point to a StoryTrigger.");
+		}
+		background_triggers_.push_back(trigger);
 	}
 
 	if (!kill_plane_path_.is_empty()) {
@@ -203,6 +223,13 @@ void GameDirector::restore_start_beat() {
 		const String id = trigger->get_trigger_id();
 		const std::optional<core::Event> event = core::event_for_trigger(id.utf8().get_data());
 		if (event.has_value() && static_cast<int>(core::beat_after(*event)) <= start_beat_) {
+			trigger->set_enabled(false);
+		}
+	}
+	// What lies behind this checkpoint stays behind it. What lies ahead has not happened yet in this world.
+	for (const NodeRef<StoryTrigger> &reference : background_triggers_) {
+		StoryTrigger *trigger = reference.get();
+		if (trigger != nullptr && trigger->get_spent_from_beat() <= start_beat_) {
 			trigger->set_enabled(false);
 		}
 	}
@@ -258,9 +285,20 @@ void GameDirector::_process(double p_delta) {
 	}
 }
 
+void GameDirector::_notification(int p_what) {
+	if (Engine::get_singleton()->is_editor_hint()) {
+		return;
+	}
+	// A cue is never resumed: it belongs to a moment, and that moment has gone by.
+	if (p_what == NOTIFICATION_PAUSED || p_what == NOTIFICATION_EXIT_TREE) {
+		haptics::stop(input_device_);
+	}
+}
+
 void GameDirector::_physics_process(double p_delta) {
 	(void)p_delta;
-	if (Engine::get_singleton()->is_editor_hint() || !recheck_pending_ || active_.has_value()) {
+	// Starting a cinematic clears the flag, so this can never run during one.
+	if (Engine::get_singleton()->is_editor_hint() || !recheck_pending_) {
 		return;
 	}
 	const uint64_t frame = Engine::get_singleton()->get_physics_frames();
@@ -321,6 +359,28 @@ void GameDirector::on_story_trigger(const StringName &p_trigger_id) {
 	}
 }
 
+// Presentation only: nothing waits on these, and nothing depends on them. One at a time, and none during a cinematic.
+// A trigger met at such a moment stays armed for the next time the player crosses it.
+void GameDirector::on_background_trigger(const StringName &p_trigger_id) {
+	AnimationPlayer *background = background_.get();
+	if (active_.has_value() || background == nullptr || background->is_playing()) {
+		return;
+	}
+	if (!background->has_animation(p_trigger_id)) {
+		ERR_PRINT(String("GameDirector: no background clip for the trigger '") + String(p_trigger_id) + "'.");
+		return;
+	}
+	for (const NodeRef<StoryTrigger> &reference : background_triggers_) {
+		StoryTrigger *trigger = reference.get();
+		if (trigger != nullptr && trigger->get_trigger_id() == p_trigger_id) {
+			trigger->set_enabled(false);
+		}
+	}
+	print_verbose("dagon: background event: ", p_trigger_id);
+	emit_signal("background_event_started", p_trigger_id);
+	background->play(p_trigger_id);
+}
+
 void GameDirector::on_puzzle_solved() {
 	process_event(core::Event::PuzzleSolved, EventSource::Internal);
 }
@@ -372,6 +432,12 @@ void GameDirector::enter_beat(core::Beat p_beat) {
 			play_atmosphere(p_beat, false);
 			apply_outcome(p_beat);
 			emit_signal("checkpoint_reached", static_cast<int>(p_beat));
+			// Only here, on the way in. A world restored at this beat does not come through this path.
+			if (p_beat == core::Beat::Monolith) {
+				if (Hud *hud = hud_.get()) {
+					hud->say(LINE_MONOLITH);
+				}
+			}
 			schedule_recheck();
 			break;
 		case core::Beat::Awakened:
@@ -400,7 +466,7 @@ void GameDirector::apply_outcome(core::Beat p_beat) {
 				puzzle->restore_solved();
 			}
 			if (Interactable *mural = mural_.get()) {
-				mural->set_caption(mural_solved_caption_);
+				mural->use_line(mural_solved_line_);
 			}
 			for (const NodeRef<CanvasItem> &reference : awakened_visuals_) {
 				if (CanvasItem *visual = reference.get()) {
@@ -412,6 +478,10 @@ void GameDirector::apply_outcome(core::Beat p_beat) {
 		case core::Beat::Fleeing:
 			set_player_control(true);
 			flee_elapsed_ = 0.0;
+			// The cue to run: he turns back the way he came, and the camera leads that way.
+			if (PlayerController *player = player_.get()) {
+				player->face(-1);
+			}
 			break;
 		case core::Beat::Shore:
 		case core::Beat::Abyss:
@@ -609,7 +679,14 @@ void GameDirector::fade_in() {
 	}
 }
 
+void GameDirector::haptic_cue(const StringName &p_cue) {
+	haptics::play(input_device_, p_cue);
+}
+
 void GameDirector::set_input_device(int p_device) {
+	if (p_device != input_device_) {
+		haptics::stop(input_device_);
+	}
 	input_device_ = p_device;
 	if (Hud *hud = hud_.get()) {
 		hud->set_input_device(p_device);

@@ -1,5 +1,7 @@
 #include "interactable.hpp"
 
+#include "narration.hpp"
+
 #include <godot_cpp/classes/engine.hpp>
 #include <godot_cpp/core/class_db.hpp>
 
@@ -10,6 +12,7 @@ namespace dagon {
 void Interactable::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("try_interact"), &Interactable::try_interact);
 	ClassDB::bind_method(D_METHOD("is_available"), &Interactable::is_available);
+	ClassDB::bind_method(D_METHOD("use_line", "id"), &Interactable::use_line);
 
 	ClassDB::bind_method(D_METHOD("set_interaction_id", "value"), &Interactable::set_interaction_id);
 	ClassDB::bind_method(D_METHOD("get_interaction_id"), &Interactable::get_interaction_id);
@@ -20,6 +23,9 @@ void Interactable::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_caption", "value"), &Interactable::set_caption);
 	ClassDB::bind_method(D_METHOD("get_caption"), &Interactable::get_caption);
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "caption", PROPERTY_HINT_MULTILINE_TEXT), "set_caption", "get_caption");
+	ClassDB::bind_method(D_METHOD("set_line_id", "value"), &Interactable::set_line_id);
+	ClassDB::bind_method(D_METHOD("get_line_id"), &Interactable::get_line_id);
+	ADD_PROPERTY(PropertyInfo(Variant::STRING_NAME, "line_id"), "set_line_id", "get_line_id");
 	ClassDB::bind_method(D_METHOD("set_one_shot", "value"), &Interactable::set_one_shot);
 	ClassDB::bind_method(D_METHOD("is_one_shot"), &Interactable::is_one_shot);
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "one_shot"), "set_one_shot", "is_one_shot");
@@ -31,6 +37,17 @@ void Interactable::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "cooldown"), "set_cooldown", "get_cooldown");
 
 	ADD_SIGNAL(MethodInfo("interacted", PropertyInfo(Variant::STRING_NAME, "interaction_id")));
+}
+
+void Interactable::_ready() {
+	if (!Engine::get_singleton()->is_editor_hint() && !line_id_.is_empty()) {
+		caption_ = narration::line_text(line_id_);
+	}
+}
+
+void Interactable::use_line(const StringName &p_id) {
+	caption_ = narration::line_text(p_id);
+	line_id_ = p_id;
 }
 
 void Interactable::_physics_process(double p_delta) {
