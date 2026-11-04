@@ -36,6 +36,9 @@ size = Vector2(10, 30)
 [sub_resource type="RectangleShape2D" id="talisman_shape"]
 size = Vector2(18, 10)
 
+[sub_resource type="RectangleShape2D" id="low_tablet_shape"]
+size = Vector2(26, 12)
+
 [sub_resource type="RectangleShape2D" id="prop_shape"]
 size = Vector2(44, 28)
 
@@ -146,8 +149,8 @@ tracks/1/path = NodePath("CameraRig")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0.1, 2.5, 5, 7.5),
-"transitions": PackedFloat32Array(1, 1, 1, 1),
+"times": PackedFloat32Array(0.1, 0.8, 2.6, 5.4, 7.5),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
 "values": [{
 "args": [0.7],
 "method": &"add_trauma"
@@ -155,12 +158,87 @@ tracks/1/keys = {
 "args": [0.5],
 "method": &"add_trauma"
 }, {
-"args": [0.5],
+"args": [0.6],
+"method": &"add_trauma"
+}, {
+"args": [0.6],
 "method": &"add_trauma"
 }, {
 "args": [0.4],
 "method": &"add_trauma"
 }]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Rockfall/RockNear:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.35, 0.8),
+"transitions": PackedFloat32Array(1, 2.5, 1),
+"update": 0,
+"values": [Vector2(4212, -320), Vector2(4212, -320), Vector2(4212, 0)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Rockfall/DustNear:modulate")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0.79, 0.8, 1.8),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 0.7), Color(1, 1, 1, 0)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Rockfall/RockMid:position")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 2.15, 2.6),
+"transitions": PackedFloat32Array(1, 2.5, 1),
+"update": 0,
+"values": [Vector2(4035, -320), Vector2(4035, -320), Vector2(4035, 0)]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Rockfall/DustMid:modulate")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(2.59, 2.6, 3.6),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 0.7), Color(1, 1, 1, 0)]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("Rockfall/RockFar:position")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0, 4.95, 5.4),
+"transitions": PackedFloat32Array(1, 2.5, 1),
+"update": 0,
+"values": [Vector2(3838, -320), Vector2(3838, -320), Vector2(3838, 0)]
+}
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("Rockfall/DustFar:modulate")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(5.39, 5.4, 6.4),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 0.7), Color(1, 1, 1, 0)]
 }
 
 [sub_resource type="Animation" id="clip_monolith_awaken"]
@@ -557,7 +635,7 @@ tracks/19/keys = {
 
 [sub_resource type="Animation" id="clip_collapse"]
 resource_name = "collapse"
-length = 5
+length = 6
 tracks/0/type = "method"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -629,7 +707,7 @@ tracks/5/path = NodePath("Hud/Fade:visible")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
-"times": PackedFloat32Array(2.8),
+"times": PackedFloat32Array(4.3),
 "transitions": PackedFloat32Array(1),
 "update": 1,
 "values": [true]
@@ -641,10 +719,48 @@ tracks/6/path = NodePath("Hud/Fade:modulate")
 tracks/6/interp = 1
 tracks/6/loop_wrap = true
 tracks/6/keys = {
-"times": PackedFloat32Array(2.8, 4.6),
+"times": PackedFloat32Array(4.3, 5.8),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("ReturningSea:visible")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(2.5),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/8/type = "value"
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/path = NodePath("ReturningSea/Water:position")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/keys = {
+"times": PackedFloat32Array(2.5, 3.3, 4.2, 5.2),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(40, 300), Vector2(14, 232), Vector2(-16, 150), Vector2(-40, -20)]
+}
+tracks/9/type = "method"
+tracks/9/imported = false
+tracks/9/enabled = true
+tracks/9/path = NodePath("CameraRig")
+tracks/9/interp = 1
+tracks/9/loop_wrap = true
+tracks/9/keys = {
+"times": PackedFloat32Array(2.5),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [0.35],
+"method": &"add_trauma"
+}]
 }
 
 [sub_resource type="AnimationLibrary" id="atmosphere_library"]
@@ -1091,7 +1207,7 @@ collision_layer = 1
 collision_mask = 0
 
 [node name="Ground" type="CollisionPolygon2D" parent="Terrain"]
-polygon = PackedVector2Array(0, -300, 24, -300, 24, 0, 200, 0, 200, -14, 240, -14, 240, 0, 360, 0, 420, -10, 480, -10, 540, 0, 640, 0, 640, 14, 710, 14, 710, 0, 900, 0, 900, -12, 930, -12, 930, -22, 980, -22, 980, 0, 1420, 0, 1480, -10, 1540, -10, 1600, 0, 2150, 0, 2150, 18, 2176, 18, 2176, 0, 2780, 0, 2780, -14, 2812, -14, 2812, 0, 3004, 0, 3004, -14, 3036, -14, 3036, 0, 3380, 0, 3380, -14, 3410, -14, 3410, 0, 3584, 0, 3584, -14, 3612, -14, 3612, 0, 4520, 0, 4520, -300, 4544, -300, 4544, 60, 0, 60)
+polygon = PackedVector2Array(0, -300, 24, -300, 24, 0, 200, 0, 200, -14, 240, -14, 240, 0, 360, 0, 420, -10, 480, -10, 540, 0, 640, 0, 640, 14, 710, 14, 710, 0, 900, 0, 900, -12, 930, -12, 930, -22, 980, -22, 980, 0, 1420, 0, 1480, -10, 1540, -10, 1600, 0, 2150, 0, 2150, 18, 2176, 18, 2176, 0, 2780, 0, 2780, -14, 2812, -14, 2812, 0, 3004, 0, 3004, -14, 3036, -14, 3036, 0, 3584, 0, 3584, -14, 3612, -14, 3612, 0, 4520, 0, 4520, -300, 4544, -300, 4544, 60, 0, 60)
 
 [node name="Art" type="Sprite2D" parent="Terrain"]
 position = Vector2(0, -220)
@@ -1100,7 +1216,7 @@ centered = false
 
 [node name="GreyboxGround" type="Polygon2D" parent="Terrain"]
 color = Color(0.2, 0.24, 0.28, 1)
-polygon = PackedVector2Array(640, 0, 640, 14, 710, 14, 710, 0, 900, 0, 900, -12, 930, -12, 930, -22, 980, -22, 980, 0, 1420, 0, 1480, -10, 1540, -10, 1600, 0, 2150, 0, 2150, 18, 2176, 18, 2176, 0, 2780, 0, 2780, -14, 2812, -14, 2812, 0, 3004, 0, 3004, -14, 3036, -14, 3036, 0, 3380, 0, 3380, -14, 3410, -14, 3410, 0, 3584, 0, 3584, -14, 3612, -14, 3612, 0, 4520, 0, 4520, -300, 4544, -300, 4544, 60, 640, 60)
+polygon = PackedVector2Array(640, 0, 640, 14, 710, 14, 710, 0, 900, 0, 900, -12, 930, -12, 930, -22, 980, -22, 980, 0, 1420, 0, 1480, -10, 1540, -10, 1600, 0, 2150, 0, 2150, 18, 2176, 18, 2176, 0, 2780, 0, 2780, -14, 2812, -14, 2812, 0, 3004, 0, 3004, -14, 3036, -14, 3036, 0, 3584, 0, 3584, -14, 3612, -14, 3612, 0, 4520, 0, 4520, -300, 4544, -300, 4544, 60, 640, 60)
 
 [node name="Boat" type="Sprite2D" parent="."]
 position = Vector2(40, -43)
@@ -1213,7 +1329,7 @@ color = Color(0.26, 0.28, 0.29, 1)
 polygon = PackedVector2Array(-16, -16, -9, -19, -6, -14, -13, -11)
 
 [node name="TabletKneel" type="Interactable" parent="Props"]
-position = Vector2(2380, -14)
+position = Vector2(2848, -14)
 collision_layer = 4
 collision_mask = 0
 monitoring = false
@@ -1221,15 +1337,18 @@ interaction_id = &"tablet_kneel"
 line_id = &"abyss.tablet_kneel"
 
 [node name="Shape" type="CollisionShape2D" parent="Props/TabletKneel"]
-shape = SubResource("prop_shape")
+position = Vector2(0, 6)
+shape = SubResource("low_tablet_shape")
 
 [node name="Art" type="Polygon2D" parent="Props/TabletKneel"]
 position = Vector2(0, 14)
+scale = Vector2(0.78, 0.78)
 color = Color(0.3, 0.34, 0.38, 1)
 polygon = PackedVector2Array(-11, 0, -12, -27, -7, -33, 7, -33, 12, -27, 11, 0)
 
 [node name="Mark" type="Polygon2D" parent="Props/TabletKneel"]
 position = Vector2(0, 14)
+scale = Vector2(0.78, 0.78)
 color = Color(0.62, 0.72, 0.72, 1)
 polygon = PackedVector2Array(-7, -9, -7, -12, -3, -12, 0, -18, 3, -21, 7, -22, 8, -18, 5, -15, 2, -13, 0, -9)
 
@@ -1250,7 +1369,7 @@ color = Color(0.26, 0.28, 0.29, 1)
 polygon = PackedVector2Array(-16, 0, -19, -3, -10, -5, -7, -11, -4, -5, 0, -12, 4, -5, 8, -10, 10, -5, 18, -3, 15, 0)
 
 [node name="TabletEye" type="Interactable" parent="Props"]
-position = Vector2(3240, -14)
+position = Vector2(3445, -56)
 collision_layer = 4
 collision_mask = 0
 monitoring = false
@@ -1261,17 +1380,17 @@ line_id = &"abyss.tablet_eye"
 shape = SubResource("prop_shape")
 
 [node name="Art" type="Polygon2D" parent="Props/TabletEye"]
-position = Vector2(0, 14)
+position = Vector2(0, 20)
 color = Color(0.3, 0.34, 0.38, 1)
 polygon = PackedVector2Array(-11, 0, -12, -27, -7, -33, 7, -33, 12, -27, 11, 0)
 
 [node name="Mark" type="Polygon2D" parent="Props/TabletEye"]
-position = Vector2(0, 14)
+position = Vector2(0, 20)
 color = Color(0.62, 0.72, 0.72, 1)
 polygon = PackedVector2Array(-9, -18, -4, -23, 4, -23, 9, -18, 4, -13, -4, -13)
 
 [node name="Pupil" type="Polygon2D" parent="Props/TabletEye"]
-position = Vector2(0, 14)
+position = Vector2(0, 20)
 color = Color(0.3, 0.34, 0.38, 1)
 polygon = PackedVector2Array(-2, -20, 2, -20, 2, -16, -2, -16)
 
@@ -1622,6 +1741,53 @@ polygon = PackedVector2Array(3424, -36, 3570, -36, 3570, -28, 3424, -28)
 color = Color(0.2, 0.24, 0.28, 1)
 polygon = PackedVector2Array(3424, -36, 3570, -36, 3568, -28, 3426, -28)
 
+[node name="Rockfall" type="StaticBody2D" parent="."]
+visible = false
+collision_layer = 0
+collision_mask = 0
+
+[node name="ShapeNear" type="CollisionPolygon2D" parent="Rockfall"]
+polygon = PackedVector2Array(4196, 0, 4198, -8, 4206, -15, 4217, -14, 4225, -9, 4228, 0)
+
+[node name="RockNear" type="Polygon2D" parent="Rockfall"]
+position = Vector2(4212, 0)
+color = Color(0.3, 0.34, 0.38, 1)
+polygon = PackedVector2Array(-16, 0, -14, -8, -6, -15, 5, -14, 13, -9, 16, 0)
+
+[node name="DustNear" type="Polygon2D" parent="Rockfall"]
+modulate = Color(1, 1, 1, 0)
+position = Vector2(4212, 0)
+color = Color(0.55, 0.58, 0.58, 1)
+polygon = PackedVector2Array(-30, 0, -24, -9, -10, -14, 10, -14, 24, -9, 30, 0)
+
+[node name="ShapeMid" type="CollisionPolygon2D" parent="Rockfall"]
+polygon = PackedVector2Array(4017, 0, 4020, -10, 4028, -16, 4039, -13, 4046, -15, 4051, -7, 4053, 0)
+
+[node name="RockMid" type="Polygon2D" parent="Rockfall"]
+position = Vector2(4035, 0)
+color = Color(0.3, 0.34, 0.38, 1)
+polygon = PackedVector2Array(-18, 0, -15, -10, -7, -16, 4, -13, 11, -15, 16, -7, 18, 0)
+
+[node name="DustMid" type="Polygon2D" parent="Rockfall"]
+modulate = Color(1, 1, 1, 0)
+position = Vector2(4035, 0)
+color = Color(0.55, 0.58, 0.58, 1)
+polygon = PackedVector2Array(-30, 0, -24, -9, -10, -14, 10, -14, 24, -9, 30, 0)
+
+[node name="ShapeFar" type="CollisionPolygon2D" parent="Rockfall"]
+polygon = PackedVector2Array(3821, 0, 3822, -7, 3830, -14, 3840, -16, 3850, -11, 3855, 0)
+
+[node name="RockFar" type="Polygon2D" parent="Rockfall"]
+position = Vector2(3838, 0)
+color = Color(0.3, 0.34, 0.38, 1)
+polygon = PackedVector2Array(-17, 0, -16, -7, -8, -14, 2, -16, 12, -11, 17, 0)
+
+[node name="DustFar" type="Polygon2D" parent="Rockfall"]
+modulate = Color(1, 1, 1, 0)
+position = Vector2(3838, 0)
+color = Color(0.55, 0.58, 0.58, 1)
+polygon = PackedVector2Array(-30, 0, -24, -9, -10, -14, 10, -14, 24, -9, 30, 0)
+
 [node name="Talisman" type="Sprite2D" parent="."]
 light_mask = 2
 position = Vector2(342, -9)
@@ -1760,6 +1926,19 @@ position = Vector2(4150, -30)
 [node name="Reveal" type="Marker2D" parent="CameraMarks"]
 position = Vector2(4304, -30)
 
+[node name="ReturningSea" type="CanvasLayer" parent="."]
+layer = 4
+visible = false
+
+[node name="Water" type="Polygon2D" parent="ReturningSea"]
+position = Vector2(40, 300)
+color = Color(0.02, 0.05, 0.07, 0.96)
+polygon = PackedVector2Array(-40, 0, 40, -7, 120, -1, 200, -8, 280, -2, 360, -7, 440, -1, 520, -6, 520, 340, -40, 340)
+
+[node name="Foam" type="Polygon2D" parent="ReturningSea/Water"]
+color = Color(0.4, 0.54, 0.54, 0.85)
+polygon = PackedVector2Array(-40, 0, 40, -7, 120, -1, 200, -8, 280, -2, 360, -7, 440, -1, 520, -6, 520, -2, 440, 4, 360, -2, 280, 3, 200, -3, 120, 4, 40, -2, -40, 4)
+
 [node name="Hud" parent="." instance=ExtResource("12_hud")]
 interactor_path = NodePath("../Player/Interactor")
 
@@ -1782,6 +1961,7 @@ cinematics_path = NodePath("../Cinematics")
 background_path = NodePath("../Background")
 background_triggers = [NodePath("../Triggers/RitualSight"), NodePath("../Triggers/WatcherSight"), NodePath("../Triggers/CanyonSight")]
 monolith_gate_path = NodePath("../Monolith/Gate")
+rockfall_path = NodePath("../Rockfall")
 puzzle_path = NodePath("../Monolith/Puzzle")
 mural_path = NodePath("../Monolith/Mural")
 checkpoints = [NodePath("../Checkpoints/Shore"), NodePath("../Checkpoints/PastTheTrench"), NodePath("../Checkpoints/Monolith"), NodePath("../Checkpoints/Awakened")]

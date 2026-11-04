@@ -45,6 +45,8 @@ starts only after M6 is green, and is time-boxed.
 
 **If it still does not fit, the owner chooses** between a later date, which the jam allows until 1 December, and cutting more. Key rebinding and save support are never removed silently (D28).
 
+**The owner played the M3 build on 2026-11-04 and did not accept it** ([record](evidence/m3/owner-playtest-2026-11-04.md)). The three small changes that fit M3's scope are D67–D69. **A proposal that goes beyond that scope, with its cost to this schedule, is in the [package](reviews/m3-review-package.md) §12, and waits for the owner.** Nothing in the table above has been moved because of it.
+
 **Who delivers what, as the owner set out on 2026-11-04:**
 
 | | M3 (this milestone) | M4 and M5 |
@@ -53,7 +55,7 @@ starts only after M6 is green, and is time-boxed.
 | Narrative | Props, captions, and background-event logic | Final ritual imagery |
 | Reveal | Readable placeholder reveal, timing and collapse | Final Dagon art, animation, lighting and effects |
 | Controller | Vibration behaviour and settings | Tuning by feel, with the owner |
-| Narration | Playback and subtitle integration, and three voice samples for review | Approved final narration |
+| Narration | Playback and subtitle integration, and three voice samples for direction. **The owner finds them noticeably synthetic, so a direction is still to be chosen** | Approved final narration |
 | Audio | None beyond the samples | Music, ambience, footsteps, interaction and cinematic sounds, and the complete mix |
 | Persistence | Save and restore correctness, with focused regression coverage | Kept green |
 

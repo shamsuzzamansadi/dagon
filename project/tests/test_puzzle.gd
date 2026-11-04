@@ -311,6 +311,8 @@ func test_each_tablet_shows_its_own_line_in_the_story_order(h) -> void:
 		h.check(tablets[pair[0]].caption.contains(pair[1]), "tablet %d reads '%s'" % [pair[0], tablets[pair[0]].caption])
 		h.check(not tablets[pair[0]].one_shot, "a tablet is one-shot")
 	for tablet in tablets:
-		await h.stand_at(_player(h), Vector2(tablet.global_position.x, -2))
+		# The third stands up on the shelf.
+		var y := -38.0 if tablet.name == "TabletEye" else -2.0
+		await h.stand_at(_player(h), Vector2(tablet.global_position.x, y))
 		await h.tap_key(KEY_E)
 		h.check(_caption(h).text == tablet.caption, "at %s the caption reads '%s'" % [tablet.name, _caption(h).text])

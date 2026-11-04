@@ -11,7 +11,9 @@ const SPOTS := [
 	["act2-crevasse", 2120.0, -40.0],
 	["act2-shelf-from-below", 2908.0, -6.0],
 	["act2-shelf-from-above", 2940.0, -60.0],
-	["act2-third-tablet", 3240.0, -40.0],
+	["act2-second-tablet-in-the-recess", 2848.0, -6.0],
+	["act3-third-tablet-seen-from-below", 3360.0, -6.0],
+	["act3-third-tablet-on-the-shelf", 3470.0, -60.0],
 	["act3-shelf-statue", 3490.0, -60.0],
 	["act3-mural-before", 3898.0, -40.0],
 	["act3-stones-and-statues", 4060.0, -40.0],
@@ -31,8 +33,13 @@ const STILLS := [
 	["reveal-3-hand-comes-down", "Cinematics", &"dagon_reveal", 7.2, Vector2(4420, -2)],
 	["reveal-4-eye-opens", "Cinematics", &"dagon_reveal", 10.0, Vector2(4420, -2)],
 	["reveal-5-head-turns", "Cinematics", &"dagon_reveal", 12.4, Vector2(4420, -2)],
+	["flee-1-rock-coming-down", "Atmosphere", &"beat_fleeing", 0.65, Vector2(4364, -2)],
+	["flee-2-rock-across-the-way", "Atmosphere", &"beat_fleeing", 2.8, Vector2(4240, -2)],
+	["flee-3-the-last-rock", "Atmosphere", &"beat_fleeing", 5.6, Vector2(3990, -2)],
 	["collapse-1-falling", "Cinematics", &"collapse", 1.0, Vector2(3760, -2)],
-	["collapse-2-lying-still", "Cinematics", &"collapse", 2.6, Vector2(3760, -2)],
+	["collapse-2-lying-still", "Cinematics", &"collapse", 2.4, Vector2(3760, -2)],
+	["collapse-3-the-sea-comes", "Cinematics", &"collapse", 3.6, Vector2(3760, -2)],
+	["collapse-4-the-sea-over-him", "Cinematics", &"collapse", 4.5, Vector2(3760, -2)],
 ]
 
 
@@ -79,8 +86,11 @@ func _run() -> void:
 
 func _show_as_it_would_be(world: Node, still: Array) -> void:
 	var clip := String(still[2])
-	if clip == "dagon_reveal" or clip == "collapse" or clip == "monolith_awaken":
+	if clip == "dagon_reveal" or clip == "collapse" or clip == "monolith_awaken" or clip == "beat_fleeing":
 		world.get_node("Monolith/Gate").hide()
+	if clip == "beat_fleeing":
+		world.get_node("Rockfall").show()
+		world.get_node("Rockfall").set_deferred("collision_layer", 1)
 
 
 func _save(out: String, shot: String) -> void:

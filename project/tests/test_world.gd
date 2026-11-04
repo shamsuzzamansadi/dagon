@@ -139,7 +139,13 @@ func test_running_left_from_the_witness_reaches_collapse_in_eight_to_ten_seconds
 	await h.steps(4)
 	var frames := 0
 	h.send(h.key_event(KEY_A, true))
+	# Hopping only on meeting each rock, as someone seeing it late would.
 	while player.global_position.x > COLLAPSE_X and frames < 1000:
+		if player.is_on_wall() and player.is_on_floor():
+			h.send(h.key_event(KEY_SPACE, true))
+			await h.steps(10)
+			h.send(h.key_event(KEY_SPACE, false))
+			frames += 10
 		await h.steps(1)
 		frames += 1
 	h.send(h.key_event(KEY_A, false))
@@ -239,8 +245,8 @@ func test_nothing_in_a_clip_is_left_out_of_the_acts_and_the_acts_are_in_order(h)
 		world.get_node("Props/FossilA").global_position.x,
 		world.get_node("Props/TabletWave").global_position.x,
 		world.get_node("Props/FossilB").global_position.x,
-		world.get_node("Props/TabletKneel").global_position.x,
 		world.get_node("Props/Footprint").global_position.x,
+		world.get_node("Props/TabletKneel").global_position.x,
 		world.get_node("Props/TabletEye").global_position.x,
 		world.get_node("Triggers/ReachMonolith").global_position.x,
 		world.get_node("Checkpoints/Monolith").global_position.x,

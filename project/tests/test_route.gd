@@ -96,8 +96,10 @@ func test_the_whole_game_can_be_played_from_new_game_to_the_ending_and_back_to_a
 	h.check(beats == [1, 2, 3], "up to the stones, the beats ran %s" % str(beats))
 	h.check(clips.has(&"collapse crossed"), "the way out did not cross collapse")
 	h.check(route.world().get_node("Triggers/Collapse").enabled, "the outbound crossing consumed collapse")
-	for id in [&"lifeboat", &"fish", &"fossil_a", &"tablet_wave", &"fossil_b", &"tablet_kneel", &"footprint", &"tablet_eye", &"mural"]:
+	# Along the ground. The third tablet is up on a shelf, and this walk does not need it.
+	for id in [&"lifeboat", &"fish", &"fossil_a", &"tablet_wave", &"fossil_b", &"footprint", &"tablet_kneel", &"mural"]:
 		h.check(route.captions.has(id), "the walk never offered %s" % id)
+	h.check(not route.captions.has(&"tablet_eye"), "the ground walk reached the tablet on the shelf")
 	h.check(route.captions.get(&"tablet_wave", "").contains("The waters rose first"), "the first tablet read '%s'" % route.captions.get(&"tablet_wave", ""))
 	h.check(route.captions.get(&"mural", "").contains("Ruins"), "the mural first read '%s'" % route.captions.get(&"mural", ""))
 
@@ -326,7 +328,7 @@ func test_the_device_in_use_carries_through_the_ending_to_the_main_menu(h) -> vo
 	h.send(h.pad_event(JOY_BUTTON_DPAD_RIGHT, true))
 	await h.wait_until(func() -> bool: return not route.player().is_control_enabled(), 300, "the walk into the reveal")
 	h.send(h.pad_event(JOY_BUTTON_DPAD_RIGHT, false))
-	var ending: Node = await h.wait_for_scene("MenuController", 1200)
+	var ending: Node = await h.wait_for_scene("MenuController", 1500)
 	h.check(ending.get_active_device() == 0, "the ending has device %d" % ending.get_active_device())
 	for i in ending.ending_lines.size() + 1:
 		await h.tap_pad(JOY_BUTTON_A)

@@ -270,3 +270,14 @@ Owner's feedback on the first M3 build: too short, too mechanically linear, an a
 - **D29:** the owner has since tried a physical Xbox controller, with positive feedback for the controls they exercised
   ([record](evidence/m2/xbox-feedback-2026-11-03.md)). Everything else about physical controllers stays pending, including all
   PlayStation hardware. Testing a controller on Windows says nothing about Xbox or PlayStation console platforms, which are not targets.
+
+## 10. After the owner's playtest (2026-11-04, for the M3 review)
+
+The owner's feedback is [recorded](evidence/m3/owner-playtest-2026-11-04.md). **These three changes stay inside M3's approved scope, use only existing verbs, and add no text and no walking. They do not claim to answer that feedback in full:** the [package](reviews/m3-review-package.md) says what remains, and proposes the rest.
+
+| ID | Choice | Why |
+|---|---|---|
+| D67 | **The second and third tablets move off the main line,** replacing D56's "required clues stay on the ground". The second is in the recess under the first shelf, and the third on the second shelf, which now has one way up, from its far end | With every clue on the way, the shelves held only lore, and the owner said optional lore does not count as activity. Now where you go decides what you know at the stones. Nothing can block: the mural's fragments show the order, trial and error always finishes, and the way back is open (GDD §5) |
+| D68 | **Rock comes down across the way back when the flee begins.** Three low falls of rock, hopped like the rocks the player already knows. `GameDirector` gives them collision and shows them, so a missing clip changes nothing but the sight of them falling. Each lands before someone running flat out could be under it, and a test holds it to that | The escape was holding one direction for 9.4 s, with nothing to do. It is still never a fail state: both ends, and the one ending, stay as the owner asked. No saved state: a restart rebuilds the world without it |
+| D69 | **The sea comes back over him, then the fade.** A screen-space layer rises in the `collapse` clip, which grows from 5 s to 6 s. It is a picture only, as a clip must be | The ending was a fall and a fade. This connects the collapse to the epilogue's first line, "They found me in the shallows", and the theme: the sea drawn back has returned. It costs no new system. M5 replaces the placeholder |
+

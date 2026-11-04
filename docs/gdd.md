@@ -75,9 +75,9 @@ far shorter, because timing is set later by adding content, not walking (risk R1
 | The Shore | A **talisman**, washed up beyond the fish, with the mark on it. One prop and one caption, and nothing is collected | Nothing is lost |
 | The cave beyond the entrance | The same mark, **cut into the wall** and kept clean | Nothing is lost |
 | Where the cave opens | A **distant ritual:** kneeling figures among stones around the mark, and one standing figure that turns and moves off. About 13 seconds, at a distance, and never a threat. The stones stay when the figures have gone | The stones are still there. No clue depends on it |
-| The first shelf (Act II) | A **route choice.** Below: a recess, with a procession carved walking to the sea. Above: a cairn looking back the way you came, and a **watcher** on the far ridge, seen only from there | The way on is the same. Both rejoin |
-| The second shelf (Act III) | A **route choice.** Above: a kneeling statue, its head wrong. Below: the quicker way. On either, a **figure crosses** the canyon ahead | Both rejoin |
-| The three tablets | The clues, always on the ground, on the way | Cannot be missed by walking on |
+| The first shelf (Act II) | A **route choice with a stake.** Below: a recess, with a procession carved walking to the sea, **and the second tablet.** Above: a cairn looking back the way you came, and a **watcher** on the far ridge, seen only from there | Both rejoin. The second tablet can be gone back for, or the order worked out without it |
+| The second shelf (Act III) | **A slab seen from below, with no way up on this side.** Walk under it, find the rock at the far end, and come back along the shelf to **the third tablet,** past a kneeling statue with its head wrong. Below: the quicker way. On either, a **figure crosses** the canyon ahead | The way on is open. The third tablet can be gone back for, or the order worked out without it |
+| The three tablets | **The first on the way, the second in the recess, the third on the shelf,** so that where you go decides what you know. "A third slab" tells a player who missed one that there is one to go back for | The mural's fragments show the order, and trial and error always finishes the puzzle (§5) |
 | The monolith | Statues kneeling at its foot, and the mural. **Solving changes the mural in picture and caption:** a vast swimmer, rows of figures bowing, and the mark above them, with the statues' eyes lit | |
 | The reveal | The far ridge seen from the monolith on turns out to be the creature's shoulder | |
 | The epilogue | The mark again, in a shop window in **Innsmouth,** years on, suggesting a larger world. Our addition, which needs no knowledge of Lovecraft | |
@@ -90,10 +90,10 @@ back over the same ground.
 **Flee rules (still one ending):**
 - The way right is the trench edge, a solid rock wall, so moving the wrong way
   just presses against it.
-- Running left reaches the collapse point in about 8–10 s.
+- Running left reaches the collapse point in about 8–10 s, **hopping over three falls of rock** that come down across the ground he walked in on. They are as high as the rocks he has been hopping onto, and can be crossed either way. Stopping at one costs time, and nothing else.
 - If the player waits or keeps pushing the wrong way, the sailor collapses
   where he stands after 12 s (tunable).
-- Both cases play the same collapse and the same ending.
+- Both cases play the same collapse and the same ending: he falls, **and the sea comes back over him** before the fade ("They found me in the shallows").
 
 ## 5. Monolith puzzle
 
@@ -115,10 +115,12 @@ same place, reads differently:
   vast swimmer. The caption swap is part of the Awakened beat's essential
   outcome, so a missing clip cannot leave the mural unchanged.
 
-**Clues.** The three Act II tablets each show one glyph, with a short examine
+**Clues.** The three tablets each show one glyph, with a short examine
 line ("The waters rose first…", "…and they bowed…", "…and He saw them.").
 The mural's surviving fragments show the same order faintly. A player who
 skipped the tablets can still solve it.
+
+**Where they are.** The first is on the way. The second is in the recess under the first shelf, and cannot be read from above. The third is on the second shelf, reached from its far end, and cannot be read from below. So a route choice decides what the player knows at the stones, and exploring does something beyond adding lore.
 
 **Rules**
 - Press a stone (Interact). Correct next stone: it lights teal with a soft tone.
@@ -144,7 +146,7 @@ skipped the tablets can still solve it.
 | I   | Talisman              | no       | The mark, first seen. Nothing is collected |
 | II  | Cave carving          | no       | The mark, kept clean    |
 | II  | Fossil A, Fossil B    | no       | Escalation              |
-| II  | Clue tablets ×3       | no       | Puzzle clues            |
+| II  | Clue tablets ×3, across both routes | no | Puzzle clues |
 | II  | Footprint (webbed)    | no       | Dread                   |
 | II  | Relief, in the recess below the shelf | no | Worship, on the low route |
 | II  | Cairn, on the shelf   | no       | Someone watched, on the high route |

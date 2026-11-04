@@ -24,6 +24,7 @@ const char *const LINE_MONOLITH = "monolith.first";
 
 // A clip gets its own length and this long again before the watchdog ends it.
 constexpr double WATCHDOG_MARGIN_SECONDS = 2.0;
+constexpr int WORLD_COLLISION_LAYER = 1;
 
 // Measured on 4.7.2 (docs/evidence/m3/overlap-latency.txt). A body moved in the physics phase of frame F is in the
 // overlap list at F + 2. One moved in the idle phase of F, which is where a clip ends, is only there at F + 3, as
@@ -84,6 +85,7 @@ void GameDirector::_bind_methods() {
 	DAGON_BIND_PATH(atmosphere_path, "AnimationPlayer");
 	DAGON_BIND_PATH(cinematics_path, "AnimationPlayer");
 	DAGON_BIND_PATH(monolith_gate_path, "CollisionObject2D");
+	DAGON_BIND_PATH(rockfall_path, "CollisionObject2D");
 	DAGON_BIND_PATH(puzzle_path, "PuzzleController");
 	DAGON_BIND_PATH(mural_path, "Interactable");
 	DAGON_BIND_PATH(background_path, "AnimationPlayer");
@@ -145,6 +147,7 @@ void GameDirector::_ready() {
 	cinematics_.set(cinematics_path_.is_empty() ? nullptr : get_node<AnimationPlayer>(cinematics_path_));
 	background_.set(background_path_.is_empty() ? nullptr : get_node<AnimationPlayer>(background_path_));
 	monolith_gate_.set(monolith_gate_path_.is_empty() ? nullptr : get_node<CollisionObject2D>(monolith_gate_path_));
+	rockfall_.set(rockfall_path_.is_empty() ? nullptr : get_node<CollisionObject2D>(rockfall_path_));
 	puzzle_.set(puzzle_path_.is_empty() ? nullptr : get_node<PuzzleController>(puzzle_path_));
 	mural_.set(mural_path_.is_empty() ? nullptr : get_node<Interactable>(mural_path_));
 
@@ -482,6 +485,7 @@ void GameDirector::apply_outcome(core::Beat p_beat) {
 			if (PlayerController *player = player_.get()) {
 				player->face(-1);
 			}
+			bring_down_rockfall();
 			break;
 		case core::Beat::Shore:
 		case core::Beat::Abyss:
@@ -497,6 +501,14 @@ void GameDirector::open_gate() {
 		// Deferred: this can run from inside a physics callback, where the server refuses state changes.
 		gate->set_deferred("collision_layer", 0);
 		gate->set_visible(false);
+	}
+}
+
+void GameDirector::bring_down_rockfall() {
+	if (CollisionObject2D *rockfall = rockfall_.get()) {
+		// Deferred like the gate. He is on the ledge, so none of it can land on him.
+		rockfall->set_deferred("collision_layer", WORLD_COLLISION_LAYER);
+		rockfall->set_visible(true);
 	}
 }
 

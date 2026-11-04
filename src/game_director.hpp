@@ -93,6 +93,8 @@ public:
 	godot::NodePath get_cinematics_path() const { return cinematics_path_; }
 	void set_monolith_gate_path(const godot::NodePath &p_value) { monolith_gate_path_ = p_value; }
 	godot::NodePath get_monolith_gate_path() const { return monolith_gate_path_; }
+	void set_rockfall_path(const godot::NodePath &p_value) { rockfall_path_ = p_value; }
+	godot::NodePath get_rockfall_path() const { return rockfall_path_; }
 	void set_puzzle_path(const godot::NodePath &p_value) { puzzle_path_ = p_value; }
 	godot::NodePath get_puzzle_path() const { return puzzle_path_; }
 	void set_mural_path(const godot::NodePath &p_value) { mural_path_ = p_value; }
@@ -145,6 +147,7 @@ private:
 	void set_player_control(bool p_enabled);
 	void restore_camera();
 	void open_gate();
+	void bring_down_rockfall();
 	void play_atmosphere(core::Beat p_beat, bool p_instant);
 	void consume_trigger(core::Event p_event);
 	void report_contract_error(const godot::String &p_message);
@@ -160,6 +163,7 @@ private:
 	godot::NodePath atmosphere_path_;
 	godot::NodePath cinematics_path_;
 	godot::NodePath monolith_gate_path_;
+	godot::NodePath rockfall_path_;
 	godot::NodePath puzzle_path_;
 	godot::NodePath mural_path_;
 	godot::StringName mural_solved_line_;
@@ -177,6 +181,7 @@ private:
 	NodeRef<godot::AnimationPlayer> cinematics_;
 	NodeRef<godot::AnimationPlayer> background_;
 	NodeRef<godot::CollisionObject2D> monolith_gate_;
+	NodeRef<godot::CollisionObject2D> rockfall_;
 	NodeRef<PuzzleController> puzzle_;
 	NodeRef<Interactable> mural_;
 	std::vector<NodeRef<godot::CanvasItem>> awakened_visuals_;

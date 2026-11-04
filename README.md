@@ -4,13 +4,13 @@ A short 2D cinematic horror game for [GitHub Game Off 2026](https://itch.io/jam/
 (theme: SHIFT). A shipwrecked sailor wakes on a stretch of seabed that should be
 under the ocean. Godot 4.7 with gameplay in C++20 through GDExtension.
 
-**Status: M1 and M2 are accepted by the owner, with documented deferrals. M3 is implemented, awaiting review and owner acceptance.** The game opens on a main menu, with New Game, Continue
+**Status: M1 and M2 are accepted by the owner, with documented deferrals. M3 is implemented and awaiting independent review. It is not accepted by the owner, who has played it and finds it improved but not yet engaging enough ([record](docs/evidence/m3/owner-playtest-2026-11-04.md)).** The game opens on a main menu, with New Game, Continue
 from one checkpoint save, Settings with key rebinding, Controls and Credits. Play starts on the Shore, in its accepted art direction: a
 sailor you can walk and jump with, on exposed seabed beside a stranded boat, with the sea far off. You can examine things, pause, and
 use a controller, with buttons named for the device in use.
 
 On the M3 branch, the whole route can be played: Shore, Exposed Abyss, Monolith, Witness, the escape and the ending. There are clue tablets, side routes, a distant ritual, a three-stone puzzle, placeholder cinematics,
-a save at each checkpoint, and optional controller vibration. **Past the cliff opening it is all unfinished greybox,** which is a known boundary and not the finished look. The cinematics are placeholders. **Three narration samples are in the game for the owner's judgment, and they are the only audio:** the rest of the
+a save at each checkpoint, and optional controller vibration. **Past the cliff opening it is all unfinished greybox,** which is a known boundary and not the finished look. The cinematics are placeholders. **Three narration samples are in the game for voice direction. The owner finds them noticeably synthetic, and they are not an approved voice.** the rest of the
 narration is text, and there is no music or effects yet. It is much shorter than the finished game is meant to be. See
 [docs/roadmap.md](docs/roadmap.md), [docs/reviews/m3-review-package.md](docs/reviews/m3-review-package.md) and [docs/shore-preview.md](docs/shore-preview.md).
 

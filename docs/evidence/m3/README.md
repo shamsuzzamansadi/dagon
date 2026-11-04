@@ -11,5 +11,6 @@ Everything here is automated or scripted. **Nothing in this folder is a human te
 | `route/` | Transcripts of the exported route from CI, with the pacing lines, and what the game logged | `tools/route_check.py` on the `dagon-linux` and `dagon-windows` builds |
 | `route/screens/` | Screens from the exported route on Linux, under Xvfb with software rendering (`llvmpipe`). **Not a real GPU, and not a statement about how the game looks on a player's display** | `--shots` |
 | `walk/` | Each stretch of the greybox, and stills of each stage of the reveal, reached by seeking the clips. **To judge staging only:** they cannot show timing | `tests/capture_m3.gd` on a private display, with software rendering |
-| `narration/` | The voice samples' source, rights, direction, measurements and approval status. **No one on the project has heard them yet** | [Its README](narration/README.md) |
+| `owner-playtest-2026-11-04.md` | **The owner's own feedback on the M3 build. Not accepted.** The one human record here | Written down as the owner gave it |
+| `narration/` | The voice samples' source, rights, direction, measurements and approval status. **The owner has heard them, and they are not an approved voice.** The developer cannot hear audio | [Its README](narration/README.md) |
 | `fresh-clone.txt` | A clean clone from GitHub, built and tested following the README, with the suite repeated | Developer's machine, Ubuntu 24.04 under WSL2 |

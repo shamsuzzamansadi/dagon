@@ -409,7 +409,8 @@ def run_new_game_to_the_ending(game, read):
     game.wait_for("dagon: beat=fleeing", 5)
     time.sleep(0.5)
     game.shot(name("13-fleeing"))
-    game.walk_until("left", "dagon: beat=ended", 20, hop=False)
+    # Rock has come down across the way back, so this run hops as well.
+    game.walk_until("left", "dagon: beat=ended", 20, hop=True)
     time.sleep(1.5)
     game.shot(name("14-collapse"))
     game.wait_for("dagon: ending card shown", 20)
