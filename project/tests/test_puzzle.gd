@@ -111,8 +111,10 @@ func test_a_wrong_stone_goes_dark_locks_out_and_then_lets_the_player_try_again(h
 	h.check(puzzle.is_rejecting(), "not locked out")
 	h.check(puzzle.get_progress() == 0, "progress kept: %d" % puzzle.get_progress())
 
-	# During the lockout a press reaches nothing, and the prompt says so by being gone.
-	await h.steps(2)
+	# During the lockout a press reaches nothing, and the prompt says so by being gone. Waited past the stone's own
+	# cooldown of 0.4 s, which would hide the prompt for a moment anyway.
+	await h.steps(30)
+	h.check(puzzle.is_rejecting(), "the lockout ended too soon for this check")
 	h.check(not _prompt(h).visible, "a prompt during the lockout: '%s'" % _prompt(h).text)
 	await h.tap_key(KEY_E)
 	h.check(puzzle.is_rejecting() and failed[0] == 1, "a press during the lockout counted")
@@ -198,6 +200,9 @@ func test_solved_is_terminal_and_the_stones_stop_reacting(h) -> void:
 	var director: Node = h.fixture.get_node("GameDirector")
 	for id in [&"glyph_wave", &"glyph_kneel", &"glyph_eye"]:
 		puzzle.submit(id)
+	# At once, and not only when the cinematic has finished.
+	for stone_name in ["GlyphWave", "GlyphKneel", "GlyphEye"]:
+		h.check(not _stone(h, stone_name).enabled, "%s still reacts straight after solving" % stone_name)
 	puzzle.step_accepted.connect(func(_index: int) -> void: signals[0] += 1)
 	puzzle.failed.connect(func() -> void: signals[0] += 1)
 	puzzle.solved.connect(func() -> void: signals[0] += 1)

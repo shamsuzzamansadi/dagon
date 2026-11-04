@@ -213,6 +213,17 @@ func test_a_puzzle_solved_before_its_beat_is_taken_up_when_the_beat_begins(h) ->
 	await h.wait_until(func() -> bool: return director.get_beat() == AWAKENED, 30, "the solve to be taken up")
 
 
+## Crossing collapse is dropped during the reveal, so only the recheck can notice someone still standing in it.
+func test_a_player_still_inside_collapse_when_the_flee_begins_ends_it_at_once(h) -> void:
+	await _arena(h, AWAKENED, true)
+	var director := _director(h)
+	h.fixture.get_node("Collapse").position.x = WITNESS_X
+	_player(h).teleport(Vector2(WITNESS_X, -2))
+	await h.wait_until(func() -> bool: return director.get_beat() == FLEEING, 40, "the flee to begin")
+	h.check(director.get_beat() == FLEEING, "the flee did not begin")
+	await h.wait_until(func() -> bool: return director.get_beat() == ENDED, 8, "the recheck to find the player in collapse")
+
+
 ## ---- Locks and the camera ----
 
 

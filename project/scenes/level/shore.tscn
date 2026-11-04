@@ -648,7 +648,7 @@ collision_layer = 4
 collision_mask = 0
 monitoring = false
 interaction_id = &"fossil_a"
-caption = "A spine as long as the boat, with too many ribs. Nothing in any sea I have sailed was built like this."
+caption = "A spine as long as the boat, with too many ribs. Nothing in any known sea was built like this."
 
 [node name="Shape" type="CollisionShape2D" parent="Props/FossilA"]
 shape = SubResource("prop_shape")
@@ -695,7 +695,7 @@ collision_layer = 4
 collision_mask = 0
 monitoring = false
 interaction_id = &"fossil_b"
-caption = "Under the great ribs, a skull. Its jaw is wider than I am tall, and it was facing the same way I am walking."
+caption = "Under the great ribs, a skull. Its jaw is wider than a man is tall, and it faces inland."
 
 [node name="Shape" type="CollisionShape2D" parent="Props/FossilB"]
 shape = SubResource("prop_shape")
@@ -737,7 +737,7 @@ collision_layer = 4
 collision_mask = 0
 monitoring = false
 interaction_id = &"footprint"
-caption = "A print pressed into the mud, as fresh as my own. It is webbed, and I could lie down inside it."
+caption = "A print pressed into the mud, fresh as the morning. It is webbed, and a man could lie down inside it."
 
 [node name="Shape" type="CollisionShape2D" parent="Props/Footprint"]
 shape = SubResource("prop_shape")
