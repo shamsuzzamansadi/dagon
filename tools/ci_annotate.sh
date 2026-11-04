@@ -52,6 +52,8 @@ case "$group" in
 		exit_of exported-pack-integration-exit "build/logs/export/integration-$platform-pack.exit"
 		notice exported-pack-first-failed-test "build/logs/export/integration-$platform-pack.stdout" '^FAIL'
 		notice user-dir-probe build/logs/user-dir-probe.log '^USER_DIR_PROBE'
+		notice exported-route build/logs/route.log '^ROUTE_RESULT'
+		notice exported-route-first-failure build/logs/route.log 'FAILED'
 		notice first-failed-test build/logs/godot/integration.stdout '^FAIL'
 		notice first-failure-detail build/logs/godot/integration.stdout '^     '
 		;;

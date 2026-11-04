@@ -3,7 +3,7 @@
 #include "doctest.h"
 
 #include <optional>
-#include <string_view>
+#include <string>
 
 using namespace dagon::core;
 
@@ -75,13 +75,13 @@ TEST_CASE("the outbound crossing of collapse is rejected at every beat before th
 }
 
 TEST_CASE("each beat names the trigger it is waiting for") {
-	CHECK(std::string_view(awaited_trigger(Beat::Shore)) == "enter_abyss");
-	CHECK(std::string_view(awaited_trigger(Beat::Abyss)) == "reach_monolith");
-	CHECK(std::string_view(awaited_trigger(Beat::Monolith)).empty());
-	CHECK(std::string_view(awaited_trigger(Beat::Awakened)) == "witness");
-	CHECK(std::string_view(awaited_trigger(Beat::Witness)).empty());
-	CHECK(std::string_view(awaited_trigger(Beat::Fleeing)) == "collapse");
-	CHECK(std::string_view(awaited_trigger(Beat::Ended)).empty());
+	CHECK(std::string(awaited_trigger(Beat::Shore)) == "enter_abyss");
+	CHECK(std::string(awaited_trigger(Beat::Abyss)) == "reach_monolith");
+	CHECK(std::string(awaited_trigger(Beat::Monolith)).empty());
+	CHECK(std::string(awaited_trigger(Beat::Awakened)) == "witness");
+	CHECK(std::string(awaited_trigger(Beat::Witness)).empty());
+	CHECK(std::string(awaited_trigger(Beat::Fleeing)) == "collapse");
+	CHECK(std::string(awaited_trigger(Beat::Ended)).empty());
 }
 
 TEST_CASE("every beat a trigger waits for is entered by that trigger's successor") {

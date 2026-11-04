@@ -100,6 +100,9 @@ void Hud::refresh_prompt() {
 		return;
 	}
 	if (prompt_text_.is_empty()) {
+		if (label->is_visible()) {
+			print_verbose("dagon: prompt hidden");
+		}
 		label->hide();
 		return;
 	}
@@ -127,6 +130,8 @@ void Hud::show_caption(const String &p_text) {
 	label->set_text(p_text);
 	label->set_modulate(Color(1, 1, 1, 0));
 	label->show();
+	// Positive proof, as with the prompt.
+	print_verbose("dagon: caption: ", p_text);
 	caption_tween_ = create_tween();
 	caption_tween_->tween_property(label, "modulate:a", 1.0, CAPTION_FADE_SECONDS);
 	caption_tween_->tween_interval(caption_hold_seconds_);
@@ -158,6 +163,7 @@ void Hud::show_notice(const String &p_text) {
 	label->set_text(p_text);
 	label->set_modulate(Color(1, 1, 1, 1));
 	label->show();
+	print_verbose("dagon: notice: ", p_text);
 	notice_tween_ = create_tween();
 	notice_tween_->tween_interval(NOTICE_HOLD_SECONDS);
 	notice_tween_->tween_property(label, "modulate:a", 0.0, CAPTION_FADE_SECONDS);

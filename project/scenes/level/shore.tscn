@@ -523,39 +523,12 @@ polygon = PackedVector2Array(0, -150, 26, -196, 50, -214, 80, -205, 104, -170, 1
 [node name="Trench" type="Node2D" parent="."]
 
 [node name="Sky" type="Polygon2D" parent="Trench"]
-color = Color(0.0392157, 0.054902, 0.0941176, 1)
+color = Color(0.11, 0.15, 0.18, 1)
 polygon = PackedVector2Array(4544, -700, 5400, -700, 5400, 60, 4544, 60)
 
 [node name="Water" type="Polygon2D" parent="Trench"]
 color = Color(0.05, 0.11, 0.13, 1)
 polygon = PackedVector2Array(4544, 20, 5400, 20, 5400, 60, 4544, 60)
-
-[node name="Dagon" type="Node2D" parent="."]
-position = Vector2(4700, 0)
-
-[node name="Ridge" type="Polygon2D" parent="Dagon"]
-color = Color(0.025, 0.035, 0.06, 1)
-polygon = PackedVector2Array(-330, 0, -326, -120, -296, -170, -250, -186, -214, -160, -190, -96, -150, 0)
-
-[node name="Body" type="Polygon2D" parent="Dagon"]
-visible = false
-color = Color(0.025, 0.035, 0.06, 1)
-polygon = PackedVector2Array(-330, 240, -326, -120, -296, -170, -250, -186, -160, -300, -40, -350, 90, -330, 190, -240, 260, -90, 300, 240)
-
-[node name="Crest" type="Polygon2D" parent="Dagon"]
-visible = false
-color = Color(0.025, 0.035, 0.06, 1)
-polygon = PackedVector2Array(-160, -300, -136, -372, -104, -336, -70, -404, -34, -350, 10, -412, 40, -340)
-
-[node name="Arm" type="Polygon2D" parent="Dagon"]
-visible = false
-color = Color(0.025, 0.035, 0.06, 1)
-polygon = PackedVector2Array(-250, -100, -340, -130, -430, -190, -470, -250, -452, -256, -420, -216, -412, -270, -394, -272, -392, -214, -364, -252, -348, -240, -364, -190, -240, -150)
-
-[node name="Eye" type="Polygon2D" parent="Dagon"]
-visible = false
-color = Color(0.5, 0.92, 0.78, 1)
-polygon = PackedVector2Array(-34, -230, -14, -244, 10, -244, 28, -230, 10, -220, -14, -220)
 
 [node name="ActArt" type="Node2D" parent="."]
 
@@ -581,7 +554,35 @@ polygon = PackedVector2Array(1980, -0, 1988.4, -29, 1996.8, -57, 2005.2, -82.7, 
 
 [node name="CanyonBack" type="Polygon2D" parent="ActArt"]
 color = Color(0.085, 0.105, 0.145, 1)
-polygon = PackedVector2Array(3540, 0, 3540, -120, 3600, -190, 3680, -210, 3780, -330, 3820, -520, 4544, -520, 4544, 0)
+polygon = PackedVector2Array(3540, 0, 3540, -120, 3600, -190, 3680, -210, 3780, -330, 3820, -520, 4310, -520, 4400, -260, 4470, -170, 4544, -120, 4544, 0)
+
+[node name="Dagon" type="Node2D" parent="."]
+position = Vector2(4700, 0)
+
+[node name="Ridge" type="Polygon2D" parent="Dagon"]
+color = Color(0.025, 0.035, 0.06, 1)
+polygon = PackedVector2Array(-330, 0, -326, -120, -296, -170, -250, -186, -214, -160, -190, -96, -150, 0)
+
+[node name="Body" type="Polygon2D" parent="Dagon"]
+visible = false
+color = Color(0.025, 0.035, 0.06, 1)
+polygon = PackedVector2Array(-330, 240, -326, -120, -296, -170, -250, -186, -160, -300, -40, -350, 90, -330, 190, -240, 260, -90, 300, 240)
+
+[node name="Crest" type="Polygon2D" parent="Dagon"]
+visible = false
+color = Color(0.025, 0.035, 0.06, 1)
+polygon = PackedVector2Array(-160, -300, -136, -372, -104, -336, -70, -404, -34, -350, 10, -412, 40, -340)
+
+[node name="Arm" type="Polygon2D" parent="Dagon"]
+visible = false
+z_index = 1
+color = Color(0.025, 0.035, 0.06, 1)
+polygon = PackedVector2Array(-250, -100, -340, -130, -430, -190, -470, -250, -452, -256, -420, -216, -412, -270, -394, -272, -392, -214, -364, -252, -348, -240, -364, -190, -240, -150)
+
+[node name="Eye" type="Polygon2D" parent="Dagon"]
+visible = false
+color = Color(0.5, 0.92, 0.78, 1)
+polygon = PackedVector2Array(-34, -230, -14, -244, 10, -244, 28, -230, 10, -220, -14, -220)
 
 [node name="Terrain" type="StaticBody2D" parent="."]
 collision_layer = 1
@@ -788,34 +789,34 @@ polygon = PackedVector2Array(3852, -6, 3852, -92, 3944, -92, 3944, -6)
 
 [node name="FragmentWave" type="Polygon2D" parent="Monolith"]
 color = Color(0.36, 0.42, 0.45, 1)
-polygon = PackedVector2Array(3864, -65, 3868, -69, 3872, -65, 3876, -69, 3880, -65, 3880, -62, 3876, -66, 3872, -62, 3868, -66, 3864, -62)
+polygon = PackedVector2Array(3864, -57, 3868, -61, 3872, -57, 3876, -61, 3880, -57, 3880, -54, 3876, -58, 3872, -54, 3868, -58, 3864, -54)
 
 [node name="FragmentKneel" type="Polygon2D" parent="Monolith"]
 color = Color(0.36, 0.42, 0.45, 1)
-polygon = PackedVector2Array(3891, -47, 3891, -50, 3895, -50, 3898, -56, 3901, -59, 3905, -60, 3906, -56, 3903, -53, 3900, -51, 3898, -47)
+polygon = PackedVector2Array(3891, -39, 3891, -42, 3895, -42, 3898, -48, 3901, -51, 3905, -52, 3906, -48, 3903, -45, 3900, -43, 3898, -39)
 
 [node name="FragmentEye" type="Polygon2D" parent="Monolith"]
 color = Color(0.36, 0.42, 0.45, 1)
-polygon = PackedVector2Array(3915, -62, 3920, -67, 3928, -67, 3933, -62, 3928, -57, 3920, -57)
+polygon = PackedVector2Array(3915, -54, 3920, -59, 3928, -59, 3933, -54, 3928, -49, 3920, -49)
 
 [node name="MuralLit" type="Node2D" parent="Monolith"]
 visible = false
 
 [node name="WaveTop" type="Polygon2D" parent="Monolith/MuralLit"]
 color = Color(0.5, 0.92, 0.78, 1)
-polygon = PackedVector2Array(3864, -65, 3868, -69, 3872, -65, 3876, -69, 3880, -65, 3880, -62, 3876, -66, 3872, -62, 3868, -66, 3864, -62)
+polygon = PackedVector2Array(3864, -57, 3868, -61, 3872, -57, 3876, -61, 3880, -57, 3880, -54, 3876, -58, 3872, -54, 3868, -58, 3864, -54)
 
 [node name="WaveLow" type="Polygon2D" parent="Monolith/MuralLit"]
 color = Color(0.5, 0.92, 0.78, 1)
-polygon = PackedVector2Array(3864, -58, 3868, -62, 3872, -58, 3876, -62, 3880, -58, 3880, -55, 3876, -59, 3872, -55, 3868, -59, 3864, -55)
+polygon = PackedVector2Array(3864, -50, 3868, -54, 3872, -50, 3876, -54, 3880, -50, 3880, -47, 3876, -51, 3872, -47, 3868, -51, 3864, -47)
 
 [node name="Kneel" type="Polygon2D" parent="Monolith/MuralLit"]
 color = Color(0.5, 0.92, 0.78, 1)
-polygon = PackedVector2Array(3891, -47, 3891, -50, 3895, -50, 3898, -56, 3901, -59, 3905, -60, 3906, -56, 3903, -53, 3900, -51, 3898, -47)
+polygon = PackedVector2Array(3891, -39, 3891, -42, 3895, -42, 3898, -48, 3901, -51, 3905, -52, 3906, -48, 3903, -45, 3900, -43, 3898, -39)
 
 [node name="Eye" type="Polygon2D" parent="Monolith/MuralLit"]
 color = Color(0.5, 0.92, 0.78, 1)
-polygon = PackedVector2Array(3915, -62, 3920, -67, 3928, -67, 3933, -62, 3928, -57, 3920, -57)
+polygon = PackedVector2Array(3915, -54, 3920, -59, 3928, -59, 3933, -54, 3928, -49, 3920, -49)
 
 [node name="Bowing1" type="Polygon2D" parent="Monolith/MuralLit"]
 color = Color(0.5, 0.92, 0.78, 1)
@@ -839,7 +840,7 @@ polygon = PackedVector2Array(3923.8, -15.4, 3923.8, -17.2, 3926.2, -17.2, 3928, 
 
 [node name="Swimmer" type="Polygon2D" parent="Monolith/MuralLit"]
 color = Color(0.5, 0.92, 0.78, 1)
-polygon = PackedVector2Array(3858, -74, 3880, -86, 3916, -88, 3938, -78, 3926, -70, 3896, -66, 3868, -68)
+polygon = PackedVector2Array(3858, -76, 3880, -88, 3916, -89, 3938, -80, 3926, -74, 3896, -69, 3868, -70)
 
 [node name="Mural" type="Interactable" parent="Monolith"]
 position = Vector2(3898, -16)

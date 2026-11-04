@@ -127,6 +127,28 @@ jobs:
       - name: Export and run release build
         run: sh tools/export_check.sh ${{ matrix.platform }} build/logs/export
 
+      # The shipped build, as shipped, played from New Game to the ending with real window-system key events.
+      - name: Install a private display for the exported route
+        if: ${{ matrix.ships && matrix.platform == 'linux' }}
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq xvfb xdotool libgl1-mesa-dri imagemagick
+
+      - name: Play the exported build from New Game to the ending (Linux)
+        if: ${{ matrix.ships && matrix.platform == 'linux' }}
+        run: |
+          xvfb-run -a -s "-screen 0 1440x810x24 +extension GLX" sh -c \
+            'python3 tools/route_check.py build/export/linux/dagon.x86_64 build/logs/route --display "$DISPLAY" --shots build/logs/route/shots' 2>&1 | tee build/logs/route.log
+          test "${PIPESTATUS[0]}" -eq 0
+          grep -q "^ROUTE_RESULT runs=3 failed=0" build/logs/route.log
+
+      - name: Play the exported build from New Game to the ending (Windows)
+        if: ${{ matrix.ships && matrix.platform == 'windows' }}
+        run: |
+          python tools/route_check.py build/export/windows/dagon.exe build/logs/route --windows-ci 2>&1 | tee build/logs/route.log
+          test "${PIPESTATUS[0]}" -eq 0
+          grep -q "^ROUTE_RESULT runs=3 failed=0" build/logs/route.log
+
       # Every other check redirects storage. This one uses the real user folder of this throwaway runner.
       - name: Check the player's storage path
         if: ${{ matrix.ships }}
