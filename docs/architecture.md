@@ -7,7 +7,7 @@ Toolchain: see
 [toolchain.md](toolchain.md). The menu, settings and save design in §5 ([D26](decisions.md))
 came after that approval, and was approved for implementation with the reviewer's corrections included below.
 
-**Status: M1 and M2 are accepted. M3 is implemented, awaiting review and owner acceptance.** Where M3 measured or chose
+**Status: M1 and M2 are accepted. M3 is implemented, awaiting independent review, and not accepted by the owner.** Where M3 measured or chose
 something this design left open, the section says so, and [decisions.md](decisions.md) §8 lists each one.
 
 ## 1. Principles

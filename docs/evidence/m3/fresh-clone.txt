@@ -1,0 +1,58 @@
+Fresh clone from GitHub, following the README. Developer's machine. Scripted, with simulated input.
+2026-11-04T11:27Z
+Linux 6.6.87.2-microsoft-standard-WSL2
+g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+4.7.2.stable.official.ed1daf0bf
+commit 2ce855a0acad4482bd1fead0c5a13e91451e4f7a
+godot-cpp 507ed9d840c01a3c5b2a39af8bb4000bfac30bf5
+
+build template_debug exit=0 own-warnings=0
+build template_release exit=0 own-warnings=0
+unit tests exit=0 own-warnings=0
+[doctest] test cases:  120 |  120 passed | 0 failed | 0 skipped
+[doctest] assertions: 1201 | 1201 passed | 0 failed |
+--- Godot checks
+import: ok
+check_classes: ok
+integration: ok
+smoke: ok
+smoke_greybox: ok
+smoke_game: ok
+CHECK_CLASSES classes=11 problems=0
+RESULT passed=385 failed=0
+--- art check, and regenerating the art changes nothing
+CHECK_ART problems=0
+changed by regenerating: 0
+--- release tools
+OK
+release records: 1, problems: 0
+--- release export, New Game, Continue, and the suite on the exported pack
+export-linux: created
+dagon: extension initialized build=release compiler=gcc 130300 __cplusplus=202002
+export-linux: new game and continue ran
+RESULT passed=385 failed=0
+export-linux: ran exit=0
+--- the exported build played to the ending, on a private X display, with real X11 keys
+ROUTE_TIMING profile=reading puzzle=known-to-the-script one-deliberate-mistake total=256s to-ending-card=209s | acts: shore=33s abyss=106s monolith=36s witness-and-escape=27s collapse=7s epilogue-and-credits=46s | spent: walking=77s reading=87s solving=8s cinematics=30s
+ROUTE new-game-reading-everything: ok
+ROUTE_TIMING profile=direct puzzle=known-to-the-script one-deliberate-mistake total=127s to-ending-card=123s | acts: shore=11s abyss=51s monolith=27s witness-and-escape=27s collapse=7s epilogue-and-credits=4s | spent: walking=78s reading=0s solving=8s cinematics=30s
+ROUTE new-game-direct: ok
+ROUTE continue-and-wait-out-the-flee: ok
+ROUTE continue-after-the-ending: ok
+ROUTE save.dat: dagon_save=1 beat=awakened checkpoint=Awakened 
+ROUTE save.bak: dagon_save=1 beat=monolith checkpoint=Monolith 
+ROUTE_RESULT runs=4 failed=0
+   32.37  the flee timed out after 13.21 s of wall clock
+--- the integration suite, 10 repeats, each with its own storage
+repeat 1 exit=0 RESULT passed=385 failed=0 
+repeat 2 exit=0 RESULT passed=385 failed=0 
+repeat 3 exit=0 RESULT passed=385 failed=0 
+repeat 4 exit=0 RESULT passed=385 failed=0 
+repeat 5 exit=0 RESULT passed=385 failed=0 
+repeat 6 exit=0 RESULT passed=385 failed=0 
+repeat 7 exit=0 RESULT passed=385 failed=0 
+repeat 8 exit=0 RESULT passed=385 failed=0 
+repeat 9 exit=0 RESULT passed=385 failed=0 
+repeat 10 exit=0 RESULT passed=385 failed=0 
+--- working tree after everything
+tracked files changed: 0

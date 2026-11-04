@@ -11,7 +11,7 @@
 
 | Talisman sprite (`project/assets/shore/talisman.png`) | This project; `tools/art/gen_shore.py` | AI-assisted (Claude), under the owner's direction | CC BY 4.0 |
 | Narration script, epilogue and examine text (`project/narration/script.txt`) | This project. Original writing | AI-assisted (Claude), under the owner's direction | CC BY 4.0 |
-| **Three narration samples** (`project/assets/narration/`) | **AI-generated voice.** [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) v1.0, stock voice `am_michael`, run locally through `tools/audio/make_narration.py`. Not a recording of a person, and no one's voice was cloned on purpose. [Full record](docs/evidence/m3/narration/README.md) | Samples for the owner's judgment. Not approved, and not final | Model: Apache-2.0. Generated files: CC BY 4.0, as this project's assets |
+| **Three narration samples** (`project/assets/narration/`) | **AI-generated voice.** [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) v1.0, stock voice `am_michael`, run locally through `tools/audio/make_narration.py`. Not a recording of a person, and no one's voice was cloned on purpose. [Full record](docs/evidence/m3/narration/README.md) | Samples kept for voice direction. The owner finds them noticeably synthetic. Not approved, and not final | Model: Apache-2.0. Generated files: CC BY 4.0, as this project's assets |
 
 These three samples are the only audio files in the project. Add a row here when another is added. Final asset production is decided before M4.
 

@@ -31,36 +31,39 @@ ChatGPT inspected sampled video frames, but did not listen to the audio.
 
 ## Done
 
-Everything in the approved scope above has been built. After the owner's playtest, three small in-scope changes were added at `2ce855a` ([D67–D69](decisions.md)): clues placed so that routes matter, rock across the escape, the sea coming back over the ending. **No person has played them.** They do not answer the feedback in full.
+Everything in the approved scope above has been built. After the owner's playtest, three small in-scope changes were added at `2ce855a` ([D67–D69](decisions.md)): clues placed so that routes matter, rock across the escape, the sea coming back over the ending. **No person has played them.** They do not answer the feedback in full. The review package is [reviews/m3-review-package.md](reviews/m3-review-package.md), and pull request #3 names the final commit and its CI run.
 
 ## Results, each with its commit
 
+**The tested code and the build to play are `2ce855a`,** fingerprint `sha256:8645ded9104896405f1df83694c40cf22321ba63b1287f925a2118adf9f18c2e`. Later commits add only documents and evidence.
+
 | Result | Commit | Who | Outcome |
 |---|---|---|---|
-| CI run `41806608806`: GCC, Clang, MSVC, exported pack, exported route on Linux and Windows, release tools | `35ff084` | CI | Green. Release job skipped, as it should be. **Superseded by the candidate below** |
-| Focused deliberate breakage, 58 entries | `35ff084` | Developer, scripted | 54 caught, 4 not. See "Findings" |
-| Full deliberate breakage, 84 entries | `2cae7bb` | Developer, scripted | Recorded in `evidence/m3/breakage-first-pass-at-2cae7bb.txt` |
-| Local check script, 385 integration tests | `2ce855a` | Developer | Pass |
-| CI run `41818800097` | `2ce855a` | CI | **Running when this was written.** Check it |
-| Last focused breakage, 18 entries | `2ce855a` | Developer, scripted | **Running when this was written.** `$S/mut/summary.txt` |
-| Owner's playtest | A build before `2ce855a`, exact build not recorded | The owner | Not accepted. See above |
+| CI run `41818800097`: GCC, Clang, MSVC, exported pack, exported route on Linux and Windows, release tools | `2ce855a` | CI | **Green.** 120 native cases, 385 integration tests. Release job skipped, as it should be. Logs and builds expire 2027-02-02 |
+| Fresh clone by the README, with 10 repeats of the suite and the exported route | `2ce855a` | Developer, scripted, software rendering | All pass. No tracked files changed. `evidence/m3/fresh-clone.txt` |
+| Focused deliberate breakage, 19 entries | `2ce855a` | Developer, scripted | 17 caught, 2 not. `evidence/m3/breakage.txt` |
+| Focused deliberate breakage, 58 entries. The pass the limit interrupted the reading of | `35ff084` | Developer, scripted | 54 caught, 4 not. `evidence/m3/breakage-focused-at-35ff084.txt` |
+| Full deliberate breakage, 84 entries | `2cae7bb` | Developer, scripted | `evidence/m3/breakage-first-pass-at-2cae7bb.txt` |
+| Exported route, scripted, knowing the puzzle | `2ce855a` | CI | About 2 min direct, about 4 min reading the ground route. **Not a playtest** |
+| Owner's playtest | A build before `2ce855a`, exact build not recorded | The owner | **Not accepted.** Under three minutes, by the owner's report |
+| First-time player | | **Nobody** | **Unknown** |
+| Independent review | | **Not yet done** | |
+| Xbox vibration by feel, PlayStation hardware, the M2 J/caption event | | **Not done** | Deferred or unresolved. Do not infer a pass |
 
-## Findings from the interrupted pass
+## Findings from the breakage passes
 
-- **"The voice goes on into the credits":** a real test gap. A test was added at `75fe57e`.
-- **"A background event replays on every crossing":** a real test gap. The test crossed back while the clip was still playing, which hid it. Fixed at `75fe57e`.
-- **"The gate changes in a physics callback" and "Restoring leaves the atmosphere clip running":** expected to change nothing observable. To be stated plainly in the package.
+- **Real gaps, closed at `75fe57e`:** "The voice goes on into the credits", which had no test, and "A background event replays on every crossing", whose test crossed back while the clip was still playing.
+- **Still not caught, read as changing nothing observable. A reading, not a proof:** "The gate changes in a physics callback" and "Restoring leaves the atmosphere clip running".
 
 ## Known problems
 
-- **Engagement:** see the owner's feedback, and the proposal in the package §12. Not started, and needs a decision.
-- **GitHub began refusing this machine's SSH key** during the resumed session (`Permission denied (publickey)`), having accepted it minutes earlier. The cause is not established. The clone's `origin` is that SSH remote. Pushing to the HTTPS URL with the logged-in `gh` as credential helper works, but `gh`'s token has no `workflow` scope, so a commit that changes `.github/workflows` needs the SSH route or the owner.
+- **Engagement:** see the owner's feedback, and the package §12. One real thing to work out in the whole game. A proposal is written. Not started, and it needs a decision.
+- **Art and sound:** nothing past the Shore is production art, and only three voice samples sound. M4 and M5.
+- **GitHub began refusing this machine's SSH key** during the resumed session (`Permission denied (publickey)`), having accepted it minutes earlier. The cause is not established. Clones whose `origin` is that SSH remote cannot push or fetch through it. The HTTPS URL with the logged-in `gh` as credential helper works, but `gh`'s token has no `workflow` scope, so a commit that changes `.github/workflows` needs the SSH route or the owner.
 
 ## Remaining work
 
-1. Read the CI and breakage results above, and act on any concrete finding.
-2. Fresh clone at the candidate, evidence copied into `docs/evidence/m3/`, pacing from CI.
-3. Fill in the review package from the template, update pull request #3, pull into the owner's working copy, and hand off. Then stop.
+**Independent work is complete until the decisions below.** Nothing else is authorized to start. After the review and the owner's answers: any review fixes, which void the fingerprint, then the owner's acceptance of an identified build, then the normal squash merge and the release record in its own pull request.
 
 ## Owner decisions pending
 
@@ -76,12 +79,12 @@ These may be gone. Nothing in them is the only copy of finished work unless stat
 | What | Where |
 |---|---|
 | Native clone for builds and CI work | `/tmp/claude-1000/-mnt-c-Users-sadi-projects-dagon/621ac8dc-276d-4bbd-8143-03866a5a9d1a/scratchpad/work` (call its parent `$S`) |
-| Breakage tool and results | `$S/mut/breakage.py`, `$S/mut/summary.txt`, `$S/mut/out-*.txt` |
-| Package template, with tokens to fill. **The only copy until the package is written** | `$S/m3-package-template.md` |
+| Breakage tool and working clones. A copy of the tool and the results are committed under `evidence/m3/` | `$S/mut/` |
+| Package template and the script that fills it. The package itself is committed, so edit that instead | `$S/m3-package-template.md`, `$S/gen/fill_package.py` |
 | Fresh-clone script, Xvfb start script | `$S/fresh.sh`, `$S/xvfb-start.sh` |
 | Private X display, for local graphical runs | `:77`. Never use WSLg's `:0` |
 | Background task outputs | `/tmp/claude-1000/-mnt-c-Users-sadi-projects-dagon/621ac8dc-276d-4bbd-8143-03866a5a9d1a/tasks/` |
 
 ## Next concrete action
 
-Read CI run `41818800097` and the breakage summary. Then the fresh clone and the package.
+**Wait for independent review by ChatGPT and the owner's answers to the package §12:** engagement, voice, date, and whether M3 can be accepted with the proposal as follow-up work. Do not merge, tag, publish, delete the branch or start M4 meanwhile.
