@@ -266,6 +266,16 @@ func test_the_kill_plane_and_backdrop_cover_the_whole_width(h) -> void:
 	h.check(kill_plane.global_position.x + size.x / 2.0 >= world.get_node("CameraRig").limit_right, "the kill plane stops short")
 
 
+## A polygon that crosses itself fails to triangulate and simply is not drawn, with nothing logged and no test noticing.
+## The rib arch was lost that way until someone looked at a screenshot.
+func test_every_polygon_in_the_world_can_actually_be_drawn(h) -> void:
+	var world := await _world(h)
+	var polygons := world.find_children("*", "Polygon2D", true, false)
+	h.check(polygons.size() > 50, "only %d polygons" % polygons.size())
+	for polygon: Polygon2D in polygons:
+		h.check(not Geometry2D.triangulate_polygon(polygon.polygon).is_empty(), "%s cannot be triangulated" % world.get_path_to(polygon))
+
+
 func test_all_new_text_can_be_drawn_in_the_game_font(h) -> void:
 	var world := await _world(h)
 	var label: Label = world.get_node("Hud/Caption")
