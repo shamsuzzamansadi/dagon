@@ -10,7 +10,7 @@
 
 ## Review round 1
 
-**Reported by the reviewer (ChatGPT) on `a7859c2`, relayed by the owner.** The reviewer ran the 47 release-tool tests and the record validation. The Godot integration tests, Windows gameplay and actual release publication were not independently rerun. **The fixes below have not been reviewed.**
+**Reported by the reviewer (ChatGPT) on `a7859c2`, relayed by the owner.** The reviewer ran the 47 release-tool tests and the record validation. The Godot integration tests, Windows gameplay and actual release publication were not independently rerun.
 
 All three findings reproduced on the unfixed code: [before-the-fixes.txt](review-round-1-before-the-fixes.txt).
 
@@ -25,3 +25,13 @@ All three findings reproduced on the unfixed code: [before-the-fixes.txt](review
 **Also corrected:** `docs/release.md` said the repository protections were applied. None are. They stay planned until this workflow is accepted, and the document now says what that leaves open.
 
 **Limits of the tests:** the API tests use a local stand-in for GitHub's API, with real HTTP requests and a real bare git remote. They establish how the tools respond to each answer, not that GitHub gives those exact answers. The first real publish is the first time the write path runs.
+
+## Follow-up review and the owner's acceptance
+
+**Reported by the reviewer (ChatGPT) on `effa099`, relayed by the owner:** all three findings are resolved, the 97 release-tool tests and the record validation passed independently, and no new blocking defect was identified in the reviewed areas. **Actual publication and gameplay were not independently rerun.**
+
+**The owner, 2026-11-04:** "I accept this release engineering work." That covers this workflow and the Clang job. It is not an acceptance of any game build, and says nothing about M3.
+
+**CI at `effa099`:** [push](https://github.com/shamsuzzamansadi/dagon/actions/runs/41706549622), [pull request](https://github.com/shamsuzzamansadi/dagon/actions/runs/41706560344) and [rehearsal](https://github.com/shamsuzzamansadi/dagon/actions/runs/41706565108) all succeeded. Only this record and other documents changed after that commit.
+
+**Still unproven:** the steps listed in [Before the first real publication](../../release.md#before-the-first-real-publication).

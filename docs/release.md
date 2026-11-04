@@ -89,8 +89,9 @@ Each `main` push asks GitHub what exists for every record in `release/`. **A tag
 
 - **Only the run's own `GITHUB_TOKEN`.** No secrets are stored or used, and the token is never printed. The gate reads with a read-only token. Only the `publish` job has `contents: write`, and it only runs for a push to `main`.
 - **One publication at a time:** the `release-publication` concurrency group, which never cancels one in progress. Inside it, the publisher asks again what exists. If an earlier run has just published this version, a later one skips it.
-- **Planned repository settings, which are not enabled yet.** They go on only after this workflow is reviewed and accepted: `main` requiring the `linux`, `linux-clang`, `windows` and `release-tools` checks and refusing force-pushes and deletion, a ruleset refusing to move or delete `v*` tags, and GitHub's immutable releases.
-- **Until then, these rules bind the workflow and not people.** Anyone with write access to the repository could still push to `main`, merge past a failed check, or move a tag. The gate would then report a moved tag.
+- **Repository settings, chosen by the owner on 2026-11-04** ([D47](decisions.md)). For `main`: pull requests are required, with no approving reviews, because this is a single-account repository. The `linux`, `linux-clang`, `windows` and `release-tools` checks are required, and must come from GitHub Actions. History must be linear, force-pushes and deletion are refused, and the rules apply to administrators. Only squash merging is allowed. A ruleset with no bypass refuses updating or deleting `v*` tags, and does not restrict creating them, so a release can still create its tag. Immutable releases are on.
+- **GitHub holds the live state, not this file.** Read it with `gh api repos/shamsuzzamansadi/dagon/branches/main/protection`, `gh api repos/shamsuzzamansadi/dagon/rulesets` and `gh api repos/shamsuzzamansadi/dagon/immutable-releases`.
+- **What these settings do not do.** An administrator can still change them. A required check is only as good as the job behind it, and a branch need not be up to date with `main` to merge, which keeps checks from running again for no reason while one branch is in progress.
 
 ## Compilers
 
@@ -101,4 +102,12 @@ There is **one package per OS:** GCC on `ubuntu-22.04` for Linux, and MSVC on `w
 - **On every pull request:** `python tools/test_release_tools.py`, and `python tools/release_gate.py validate`.
 - **A rehearsal** runs the gate, packaging, smoke test and preparation for real, on any branch: `gh workflow run ci.yml --ref <branch> -f rehearse=true`. It uses version `.0`, which can never be published, and the `publish` job cannot run outside a push to `main`.
 - **A rehearsal also asks GitHub what exists, with its read-only token,** so those requests run for real.
-- **What no rehearsal can show:** creating, removing and publishing a draft from the workflow, with its write token, which first happens on a real release. Local tests run those requests against a stand-in for the API, and the commands were checked once by hand as far as a draft ([evidence](evidence/release-workflow/README.md)). If the first real publish fails, nothing further is published, and the failure is reported on that commit.
+
+## Before the first real publication
+
+**No tag or release has ever been made by this workflow.** Whoever runs the first release should watch its `publish` job, because these are still unproven:
+
+- **The write path has not run from the workflow:** creating a draft and uploading to it, removing a failed draft, publishing, and the check after publishing. Local tests run those requests against a stand-in for the API, and the commands were checked once by hand as far as a draft ([evidence](evidence/release-workflow/README.md)). A failure before publishing publishes nothing, and is reported on that commit.
+- **The tag rules and immutable releases have not met a real publication.** The ruleset does not restrict creating a tag, and the workflow publishes a draft, which is the order immutable releases expect. That comes from how they are configured and documented. It has not been observed.
+- **The consistency check assumes GitHub keeps the commit as a release's target after publishing.** That has been seen on a draft only. If it does not, the release would publish and `verify` would then report it as inconsistent, and so would the gate on every later `main` push.
+- **A mistake in a published release cannot be repaired in place.** Immutable releases lock its files and tag, and the tag rules refuse moving or deleting it, so a correction is a new version. Resolving an inconsistent state needs a person, and possibly a change to the settings.
