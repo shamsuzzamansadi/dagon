@@ -243,6 +243,35 @@ func test_reset_clears_an_attempt_and_a_lockout(h) -> void:
 	h.check(_stone(h, "GlyphEye").enabled, "a stone stayed disabled")
 
 
+## Simulated: this says the labels and routing are right, and nothing about a physical controller.
+func test_a_controller_presses_the_stones_and_the_prompt_names_its_button(h) -> void:
+	h.use_controller("Xbox Wireless Controller")
+	await _world(h)
+	var puzzle := _puzzle(h)
+	h.fixture.get_node("Hud").set_input_device(0)
+	await h.stand_at(_player(h), Vector2(WAVE_X, -2))
+	h.check(_prompt(h).text == "[X] Press the wave stone", "the prompt reads '%s'" % _prompt(h).text)
+	await h.tap_pad(JOY_BUTTON_X)
+	h.check(puzzle.get_progress() == 1, "the west button did not press the stone: %d" % puzzle.get_progress())
+	await h.tap_pad(JOY_BUTTON_A)
+	h.check(puzzle.get_progress() == 1, "the south button pressed a stone")
+
+
+## The director restores a puzzle before or after the puzzle's own _ready, depending on where the two sit in the scene.
+func test_restoring_before_the_puzzle_is_ready_still_lights_every_stone(h) -> void:
+	var world: Node2D = (load(WORLD) as PackedScene).instantiate()
+	var puzzle: Node = world.get_node("Monolith/Puzzle")
+	var signals := [0]
+	puzzle.solved.connect(func() -> void: signals[0] += 1)
+	puzzle.restore_solved()
+	h.check(puzzle.is_solved(), "not solved before entering the tree")
+	await h.load_with(world)
+	h.check(puzzle.is_solved(), "not solved after entering the tree")
+	h.check(_lit(h).size() == 3, "lit: %s" % str(_lit(h)))
+	h.check(not _stone(h, "GlyphEye").enabled, "a restored stone still reacts")
+	h.check(signals[0] == 0, "restoring emitted %d signals" % signals[0])
+
+
 func test_the_mural_reads_differently_before_and_after_and_a_missing_clip_changes_nothing_about_that(h) -> void:
 	await _world(h)
 	var mural: Node = h.fixture.get_node("Monolith/Mural")
