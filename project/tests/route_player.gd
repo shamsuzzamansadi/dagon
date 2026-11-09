@@ -4,6 +4,9 @@ extends RefCounted
 
 var h
 var captions := {}
+## When set, every line examined is let run to its end, spoken or read, before walking on: how a careful player plays,
+## and what a recording of the mix needs. The tests leave it off.
+var read_through := false
 
 
 func _init(harness) -> void:
@@ -70,6 +73,8 @@ func walk(key: Key, reached: Callable, max_steps: int, examine := false) -> bool
 				if caption().text != focus.caption or not caption().visible:
 					await h.tap_key(KEY_E)
 				captions[focus.interaction_id] = caption().text
+				if read_through:
+					await h.wait_until(func() -> bool: return not caption().visible, 60 * 30, "the line to end")
 				h.send(h.key_event(key, true))
 				last_x = body.global_position.x
 				stalled = 0
@@ -88,6 +93,33 @@ func walk(key: Key, reached: Callable, max_steps: int, examine := false) -> bool
 
 func walk_to_prompt(key: Key, text: String, max_steps: int, examine := false) -> bool:
 	return await walk(key, func() -> bool: return prompt().visible and prompt().text.ends_with(text), max_steps, examine)
+
+
+## Holds a key and hops each time the sailor stands on something, until the prompt shows: climbing ledges.
+func climb_to_prompt(key: Key, text: String, max_steps: int) -> bool:
+	var body := player()
+	h.send(h.key_event(key, true))
+	for i in max_steps:
+		if prompt().visible and prompt().text.ends_with(text):
+			h.send(h.key_event(key, false))
+			await h.steps(1)
+			return true
+		if body.is_on_floor():
+			h.send(h.key_event(KEY_SPACE, true))
+			await h.steps(16)
+			h.send(h.key_event(KEY_SPACE, false))
+		await h.steps(1)
+	h.send(h.key_event(key, false))
+	h.fail("climbing did not reach '%s', at %s" % [text, body.global_position])
+	return false
+
+
+## From the Shore, reading everything on the way, to the carving at the ledges. Then up them, and push the stone.
+func cross_the_gap() -> void:
+	await walk(KEY_D, func() -> bool: return captions.has(&"crossing_mark"), 3000, true)
+	await climb_to_prompt(KEY_D, "Push the stone", 600)
+	await h.tap_key(KEY_E)
+	await h.wait_until(func() -> bool: return director().is_crossing_lowered() and not director().is_crossing_moving(), 120, "the slab to come down")
 
 
 ## At the stone whose prompt is showing: waits for it to be ready, and presses.

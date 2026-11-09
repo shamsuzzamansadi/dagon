@@ -8,7 +8,9 @@
 #include "narration.hpp"
 #include "storage.hpp"
 
+#include <godot_cpp/classes/animation_player.hpp>
 #include <godot_cpp/classes/audio_stream.hpp>
+#include <godot_cpp/classes/audio_stream_player.hpp>
 #include <godot_cpp/classes/engine.hpp>
 #include <godot_cpp/classes/input.hpp>
 #include <godot_cpp/classes/os.hpp>
@@ -42,6 +44,8 @@ const char *const QUIT_SETTINGS_LOST = " Your latest settings could not be saved
 const char *const AUTOSTART_VARIABLE = "DAGON_AUTOSTART";
 constexpr double ENDING_LINE_MINIMUM_SECONDS = 3.0;
 constexpr double ENDING_LINE_PAUSE_SECONDS = 0.7;
+constexpr double CREDITS_FADE_SECONDS = 5.0;
+constexpr float FADE_OUT_DB = 36.0f;
 constexpr float ENDING_LINE_FADE_SECONDS = 0.8f;
 constexpr float ENDING_LINE_WIDTH = 400.0f;
 
@@ -256,8 +260,49 @@ void MenuController::show_panel(int p_index) {
 		if (shown && !panel->is_visible()) {
 			panel->set_modulate(Color(1, 1, 1, 0));
 			panel->create_tween()->tween_property(panel, "modulate:a", 1.0, ENDING_LINE_FADE_SECONDS);
+			start_panel(panel);
+		} else if (!shown && panel->is_visible()) {
+			stop_panel(panel);
 		}
 		panel->set_visible(shown);
+	}
+}
+
+// Every sound of this screen but the voice, down to nearly nothing, while it carries on playing.
+void MenuController::fade_sounds(double p_seconds) {
+	const AudioStreamPlayer *voice = voice_.get();
+	const TypedArray<Node> players = find_children("*", "AudioStreamPlayer", true, false);
+	for (int64_t i = 0; i < players.size(); i++) {
+		AudioStreamPlayer *sound = Object::cast_to<AudioStreamPlayer>(players[i]);
+		if (sound == nullptr || sound == voice || !sound->is_playing()) {
+			continue;
+		}
+		sound->create_tween()->tween_property(sound, "volume_db", sound->get_volume_db() - FADE_OUT_DB, p_seconds);
+	}
+}
+
+// A picture can move a little and have its own sound. Both start with it, from the beginning, and stop with it, so
+// nothing of one picture carries into the next, into the game, or into the credits.
+void MenuController::start_panel(Node *p_panel) {
+	for (int i = 0; i < p_panel->get_child_count(); i++) {
+		Node *child = p_panel->get_child(i);
+		if (AnimationPlayer *motion = Object::cast_to<AnimationPlayer>(child); motion != nullptr && motion->has_animation("show")) {
+			motion->play("show");
+			motion->seek(0.0, true);
+		} else if (AudioStreamPlayer *sound = Object::cast_to<AudioStreamPlayer>(child); sound != nullptr && sound->get_stream().is_valid()) {
+			sound->play();
+		}
+	}
+}
+
+void MenuController::stop_panel(Node *p_panel) {
+	for (int i = 0; i < p_panel->get_child_count(); i++) {
+		Node *child = p_panel->get_child(i);
+		if (AnimationPlayer *motion = Object::cast_to<AnimationPlayer>(child)) {
+			motion->stop();
+		} else if (AudioStreamPlayer *sound = Object::cast_to<AudioStreamPlayer>(child)) {
+			sound->stop();
+		}
 	}
 }
 
@@ -315,6 +360,10 @@ void MenuController::show_next_ending_line() {
 	show_panel(ending_line_);
 	print_verbose(mode_ == MODE_PROLOGUE ? "dagon: prologue line: " : "dagon: ending line: ", id, " voiced=", voiced);
 	ending_line_left_ = core::line_seconds(static_cast<std::size_t>(text.length()), voiced ? stream->get_length() : 0.0, ENDING_LINE_MINIMUM_SECONDS) + ENDING_LINE_PAUSE_SECONDS;
+	// The prologue's music and sea fade out over its last line, so the game does not cut them off.
+	if (mode_ == MODE_PROLOGUE && ending_line_ + 1 >= ending_lines_.size()) {
+		fade_sounds(ending_line_left_);
+	}
 }
 
 void MenuController::advance_ending() {
@@ -517,6 +566,10 @@ void MenuController::on_settings_closed() {
 void MenuController::open_credits() {
 	if (AudioStreamPlayer *voice = voice_.get()) {
 		voice->stop();
+	}
+	// The ending's music and sea fade under the credits, so the main menu does not cut them off.
+	if (mode_ == MODE_ENDING) {
+		fade_sounds(CREDITS_FADE_SECONDS);
 	}
 	show_screen(Screen::Credits);
 	focus_path(credits_back_button_path_);

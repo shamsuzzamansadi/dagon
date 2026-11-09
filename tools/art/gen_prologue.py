@@ -2,10 +2,14 @@
 nothing taken from any adaptation of the story. The card with the line covers the bottom of the screen, about from
 y = 190 down, so what matters in each picture stands above that.
 
-    prologue_1_raider.png   a grey raider at night, our ship held beside it
-    prologue_2_escape.png   a small boat pulling away from a dark hull
-    prologue_3_drift.png    the boat alone, under a white sun
-    prologue_4_dry.png      the boat on bare seabed, the sea a thin line far off
+    prologue_1_raider.png   captivity: the raider's side close, a porthole lit and barred, a guard above, our ship held
+    prologue_2_escape.png   the same side from outside; the boat pulls away from it
+    prologue_3_drift.png    the sea under a white sun; the boat drifts on it
+    prologue_4_dry.png      the boat on its side on bare seabed, the sea a thin line far off; the man beside it
+
+Each background leaves out what moves. The moving parts are saved beside it, as prologue_<n>_<part>.png, and the
+prologue scene animates them a little: the lamp flickering and going out, the boat rowing away, drifting, the man
+sitting up. The positions are in PROLOGUE_LAYERS, and the scene uses the same ones.
 """
 
 import math
@@ -54,58 +58,140 @@ def ship(img, x0, y_water, length, height, color, deck_color, funnels=2, guns=Tr
         put(img, lx + 1, ly, "A1")
 
 
-def panel_raider():
-    img = gen_shore.sky()
-    noise = Noise(401)
-    night_sea(img, noise)
-    # Our ship, held: smaller, further off, no lights but one.
-    ship(img, 300, HORIZON + 6, 110, 34, "C2", "C3", funnels=1, guns=False, lights=((352, HORIZON - 12),))
-    # The raider, nearer, longer and lower, its guns trained along the deck.
-    ship(img, 90, HORIZON + 22, 210, 52, "C1", "C2", funnels=2, guns=True, lights=((150, HORIZON + 4), (188, HORIZON + 3), (230, HORIZON + 2)))
+def porthole(img, cx, cy, r=5):
+    for y in range(cy - r - 1, cy + r + 2):
+        for x in range(cx - r - 1, cx + r + 2):
+            d = math.hypot(x - cx, y - cy)
+            if d <= r - 1:
+                put(img, x, y, "C0")
+            elif d <= r + 0.6:
+                put(img, x, y, "C3" if y < cy else "C2")
+
+
+def lamp():
+    """A porthole lit from inside, barred, a man's head dark against the lamp. Laid over a porthole; it flickers, and
+    in the escape it goes out."""
+    img = blank(12, 12)
+    for y in range(12):
+        for x in range(12):
+            d = math.hypot(x - 5.5, y - 5.5)
+            if d <= 4.6:
+                put(img, x, y, "A2" if d < 2.6 else "A1")
+    for x in (4, 7):
+        for y in range(1, 11):
+            if math.hypot(x - 5.5, y - 5.5) <= 4.6:
+                put(img, x, y, "C0")
+    for y in range(6, 11):
+        for x in range(2, 6):
+            if math.hypot(x - 3.5, y - 8.0) <= 2.2 or (y >= 9 and 1 <= x <= 6):
+                if math.hypot(x - 5.5, y - 5.5) <= 4.6:
+                    put(img, x, y, "C0")
     return img
 
 
-def panel_escape():
+def raider_hull(img, x0, top, bottom):
+    """The raider's side, close: black plates, rivets, a row of portholes, and its rail against the sky."""
+    fill(img, [(x0, top + 6), (W, top), (W, bottom), (x0 + 6, bottom + 4)], "C0")
+    for y in range(top + 14, bottom - 4, 16):
+        for x in range(x0 + 10, W, 12):
+            put(img, x + (y // 16) % 2 * 6, y, "C2")
+    hline(img, x0 + 2, W - 1, top + 3, "C3")
+    hline(img, x0 + 2, W - 1, top + 4, "C2")
+    for x in range(x0 + 4, W, 6):
+        for y in range(top - 6, top + 3):
+            put(img, x, y, "C1")
+    hline(img, x0 + 2, W - 1, top - 7, "C2")
+
+
+def panel_raider_layers():
+    """Captivity. The raider's side, close, in the dark; one porthole lit and barred, a man's head against it. A
+    guard on the deck above. Our own ship small beyond, held alongside by a line."""
     img = gen_shore.sky()
-    noise = Noise(402)
-    night_sea(img, noise, top=HORIZON + 10)
-    # The hull wall, close on the left, riveted and black.
-    fill(img, [(0, 40), (150, 70), (170, H), (0, H)], "C0")
-    for y in range(80, 230, 18):
-        for x in range(10, 150, 12):
-            put(img, x + (y // 18) % 2 * 6, y, "C2")
-    put(img, 120, 96, "A2")
-    put(img, 121, 96, "A1")
-    # The boat, pulling away, with a man at the oars.
-    bx, by = 300, 176
+    noise = Noise(401)
+    night_sea(img, noise)
+    ship(img, 24, HORIZON + 4, 118, 32, "C2", "C3", funnels=1, guns=False, lights=())
+    ImageDraw.Draw(img).line([(140, HORIZON - 12), (196, 92)], fill=rgba("C3"))
+    raider_hull(img, 190, 64, 188)
+    for y in range(186, 194):
+        for x in range(190, W):
+            if noise(x / 6.0, y) > 0.55:
+                put(img, x, y, "C5")
+    # The deck: a gun along it, and a guard with a rifle on his shoulder.
+    ImageDraw.Draw(img).line([(260, 56), (318, 44)], fill=rgba("C1"), width=3)
+    fill(img, [(244, 58), (270, 58), (268, 50), (248, 50)], "C1")
+    fill(img, [(372, 58), (372, 46), (370, 42), (372, 38), (376, 38), (378, 42), (376, 46), (376, 58)], "C1")
+    ImageDraw.Draw(img).line([(377, 40), (382, 30)], fill=rgba("C1"))
+    for cx in (240, 290, 340, 390, 440):
+        porthole(img, cx, 120 - (cx - 240) // 50)
+    return img, {"lamp": (lamp(), (334, 110))}
+
+
+def boat_with_rower(wake=True):
+    """The small boat from the side, a man at the oars, and its wake behind it. 110 x 26; the boat's bow at the right."""
+    img = blank(110, 26)
+    bx, by = 60, 16
     fill(img, [(bx, by), (bx + 46, by - 2), (bx + 40, by + 7), (bx + 6, by + 7)], "W1")
     hline(img, bx + 2, bx + 44, by, "W3")
     fill(img, [(bx + 20, by - 1), (bx + 26, by - 1), (bx + 25, by - 12), (bx + 21, by - 12)], "C2")
     for k in range(4):
         put(img, bx + 22 + k // 2, by - 14 + k % 2, "S0")
-    ImageDraw.Draw(img).line([(bx + 4, by + 9), (bx + 34, by - 6)], fill=rgba("W2"))
-    ImageDraw.Draw(img).line([(bx + 10, by - 6), (bx + 44, by + 10)], fill=rgba("W2"))
-    # The wake, back toward the ship.
-    for i in range(30):
-        x = bx - 6 - i * 5
-        y = by + 5 + i // 6
-        if x > 160:
-            put(img, x, y, "C6" if i % 3 else "C5")
-            put(img, x - 2, y + 1, "C4")
+    if wake:
+        for i in range(12):
+            x = bx - 4 - i * 5
+            y = by + 5 + i // 5
+            if x >= 0:
+                put(img, x, y, "C6" if i % 3 else "C5")
+                put(img, x - 2, y + 1, "C4")
     return img
 
 
-def panel_drift():
+def oars(frame):
+    """The oars over the boat above, at the catch (0) or at the end of the stroke (1)."""
+    img = blank(110, 26)
+    bx, by = 60, 16
+    if frame == 0:
+        ImageDraw.Draw(img).line([(bx + 23, by - 6), (bx + 6, by + 9)], fill=rgba("W2"))
+        ImageDraw.Draw(img).line([(bx + 23, by - 6), (bx + 2, by + 6)], fill=rgba("W1"))
+    else:
+        ImageDraw.Draw(img).line([(bx + 23, by - 6), (bx + 42, by + 9)], fill=rgba("W2"))
+        ImageDraw.Draw(img).line([(bx + 23, by - 6), (bx + 46, by + 6)], fill=rgba("W1"))
+        for k in range(3):
+            put(img, bx + 44 + k, by + 9 + k % 2, "C6")
+    return img
+
+
+def panel_escape_layers():
+    """The same raider's side from outside, at night, the lit porthole low on it. The boat pulls away from it to the
+    right, the oars dipping, and the lamp behind goes out."""
+    img = gen_shore.sky()
+    noise = Noise(402)
+    night_sea(img, noise, top=HORIZON)
+    fill(img, [(0, 40), (150, 70), (170, H), (0, H)], "C0")
+    for y in range(80, 230, 18):
+        for x in range(10, 150, 12):
+            put(img, x + (y // 18) % 2 * 6, y, "C2")
+    for cx, cy in ((44, 100), (84, 104)):
+        porthole(img, cx, cy)
+    porthole(img, 124, 108)
+    return img, {
+        "lamp": (lamp(), (118, 102)),
+        "boat": (boat_with_rower(), (190, 158)),
+        "oars_0": (oars(0), (0, 0)),
+        "oars_1": (oars(1), (0, 0)),
+    }
+
+
+def panel_drift_layers():
     img = blank(W, H)
     noise = Noise(403)
     # A white sky, hot and empty, and a sun too bright to look at.
     for y in range(HORIZON + 1):
         for x in range(W):
-            value = 4.6 - (y / HORIZON) * 0.8 + 1.4 * math.exp(-((math.hypot(x - 340, y - 40) / 50.0) ** 2))
+            value = 3.4 - (y / HORIZON) * 0.7 + 1.9 * math.exp(-((math.hypot(x - 340, y - 40) / 24.0) ** 2))
             put(img, x, y, ramp(["C5", "C6", "C7", "C8", "C9", "A3"], value, x, y, 0.4))
-    for y in range(28, 53):
-        for x in range(328, 353):
-            if math.hypot(x - 340, y - 40) <= 9:
+    for y in range(30, 51):
+        for x in range(330, 351):
+            if math.hypot(x - 340, y - 40) <= 7:
                 put(img, x, y, "A3")
     # The sea like oil, flat to every edge.
     for y in range(HORIZON, H):
@@ -114,17 +200,33 @@ def panel_drift():
             value = 3.2 - d * 1.8 + (noise(x / 60.0, y / 1.5) - 0.5) * 0.4
             put(img, x, y, ramp(["C2", "C3", "C4", "C5", "C6"], value, x, y, 0.4))
     hline(img, 0, W - 1, HORIZON, "C7")
-    # The boat, small, and no one rowing.
-    bx, by = 200, 172
-    fill(img, [(bx, by), (bx + 40, by - 2), (bx + 35, by + 6), (bx + 5, by + 6)], "W1")
-    hline(img, bx + 2, bx + 38, by, "W3")
-    fill(img, [(bx + 16, by - 2), (bx + 24, by - 2), (bx + 24, by - 6), (bx + 16, by - 5)], "C2")
+    # The boat, small, and no one rowing: the oars shipped, the man slumped low in it.
+    boat = blank(70, 16)
+    bx, by = 15, 8
+    fill(boat, [(bx, by), (bx + 40, by - 2), (bx + 35, by + 6), (bx + 5, by + 6)], "W1")
+    hline(boat, bx + 2, bx + 38, by, "W3")
+    fill(boat, [(bx + 16, by - 2), (bx + 24, by - 2), (bx + 24, by - 6), (bx + 16, by - 5)], "C2")
+    hline(boat, bx + 6, bx + 34, by - 3, "W2")
     for i in range(3):
-        hline(img, bx - 10 + i * 4, bx + 50 - i * 4, by + 8 + i * 2, "C3")
+        hline(boat, bx - 10 + i * 4, bx + 50 - i * 4, by + 8 + min(i, 1) * 2 - (i == 2), "C3")
+    return img, {"boat": (boat, (185, 164))}
+
+
+def man(lying):
+    img = blank(20, 14)
+    if lying:
+        fill(img, [(1, 12), (3, 9), (14, 9), (17, 10), (18, 12), (15, 13), (2, 13)], "C1")
+        for k in range(4):
+            put(img, 16 + k % 2, 9 + k // 2, "S0")
+    else:
+        fill(img, [(6, 13), (6, 6), (8, 3), (11, 3), (12, 6), (13, 13)], "C1")
+        fill(img, [(12, 13), (17, 11), (18, 13)], "C1")
+        for k in range(4):
+            put(img, 9 + k % 2, 1 + k // 2, "S0")
     return img
 
 
-def panel_dry():
+def panel_dry_layers():
     img = gen_shore.sky()
     noise = Noise(404)
     # The sea, gone to a thin pale line at the very edge of sight.
@@ -147,15 +249,67 @@ def panel_dry():
     fill(img, [(bx, by - 2), (bx + 70, by - 10), (bx + 74, by + 2), (bx + 4, by + 6)], "W1")
     hline(img, bx + 4, bx + 70, by - 9, "W3")
     fill(img, [(bx + 6, by - 3), (bx + 68, by - 9), (bx + 66, by - 4), (bx + 8, by + 1)], "W0")
+    # Dead fish near it, as on the Shore.
+    for fx, fy in ((250, 186), (128, 190), (276, 194)):
+        hline(img, fx, fx + 5, fy, "C6")
+        put(img, fx + 6, fy - 1, "C5")
+        put(img, fx + 6, fy + 1, "C5")
+    return img, {"lying": (man(True), (226, 172)), "sitting": (man(False), (226, 172))}
+
+
+def panel_raider():
+    return flatten(panel_raider_layers())
+
+
+def panel_escape():
+    return flatten(panel_escape_layers(), skip=("oars_1",))
+
+
+def panel_drift():
+    return flatten(panel_drift_layers())
+
+
+def panel_dry():
+    return flatten(panel_dry_layers(), skip=("sitting",))
+
+
+def flatten(layers, skip=()):
+    """The picture as one image, for anything that shows it still."""
+    img, parts = layers
+    img = img.copy()
+    boat_at = parts.get("boat", (None, (0, 0)))[1]
+    for name, (part, (x, y)) in parts.items():
+        if name in skip:
+            continue
+        if name.startswith("oars"):
+            x, y = boat_at
+        img.alpha_composite(part, (x, y))
     return img
 
 
-PANELS = {
-    "prologue_1_raider.png": panel_raider,
-    "prologue_2_escape.png": panel_escape,
-    "prologue_3_drift.png": panel_drift,
-    "prologue_4_dry.png": panel_dry,
+PROLOGUE_LAYERS = {
+    "prologue_1": panel_raider_layers,
+    "prologue_2": panel_escape_layers,
+    "prologue_3": panel_drift_layers,
+    "prologue_4": panel_dry_layers,
 }
+
+
+PANELS = {
+    "prologue_1_raider.png": lambda: panel_raider_layers()[0],
+    "prologue_2_escape.png": lambda: panel_escape_layers()[0],
+    "prologue_3_drift.png": lambda: panel_drift_layers()[0],
+    "prologue_4_dry.png": lambda: panel_dry_layers()[0],
+}
+
+
+def prologue_parts():
+    """Every moving part, by file name, with where it goes in its picture."""
+    parts = {}
+    for key, layers in PROLOGUE_LAYERS.items():
+        for name, (image, at) in layers()[1].items():
+            parts[f"{key}_{name}.png"] = (image, at)
+    return parts
 
 
 # ---------------------------------------------------------------- the epilogue's pictures, after the escape

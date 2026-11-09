@@ -22,12 +22,12 @@ UI_OUT = ROOT / "project" / "assets" / "ui"
 # light.png is a light mask, not artwork: its values multiply the lantern colour.
 ARTWORK = ["sky", "clouds", "far", "glints", "flats", "bank", "terrain", "foreground", "fish", "boat", "sailor", "talisman", "tentacle", "ribs"]
 REVEAL_OUT = ROOT / "project" / "assets" / "reveal"
-REVEAL_ARTWORK = ["monolith", "dagon_body", "dagon_head", "dagon_crest", "dagon_arm"]
+REVEAL_ARTWORK = ["monolith", "dagon_body", "dagon_head", "dagon_crest", "dagon_arm", "crossing_carving"]
 # The finished reference section, and the prologue. shaft.png is a light mask, like light.png.
 CAVE_OUT = ROOT / "project" / "assets" / "cave"
 CAVE_ARTWORK = ["cave_front", "cave_wall", "abyss_far", "ritual_far", "foreground_cave"]
 PROLOGUE_OUT = ROOT / "project" / "assets" / "prologue"
-PROLOGUE_ARTWORK = ["prologue_1_raider", "prologue_2_escape", "prologue_3_drift", "prologue_4_dry", "ending_1_found", "ending_2_listen", "ending_3_shop", "ending_4_rising"]
+PROLOGUE_ARTWORK = ["prologue_1_raider", "prologue_2_escape", "prologue_3_drift", "prologue_4_dry", "prologue_1_lamp", "prologue_2_lamp", "prologue_2_boat", "prologue_2_oars_0", "prologue_2_oars_1", "prologue_3_boat", "prologue_4_lying", "prologue_4_sitting", "ending_1_found", "ending_2_listen", "ending_3_shop", "ending_4_rising"]
 CAVE_X0 = 600
 CAVE_OPEN_GROUND = range(640, 1440)
 IDLE_FRAMES = 8

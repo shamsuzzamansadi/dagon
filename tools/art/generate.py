@@ -119,6 +119,7 @@ def main():
     gen_cave.remains_ribs().save(OUT / "ribs.png")
     REVEAL_OUT.mkdir(parents=True, exist_ok=True)
     gen_reveal.monolith().save(REVEAL_OUT / "monolith.png")
+    gen_reveal.crossing_carving().save(REVEAL_OUT / "crossing_carving.png")
     for name, (image, _offset) in gen_reveal.dagon_parts().items():
         image.save(REVEAL_OUT / f"dagon_{name}.png")
     CAVE_OUT.mkdir(parents=True, exist_ok=True)
@@ -131,6 +132,8 @@ def main():
     PROLOGUE_OUT.mkdir(parents=True, exist_ok=True)
     for name, draw in gen_prologue.PANELS.items():
         draw().save(PROLOGUE_OUT / name)
+    for name, (image, _at) in gen_prologue.prologue_parts().items():
+        image.save(PROLOGUE_OUT / name)
     for name, draw in gen_prologue.ENDING_PANELS.items():
         draw().save(PROLOGUE_OUT / name)
     write_sailor()

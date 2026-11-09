@@ -7,6 +7,152 @@
 [ext_resource type="Texture2D" path="res://assets/prologue/prologue_3_drift.png" id="p3"]
 [ext_resource type="Texture2D" path="res://assets/prologue/prologue_4_dry.png" id="p4"]
 [ext_resource type="AudioStream" path="res://assets/audio/music/prologue.ogg" id="music"]
+[ext_resource type="Texture2D" path="res://assets/prologue/prologue_1_lamp.png" id="p1_lamp"]
+[ext_resource type="Texture2D" path="res://assets/prologue/prologue_2_lamp.png" id="p2_lamp"]
+[ext_resource type="Texture2D" path="res://assets/prologue/prologue_2_boat.png" id="p2_boat"]
+[ext_resource type="Texture2D" path="res://assets/prologue/prologue_2_oars_0.png" id="p2_oars0"]
+[ext_resource type="Texture2D" path="res://assets/prologue/prologue_2_oars_1.png" id="p2_oars1"]
+[ext_resource type="Texture2D" path="res://assets/prologue/prologue_3_boat.png" id="p3_boat"]
+[ext_resource type="Texture2D" path="res://assets/prologue/prologue_4_lying.png" id="p4_lying"]
+[ext_resource type="Texture2D" path="res://assets/prologue/prologue_4_sitting.png" id="p4_sitting"]
+[ext_resource type="AudioStream" path="res://assets/audio/ambience/night_sea.ogg" id="a_sea"]
+[ext_resource type="AudioStream" path="res://assets/audio/effects/oars.ogg" id="a_oars"]
+[ext_resource type="AudioStream" path="res://assets/audio/ambience/lapping.ogg" id="a_lapping"]
+[ext_resource type="AudioStream" path="res://assets/audio/ambience/wind.ogg" id="a_wind"]
+
+[sub_resource type="Animation" id="raider_show"]
+resource_name = "show"
+length = 4.0
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Lamp:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5, 0.9, 1.6, 2.2, 2.9, 3.3, 4),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0.72), Color(1, 1, 1, 1), Color(1, 1, 1, 0.84), Color(1, 1, 1, 1), Color(1, 1, 1, 0.68), Color(1, 1, 1, 1), Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="raider_lib"]
+_data = {
+&"show": SubResource("raider_show")
+}
+
+[sub_resource type="Animation" id="escape_show"]
+resource_name = "show"
+length = 12.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Boat:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.25, 3.5, 3.75, 4, 4.25, 4.5, 4.75, 5, 5.25, 5.5, 5.75, 6, 6.25, 6.5, 6.75, 7, 7.25, 7.5, 7.75, 8, 8.25, 8.5, 8.75, 9, 9.25, 9.5, 9.75, 10, 10.25, 10.5, 10.75, 11, 11.25, 11.5, 11.75, 12),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [Vector2(190, 158), Vector2(191, 158), Vector2(192, 158), Vector2(193, 158), Vector2(194, 158), Vector2(195, 158), Vector2(196, 158), Vector2(197, 158), Vector2(198, 158), Vector2(199, 158), Vector2(200, 158), Vector2(201, 158), Vector2(202, 158), Vector2(203, 158), Vector2(204, 158), Vector2(205, 158), Vector2(206, 158), Vector2(207, 158), Vector2(208, 158), Vector2(209, 158), Vector2(210, 158), Vector2(211, 158), Vector2(212, 158), Vector2(213, 158), Vector2(214, 158), Vector2(215, 158), Vector2(216, 158), Vector2(217, 158), Vector2(218, 158), Vector2(219, 158), Vector2(220, 158), Vector2(221, 158), Vector2(222, 158), Vector2(223, 158), Vector2(224, 158), Vector2(225, 158), Vector2(226, 158), Vector2(227, 158), Vector2(228, 158), Vector2(229, 158), Vector2(230, 158), Vector2(231, 158), Vector2(232, 158), Vector2(233, 158), Vector2(234, 158), Vector2(235, 158), Vector2(236, 158), Vector2(237, 158), Vector2(238, 158)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Boat/Oars0:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.15, 0.85, 1.6, 2.3, 3.05, 3.75, 4.5, 5.2, 5.95, 6.65, 7.4, 8.1, 8.85, 9.55, 10.3, 11, 11.75, 12.45),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [false, true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Boat/Oars1:visible")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.15, 0.85, 1.6, 2.3, 3.05, 3.75, 4.5, 5.2, 5.95, 6.65, 7.4, 8.1, 8.85, 9.55, 10.3, 11, 11.75, 12.45),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false, true]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Lamp:modulate")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 2, 7.5),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="escape_lib"]
+_data = {
+&"show": SubResource("escape_show")
+}
+
+[sub_resource type="Animation" id="drift_show"]
+resource_name = "show"
+length = 12.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Boat:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [Vector2(185, 164), Vector2(185, 165), Vector2(185, 165), Vector2(185, 164), Vector2(186, 164), Vector2(186, 165), Vector2(186, 165), Vector2(186, 164), Vector2(187, 164), Vector2(187, 165), Vector2(187, 165), Vector2(187, 164), Vector2(188, 164), Vector2(188, 165), Vector2(188, 165), Vector2(188, 164), Vector2(189, 164), Vector2(189, 165), Vector2(189, 165), Vector2(189, 164), Vector2(190, 164), Vector2(190, 165), Vector2(190, 165), Vector2(190, 164), Vector2(191, 164)]
+}
+
+[sub_resource type="AnimationLibrary" id="drift_lib"]
+_data = {
+&"show": SubResource("drift_show")
+}
+
+[sub_resource type="Animation" id="dry_show"]
+resource_name = "show"
+length = 12.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Lying:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1.4, 2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sitting:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 1.4, 2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="dry_lib"]
+_data = {
+&"show": SubResource("dry_show")
+}
+
 
 [node name="Prologue" type="MenuController"]
 layout_mode = 3
@@ -63,6 +209,25 @@ mouse_filter = 2
 texture = ExtResource("p1")
 stretch_mode = 5
 
+[node name="Lamp" type="TextureRect" parent="Panels/Raider"]
+layout_mode = 0
+offset_left = 334.0
+offset_top = 110.0
+offset_right = 346.0
+offset_bottom = 122.0
+mouse_filter = 2
+texture = ExtResource("p1_lamp")
+
+[node name="Sea" type="AudioStreamPlayer" parent="Panels/Raider"]
+stream = ExtResource("a_sea")
+volume_db = -12.0
+bus = &"Effects"
+
+[node name="Motion" type="AnimationPlayer" parent="Panels/Raider"]
+libraries = {
+&"": SubResource("raider_lib")
+}
+
 [node name="Escape" type="TextureRect" parent="Panels"]
 visible = false
 layout_mode = 1
@@ -72,6 +237,58 @@ anchor_bottom = 1.0
 mouse_filter = 2
 texture = ExtResource("p2")
 stretch_mode = 5
+
+[node name="Lamp" type="TextureRect" parent="Panels/Escape"]
+layout_mode = 0
+offset_left = 118.0
+offset_top = 102.0
+offset_right = 130.0
+offset_bottom = 114.0
+mouse_filter = 2
+texture = ExtResource("p2_lamp")
+
+[node name="Boat" type="TextureRect" parent="Panels/Escape"]
+layout_mode = 0
+offset_left = 190.0
+offset_top = 158.0
+offset_right = 300.0
+offset_bottom = 184.0
+mouse_filter = 2
+texture = ExtResource("p2_boat")
+
+[node name="Oars0" type="TextureRect" parent="Panels/Escape/Boat"]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 110.0
+offset_bottom = 26.0
+mouse_filter = 2
+texture = ExtResource("p2_oars0")
+
+[node name="Oars1" type="TextureRect" parent="Panels/Escape/Boat"]
+visible = false
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 110.0
+offset_bottom = 26.0
+mouse_filter = 2
+texture = ExtResource("p2_oars1")
+
+[node name="Sea" type="AudioStreamPlayer" parent="Panels/Escape"]
+stream = ExtResource("a_sea")
+volume_db = -12.0
+bus = &"Effects"
+
+[node name="Oars" type="AudioStreamPlayer" parent="Panels/Escape"]
+stream = ExtResource("a_oars")
+volume_db = -8.0
+bus = &"Effects"
+
+[node name="Motion" type="AnimationPlayer" parent="Panels/Escape"]
+libraries = {
+&"": SubResource("escape_lib")
+}
 
 [node name="Drift" type="TextureRect" parent="Panels"]
 visible = false
@@ -83,6 +300,25 @@ mouse_filter = 2
 texture = ExtResource("p3")
 stretch_mode = 5
 
+[node name="Boat" type="TextureRect" parent="Panels/Drift"]
+layout_mode = 0
+offset_left = 185.0
+offset_top = 164.0
+offset_right = 255.0
+offset_bottom = 180.0
+mouse_filter = 2
+texture = ExtResource("p3_boat")
+
+[node name="Water" type="AudioStreamPlayer" parent="Panels/Drift"]
+stream = ExtResource("a_lapping")
+volume_db = -6.0
+bus = &"Effects"
+
+[node name="Motion" type="AnimationPlayer" parent="Panels/Drift"]
+libraries = {
+&"": SubResource("drift_lib")
+}
+
 [node name="Dry" type="TextureRect" parent="Panels"]
 visible = false
 layout_mode = 1
@@ -92,6 +328,35 @@ anchor_bottom = 1.0
 mouse_filter = 2
 texture = ExtResource("p4")
 stretch_mode = 5
+
+[node name="Lying" type="TextureRect" parent="Panels/Dry"]
+layout_mode = 0
+offset_left = 226.0
+offset_top = 172.0
+offset_right = 246.0
+offset_bottom = 186.0
+mouse_filter = 2
+texture = ExtResource("p4_lying")
+
+[node name="Sitting" type="TextureRect" parent="Panels/Dry"]
+modulate = Color(1, 1, 1, 0)
+layout_mode = 0
+offset_left = 226.0
+offset_top = 172.0
+offset_right = 246.0
+offset_bottom = 186.0
+mouse_filter = 2
+texture = ExtResource("p4_sitting")
+
+[node name="Wind" type="AudioStreamPlayer" parent="Panels/Dry"]
+stream = ExtResource("a_wind")
+volume_db = -14.0
+bus = &"Effects"
+
+[node name="Motion" type="AnimationPlayer" parent="Panels/Dry"]
+libraries = {
+&"": SubResource("dry_lib")
+}
 
 [node name="Card" type="PanelContainer" parent="."]
 layout_mode = 1

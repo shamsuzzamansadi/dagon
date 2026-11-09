@@ -649,6 +649,45 @@ def water_cascade(rng):
 # ---------------------------------------------------------------- the list
 
 
+def oars(rng):
+    """The prologue's escape: a man rowing hard and quietly. Each stroke: the oars biting, a pull of water, the
+    oarlocks creaking, drips off the blades on the return. Two strokes to the loop."""
+    n = seconds(3.2)
+    out = []
+    for side in range(2):
+        x = np.zeros(n)
+        for k in range(2):
+            start = 0.15 + k * 1.6 + side * 0.012
+            m = seconds(0.12)
+            place(x, filt(white(m, rng), "band", (400, 2600)) * env_exp(m, 0.03) * 0.5, start)
+            m = seconds(0.7)
+            pull = np.sin(np.linspace(0, math.pi, m)) ** 1.5
+            place(x, filt(pink(m, rng), "band", (180, 1800)) * pull * 0.6, start + 0.05)
+            m = seconds(0.18)
+            creak = np.sin(2 * math.pi * np.cumsum(np.linspace(520, 380, m)) / SR) * env_exp(m, 0.06)
+            place(x, filt(creak + 0.4 * filt(white(m, rng), "band", (900, 2000)) * env_exp(m, 0.05), "band", (300, 2500)) * 0.25, start + 0.55)
+            for d in range(4):
+                m = seconds(0.06)
+                place(x, filt(white(m, rng), "band", (1800, 5000)) * env_exp(m, 0.012) * rng.uniform(0.06, 0.14), start + 0.95 + d * rng.uniform(0.08, 0.16))
+        out.append(x + filt(brown(n, rng), "low", 120) * 0.08)
+    return level(make_loop(stereo(*out), 0.3), rms=-27)
+
+
+def amb_lapping(rng):
+    """The prologue's drift: the sea flat calm under a hot sun, small water knocking against a hull, and nothing else."""
+    n = seconds(16)
+    out = []
+    for side in range(2):
+        x = np.zeros(n)
+        time = 0.4 + side * 0.3
+        while time < 15.0:
+            m = seconds(rng.uniform(0.18, 0.35))
+            place(x, filt(pink(m, rng), "band", (250, 1600)) * np.sin(np.linspace(0, math.pi, m)) ** 2 * rng.uniform(0.3, 0.7), time)
+            time += rng.uniform(0.9, 2.2)
+        out.append(x + filt(pink(n, rng), "band", (120, 900)) * 0.04)
+    return level(make_loop(stereo(*out), 1.5), rms=-34)
+
+
 SOUNDS = {
     # path under assets/audio: (maker, loops, what it is for)
     "ambience/shore_sea.ogg": (amb_shore_sea, True, "The Shore: a thin, far-off sea"),
@@ -689,6 +728,8 @@ SOUNDS = {
     "music/cave.ogg": (music_cave, False, "Music: the cave, restrained"),
     "ambience/night_sea.ogg": (amb_night_sea, True, "The epilogue: the sea at night, close and quiet"),
     "effects/water_cascade.ogg": (water_cascade, False, "The reveal: water pouring off it as it rises"),
+    "effects/oars.ogg": (oars, True, "The prologue's escape: rowing"),
+    "ambience/lapping.ogg": (amb_lapping, True, "The prologue's drift: a calm sea against the hull"),
 }
 
 
@@ -728,12 +769,13 @@ def measure(path, loops):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--check", action="store_true")
+    parser.add_argument("--only", nargs="*", default=[], help="make only these files; the rest are measured as they are")
     args = parser.parse_args()
     problems = 0
     print(f"{'file':34} {'s':>6} {'ch':>2} {'peak':>7} {'rms':>7} {'seam':>5}  use")
     for rel, (maker, loops, use) in SOUNDS.items():
         path = OUT / rel
-        if not args.check:
+        if not args.check and (not args.only or rel in args.only):
             rng = np.random.default_rng(seed_for(rel))
             x = np.asarray(maker(rng), dtype=np.float64)
             path.parent.mkdir(parents=True, exist_ok=True)

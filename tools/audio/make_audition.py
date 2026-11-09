@@ -16,6 +16,13 @@ files (kokoro-v1.0.onnx, voices-v1.0.bin) in --models.
 
 --install copies that candidate's three files into project/assets/narration, so they play in the game with their
 captions. The words always come from project/narration/script.txt, so a caption and its audio cannot drift apart.
+
+Once the owner has chosen a candidate, and only then, the same voice speaks further lines straight into the game:
+
+    python tools/audio/make_audition.py --models DIR --speak A ending.found ending.listen ending.rising
+
+--speak makes only the lines it names, in the chosen candidate's voice and settings, trimmed and levelled as above,
+into project/assets/narration/<id>.ogg. There is deliberately no option to speak every line at once.
 """
 
 import argparse
@@ -74,10 +81,13 @@ def trim_and_level(audio, rate):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--models", required=True, type=Path)
-    parser.add_argument("--out", required=True, type=Path)
     parser.add_argument("--install", choices=sorted(CANDIDATES))
     parser.add_argument("--only", choices=sorted(CANDIDATES), help="regenerate one candidate and keep the other's files")
+    parser.add_argument("--speak", nargs="+", metavar=("CANDIDATE", "LINE"), help="after the owner's choice: speak these lines in that voice, into the game")
+    parser.add_argument("--out", type=Path, default=ROOT / "docs" / "evidence" / "m3" / "voice-audition")
     args = parser.parse_args()
+    if args.speak and (args.speak[0] not in CANDIDATES or len(args.speak) < 2):
+        parser.error("--speak needs a candidate, A or B, then one or more line ids")
 
     import os
 
@@ -95,6 +105,26 @@ def main():
     kokoro = Kokoro(str(args.models / "kokoro-v1.0.onnx"), str(args.models / "voices-v1.0.bin"))
     model = ChatterboxTTS.from_pretrained(device="cuda" if torch.cuda.is_available() else "cpu")
     report = []
+    if args.speak:
+        name, line_ids = args.speak[0], args.speak[1:]
+        unknown = [line_id for line_id in line_ids if line_id not in words]
+        if unknown:
+            print(f"not in the script: {unknown}")
+            return 2
+        spec = CANDIDATES[name]
+        timbre, rate = kokoro.create(TIMBRE_TEXT, voice=spec["timbre_voice"], speed=spec["timbre_speed"], lang=spec["lang"])
+        timbre_path = args.models / f"timbre_{name}.wav"
+        sf.write(timbre_path, timbre, rate)
+        target = ROOT / "project" / "assets" / "narration"
+        target.mkdir(parents=True, exist_ok=True)
+        for line_id in line_ids:
+            torch.manual_seed(7)
+            wav = model.generate(words[line_id], audio_prompt_path=str(timbre_path), exaggeration=spec["exaggeration"], cfg_weight=spec["cfg"])
+            audio = trim_and_level(wav.cpu().numpy(), model.sr)
+            sf.write(target / f"{line_id}.ogg", audio, model.sr, format="OGG", subtype="VORBIS")
+            seconds = len(audio) / model.sr
+            print(f"{name} {line_id} {seconds:.2f}s {len(words[line_id]) / seconds:.1f} chars/s -> {target / (line_id + '.ogg')}", flush=True)
+        return 0
     for name, spec in CANDIDATES.items():
         if args.only and name != args.only:
             report.extend(line for line in (args.out / "measurements.txt").read_text().splitlines() if line.startswith(name + " ")) if (args.out / "measurements.txt").exists() else None

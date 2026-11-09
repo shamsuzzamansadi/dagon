@@ -154,6 +154,9 @@ private:
 	void show_next_ending_line();
 	bool is_sequence() const { return mode_ == MODE_ENDING || mode_ == MODE_PROLOGUE; }
 	void show_panel(int p_index);
+	static void start_panel(godot::Node *p_panel);
+	void fade_sounds(double p_seconds);
+	static void stop_panel(godot::Node *p_panel);
 	void finish_prologue(bool p_skipped);
 	godot::Control *panel(const NodeRef<godot::Control> &p_panel) const { return p_panel.get(); }
 

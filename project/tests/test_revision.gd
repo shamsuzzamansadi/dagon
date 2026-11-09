@@ -162,18 +162,65 @@ func test_the_story_hangs_together_from_the_prologue_to_the_epilogue(h) -> void:
 ## ---- The crossing in Act II ----
 
 
-func test_the_slab_starts_raised_and_walking_up_it_from_the_hollow_brings_it_down_level(h) -> void:
+## Holds a direction and hops each time the sailor stands on something, as anyone climbing ledges does.
+func _climb(h, key: Key, reached: Callable, max_frames: int) -> bool:
+	var player := _player(h)
+	h.send(h.key_event(key, true))
+	for i in max_frames:
+		if reached.call():
+			h.send(h.key_event(key, false))
+			return true
+		if player.is_on_floor():
+			h.send(h.key_event(KEY_SPACE, true))
+			await h.steps(16)
+			h.send(h.key_event(KEY_SPACE, false))
+		await h.steps(1)
+	h.send(h.key_event(key, false))
+	return false
+
+
+func _push_in_reach(h) -> bool:
+	return _player(h).get_node("Interactor").get_focus() == h.fixture.get_node("CrossingStone/Push")
+
+
+## Up the ledges to the stone, and push it: it falls on the raised end, and the slab comes down level.
+func _climb_and_push(h) -> bool:
+	await h.stand_at(_player(h), Vector2(1990, -2))
+	var up: bool = await _climb(h, KEY_D, func() -> bool: return _push_in_reach(h), 600)
+	h.check(up, "climbing did not reach the stone, at %s" % _player(h).global_position)
+	await h.tap_key(KEY_E)
+	return _director(h).is_crossing_lowered()
+
+
+func test_the_slab_starts_raised_out_of_reach_and_the_gap_cannot_be_crossed_along_the_ground(h) -> void:
 	var world := await _world(h, ABYSS)
 	var crossing: Node2D = world.get_node("Crossing")
 	var director := _director(h)
 	h.check(not director.is_crossing_lowered(), "the slab starts down")
 	h.check(absf(crossing.rotation - director.crossing_raised_rotation) < 0.001, "the slab starts at %.3f" % crossing.rotation)
-	await h.stand_at(_player(h), Vector2(RIM_X, -2))
-	var across: bool = await _walk_hopping(h, KEY_D, func() -> bool: return _player(h).global_position.x > FAR_RIM_X + 10.0, 900)
-	h.check(across, "walking and hopping did not get across, stopped at %s" % _player(h).global_position)
-	h.check(director.is_crossing_lowered(), "the slab is not down")
+	var near_end: Vector2 = crossing.global_transform * Vector2(-80, -4)
+	h.check(near_end.y < -30.0, "the slab's near end is in reach, at %s" % near_end)
+	# Along the ground, under the ledges and down into the hollow, hopping at everything: no way over.
+	await h.stand_at(_player(h), Vector2(RIM_X - 140.0, -2))
+	var across: bool = await _walk_hopping(h, KEY_D, func() -> bool: return _player(h).global_position.x > FAR_RIM_X + 10.0, 600)
+	h.check(not across, "the gap was crossed without the stone")
+	h.check(not director.is_crossing_lowered(), "walking brought the slab down")
+
+
+func test_climbing_the_ledges_and_pushing_the_stone_brings_the_slab_down_and_it_can_be_crossed(h) -> void:
+	var world := await _world(h, ABYSS)
+	var crossing: Node2D = world.get_node("Crossing")
+	var director := _director(h)
+	h.check(await _climb_and_push(h), "pushing the stone did not bring the slab down")
+	await h.wait_until(func() -> bool: return not director.is_crossing_moving(), 120, "the slab to settle")
 	h.check(absf(crossing.rotation) < 0.001, "the slab is not level: %.3f" % crossing.rotation)
-	h.check(not world.get_node("Triggers/CrossingWeight").enabled, "the weight trigger is still armed")
+	var stone: Node2D = world.get_node("CrossingStone")
+	var rest: Vector2 = crossing.global_transform * director.crossing_weight_rest
+	h.check(stone.global_position.distance_to(rest) < 1.0, "the stone is at %s, not on the slab's end at %s" % [stone.global_position, rest])
+	h.check(stone.collision_layer == 0, "the fallen stone still blocks")
+	h.check(not world.get_node("CrossingStone/Push").is_available(), "the stone can be pushed again")
+	var across: bool = await _walk_hopping(h, KEY_D, func() -> bool: return _player(h).global_position.x > FAR_RIM_X + 10.0, 600)
+	h.check(across, "could not cross the lowered slab, stopped at %s" % _player(h).global_position)
 
 
 func test_the_slab_comes_down_once_with_one_sound_and_one_line(h) -> void:
@@ -181,28 +228,30 @@ func test_the_slab_comes_down_once_with_one_sound_and_one_line(h) -> void:
 	var sound: AudioStreamPlayer2D = world.get_node("Crossing/Sound")
 	var hud: Node = world.get_node("Hud")
 	var director := _director(h)
-	await h.stand_at(_player(h), Vector2(2262, -40))
-	await h.steps(5)
-	h.check(director.is_crossing_lowered(), "a weight beyond the stone did not bring it down")
+	await _climb_and_push(h)
+	await h.steps(2)
 	h.check(sound.playing, "the slab came down in silence")
-	h.check(world.get_node("Hud/Caption").visible and world.get_node("Hud/Caption").text.contains("tipped"), "no line as it came down: '%s'" % world.get_node("Hud/Caption").text)
+	h.check(world.get_node("Hud/Caption").visible and world.get_node("Hud/Caption").text.contains("struck the raised end"), "no line as it came down: '%s'" % world.get_node("Hud/Caption").text)
 	await h.wait_until(func() -> bool: return not director.is_crossing_moving(), 120, "the slab to settle")
-	# Walking back over it, and onto the spot again, changes nothing and says nothing.
+	# Pressing again where the stone was, and walking over the slab, change nothing and say nothing.
 	hud.hide_caption()
 	await h.steps(2)
 	sound.stop()
-	await h.stand_at(_player(h), Vector2(2180, -2))
-	await h.stand_at(_player(h), Vector2(2262, -2))
+	await h.tap_key(KEY_E)
 	await h.steps(10)
 	h.check(not sound.playing, "the slab's sound played again")
-	h.check(not world.get_node("Hud/Caption").visible, "the line was said again")
+	h.check(not world.get_node("Hud/Caption").visible or not world.get_node("Hud/Caption").text.contains("struck"), "the line was said again")
 
 
 func test_a_world_restored_at_the_abyss_has_the_slab_up_and_from_the_monolith_on_has_it_down(h) -> void:
 	for pair in [[ABYSS, false], [MONOLITH, true], [AWAKENED, true]]:
 		var world := await _world(h, pair[0])
 		var director := _director(h)
+		var stone: Node2D = world.get_node("CrossingStone")
+		var rest: Vector2 = world.get_node("Crossing").global_transform * director.crossing_weight_rest
 		h.check(director.is_crossing_lowered() == pair[1], "at beat %d the slab is %s" % [pair[0], "down" if director.is_crossing_lowered() else "up"])
+		h.check((stone.global_position.distance_to(rest) < 1.0) == pair[1], "at beat %d the stone is at %s" % [pair[0], stone.global_position])
+		h.check(world.get_node("CrossingStone/Push").is_available() != pair[1], "at beat %d the stone's push is wrong" % pair[0])
 		h.check(not world.get_node("Crossing/Sound").playing, "restoring beat %d played the slab's sound" % pair[0])
 		h.check(not world.get_node("Hud/Caption").visible, "restoring beat %d said something" % pair[0])
 		await h.unload_fixture()
@@ -212,7 +261,7 @@ func test_once_down_the_crossing_can_be_walked_both_ways(h) -> void:
 	var world := await _world(h, MONOLITH)
 	h.check(_director(h).is_crossing_lowered(), "the slab is up at the Monolith")
 	await h.stand_at(_player(h), Vector2(FAR_RIM_X + 30.0, -2))
-	var back: bool = await _walk_hopping(h, KEY_A, func() -> bool: return _player(h).global_position.x < RIM_X, 600)
+	var back: bool = await _walk_hopping(h, KEY_A, func() -> bool: return _player(h).global_position.x < RIM_X - 120.0, 600)
 	h.check(back, "could not walk back over the slab: at %s" % _player(h).global_position)
 	h.check(_player(h).global_position.y < 2.0, "fell into the hollow going back")
 	var again: bool = await _walk_hopping(h, KEY_D, func() -> bool: return _player(h).global_position.x > FAR_RIM_X + 10.0, 600)
@@ -464,15 +513,19 @@ func test_the_tentacle_is_large_enough_to_read_and_its_caption_does_not_claim_to
 		h.check(world.get_node(remains).texture != null, "%s is not on the Shore" % remains)
 
 
-func test_a_stone_by_the_gap_shows_how_it_is_crossed(h) -> void:
+## The clue stands where the action is: on the rock above the ledges, large enough to read at the game's scale.
+func test_the_carving_at_the_ledges_shows_how_the_gap_is_crossed(h) -> void:
 	var world := await _world(h, ABYSS)
 	var mark: Node = world.get_node("Props/CrossingMark")
-	h.check(mark.global_position.x < world.get_node("Crossing").global_position.x - 60.0, "the clue stands past the gap, at %.0f" % mark.global_position.x)
+	var art: Sprite2D = world.get_node("Props/CrossingMark/Art")
+	h.check(art.texture.get_width() >= 72 and art.texture.get_height() >= 40, "the carving is only %s" % art.texture.get_size())
+	var ledges_left: float = world.get_node("CrossingLedges/Low").polygon[0].x
+	h.check(absf(mark.global_position.x - ledges_left) < 60.0, "the carving is not at the ledges: %.0f" % mark.global_position.x)
 	await h.stand_at(_player(h), Vector2(mark.global_position.x, -2))
-	h.check(_player(h).get_node("Interactor").get_focus() == mark, "the clue cannot be examined from the rim")
-	h.check(narration_text("abyss.crossing_mark").contains("tilted beam") and narration_text("abyss.crossing_mark").contains("lying flat"), "the clue does not show both states")
-	for i in 4:
-		h.check(world.get_node("Crossing/Print%d" % i) != null, "no footprints on the slab")
+	h.check(_player(h).get_node("Interactor").get_focus() == mark, "the carving cannot be examined from below it")
+	var line := narration_text("abyss.crossing_mark")
+	h.check(line.contains("stone dropped on the raised end") and line.contains("level"), "the carving's line does not say what it shows: %s" % line)
+	h.check(world.get_node("ActArt/PrintDown0").polygon[0].x < ledges_left, "the footprints do not lead to the ledges")
 
 
 func test_the_monolith_and_the_creature_are_drawn_over_the_shapes_the_clips_move(h) -> void:
@@ -555,3 +608,109 @@ func test_the_prologue_card_stays_under_its_pictures(h) -> void:
 		h.check(card.position.y >= viewport.size.y * 0.66, "line %d's card covers its picture from y=%.0f" % [line, card.position.y])
 		if line + 1 < prologue.ending_lines.size():
 			prologue.advance_ending()
+
+
+## Each picture of the prologue moves a little and has its own sound. Both start with it and stop with it.
+func test_each_prologue_picture_moves_and_sounds_while_it_shows_and_nothing_carries_over(h) -> void:
+	var prologue: Node = await h.load_main_fixture("res://scenes/ui/prologue.tscn")
+	var panels: Node = prologue.get_node("Panels")
+	for line in prologue.ending_lines.size():
+		await h.steps(20)
+		var shown: Node = panels.get_child(line)
+		var sounds := shown.get_children().filter(func(node: Node) -> bool: return node is AudioStreamPlayer)
+		h.check(not sounds.is_empty(), "%s has no sound" % shown.name)
+		for sound in sounds:
+			h.check(sound.playing and sound.bus == &"Effects", "%s/%s is not playing on Effects" % [shown.name, sound.name])
+		h.check(shown.get_node("Motion").is_playing(), "%s does not move" % shown.name)
+		for other in panels.get_children():
+			if other == shown:
+				continue
+			for node in other.get_children():
+				h.check(not (node is AudioStreamPlayer and node.playing), "%s/%s still plays under %s" % [other.name, node.name, shown.name])
+			h.check(not other.get_node("Motion").is_playing(), "%s still moves under %s" % [other.name, shown.name])
+		if shown.name == "Escape":
+			var from: float = shown.get_node("Boat").position.x
+			await h.steps(120)
+			h.check(shown.get_node("Boat").position.x > from + 4.0, "the boat does not pull away")
+		if shown.name == "Dry":
+			# The line holds about 3.8 s, so he is sitting up well before it ends.
+			await h.steps(110)
+			h.check(shown.get_node("Sitting").modulate.a > 0.9 and shown.get_node("Lying").modulate.a < 0.1, "he does not sit up")
+		if line + 1 < prologue.ending_lines.size():
+			prologue.advance_ending()
+
+
+func test_skipping_the_prologue_leaves_none_of_its_sound_in_the_game(h) -> void:
+	await _title(h)
+	await h.tap_key(KEY_ENTER)
+	await h.wait_until(func() -> bool: return is_instance_valid(h.tree.current_scene) and h.tree.current_scene.has_method("skip_prologue"), 60, "the prologue")
+	await h.steps(10)
+	h.tree.current_scene.skip_prologue()
+	await h.wait_until(func() -> bool: return is_instance_valid(h.tree.current_scene) and h.tree.current_scene.is_class("GameSession"), 60, "the game")
+	await h.steps(5)
+	for name in ["Oars", "Water", "Wind"]:
+		for node in h.tree.root.find_children(name, "AudioStreamPlayer", true, false):
+			h.check(not node.playing, "the prologue's %s still plays in the game" % name)
+	h.check(h.tree.root.find_children("Prologue", "MenuController", true, false).is_empty(), "the prologue is still there")
+
+
+## As the hand comes down beside its carving, the carving is lit, so the eye goes from one to the other. Only then.
+func test_the_carving_is_lit_only_while_the_hand_is_beside_it(h) -> void:
+	var world := await _world(h, AWAKENED)
+	var light: PointLight2D = world.get_node("Monolith/CarvingLight")
+	h.check(is_zero_approx(light.energy), "the carving is lit before the reveal")
+	var clip: AnimationPlayer = world.get_node("Cinematics")
+	clip.play(&"dagon_reveal")
+	clip.seek(8.0, true)
+	clip.pause()
+	h.check(light.energy > 1.0, "the carving is not lit as the hand comes down: %.2f" % light.energy)
+	var monolith: Sprite2D = world.get_node("Monolith/Art")
+	var carving := monolith.global_position + Vector2(253, 200)
+	h.check(light.global_position.distance_to(carving) < 10.0, "the light is not on the carving of the swimmer")
+	clip.seek(clip.current_animation_length, true)
+	h.check(is_zero_approx(light.energy), "the carving stays lit after the reveal")
+	clip.stop()
+
+
+func test_the_master_bus_is_limited_below_full_scale(h) -> void:
+	var master := AudioServer.get_bus_index(&"Master")
+	var limited := false
+	for i in AudioServer.get_bus_effect_count(master):
+		var effect := AudioServer.get_bus_effect(master, i)
+		if effect is AudioEffectHardLimiter and AudioServer.is_bus_effect_enabled(master, i):
+			limited = effect.ceiling_db <= -1.0
+	h.check(limited, "nothing keeps the mix below full scale")
+
+
+func test_the_prologue_fades_over_its_last_line_and_the_ending_under_the_credits(h) -> void:
+	var prologue: Node = await h.load_main_fixture("res://scenes/ui/prologue.tscn")
+	var music: AudioStreamPlayer = prologue.get_node("Music")
+	var start: float = music.volume_db
+	for line in prologue.ending_lines.size() - 1:
+		await h.steps(5)
+		prologue.advance_ending()
+	await h.steps(150)
+	h.check(music.playing and music.volume_db < start - 12.0, "the prologue's music is at %.1f dB on its last line" % music.volume_db)
+	h.check(prologue.get_node("Panels/Dry/Wind").volume_db < -14.0 - 12.0, "the wind does not fade with it")
+	await h.unload_fixture()
+	var ending: Node = await h.load_main_fixture("res://scenes/ui/ending.tscn")
+	var sea: AudioStreamPlayer = ending.get_node("Sea")
+	var sea_start: float = sea.volume_db
+	await h.steps(3)
+	ending.open_credits()
+	await h.steps(200)
+	h.check(sea.playing and sea.volume_db < sea_start - 12.0, "the sea under the credits is at %.1f dB" % sea.volume_db)
+	h.check(ending.get_node("Music").volume_db < -3.0 - 12.0, "the ending's music does not fade under the credits")
+
+
+## The epilogue's card is its text, so turning subtitles off never hides it, voiced line or not.
+func test_the_epilogue_shows_every_line_with_subtitles_off(h) -> void:
+	h.write_storage_file("settings.cfg", "dagon_settings=1\nsubtitles=0\n".to_utf8_buffer())
+	var ending: Node = await h.load_main_fixture("res://scenes/ui/ending.tscn")
+	for line in ending.ending_lines.size():
+		await h.steps(3)
+		var lines: Node = ending.get_node("Center/Card/Items/Lines")
+		h.check(ending.get_node("Center/Card").visible and lines.get_child_count() == 1 and not lines.get_child(0).text.is_empty(), "line %d is not shown with subtitles off" % line)
+		h.check(lines.get_child(0).text == narration_text(ending.ending_lines[line]), "line %d does not match the script" % line)
+		if line + 1 < ending.ending_lines.size():
+			ending.advance_ending()

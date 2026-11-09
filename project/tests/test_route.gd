@@ -94,12 +94,14 @@ func test_the_whole_game_can_be_played_from_new_game_to_the_ending_and_back_to_a
 	route.director().cinematic_started.connect(func(clip: StringName, _generation: int) -> void: clips.append(clip))
 	route.world().get_node("Triggers/Collapse").triggered.connect(func(_id: StringName) -> void: clips.append(&"collapse crossed"))
 
+	await route.cross_the_gap()
+	h.check(route.director().is_crossing_lowered(), "the stone did not bring the slab down")
 	await route.solve_with_one_mistake()
 	h.check(beats == [1, 2, 3], "up to the stones, the beats ran %s" % str(beats))
 	h.check(clips.has(&"collapse crossed"), "the way out did not cross collapse")
 	h.check(route.world().get_node("Triggers/Collapse").enabled, "the outbound crossing consumed collapse")
 	# Along the ground. The third tablet is up on a shelf, and this walk does not need it.
-	for id in [&"lifeboat", &"fish", &"fossil_a", &"tablet_wave", &"fossil_b", &"footprint", &"tablet_kneel", &"mural"]:
+	for id in [&"lifeboat", &"fish", &"fossil_a", &"tablet_wave", &"crossing_mark", &"fossil_b", &"footprint", &"tablet_kneel", &"mural"]:
 		h.check(route.captions.has(id), "the walk never offered %s" % id)
 	h.check(not route.captions.has(&"tablet_eye"), "the ground walk reached the tablet on the shelf")
 	h.check(route.captions.get(&"tablet_wave", "").contains("The waters rose first"), "the first tablet read '%s'" % route.captions.get(&"tablet_wave", ""))

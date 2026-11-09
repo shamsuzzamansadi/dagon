@@ -1,6 +1,6 @@
 # The first sound pass
 
-**Status: an initial pass, brought forward from M4 and M5 by the owner ([D70](../../../decisions.md)). It is not final production audio. The developer cannot hear, so every sound here has been measured and never listened to.** Whether any of it works is the owner's ear to decide.
+**Status: an initial pass, brought forward from M4 and M5 by the owner ([D70](../../../decisions.md)). It is not final production audio. The developer cannot hear, so every sound here has been measured, not listened to. The owner has played builds with sound, but has not yet given a documented listening review of this pass.** Whether any of it works is the owner's ear to decide. To judge it, use [the listening package](../listening/README.md): the two voices on the same passages at the same loudness, and a recording of the game playing with its mix.
 
 ## How it was made
 
@@ -18,7 +18,7 @@ Every sound is synthesized by [`tools/audio/make_sounds.py`](../../../../tools/a
 
 | Scene or event | What plays | Kind |
 |---|---|---|
-| Prologue | A slow minor pad under one bowed line | Music |
+| Prologue | A slow minor pad under one bowed line. Under its pictures: the sea at night, oars, a calm sea against the hull, the wind on the dry seabed. All of it fades over the last line | Music, ambience, effect |
 | The Shore | A thin, far-off sea and wind, both positional. Wet sand underfoot. His breathing, slow and spent | Ambience, footsteps, breathing |
 | The cave | Still air with a low resonance, and drips somewhere behind, with reverb. Rock underfoot. **Restrained music from the mouth,** low and sparse, starting as he enters and not looped, so it has thinned to nothing out on the seabed | Ambience, footsteps, music |
 | The ritual, far off | A slow drum and a low hum, heavily distant | Effect, in its clip |
@@ -43,7 +43,6 @@ Every sound is synthesized by [`tools/audio/make_sounds.py`](../../../../tools/a
 
 - **The interface:** no sound for menus, buttons or the pause.
 - **Examining:** no sound when a caption appears.
-- **The prologue:** no sea, ship or oar sounds under its pictures. Only its music.
 - **Spoken lines:** only the three audition lines have a voice. Everything else, including three of the epilogue's four lines, the fragments in the escape and the prologue, is captions until a voice is chosen. **Once one is, every line of the epilogue is narrated first.**
 - **The mix by ear,** and every level here, which the owner may well want changed.
 
@@ -55,5 +54,6 @@ Each of these is tested in `project/tests/test_revision.gd` or `test_narration.g
 - **Restart, scene change and quit** stop it with the world. Quitting first stops all sound, then waits a moment of real time, because the engine reports a sound still playing at shutdown as leaked ([D78](../../../decisions.md)).
 - **Restore** plays no one-shot sound, and no music: an atmosphere clip restored at its end updates its values only ([D85](../../../decisions.md)).
 - **No stacking:** each one-shot has its own player, which restarts rather than doubling.
+- **The mix is limited at −1 dB** on the Master bus, and was measured on a recording of play: no clipping, no clicks, silence while paused ([report](../listening/mix-check.txt), [D91](../../../decisions.md)).
 - **Missing audio never blocks anything:** a test takes every stream away and plays the final sequence to the ending.
 - **Footsteps** follow walking, change from sand to rock where the cave begins, vary between takes, and are heavier on landing.

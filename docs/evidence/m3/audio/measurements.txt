@@ -37,4 +37,6 @@ music/ending.ogg                    48.00  2    -9.9   -24.0  0.00  Music: the e
 music/cave.ogg                      56.00  2    -7.9   -28.0  0.00  Music: the cave, restrained
 ambience/night_sea.ogg              22.00  2   -14.3   -30.1  0.03  The epilogue: the sea at night, close and quiet
 effects/water_cascade.ogg            7.00  2    -3.7   -19.3  0.00  The reveal: water pouring off it as it rises
-SOUNDS files=38 problems=0
+effects/oars.ogg                     2.90  2    -8.8   -27.1  0.07  The prologue's escape: rowing
+ambience/lapping.ogg                14.50  2    -9.3   -34.2  0.01  The prologue's drift: a calm sea against the hull
+SOUNDS files=40 problems=0

@@ -139,6 +139,12 @@ public:
 	float get_crossing_raised_rotation() const { return crossing_raised_rotation_; }
 	void set_crossing_line(const godot::StringName &p_value) { crossing_line_ = p_value; }
 	godot::StringName get_crossing_line() const { return crossing_line_; }
+	void set_crossing_weight_path(const godot::NodePath &p_value) { crossing_weight_path_ = p_value; }
+	godot::NodePath get_crossing_weight_path() const { return crossing_weight_path_; }
+	void set_crossing_weight_rest(const godot::Vector2 &p_value) { crossing_weight_rest_ = p_value; }
+	godot::Vector2 get_crossing_weight_rest() const { return crossing_weight_rest_; }
+	void set_crossing_fall_seconds(float p_value) { crossing_fall_seconds_ = p_value; }
+	float get_crossing_fall_seconds() const { return crossing_fall_seconds_; }
 	void set_crossing_lower_seconds(float p_value) { crossing_lower_seconds_ = p_value; }
 	float get_crossing_lower_seconds() const { return crossing_lower_seconds_; }
 	void set_breath_path(const godot::NodePath &p_value) { breath_path_ = p_value; }
@@ -189,6 +195,11 @@ private:
 	void bring_down_rockfall();
 	void lower_crossing(bool p_instant);
 	void update_crossing(double p_delta);
+	void release_crossing_weight();
+	void rest_crossing_weight();
+	godot::Vector2 crossing_point(float p_rotation, const godot::Vector2 &p_local) const;
+	// The slab's angle as last set. Its node reports the old one until the next physics step.
+	void set_crossing_angle(godot::Node2D *p_crossing, float p_angle);
 	void update_flee(double p_delta);
 	void play_breath(core::Beat p_beat);
 	void play_atmosphere(core::Beat p_beat, bool p_instant);
@@ -224,6 +235,9 @@ private:
 	godot::NodePath crossing_sound_path_;
 	float crossing_raised_rotation_ = 0.0f;
 	float crossing_lower_seconds_ = 0.5f;
+	godot::NodePath crossing_weight_path_;
+	godot::Vector2 crossing_weight_rest_;
+	float crossing_fall_seconds_ = 0.4f;
 	godot::StringName crossing_line_;
 	godot::NodePath breath_path_;
 	godot::Array breath_streams_;
@@ -240,7 +254,8 @@ private:
 	NodeRef<godot::CollisionObject2D> rockfall_;
 	NodeRef<godot::Node2D> tide_node_;
 	NodeRef<godot::Node2D> crossing_;
-	NodeRef<StoryTrigger> crossing_trigger_;
+	NodeRef<Interactable> crossing_trigger_;
+	NodeRef<godot::Node2D> crossing_weight_;
 	NodeRef<godot::AudioStreamPlayer2D> crossing_sound_;
 	NodeRef<godot::AudioStreamPlayer2D> breath_;
 	NodeRef<PuzzleController> puzzle_;
@@ -265,6 +280,9 @@ private:
 	bool crossing_lowered_ = false;
 	bool crossing_moving_ = false;
 	double crossing_elapsed_ = 0.0;
+	bool crossing_falling_ = false;
+	float crossing_angle_ = 0.0f;
+	godot::Vector2 crossing_weight_from_;
 };
 
 } // namespace dagon

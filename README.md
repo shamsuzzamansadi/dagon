@@ -9,7 +9,7 @@ from one checkpoint save, Settings with key rebinding, Controls and Credits. New
 sailor you can walk and jump with, on exposed seabed beside a stranded boat, with the sea far off. You can examine things, pause, and
 use a controller, with buttons named for the device in use.
 
-On the M3 branch, the whole route can be played: the prologue, Shore, Exposed Abyss, Monolith, Witness, the escape and the ending. There are clue tablets, side routes, a slab to bring down across a gap, a distant ritual, a three-stone puzzle, placeholder cinematics,
+On the M3 branch, the whole route can be played: the prologue, Shore, Exposed Abyss, Monolith, Witness, the escape and the ending. There are clue tablets, side routes, a stone to push onto a raised slab to bring it down across a gap, a distant ritual, a three-stone puzzle, placeholder cinematics,
 the sea coming back after you in the escape, a save at each checkpoint, and optional controller vibration. **The Shore and the stretch from the cave entrance to the first tablet are finished art, and so are the monolith, the creature and the epilogue's pictures. The rest past x = 1440 is unfinished greybox,** a stated boundary. The cinematics are a first pass. **There is a first sound pass across the route: ambience, footsteps, effects, breathing and music in five places. It is synthesized, not final, and has not been listened to by the developer.** Three narration lines have an AI voice for the owner's audition, not approved; the rest of the
 narration is captions. It is shorter than the finished game is meant to be. See
 [docs/roadmap.md](docs/roadmap.md), [docs/reviews/m3-review-package.md](docs/reviews/m3-review-package.md) and [docs/shore-preview.md](docs/shore-preview.md).

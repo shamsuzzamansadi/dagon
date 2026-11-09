@@ -76,8 +76,18 @@ starts only after M6 is green, and is time-boxed.
 | Controller | Vibration behaviour and settings | Tuning by feel, with the owner |
 | Narration | Playback and subtitle integration, and three voice samples for direction. **The owner finds them noticeably synthetic, so a direction is still to be chosen** | Approved final narration |
 | Audio | **Since 2026-11-09:** an initial sound pass across the route, music in five places, and a voice audition | The final mix, by ear, and anything the pass misses |
-| Art | **Since 2026-11-09:** one finished reference section, from the cave entrance to the first tablet; the monolith, the creature and the epilogue's pictures | The rest of the route |
+| Art | **Since 2026-11-09:** one finished reference section, from the cave entrance to the first tablet; its boundary into the canyon; the monolith, the creature, the carving at the crossing, and the prologue's and epilogue's pictures | The rest of the route: listed below |
 | Persistence | Save and restore correctness, with focused regression coverage | Kept green |
+
+**The art still greybox at the end of M3, for M4 and M5** (the M3 review package, §0.4, keeps the same list):
+1. The Exposed Abyss past x = 1440: ground, canyon walls, rib arch, far view.
+2. The shelves and tablets of Acts II and III, and the canyon figure's ground.
+3. The ledges, slab and stone at the crossing.
+4. The trench, the gate and the stones at the monolith.
+5. The lit mural's panel.
+6. The creature's own animation.
+7. The ritual and the watcher, as more than silhouettes.
+8. The escape's rockfall and returning sea.
 
 **Cut order if the schedule slips (approved):**
 1. Stretch work.

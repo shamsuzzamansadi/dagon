@@ -99,7 +99,8 @@ void GameDirector::_bind_methods() {
 	DAGON_BIND_PATH(background_path, "AnimationPlayer");
 	DAGON_BIND_PATH(tide_path, "Node2D");
 	DAGON_BIND_PATH(crossing_path, "Node2D");
-	DAGON_BIND_PATH(crossing_trigger_path, "StoryTrigger");
+	DAGON_BIND_PATH(crossing_trigger_path, "Interactable");
+	DAGON_BIND_PATH(crossing_weight_path, "Node2D");
 	DAGON_BIND_PATH(crossing_sound_path, "AudioStreamPlayer2D");
 	DAGON_BIND_PATH(breath_path, "AudioStreamPlayer2D");
 
@@ -138,6 +139,10 @@ void GameDirector::_bind_methods() {
 	DAGON_BIND_FLOAT(flee_look_ahead);
 	DAGON_BIND_FLOAT(crossing_raised_rotation);
 	DAGON_BIND_FLOAT(crossing_lower_seconds);
+	DAGON_BIND_FLOAT(crossing_fall_seconds);
+	ClassDB::bind_method(D_METHOD("set_crossing_weight_rest", "value"), &GameDirector::set_crossing_weight_rest);
+	ClassDB::bind_method(D_METHOD("get_crossing_weight_rest"), &GameDirector::get_crossing_weight_rest);
+	ADD_PROPERTY(PropertyInfo(Variant::VECTOR2, "crossing_weight_rest"), "set_crossing_weight_rest", "get_crossing_weight_rest");
 
 #undef DAGON_BIND_FLOAT
 
@@ -190,14 +195,15 @@ void GameDirector::_ready() {
 	crossing_sound_.set(crossing_sound_path_.is_empty() ? nullptr : get_node<AudioStreamPlayer2D>(crossing_sound_path_));
 	breath_.set(breath_path_.is_empty() ? nullptr : get_node<AudioStreamPlayer2D>(breath_path_));
 	if (Node2D *crossing = crossing_.get()) {
-		crossing->set_rotation(crossing_raised_rotation_);
+		set_crossing_angle(crossing, crossing_raised_rotation_);
 	}
+	crossing_weight_.set(crossing_weight_path_.is_empty() ? nullptr : get_node<Node2D>(crossing_weight_path_));
 	if (!crossing_trigger_path_.is_empty()) {
-		if (StoryTrigger *trigger = get_node<StoryTrigger>(crossing_trigger_path_)) {
+		if (Interactable *trigger = get_node<Interactable>(crossing_trigger_path_)) {
 			crossing_trigger_.set(trigger);
-			trigger->connect("triggered", callable_mp(this, &GameDirector::on_crossing_trigger));
+			trigger->connect("interacted", callable_mp(this, &GameDirector::on_crossing_trigger));
 		} else {
-			ERR_PRINT("GameDirector: crossing_trigger_path does not point to a StoryTrigger.");
+			ERR_PRINT("GameDirector: crossing_trigger_path does not point to an Interactable.");
 		}
 	}
 	puzzle_.set(puzzle_path_.is_empty() ? nullptr : get_node<PuzzleController>(puzzle_path_));
@@ -454,40 +460,47 @@ void GameDirector::on_background_trigger(const StringName &p_trigger_id) {
 	background->play(p_trigger_id);
 }
 
-// A weight on its raised end brings the slab down level. It stays down, and nothing is saved: from the Monolith on,
-// the world is rebuilt with it down, as everyone who got there crossed it.
-void GameDirector::on_crossing_trigger(const StringName &p_trigger_id) {
-	(void)p_trigger_id;
+// The stone pushed off the ledge lands on the slab's raised end, and its weight brings the slab down level. It stays
+// down, and nothing is saved: from the Monolith on, the world is rebuilt with it down, as everyone who got there
+// crossed it.
+void GameDirector::on_crossing_trigger(const StringName &p_interaction_id) {
+	(void)p_interaction_id;
 	lower_crossing(false);
 }
 
 void GameDirector::lower_crossing(bool p_instant) {
-	if (StoryTrigger *trigger = crossing_trigger_.get()) {
+	if (Interactable *trigger = crossing_trigger_.get()) {
 		trigger->set_enabled(false);
 	}
 	Node2D *crossing = crossing_.get();
 	if (p_instant) {
 		crossing_lowered_ = true;
 		crossing_moving_ = false;
+		crossing_falling_ = false;
 		if (crossing != nullptr) {
-			crossing->set_rotation(0.0f);
+			set_crossing_angle(crossing, 0.0f);
 		}
+		release_crossing_weight();
+		rest_crossing_weight();
 		return;
 	}
-	// Already down, or on its way: a second weight changes nothing, and plays nothing.
+	// Already down, or on its way: a second push changes nothing, and plays nothing.
 	if (crossing_lowered_) {
 		return;
 	}
 	crossing_lowered_ = true;
 	print_verbose("dagon: crossing lowered");
+	release_crossing_weight();
 	if (crossing == nullptr || crossing_lower_seconds_ <= 0.0f) {
 		if (crossing != nullptr) {
-			crossing->set_rotation(0.0f);
+			set_crossing_angle(crossing, 0.0f);
 		}
+		rest_crossing_weight();
 		return;
 	}
 	crossing_moving_ = true;
 	crossing_elapsed_ = 0.0;
+	crossing_falling_ = crossing_weight_.get() != nullptr && crossing_fall_seconds_ > 0.0f;
 	if (AudioStreamPlayer2D *sound = crossing_sound_.get()) {
 		sound->play();
 	}
@@ -496,17 +509,80 @@ void GameDirector::lower_crossing(bool p_instant) {
 	}
 }
 
+// Once pushed, the stone is only a picture: nothing stands on it and nothing is stopped by it.
+void GameDirector::release_crossing_weight() {
+	Node2D *weight = crossing_weight_.get();
+	if (weight == nullptr) {
+		return;
+	}
+	crossing_weight_from_ = weight->get_global_position();
+	if (CollisionObject2D *body = Object::cast_to<CollisionObject2D>(weight)) {
+		body->set_collision_layer(0);
+		body->set_collision_mask(0);
+	}
+}
+
+void GameDirector::rest_crossing_weight() {
+	Node2D *weight = crossing_weight_.get();
+	const Node2D *crossing = crossing_.get();
+	if (weight != nullptr && crossing != nullptr) {
+		weight->set_global_position(crossing_point(crossing_angle_, crossing_weight_rest_));
+	}
+}
+
+void GameDirector::set_crossing_angle(Node2D *p_crossing, float p_angle) {
+	crossing_angle_ = p_angle;
+	p_crossing->set_rotation(p_angle);
+}
+
+// Where a point on the slab is at a given angle. Worked out rather than read back: a body synced to physics reports
+// its old transform until the next physics step.
+Vector2 GameDirector::crossing_point(float p_rotation, const Vector2 &p_local) const {
+	const Node2D *crossing = crossing_.get();
+	if (crossing == nullptr) {
+		return p_local;
+	}
+	Transform2D parent;
+	if (const CanvasItem *above = Object::cast_to<CanvasItem>(crossing->get_parent())) {
+		parent = above->get_global_transform();
+	}
+	return (parent * Transform2D(p_rotation, crossing->get_position())).xform(p_local);
+}
+
 void GameDirector::update_crossing(double p_delta) {
 	if (!crossing_moving_) {
 		return;
 	}
 	crossing_elapsed_ += p_delta;
+	Node2D *crossing = crossing_.get();
+	Node2D *weight = crossing_weight_.get();
+	if (crossing_falling_) {
+		// Off the ledge and down onto the raised end, faster as it falls.
+		const double t = std::clamp(crossing_elapsed_ / static_cast<double>(crossing_fall_seconds_), 0.0, 1.0);
+		if (weight != nullptr && crossing != nullptr) {
+			const Vector2 to = crossing_point(crossing_raised_rotation_, crossing_weight_rest_);
+			const float x = crossing_weight_from_.x + (to.x - crossing_weight_from_.x) * static_cast<float>(t);
+			const float y = crossing_weight_from_.y + (to.y - crossing_weight_from_.y) * static_cast<float>(t * t);
+			weight->set_global_position(Vector2(x, y));
+			weight->set_rotation(static_cast<float>(t * 2.0));
+		}
+		if (t < 1.0) {
+			return;
+		}
+		crossing_falling_ = false;
+		crossing_elapsed_ = 0.0;
+		if (CameraRig *camera = camera_rig_.get()) {
+			camera->add_trauma(0.25f);
+		}
+		return;
+	}
 	const double t = std::clamp(crossing_elapsed_ / static_cast<double>(crossing_lower_seconds_), 0.0, 1.0);
 	// Slow to start, then down hard: something heavy giving way.
 	const double eased = t * t;
-	if (Node2D *crossing = crossing_.get()) {
-		crossing->set_rotation(static_cast<float>(static_cast<double>(crossing_raised_rotation_) * (1.0 - eased)));
+	if (crossing != nullptr) {
+		set_crossing_angle(crossing, static_cast<float>(static_cast<double>(crossing_raised_rotation_) * (1.0 - eased)));
 	}
+	rest_crossing_weight();
 	if (t >= 1.0) {
 		crossing_moving_ = false;
 		if (CameraRig *camera = camera_rig_.get()) {

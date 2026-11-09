@@ -1,0 +1,36 @@
+recording: 323.4 s, 2 channels, 48000 Hz
+peak -1.0 dBFS, true peak -1.0 dBTP
+
+loudness by stage (integrated LUFS, and the loudest 3 s)
+  title                        0.0-    1.6 s   -120.0 LUFS  max short-term  -72.0
+  prologue                     1.6-   31.3 s    -23.8 LUFS  max short-term  -21.6
+  shore                       31.3-   56.4 s    -22.7 LUFS  max short-term  -19.9
+  pause                       56.4-   58.5 s    -45.8 LUFS  max short-term  -49.5
+  resume                      58.5-   73.5 s    -36.1 LUFS  max short-term  -33.7
+  cave                        73.5-  108.9 s    -24.0 LUFS  max short-term  -19.4
+  seabed                     108.9-  135.6 s    -29.5 LUFS  max short-term  -22.4
+  crossed                    135.6-  196.9 s    -32.2 LUFS  max short-term  -21.6
+  stones-solved              196.9-  203.9 s    -21.5 LUFS  max short-term  -20.1
+  gate-open                  203.9-  209.1 s    -27.4 LUFS  max short-term  -25.4
+  reveal                     209.1-  223.2 s    -15.6 LUFS  max short-term  -13.3
+  escape-running             223.2-  239.1 s    -18.5 LUFS  max short-term  -14.3
+  ending                     239.1-  284.5 s    -23.0 LUFS  max short-term  -18.8
+  credits                    284.5-  288.5 s    -37.7 LUFS  max short-term  -40.2
+  main-menu                  288.5-  289.6 s   -120.0 LUFS  max short-term  -54.3
+  continue                   289.6-  306.0 s    -15.7 LUFS  max short-term  -13.4
+  escape-standing-still      306.0-  316.4 s    -16.5 LUFS  max short-term  -14.3
+  ending-again               316.4-  322.4 s    -28.2 LUFS  max short-term  -26.6
+
+sudden changes over 30 dB within 20 ms: 5
+  at   31.28 s (prologue): -180.0 ->  -41.6 dB
+  at   56.44 s (pause):  -42.2 -> -180.0 dB
+  at   58.44 s (pause): -180.0 ->  -55.0 dB
+  at  289.50 s (main-menu): -180.0 ->  -50.6 dB
+  at  322.40 s (end):  -33.6 -> -180.0 dB
+
+isolated sample steps (possible clicks): 0
+
+while paused: peak -120.0 dBFS
+main menu after the ending: peak -120.0 dBFS, -120.0 LUFS
+
+MIX_CHECK problems=0

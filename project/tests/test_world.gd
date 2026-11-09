@@ -94,9 +94,7 @@ func test_the_gap_cannot_be_hopped_and_a_fall_into_it_can_always_be_climbed_out_
 	h.send(h.key_event(KEY_D, false))
 	await h.steps(30)
 	h.check(player.global_position.x < 2290.0 or player.global_position.y > 4.0, "a hop crossed the gap: at %s" % player.global_position)
-	# Down in the hollow, on the slab's low end, the steps on the near side lead back up, by walking and hopping.
-	# The slab is held raised here, so nothing tips it while this is checked.
-	world.get_node("Triggers/CrossingWeight").enabled = false
+	# Down in the hollow, under the slab's raised end, the steps on the near side lead back up, by walking and hopping.
 	await h.stand_at(player, Vector2(2160.0, 24.0))
 	h.check(player.global_position.y > 20.0, "not down in the hollow: y=%.1f" % player.global_position.y)
 	var out_left: bool = await _walk(h, player, KEY_A, func() -> bool: return player.global_position.x < 2144.0 and player.global_position.y < 2.0, 300)

@@ -1,7 +1,7 @@
 # M3 Review Package
 
 **To:** ChatGPT (independent reviewer), and the owner for the manual check. **Date:** 2026-11-04, revised 2026-11-09.
-**Status: implemented, then expanded and refined by the owner on 2026-11-09. Awaiting ChatGPT's follow-up review and the owner's playtest. Not accepted. No voice approved.** M3 is not merged, and no tag or release has been made. **[§0](#0-the-owners-revision-of-2026-11-09-read-this-first) is the revision and the build to play; sections 1 to 12 are the record of `5fe820b`.** Any reviewer, please state which checks you rerun and which rely on the supplied CI evidence.
+**Status: implemented, expanded, refined and given a focused completion pass by the owner on 2026-11-09. The ending's voice waits for the owner's choice. Awaiting ChatGPT's follow-up review and the owner's playtest. Not accepted. No voice approved.** M3 is not merged, and no tag or release has been made. **[§0](#0-the-owners-revision-of-2026-11-09-read-this-first) is the revision and the build to play; sections 1 to 12 are the record of `5fe820b`.** Any reviewer, please state which checks you rerun and which rely on the supplied CI evidence.
 
 | | |
 |---|---|
@@ -31,157 +31,119 @@
 
 ## 0. The owner's revision of 2026-11-09: read this first
 
-The owner played `5fe820b` and found the game functional but **too brief, too passive and not atmospheric enough** ([record](../evidence/m3/owner-playtest-2026-11-09.md)). ChatGPT reviewed `5fe820b` within stated limits ([record](../evidence/m3/review-chatgpt-at-5fe820b.md)). The owner then **authorized a bounded expansion of M3, bringing some M4 and M5 work forward** ([D70–D81](../decisions.md)), and later the same day asked for **ten refinements** so that the existing route lands harder ([D82–D86](../decisions.md)). For those, the owner supplied an illustrated adaptation of the story as **a reference for dramatic structure only.** ChatGPT inspected sampled frames of it, including its reveal, and did not evaluate its soundtrack. I sampled its frames too, and cannot hear. Nothing from it is used: no illustration, recording, music or composition.
+The owner played `5fe820b` and found the game functional but **too brief, too passive and not atmospheric enough** ([record](../evidence/m3/owner-playtest-2026-11-09.md)). The owner then **authorized a bounded expansion of M3** ([D70–D81](../decisions.md)), asked for ten refinements ([D82–D86](../decisions.md)), and, agreeing that the build had improved substantially, asked for **a focused completion pass** on four concerns: incomplete ending narration, uneven visual quality, limited active play, and audio with no documented listening review ([D87–D93](../decisions.md)). The illustrated adaptation the owner supplied was used for dramatic structure only; nothing from it is in the game.
 
-This section is the revision. **Sections 1 to 12 below are the record of `5fe820b`,** kept as they were except where marked superseded.
+This section is the revision as it now stands. **Sections 1 to 12 below are the record of `5fe820b`,** kept as they were.
 
 **M3 is not accepted, and no voice is approved.** Green CI is technical evidence only. It says nothing about whether the game is engaging or sounds good.
 
 | | |
 |---|---|
-| **The tested code, and the build to play** | The commit that adds this section. **Pull request [#3](https://github.com/shamsuzzamansadi/dagon/pull/3) names it, with its CI runs, the Windows artifact and its SHA-256.** A file cannot name its own commit, and the owner asked for no commit made only to record the last one's CI |
-| **What to play** | The `dagon-windows` artifact of that CI run, exactly as the pull request names it |
+| **The build to play** | The push run's `dagon-windows` artifact for the commit that adds this text. **Pull request [#3](https://github.com/shamsuzzamansadi/dagon/pull/3) names the commit, the run, the artifact and its zip SHA-256.** A file cannot name its own commit, and the owner asked for no commit made only to record the last one's CI ([D93](../decisions.md)) |
+| **The earlier hashes** | `b379c5…` and `34102e74…` are both builds of `53e8d23`: the push run's and the pull-request run's, from identical source ([record](../evidence/m3/build-identity-53e8d23.md)) |
+| **To listen to** | [The listening package](../evidence/m3/listening/README.md): the two voices on the same passages at the same loudness, and a 5 min 23 s recording of the game playing, with its sound, cut by stage |
 
-### 0.1 What changed in play
+### 0.1 What changed, against the owner's concerns
 
-| Where | Before, at `5fe820b` | Now |
+| Concern | What was done | What is still open |
 |---|---|---|
-| **Opening** | New Game, a "How to Play" card, the Shore | New Game, then **a short prologue:** four pictures, one line each, music, Skip or Continue. A raider takes his ship in the war, he escapes in a small boat, drifts, and wakes with the sea gone, beside that same boat. Then the card and the Shore. **Continue never shows it.** Watching, pressing through and skipping reach the same state, as New Game writes the save first ([D71](../decisions.md)). The card sits low and sizes to its line, so the picture shows above it |
-| **The Shore** | A boat, a talisman, fish | **What the sea left:** a ribcage, more dead fish, and **part of an arm,** larger now, with a row of ringed suckers and a clean cut end. **Its caption doubts itself:** "A squid's, I told myself. I could not see where it had been cut from." It never says whose it is ([D82](../decisions.md)) |
-| **Act II** | A small crevasse to hop | **A wide gap with a slab balanced across it.** You see you cannot jump it, work out that the slab is a beam, go down into the hollow and walk up it, and **your weight past the stone brings it down level** with a crash, a shake and a line ([D72](../decisions.md)). **A stone by the gap is carved with how:** a figure climbing a tilted beam, then the beam flat and the figure walking over. Footprints lead down into the hollow and along the slab. Reading it is optional ([D83](../decisions.md)) |
-| **The monolith** | A grey block | **Carved stone:** the mark at its top; high up, **a crested swimmer with one arm round a standing stone;** a row of kneeling figures bowed toward it; fish; waves. The lit mural says the same: "one arm wrapped round a standing stone" ([D84](../decisions.md)) |
-| **The reveal** | Flat shapes | **The creature drawn over the same shapes:** wet, rimmed by the moon, its crest and long jaw. Water bursts from the trench and runs off it. **Its hand comes down on the stone right beside its own carving,** and he recognises it: "The carving. The same arm, round the same stone." **No timing changed,** so skip, pause, restore and the release of control behave as before ([D84](../decisions.md)) |
-| **Escape** | An invisible 12 s clock, and three falls of rock to hop | **The sea comes back.** It rises out of the trench behind him for 2.5 s, then comes on at 64 px/s, under his walking pace, roaring. The camera looks back at it. **It reaching him ends the flee,** with the same collapse and ending as reaching the end. Standing still is caught in about 4.3 s. **A 30 s fallback stays** as a guard ([D73](../decisions.md)) |
-| **The sailor** | One idle pace | **Exhaustion, curiosity, unease, recognition, panic,** without meters or effects: slow breathing on the Shore, quicker at the Monolith, a stagger back and a gasp at the reveal with the line of recognition, panting and two broken lines in the escape ([D76](../decisions.md)) |
-| **The ending** | Four lines gathering on one card, over black | **A short visual epilogue,** one line at a time, each over its own picture: the steamer finding the boat; a man awake at a window years on; the band in a shop window in Innsmouth, with the mark on it; the swell under the moon, and a crest breaking it. **Under it, the sea at night,** and the music ([D86](../decisions.md)). **The chronology holds:** the sea coming over him is where his memory stops, not his death, and the first line says so ([D81](../decisions.md)) |
-| **Sound** | Three voice samples only | **A first sound pass across the whole route,** and music in five places. Below, §0.3 |
-
-**Where the player now observes, interprets, acts and sees a consequence,** against the table in §12:
-
-| Place | Before | Now |
-|---|---|---|
-| The gap | Hop: no doubt | **Yes:** what the slab is, and how to bring it down, with a carving that helps whoever reads it |
-| The reveal | Watched | **Recognised:** the carving seen on the way in is the thing now standing there |
-| The escape | Partly: rock to hop, an invisible clock | **Yes:** a threat you can see coming, outrun, or lose to, with one ending either way |
-| The stones | Yes | Yes, unchanged |
-| The shelves | Partly | Partly, unchanged |
-
-**What did not change:** the Wave → Kneel → Eye puzzle and its stones, the cinematic contract and every clip's timing, saves and their format, the narration rules, vibration, the menus and settings, and the shelves and tablets of D67. **Nothing was lengthened** by slower walking, empty distance, a second puzzle or compulsory reading.
+| **The ending's narration** | The plumbing for a fully voiced epilogue is in place and tested: each line plays with its caption on the card, the card waits for the line, moving on or opening the credits stops it, nothing leaks into the credits or the menu, the card's text shows whatever the subtitle setting. `tools/audio/make_audition.py --speak` speaks named lines in the chosen voice, and nothing else | **Three of the four lines have no voice.** They wait for the owner's choice of voice. **The epilogue is not fully voiced** |
+| **Uneven visual quality** | **The boundary at x = 1440** now begins as a canyon wall rising from the seabed, its edge ragged and faintly lit, and the seabed's colours carry onto the greybox ground ([D89](../decisions.md)). **The reveal:** the creature's body has form now, moonlit at the shoulder, plated across the chest, with gills; and as its hand comes down beside its carving, the carving is lit ([D90](../decisions.md)). **The opening:** see below. Earlier in this revision: the carved monolith, the creature drawn over the reveal's shapes, the Shore's remains, the epilogue's pictures | Everything listed in §0.4 as greybox |
+| **Limited active play** | **The crossing is now a stone dropped on a raised beam** ([D87](../decisions.md)). The slab's near end is up, out of reach. A carving at the foot of three ledges shows a stone falling on the raised end of a beam, then the beam level and a man walking over it. You climb the ledges, push the stone, it falls, and the slab comes down. Walking the ground, under the ledges, gets you only into the hollow, which you can climb out of | Active play is still about a minute and a half, scripted (§0.2). Nobody has measured a first-time player |
+| **Audio without a listening review** | **A listening package and a recording of play with sound** ([D92](../decisions.md)). **The mix was measured on that recording, and fixed where it failed:** the reveal clipped, so the Master bus has a −1 dB limiter and the reveal's sounds were lowered; the ends of the prologue and the ending cut sound off, so both fade now ([D91](../decisions.md)). The prologue has sound of its own now | **No one has listened yet** (§0.3) |
+| **The opening** | Watched in full, unskipped, in the recording. Its pictures did not carry the story on their own, so each now moves a little and has its own sound ([D88](../decisions.md)): **captivity** (the raider's side close, one porthole lit and barred, a man's head against it, a guard above), **escape** (the boat pulling away from that side, oars dipping, the lamp going out), **drift** (the boat on the swell under a white sun), **waking** (the boat on bare seabed, the man lying beside it, then sitting up). The sea and oars, the calm, the wind. Skip and Continue start the same game as before, and none of the prologue's sound carries into it | Whether it reads to someone who has not seen it before |
 
 ### 0.2 Pacing
 
-**Scripted, by a driver that knows the puzzle and the route. These are not playtests,** and say nothing about a first-time player, which nobody has measured. The driver walks the ground route, hops when it meets something, and presses one wrong stone on purpose. Below: the exported Linux build of this commit, on a private virtual display. CI's timings for the same runs on Linux and Windows are in the pull request.
+**Scripted, by a driver that knows the route. Not playtests:** they say nothing about a first-time player, which nobody has measured. The exported Linux build of this commit, on a private virtual display. CI's timings on Linux and Windows are in the pull request.
 
 | | Reading everything | Direct |
 |---|---|---|
-| **Prologue** | 28 s, played through | 1 s, skipped |
-| **Active play:** walking and hopping, the gap, the stones | 80 s: 65 + 7 + 8 | 80 s: 70 + 2 + 8 |
-| **Optional reading:** every prop on the ground route, its line played out | 116 s | 0 |
-| **Cinematics:** the stones answering, the reveal, the collapse | 27 s | 27 s |
-| **The collapse to the epilogue card** | 6 s | 6 s |
-| **Epilogue and credits** | 45 s, each line played out | 4 s, pressed through |
-| **New Game to the main menu** | **about 5 min 3 s** | **1 min 58 s** |
+| **Prologue** | 29 s, played through | 1 s, skipped |
+| **Active play:** walking, hopping and climbing; the climb and push; the stones | **87 s:** 76 + 2 + 9 | **86 s:** 76 + 2 + 8 |
+| **Optional reading** | 108 s | 0 |
+| **Cinematics** | 28 s | 28 s |
+| The collapse, to the epilogue card | 6 s | 6 s |
+| Epilogue and credits | 46 s, each line played out | 4 s, pressed through |
+| **New Game to the main menu** | **about 5 min 4 s** | **2 min 6 s** |
 
-**Against the 10–15 minute aspiration:** not shown, and not claimed. The revision adds things to understand, not distance. How long a first-time player spends on the gap, the carvings and the escape is the question only a person can answer.
+**The climb and the push take the script about 2 s, because it knows what to do.** Active play rose from about 80 s to about 86 s scripted. A first-time player has to see the raised end, read or guess the carving, find the ledges and push: how long that takes is unmeasured. The crossing is timed from the start of the climb; reading the carving first counts as reading.
 
-### 0.3 Sound: what plays, and what is missing
+**Active play** is walking, hopping and climbing, the crossing, and the stones. **Optional reading** is the driver examining every prop on the ground route and letting each line run. **Cinematics** are the stones answering, the reveal and the collapse. **Against the 10–15 minute aspiration:** not shown, and not claimed.
 
-**An initial pass, synthesized by the project's own code, measured and never listened to by the developer** ([full record](../evidence/m3/audio/README.md), [D74](../decisions.md), [D85](../decisions.md)). 38 files, 4.1 MB, no clipping, no broken loops.
+### 0.3 Sound: implemented, checked, heard, approved
 
-| Scene or event | What plays | Status |
-|---|---|---|
-| Prologue | Music: a slow minor pad and one bowed line | Implemented. No voice |
-| Shore | A thin far-off sea and wind, positional. Wet sand underfoot. Spent breathing | Implemented |
-| Cave | Still air, a low resonance, drips with reverb. Rock underfoot. **Restrained music from the mouth,** unlooped, thinning out on the seabed | Implemented |
-| The ritual | A far drum and a low hum | Implemented |
-| Exposed Abyss | Wind on mud, far groans, settling mud, from three places along it | Implemented |
-| The crossing | A creak, the slab crashing down, debris | Implemented |
-| Monolith | A held drone. Quicker breathing. A stone accepting: a slide and a soft tone. Rejecting: a grind and a thud | Implemented |
-| The stones answer | Music: a tightening low cluster. The gate's long rumble | Implemented |
-| The reveal | Music building to the hand at 7 s. Water displaced, **then pouring off it.** Its deep call, twice. The hand on the stone. His gasp | Implemented |
-| The escape | The sea roaring after him, rock coming down three times, his breathing running | Implemented |
-| The collapse | His fall, the sea over him | Implemented |
-| The ending | Music: a restrained resolution. **The sea at night under every line and the credits** | Implemented |
-| Spoken lines | The talisman, the carving and the epilogue's third line: candidate A | **Awaiting the owner's choice of voice** |
+| Area | Implemented | Objectively checked | Listened to | Owner-approved |
+|---|---|---|---|---|
+| Prologue: music, sea, oars, calm, wind | Yes | Yes | No | No |
+| Shore: sea, wind, sand, tired breathing | Yes | Yes | Owner, on earlier builds; no documented review | No |
+| Cave: air, drips, restrained music, rock | Yes | Yes | As above | No |
+| Seabed, ritual, the crossing's slab | Yes | Yes | As above | No |
+| Stones: accept, reject, the stones answering, the gate | Yes | Yes | As above | No |
+| Reveal: surge, cascade, call, hand, gasp, music | Yes, lowered in this pass | Yes: clipped before, not now | As above | No |
+| Escape and collapse: the sea, rock, breathing, fall | Yes | Yes | As above | No |
+| Ending: music and the sea under the lines, fading under the credits | Yes | Yes | As above | No |
+| Voice, candidate A, three lines in the game | Yes | Yes | Owner judged the earlier voice synthetic; A and B unheard | **Pending the owner's choice** |
+| Voice for the other three epilogue lines | **No** | — | — | **Pending the owner's choice** |
+| Interface sounds, a sound for examining | **No** | — | — | — |
 
-**Silent on purpose:** no music on the Shore or across the open Abyss; the watcher and the canyon figure; nothing on restoring a checkpoint but the ambience of where he is.
+*Objectively checked* means measured: files ([measurements](../evidence/m3/audio/measurements.txt): 40, no clipping, no DC offset, every loop joining) and the mix during play ([report](../evidence/m3/listening/mix-check.txt): true peak −1.0 dBTP, loudness by stage, no clicks, silence while paused, the two expected cuts at pause and resume, no cut at either end of the story). And tested: pause, scene changes, restore, stacking, missing files, the three volume controls, one line at a time, the epilogue's line stopping. **I cannot hear. None of this says that anything sounds good.**
 
-**Missing, and not to be taken for silence:** interface sounds; a sound for examining; sea and oars under the prologue; a voice for anything but the three audition lines; and the mix by ear. **Every sound here is a placeholder in the sense that matters:** nobody on the project has heard it.
+**The decision I need: the voice.** A, B, a person reading, or neither, from the [listening package](../evidence/m3/listening/README.md). The rest of the epilogue is spoken first, in that voice, and nothing is generated in bulk before then.
 
-**Behaviour, tested:** pause holds every sound and resuming carries on; restart, scene change and quit stop it; restore plays no one-shot and no music; each one-shot restarts rather than stacking; with every stream removed, the final sequence still reaches the ending; the cave's music starts on the way in, on the Music bus; the sea and music play under the epilogue on their buses. **Found and fixed by a new test:** restoring in the cave replayed its music, because a seek from outside called the method key nearest the clip's end. Atmosphere clips are now restored with their values only ([D85](../decisions.md)).
+### 0.4 The art: finished, and still greybox
 
-### 0.4 The art: what is finished, and what is not
+**Finished, in the Shore's palette and methods, all original:** the Shore; the reference section, x 600 to 1440; the boundary into the canyon; the monolith's carvings; the creature; the carving at the crossing; the prologue's and the epilogue's pictures. [54 stills](../evidence/m3/walk-revision/), each looked at by the developer on software rendering.
 
-**Finished, in the Shore's palette and methods:** the Shore; the reference section from the cave entrance to the first tablet, x 600 to 1440 ([D77](../decisions.md)); **the monolith, carved, and the creature, drawn over the shapes the reveal moves** ([D84](../decisions.md)); the prologue's and the epilogue's pictures. **All of it original,** drawn by the project's own scripts, nothing taken from the reference.
+**Still greybox, for M4 and M5, and not claimed as finished:**
 
-![The Shore: the ribcage and the arm](../evidence/m3/walk-revision/shore-tentacle.png)
-![The carved stone by the gap](../evidence/m3/walk-revision/act2-crossing-clue.png)
-![The hand, beside its carving](../evidence/m3/walk-revision/reveal-4-eye-opens.png)
-![The band in the shop window](../evidence/m3/walk-revision/ending-3.png)
+1. The Exposed Abyss past x = 1440: the ground, the canyon walls, the rib arch, the far view.
+2. The shelves and tablets of Act II and III, and the canyon figure's ground.
+3. The ledges, the slab and the stone at the crossing: plain shapes, lit by the carving's art only.
+4. The trench, the gate and the stones at the monolith.
+5. The lit mural's panel, flat teal shapes.
+6. The creature's motion: the earlier clips moving its flat parts. No animation of its own.
+7. The ritual and the watcher: silhouettes.
+8. The escape's rockfall and the returning sea: plain shapes with simple motion.
 
-All 52 stills, from the Shore to the last picture of the epilogue, are in [walk-revision](../evidence/m3/walk-revision/). **I looked at each, and fixed what read badly:** the epilogue's card hid its pictures, and the prologue's boats sat under its card; the wall at the ledge's end drew a pale stripe through the creature; the kneeling figures on the monolith read as letters; the splash was hidden behind the body; earlier, a straight seam across the Shore's cliff, stripes on the cave wall, a jamb like lightning, and a hard oval of haze. **It is one developer's reading of software-rendered stills.** Whether it matches the accepted Shore is the owner's to say.
-
-**Still placeholder, and identified as such:** the rest of the Abyss past x = 1440, the shelves, the canyon, the trench and the gate, as greybox; the slab and the carved stone by the gap, as plain shapes; the lit mural's panel, as flat teal shapes, whose meaning the monolith's carving now carries; the creature's motion, which is the earlier clips moving flat parts, with no animation of its own. The boundary at x = 1440 is sharp, by design.
-
-### 0.5 The voice
-
-**Not approved. Nobody on the project has heard either candidate.** The rejected `am_michael` samples are out of the game, kept as a record. The owner asked for a small audition of the Shore, the cave and the ending ([record](../evidence/m3/voice-audition/README.md), [D79](../decisions.md)):
-
-| | A, in the game | B, as files |
-|---|---|---|
-| Made by | Chatterbox (MIT), in the timbre of Kokoro's stock `am_onyx`: lower, American | Chatterbox, in the timbre of Kokoro's stock `bm_george`: older, British |
-| Pace | 12.5–13.8 characters a second | 11.4–14.3 |
-
-**Rights:** run locally, nothing bought, **no person's voice cloned,** and not the reference's narrator: the timbre comes from a synthetic stock voice. Each file carries Resemble AI's imperceptible Perth watermark, left in. Disclosed as an AI voice in `CREDITS.md`, the in-game credits and `jam.md`. **A third route, a person reading the lines,** is ready: `tools/audio/import_recordings.py` prints the lines to read, and brings the recordings in, trimmed and levelled, under the same captions.
-
-**The dependency:** the epilogue must end up narrated in full. Three of its four lines wait for the owner's choice; **once a direction is chosen, all four are narrated first,** then the rest. Everything else in this revision is done without it.
-
-### 0.6 Tests actually run
+### 0.5 Tests actually run
 
 | What | Who | Result |
 |---|---|---|
-| Native unit tests: 127 cases, including 7 for the sea's rules | Developer; CI on this commit | Pass locally. CI: in the pull request |
-| Integration: 414 tests, including the revision's and 7 for the refinements, from source and on the exported pack | Developer; CI on GCC, Clang and MSVC | 414 of 414 locally, from source and on the exported Linux pack. CI: in the pull request |
-| The exported build played from New Game, through the prologue, the gap, the puzzle, the reveal and the sea, to the ending and back; then Continue twice | Developer on Linux, on a private virtual display; CI on Linux and Windows | 4 of 4 runs locally. CI: in the pull request |
-| Smoke runs, ending quietly, with no leak or error lines | Developer; CI | Pass locally |
-| The breakage tool's own tests: 23 | Developer | Pass |
-| **Deliberate breakage of the revision, 23 entries, fail-closed** | Developer, scripted, at `b4bd9c2` | **21 caught, 2 not caught, every control held** ([record](../evidence/m3/breakage-revision.txt)) |
-| Captures of every place and every picture, looked at | Developer, software rendering | Done, and fixes made |
+| Native unit tests: 127 cases | Developer; CI | 127 of 127 locally. CI: in the pull request |
+| Integration: 421 tests, including new ones for the crossing, the prologue's pictures, the carving's light, the limiter and the fades, from source and on the exported pack | Developer; CI on GCC, Clang and MSVC | 421 of 421 from source. On the exported Linux pack, 420 of 420, run before the last test (the epilogue with subtitles off) was added locally, from source and on the exported Linux pack. CI: in the pull request |
+| The exported build played from New Game through the prologue, the climb and the push, the puzzle, the reveal and the sea, to the ending and back; then Continue twice | Developer on Linux, on a private display; CI on Linux and Windows | 4 of 4 runs locally. CI: in the pull request |
+| A recording of the game playing, with sound, both escape outcomes | Developer, scripted, Movie Maker | Made, measured, and looked at frame by frame. Not listened to |
+| Deliberate breakage of the revision, 23 entries, fail-closed | Developer, scripted, at `b4bd9c2` | 21 caught, 2 not caught, both unresolved interpretations for the reviewer ([record](../evidence/m3/breakage-revision.txt)) |
 
-**The two not caught are unresolved interpretations,** for the reviewer to judge, not settled: *the slab comes down again for each weight*, where the first weight already disarms the trigger, so the guard is a second line of defence no input reaches; and *standing still makes footsteps*, where the change only moves which step after a stop is heard.
+**No new breakage campaign, and why:** the logic that changed is small and pinned by tests that failed on the way. Restoring the stone's place failed its test until the slab's transform was worked out rather than read back. The prologue's last-line timing failed its test until the man sat up sooner. The fades and the limiter are checked by their own tests and by the recording's measurements.
 
-**No breakage campaign for the refinements, and why:** they are pictures, sounds, text and one card's layout, over logic that did not change, with two exceptions. Restoring an atmosphere clip by its values only was found by its test failing before the fix. Showing the epilogue one line at a time is pinned by the tests that read each line and check the card holds one. **CI on the run before:** `42b2193` failed on both platforms' exported route, because the test driver still waited for the boat's old caption. That was the driver, not the game, the export or the runner; `525a8b2` corrected it, and its CI passed.
+### 0.6 Known issues and unmet requirements
 
-**Not repeated, and why:** the full campaigns of earlier breakage, and the fresh clone. The build instructions did not change; the art and audio tools need Python packages only to regenerate assets, which are committed.
+- **Not accepted.** First-time duration unmeasured.
+- **The epilogue is one line voiced in four,** pending the owner's choice of voice.
+- **No documented listening review** of the sound or of the voices.
+- **Art past x = 1440 is greybox** apart from what §0.4 lists as finished.
+- **The reveal is about 15 LU louder than the quiet stretches.** Measured, deliberate, and the first thing to judge by ear.
+- The shutdown leak is the engine's, and quitting through the game avoids it. Carried over: deferred physical checks on PlayStation and individual Xbox actions, and the unresolved M2 J/caption event.
 
-### 0.7 Known issues
+### 0.7 Schedule
 
-- **Not accepted. First-time duration unmeasured.**
-- **The sound and the voice are unheard** by anyone on the project. Their character is the owner's to judge.
-- **Art past x = 1440 is greybox apart from the monolith and the creature,** and the boundary is sharp. The creature does not move except as the earlier clips move its parts.
-- **The carved stone by the gap is small** at the game's scale. Its caption carries what its pictures may not.
-- **The shutdown leak is the engine's:** quitting through the game avoids it; closing the window quits through the game too; a crash or a forced kill would still leave the engine's report in its log, which no player sees.
-- Carried over and unchanged: deferred physical checks on PlayStation and individual Xbox actions, and the unresolved M2 J/caption event.
+**The owner's target is completion before 20 November; a move to 24 November is not approved.** The risks now: **the voice,** which needs a choice by about 12 November for the epilogue and the rest to be spoken and checked in time; the follow-up review and the owner's listening, which may ask for more; **the greybox past x = 1440,** the largest piece of work left, and M4's; and **two external first-time players** on 18–19 November. Essential validation is not traded away; polish goes first.
 
-### 0.8 Schedule
+### 0.8 Owner's playtest checklist
 
-The owner's target is **completion before 20 November; a move to 24 November is not approved.** The [roadmap](../roadmap.md) sets out the days from 9 November. **The concrete risks:** the voice, which needs a choice by about 12 November for final narration to land in time; the follow-up review and the owner's playtest, which may ask for more; the greybox past x = 1440, still the largest piece of art; and **two external first-time players** needed on 18–19 November. Essential validation is not traded away; polish goes first.
+**Use exactly the build the pull request names, with its checksum.** Extract the whole zip into a new, empty folder and run `dagon.exe`. **Please do not change your system's keyboard layout for this check.**
 
-### 0.9 Owner's playtest checklist
+1. **The full opening:** New Game, and let the prologue play to the end without pressing anything. Do the pictures alone tell it: taken, escaping, drifting, waking on dry seabed? Then a second New Game, and **Skip**.
+2. **Voice and mix:** the [listening package](../evidence/m3/listening/README.md) first. **A, B, a person, or neither?** Then, in play: the sea, the cave's music, the stones, the reveal.
+3. **The crossing:** without help. Did the carving tell you what to do? How long did it take?
+4. **The reveal:** do you see the hand come down beside its carving, and the carving lit?
+5. **Both escape outcomes:** run once; another time, stand still at the ledge and let the sea come.
+6. **The complete ending:** let the four pictures and lines play through, then the credits. Is anything cut off?
+7. **Continue:** quit mid-game, Continue. No prologue, nothing replays, nothing of the cave's music restarts.
 
-**Use exactly the Windows build the pull request names.** Extract the whole zip into a new, empty folder and run `dagon.exe`. **Please do not change your system's keyboard layout for this check.**
-
-1. **Opening:** watch the prologue once. Do the pictures read? On a second New Game, **Skip** it.
-2. **The Shore:** find the arm. Does it read as something that should not be there?
-3. **The gap:** work it out without help, then look at the carved stone beside it. **Did it make sense, and did the carving help?**
-4. **The monolith:** before the stones, look up at the carving of the swimmer.
-5. **The reveal:** does the hand beside its carving land? The water, the sound, his stagger.
-6. **The escape:** run once; another time, stand still and let the sea come.
-7. **The ending:** the four pictures, the sea and the music under them. **Does it leave the right feeling?**
-8. **The voice:** the talisman, the carving, and the epilogue's third line are candidate A. B is in `docs/evidence/m3/voice-audition/B/`. **A, B, a person, or neither?**
-9. **Save and Continue:** quit mid-game, Continue: no prologue, nothing replays, the cave's music does not restart.
-
-**Please report:** that you used this build; what you skipped; anything wrong; and your answers to 3, 5, 7 and 8.
+**Please report:** that you used this build; what you skipped; anything wrong; your choice of voice; and your answers to 1, 3 and 6.
 
 ## 1. Delivered
 

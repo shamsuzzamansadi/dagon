@@ -7,7 +7,7 @@ Toolchain: see
 [toolchain.md](toolchain.md). The menu, settings and save design in §5 ([D26](decisions.md))
 came after that approval, and was approved for implementation with the reviewer's corrections included below.
 
-**Status: M1 and M2 are accepted. M3 is implemented, awaiting independent review, and not accepted by the owner.** *The owner's revision of 2026-11-09 (D70–D81) added: a prologue mode in `MenuController`; the crossing, the returning sea, breathing and idle pace in `GameDirector`, with the sea's rules in plain C++ (`core::flee`); footsteps in `PlayerController`; and a quiet way out that stops all sound before quitting (`global_state`). Still 11 classes.* Where M3 measured or chose
+**Status: M1 and M2 are accepted. M3 is implemented, awaiting independent review, and not accepted by the owner.** *The owner's revision of 2026-11-09 (D70–D81) added: a prologue mode in `MenuController`; the crossing, the returning sea, breathing and idle pace in `GameDirector`, with the sea's rules in plain C++ (`core::flee`); footsteps in `PlayerController`; and a quiet way out that stops all sound before quitting (`global_state`). Still 11 classes. The completion pass (D87–D93) made the crossing a pushed stone (`GameDirector` drops it and works out the slab's transform itself), gave each prologue picture motion and sound started and stopped by `MenuController`, faded the prologue and the ending before their scene changes, and added a limiter on the Master bus.* Where M3 measured or chose
 something this design left open, the section says so, and [decisions.md](decisions.md) §8 lists each one.
 
 ## 1. Principles

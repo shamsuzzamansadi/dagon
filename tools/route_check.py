@@ -31,6 +31,8 @@ from pathlib import Path
 PHASE_SECONDS = 240.0
 HOP_HOLD_SECONDS = 0.2
 HOP_EVERY_SECONDS = 0.7
+# A full hop, held to its height: about 0.27 s to the top.
+CLIMB_HOP_HOLD_SECONDS = 0.3
 # Standing still at the ledge, the returning sea reaches him in about 4.3 s of game time (D73).
 SEA_REACHES_SECONDS = 4.3
 # Wall clock over a real window, so generous on the slow side only.
@@ -143,6 +145,9 @@ class Game:
         self.seen = []
         self.reading_seconds = 0.0
         self.read_lines = set()
+        # What the prompt is showing for, as the game last said: a focus id, or None once it is hidden.
+        self.focus = None
+        self.climb_started = 0.0
 
     def _read(self):
         while not self.log_path.exists():
@@ -185,7 +190,18 @@ class Game:
         elif line.startswith("dagon:"):
             self._note(arrived, line)
             self.seen.append((arrived, line))
+            if line.startswith("dagon: focus: "):
+                self.focus = line.split("dagon: focus: ")[1].strip()
+            elif line.startswith("dagon: prompt hidden"):
+                self.focus = None
         return line
+
+    def back_off(self, direction, focus_id, seconds=20.0):
+        """Walks away from something until its prompt has gone: a known place to start from, wherever walking up to
+        it left the sailor."""
+        if self.focus != focus_id:
+            self.walk_until(direction, f"dagon: focus: {focus_id}", seconds)
+        self.walk_until(direction, "dagon: prompt hidden", seconds)
 
     def wait_for(self, text, seconds=PHASE_SECONDS, unless=None):
         """Returns when a line contains the text, or fails. With unless, a line containing that fails at once."""
@@ -229,6 +245,48 @@ class Game:
                     self.press(direction)
                     next_hop = time.monotonic() + HOP_EVERY_SECONDS
             raise RouteFailed(f"walking {direction}: no '{text}' within {seconds:.0f} s")
+        finally:
+            if "space" in self.held:
+                self.release("space")
+            self.release(direction)
+
+    def climb_until(self, direction, text, seconds=30.0):
+        """Holds a direction and hops each time the game says the sailor has landed, until a line contains the text
+        and he has landed with it still showing: how anyone climbs a run of ledges to something. Letting go in the
+        air would drop him short. The game logs each landing with --verbose for this."""
+        self.climb_started = self.climb_started or time.monotonic()
+        self.press(direction)
+        deadline = time.monotonic() + seconds
+        self.press("space")
+        hop_ends = time.monotonic() + CLIMB_HOP_HOLD_SECONDS
+        showing = False
+        found = ""
+        try:
+            while time.monotonic() < deadline:
+                if hop_ends and time.monotonic() >= hop_ends:
+                    self.release("space")
+                    hop_ends = 0.0
+                line = self._next_line(min(deadline, time.monotonic() + 0.01))
+                if text in line:
+                    showing, found = True, line
+                elif "dagon: prompt hidden" in line:
+                    showing = False
+                elif "dagon: landed" in line:
+                    if showing:
+                        # Landed with it in reach: wait a moment to be sure it stays, then stop here.
+                        settle = time.monotonic() + 0.25
+                        while time.monotonic() < settle:
+                            more = self._next_line(settle)
+                            if "dagon: prompt hidden" in more:
+                                showing = False
+                            elif text in more:
+                                showing, found = True, more
+                        if showing:
+                            return found
+                    if not hop_ends:
+                        self.press("space")
+                        hop_ends = time.monotonic() + CLIMB_HOP_HOLD_SECONDS
+            raise RouteFailed(f"climbing {direction}: no '{text}' within {seconds:.0f} s")
         finally:
             if "space" in self.held:
                 self.release("space")
@@ -332,8 +390,8 @@ def report_timing(game, profile, begun, prologue_seconds):
             cinematics += arrived - start
             start = None
     solving = solved - stones
-    # The crossing: from first seeing the slab to its coming down level.
-    crossing = first_time(game, "dagon: crossing lowered") - first_time(game, "dagon: focus: abyss.slab")
+    # The crossing: from starting up the ledges to the slab coming down level. Reading the carving first is reading.
+    crossing = first_time(game, "dagon: crossing lowered") - game.climb_started
     exploring = (ended - begun) - cinematics - solving - crossing - game.reading_seconds
     text = (
         f"ROUTE_TIMING profile={profile} puzzle=known-to-the-script one-deliberate-mistake prologue={prologue_seconds:.0f}s total={menu - begun:.0f}s to-ending-card={card - begun:.0f}s"
@@ -390,6 +448,18 @@ def run_new_game_to_the_ending(game, read):
     game.walk_until("right", "dagon: background event: ritual_tableau", read=read)
     time.sleep(3.6)
     game.shot(name("05-ritual"))
+    # The gap: the carving at the ledges, up them, and the stone pushed onto the slab's raised end.
+    game.walk_until("right", "dagon: focus: abyss.crossing_mark", read=read)
+    if read:
+        game.read_what_is_offered()
+    game.back_off("left", "abyss.crossing_mark")
+    game.climb_until("right", "Push the stone")
+    time.sleep(0.2)
+    game.shot(name("05b-the-stone"))
+    game.tap("examine")
+    game.wait_for("dagon: crossing lowered", 5)
+    time.sleep(1.2)
+    game.shot(name("05c-the-slab-down"))
     game.walk_until("right", "dagon: beat=monolith", read=read)
     game.wait_for("Checkpoint saved", 5)
     game.shot(name("06-monolith"))

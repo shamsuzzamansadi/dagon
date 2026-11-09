@@ -241,6 +241,9 @@ func test_from_every_savable_beat_the_keys_alone_reach_the_ending(h) -> void:
 		await h.wait_for_scene("GameSession")
 		var route = RoutePlayer.new(h)
 		await h.landed_on_floor(route.player())
+		# Before the Monolith the slab is still up: the stone has to be pushed first, as anyone has to.
+		if not route.director().is_crossing_lowered():
+			await route.cross_the_gap()
 		if beat < AWAKENED:
 			await route.solve_with_one_mistake()
 			await route.wait_for_control()

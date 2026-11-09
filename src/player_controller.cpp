@@ -166,6 +166,8 @@ void PlayerController::_physics_process(double p_delta) {
 	update_footsteps(get_global_position().x - previous_x, result.landed);
 
 	if (result.landed) {
+		// For the exported-route driver, which hops the moment the sailor lands, as a player climbing does.
+		print_verbose("dagon: landed");
 		emit_signal("landed");
 	}
 	if (result.jumped) {

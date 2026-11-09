@@ -23,6 +23,7 @@ This file is for any coding agent working on this repository, whichever tool run
 **Honesty about what happened**
 - Never claim a review, owner acceptance, physical-device validation or audio-quality approval that did not happen. Record the owner's words as the owner's, limited to what they said.
 - Green CI is technical evidence. It does not establish gameplay quality.
+- Record precisely who evaluated what. The developer cannot hear audio. The owner has played builds with sound. A reviewer who looked at video frames did not hear the soundtrack. Never let a measurement stand for a listening judgment.
 - Do not label a scripted or developer-informed run as a first-time playtest. Say who or what ran each result, on which commit.
 - Deferred checks stay deferred until someone actually does them. Do not infer a pass from something nearby.
 - Keep placeholder work described as placeholder. Plumbing is not finished production.

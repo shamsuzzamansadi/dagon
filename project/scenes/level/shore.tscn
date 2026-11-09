@@ -20,6 +20,8 @@
 [ext_resource type="Texture2D" path="res://assets/reveal/dagon_crest.png" id="r_dagon_crest"]
 [ext_resource type="Texture2D" path="res://assets/reveal/dagon_arm.png" id="r_dagon_arm"]
 [ext_resource type="Texture2D" path="res://assets/shore/ribs.png" id="r_ribs"]
+[ext_resource type="Texture2D" path="res://assets/reveal/crossing_carving.png" id="r_crossing_carving"]
+[ext_resource type="Texture2D" path="res://assets/shore/light.png" id="r_light"]
 [ext_resource type="AudioStream" path="res://assets/audio/effects/water_cascade.ogg" id="a_cascade"]
 [ext_resource type="AudioStream" path="res://assets/audio/music/cave.ogg" id="m_cave"]
 [ext_resource type="Texture2D" path="res://assets/cave/cave_front.png" id="r_cave_front"]
@@ -78,8 +80,20 @@ size = Vector2(18, 10)
 [sub_resource type="RectangleShape2D" id="low_tablet_shape"]
 size = Vector2(26, 12)
 
-[sub_resource type="RectangleShape2D" id="crossing_weight_shape"]
-size = Vector2(76, 60)
+[sub_resource type="RectangleShape2D" id="ledge_shape"]
+size = Vector2(44, 6)
+
+[sub_resource type="RectangleShape2D" id="ledge_wide_shape"]
+size = Vector2(56, 6)
+
+[sub_resource type="RectangleShape2D" id="shelf_shape"]
+size = Vector2(64, 6)
+
+[sub_resource type="CircleShape2D" id="stone_shape"]
+radius = 8.0
+
+[sub_resource type="RectangleShape2D" id="push_shape"]
+size = Vector2(20, 10)
 
 [sub_resource type="RectangleShape2D" id="prop_shape"]
 size = Vector2(44, 28)
@@ -961,6 +975,18 @@ tracks/31/keys = {
 "update": 1,
 "values": [false, true, false]
 }
+tracks/32/type = "value"
+tracks/32/imported = false
+tracks/32/enabled = true
+tracks/32/path = NodePath("Monolith/CarvingLight:energy")
+tracks/32/interp = 1
+tracks/32/loop_wrap = true
+tracks/32/keys = {
+"times": PackedFloat32Array(0, 7, 7.5, 11.5, 13.5),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [0.0, 0.0, 1.4, 0.9, 0.0]
+}
 
 [sub_resource type="Animation" id="clip_collapse"]
 resource_name = "collapse"
@@ -1380,7 +1406,12 @@ centered = false
 [node name="GreyboxBackdrop" type="Polygon2D" parent="."]
 light_mask = 2
 color = Color(0.0392157, 0.054902, 0.0941176, 1)
-polygon = PackedVector2Array(1440, -700, 4544, -700, 4544, 60, 1440, 60)
+polygon = PackedVector2Array(1440, 60, 1440, -2, 1452, -10, 1466, -12, 1478, -28, 1494, -34, 1508, -58, 1520, -62, 1534, -96, 1548, -104, 1562, -140, 1578, -150, 1592, -190, 1604, -200, 1616, -240, 1630, -700, 4544, -700, 4544, 60)
+
+[node name="CanyonRim" type="Polygon2D" parent="."]
+light_mask = 2
+color = Color(0.1, 0.12, 0.17, 1)
+polygon = PackedVector2Array(1440, -2, 1452, -10, 1466, -12, 1478, -28, 1494, -34, 1508, -58, 1520, -62, 1534, -96, 1548, -104, 1562, -140, 1578, -150, 1592, -190, 1604, -200, 1616, -240, 1621, -237, 1609, -197, 1597, -187, 1583, -147, 1567, -137, 1553, -101, 1539, -93, 1525, -59, 1513, -55, 1499, -31, 1483, -25, 1471, -9, 1457, -7, 1445, 1)
 
 [node name="Tint" type="CanvasModulate" parent="."]
 
@@ -1537,15 +1568,15 @@ polygon = PackedVector2Array(2826, 0, 2826, -28, 2990, -28, 2990, 0)
 
 [node name="PrintDown0" type="Polygon2D" parent="ActArt"]
 color = Color(0.3, 0.36, 0.38, 1)
-polygon = PackedVector2Array(2150, 14, 2152, 13, 2154, 14, 2153, 15, 2151, 15)
+polygon = PackedVector2Array(2008, -1, 2010, -2, 2012, -1, 2011, 0, 2009, 0)
 
 [node name="PrintDown1" type="Polygon2D" parent="ActArt"]
 color = Color(0.3, 0.36, 0.38, 1)
-polygon = PackedVector2Array(2156, 22, 2158, 21, 2160, 22, 2159, 23, 2157, 23)
+polygon = PackedVector2Array(2018, -1, 2020, -2, 2022, -1, 2021, 0, 2019, 0)
 
 [node name="PrintDown2" type="Polygon2D" parent="ActArt"]
 color = Color(0.3, 0.36, 0.38, 1)
-polygon = PackedVector2Array(2162, 30, 2164, 29, 2166, 30, 2165, 31, 2163, 31)
+polygon = PackedVector2Array(2028, -1, 2030, -2, 2032, -1, 2031, 0, 2029, 0)
 
 [node name="CanyonFigure" type="Polygon2D" parent="ActArt"]
 visible = false
@@ -1688,6 +1719,10 @@ centered = false
 [node name="GreyboxGround" type="Polygon2D" parent="Terrain"]
 color = Color(0.2, 0.24, 0.28, 1)
 polygon = PackedVector2Array(1440, -3.33, 1480, -10, 1540, -10, 1600, 0, 2150, 0, 2150, 16, 2160, 16, 2160, 32, 2170, 32, 2170, 48, 2290, 48, 2290, 0, 2780, 0, 2780, -14, 2812, -14, 2812, 0, 3004, 0, 3004, -14, 3036, -14, 3036, 0, 3584, 0, 3584, -14, 3612, -14, 3612, 0, 4544, 0, 4544, 60, 1440, 60)
+
+[node name="GroundBlend" type="Polygon2D" parent="Terrain"]
+polygon = PackedVector2Array(1440, -3.33, 1480, -10, 1540, -10, 1600, 0, 1640, 0, 1640, 60, 1440, 60)
+vertex_colors = PackedColorArray(0.36, 0.32, 0.33, 1.00, 0.36, 0.32, 0.33, 0.80, 0.36, 0.32, 0.33, 0.50, 0.36, 0.32, 0.33, 0.20, 0.36, 0.32, 0.33, 0.00, 0.15, 0.15, 0.2, 0, 0.15, 0.15, 0.2, 1)
 
 [node name="ReferenceSection" type="Node2D" parent="."]
 
@@ -1933,7 +1968,7 @@ line_id = &"shore.tentacle"
 shape = SubResource("talisman_shape")
 
 [node name="CrossingMark" type="Interactable" parent="Props"]
-position = Vector2(2098, -14)
+position = Vector2(2004, -14)
 collision_layer = 4
 collision_mask = 0
 monitoring = false
@@ -1943,25 +1978,10 @@ line_id = &"abyss.crossing_mark"
 [node name="Shape" type="CollisionShape2D" parent="Props/CrossingMark"]
 shape = SubResource("talisman_shape")
 
-[node name="Stone" type="Polygon2D" parent="Props/CrossingMark"]
-color = Color(0.3, 0.34, 0.38, 1)
-polygon = PackedVector2Array(-16, 14, -17, -8, -12, -14, 12, -14, 17, -8, 16, 14)
-
-[node name="TiltedBeam" type="Polygon2D" parent="Props/CrossingMark"]
-color = Color(0.62, 0.72, 0.72, 1)
-polygon = PackedVector2Array(-14, 6, -2, -6, -1, -5, -13, 7)
-
-[node name="FigureOnIt" type="Polygon2D" parent="Props/CrossingMark"]
-color = Color(0.62, 0.72, 0.72, 1)
-polygon = PackedVector2Array(-5, -4, -5, -9, -3, -11, -2, -9, -2, -3)
-
-[node name="LevelBeam" type="Polygon2D" parent="Props/CrossingMark"]
-color = Color(0.62, 0.72, 0.72, 1)
-polygon = PackedVector2Array(2, 3, 15, 3, 15, 4, 2, 4)
-
-[node name="FigureAcross" type="Polygon2D" parent="Props/CrossingMark"]
-color = Color(0.62, 0.72, 0.72, 1)
-polygon = PackedVector2Array(10, 2, 10, -4, 12, -6, 13, -4, 13, 2)
+[node name="Art" type="Sprite2D" parent="Props/CrossingMark"]
+position = Vector2(-44, -96)
+texture = ExtResource("r_crossing_carving")
+centered = false
 
 [node name="Slab" type="Interactable" parent="Props"]
 position = Vector2(2138, -14)
@@ -2088,6 +2108,14 @@ color = Color(0.62, 0.72, 0.72, 1)
 polygon = PackedVector2Array(-3.6, 22.8, -1.6, 20.8, 1.6, 20.8, 3.6, 22.8, 1.6, 24.8, -1.6, 24.8)
 
 [node name="Monolith" type="Node2D" parent="."]
+
+[node name="CarvingLight" type="PointLight2D" parent="Monolith"]
+position = Vector2(4083, -320)
+color = Color(0.55, 0.75, 0.78, 1)
+energy = 0.0
+range_item_cull_mask = 1
+texture = ExtResource("r_light")
+texture_scale = 2.0
 
 [node name="Back" type="Polygon2D" parent="Monolith"]
 visible = false
@@ -2352,7 +2380,7 @@ polygon = PackedVector2Array(3424, -36, 3570, -36, 3568, -28, 3426, -28)
 
 [node name="Crossing" type="AnimatableBody2D" parent="."]
 position = Vector2(2220, 4)
-rotation = -0.53
+rotation = 0.53
 collision_layer = 1
 collision_mask = 0
 
@@ -2371,25 +2399,76 @@ polygon = PackedVector2Array(-24, -4, -22, -4, -22, 4, -24, 4)
 color = Color(0.62, 0.72, 0.72, 1)
 polygon = PackedVector2Array(36, -2, 40, -3, 44, -2, 48, -3, 52, -2, 52, -1, 48, -2, 44, -1, 40, -2, 36, -1)
 
-[node name="Print0" type="Polygon2D" parent="Crossing"]
-color = Color(0.4, 0.46, 0.48, 1)
-polygon = PackedVector2Array(-58, -4, -56, -5, -54, -4, -55, -3, -57, -3)
-
-[node name="Print1" type="Polygon2D" parent="Crossing"]
-color = Color(0.4, 0.46, 0.48, 1)
-polygon = PackedVector2Array(-38, -4, -36, -5, -34, -4, -35, -3, -37, -3)
-
-[node name="Print2" type="Polygon2D" parent="Crossing"]
-color = Color(0.4, 0.46, 0.48, 1)
-polygon = PackedVector2Array(-18, -4, -16, -5, -14, -4, -15, -3, -17, -3)
-
-[node name="Print3" type="Polygon2D" parent="Crossing"]
-color = Color(0.4, 0.46, 0.48, 1)
-polygon = PackedVector2Array(2, -4, 4, -5, 6, -4, 5, -3, 3, -3)
-
 [node name="Sound" type="AudioStreamPlayer2D" parent="Crossing"]
 stream = ExtResource("a_slab")
 bus = &"Effects"
+
+[node name="CrossingLedges" type="StaticBody2D" parent="."]
+
+[node name="SupportLow" type="Polygon2D" parent="CrossingLedges"]
+color = Color(0.13, 0.16, 0.2, 1)
+polygon = PackedVector2Array(2038, 0, 2040, -14, 2048, -16, 2060, -15, 2066, -12, 2068, 0)
+
+[node name="SupportMid" type="Polygon2D" parent="CrossingLedges"]
+color = Color(0.12, 0.15, 0.19, 1)
+polygon = PackedVector2Array(2066, 0, 2068, -30, 2078, -35, 2092, -34, 2098, -28, 2100, 0)
+
+[node name="SupportHigh" type="Polygon2D" parent="CrossingLedges"]
+color = Color(0.11, 0.14, 0.18, 1)
+polygon = PackedVector2Array(2096, 0, 2098, -48, 2108, -55, 2124, -55, 2132, -50, 2134, 0)
+
+[node name="LowShape" type="CollisionShape2D" parent="CrossingLedges"]
+position = Vector2(2056, -15)
+shape = SubResource("ledge_shape")
+one_way_collision = true
+
+[node name="Low" type="Polygon2D" parent="CrossingLedges"]
+color = Color(0.26, 0.3, 0.34, 1)
+polygon = PackedVector2Array(2034, -18, 2078, -18, 2076, -13, 2060, -11, 2036, -13)
+
+[node name="MidShape" type="CollisionShape2D" parent="CrossingLedges"]
+position = Vector2(2082, -35)
+shape = SubResource("ledge_wide_shape")
+one_way_collision = true
+
+[node name="Mid" type="Polygon2D" parent="CrossingLedges"]
+color = Color(0.25, 0.29, 0.33, 1)
+polygon = PackedVector2Array(2054, -38, 2110, -38, 2108, -33, 2086, -31, 2056, -33)
+
+[node name="ShelfShape" type="CollisionShape2D" parent="CrossingLedges"]
+position = Vector2(2110, -55)
+shape = SubResource("shelf_shape")
+one_way_collision = true
+
+[node name="Shelf" type="Polygon2D" parent="CrossingLedges"]
+color = Color(0.24, 0.28, 0.32, 1)
+polygon = PackedVector2Array(2078, -58, 2142, -58, 2140, -53, 2112, -50, 2080, -53)
+
+[node name="CrossingStone" type="StaticBody2D" parent="."]
+position = Vector2(2133, -66)
+
+[node name="Shape" type="CollisionShape2D" parent="CrossingStone"]
+shape = SubResource("stone_shape")
+
+[node name="Art" type="Polygon2D" parent="CrossingStone"]
+color = Color(0.34, 0.37, 0.4, 1)
+polygon = PackedVector2Array(-8, 2, -7, -4, -3, -8, 3, -8, 7, -5, 8, 1, 6, 6, 1, 8, -5, 7)
+
+[node name="Lit" type="Polygon2D" parent="CrossingStone"]
+color = Color(0.5, 0.55, 0.57, 1)
+polygon = PackedVector2Array(-6, -4, -3, -7, 2, -7, 0, -5, -4, -2)
+
+[node name="Push" type="Interactable" parent="CrossingStone"]
+position = Vector2(-19, -15)
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+interaction_id = &"crossing_push"
+prompt = "Push the stone"
+one_shot = true
+
+[node name="Shape" type="CollisionShape2D" parent="CrossingStone/Push"]
+shape = SubResource("push_shape")
 
 [node name="Pillar" type="Polygon2D" parent="."]
 color = Color(0.16, 0.19, 0.23, 1)
@@ -2600,16 +2679,6 @@ spent_from_beat = 2
 [node name="Shape" type="CollisionShape2D" parent="Triggers/CanyonSight"]
 shape = SubResource("enter_abyss_shape")
 
-[node name="CrossingWeight" type="StoryTrigger" parent="Triggers"]
-position = Vector2(2262, -30)
-collision_layer = 8
-collision_mask = 2
-monitorable = false
-trigger_id = &"crossing_weight"
-
-[node name="Shape" type="CollisionShape2D" parent="Triggers/CrossingWeight"]
-shape = SubResource("crossing_weight_shape")
-
 [node name="KillPlane" type="StoryTrigger" parent="Triggers"]
 position = Vector2(2700, 130)
 collision_layer = 8
@@ -2748,10 +2817,12 @@ bus = &"Effects"
 
 [node name="WaterSurge" type="AudioStreamPlayer" parent="Sound"]
 stream = ExtResource("a_surge")
+volume_db = -4.0
 bus = &"Effects"
 
 [node name="CreatureCall" type="AudioStreamPlayer" parent="Sound"]
 stream = ExtResource("a_call")
+volume_db = -3.0
 bus = &"Effects"
 
 [node name="CreatureTurn" type="AudioStreamPlayer" parent="Sound"]
@@ -2760,6 +2831,7 @@ bus = &"Effects"
 
 [node name="HandImpact" type="AudioStreamPlayer" parent="Sound"]
 stream = ExtResource("a_hand")
+volume_db = -3.0
 bus = &"Effects"
 
 [node name="BodyFall" type="AudioStreamPlayer" parent="Sound"]
@@ -2781,6 +2853,7 @@ bus = &"Music"
 
 [node name="WaterCascade" type="AudioStreamPlayer" parent="Sound"]
 stream = ExtResource("a_cascade")
+volume_db = -6.0
 bus = &"Effects"
 
 [node name="MusicAwaken" type="AudioStreamPlayer" parent="Sound"]
@@ -2789,6 +2862,7 @@ bus = &"Music"
 
 [node name="MusicReveal" type="AudioStreamPlayer" parent="Sound"]
 stream = ExtResource("m_reveal")
+volume_db = -4.0
 bus = &"Music"
 
 [node name="Hud" parent="." instance=ExtResource("12_hud")]
@@ -2816,9 +2890,11 @@ monolith_gate_path = NodePath("../Monolith/Gate")
 rockfall_path = NodePath("../Rockfall")
 tide_path = NodePath("../Tide")
 crossing_path = NodePath("../Crossing")
-crossing_trigger_path = NodePath("../Triggers/CrossingWeight")
+crossing_trigger_path = NodePath("../CrossingStone/Push")
+crossing_weight_path = NodePath("../CrossingStone")
+crossing_weight_rest = Vector2(-70, -12)
 crossing_sound_path = NodePath("../Crossing/Sound")
-crossing_raised_rotation = -0.53
+crossing_raised_rotation = 0.53
 crossing_line = &"abyss.crossing"
 breath_path = NodePath("../Player/Breath")
 breath_streams = [ExtResource("a_breath_tired"), null, ExtResource("a_breath_uneasy"), ExtResource("a_breath_uneasy"), null, ExtResource("a_breath_panic"), null]

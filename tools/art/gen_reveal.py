@@ -7,6 +7,8 @@ wet streaks, texture, and on the monolith its carvings.
     monolith.png     the standing stone, world x 3830-4296, y -520-0, carved with the mark, worshippers, fish, and
                      high up the swimmer with its arm around a standing stone: what the reveal then shows, alive
     dagon_body.png, dagon_head.png, dagon_crest.png, dagon_arm.png    the creature, one per animated part
+    crossing_carving.png    the panel by the ledges at the gap: a stone dropped on a beam's raised end, then the beam
+                            level with the stone on it and a figure walking over. Bold, to be read at the game's scale
 """
 
 import math
@@ -243,12 +245,127 @@ def shade_part(name, rim_side=-1, sheen=True):
     return img, (left, top)
 
 
+def body_form(img):
+    """The body's form, so it reads as a body and not a wall. Moonlight from above and to the left rounds it: light
+    falls off inward from the edges that face the moon. Three broad plates curve across the chest, each a groove lit
+    along its lower lip. A fold of gill below the head."""
+    import numpy as np
+    from scipy import ndimage
+
+    w, h = img.size
+    alpha = np.array(img.split()[3]) > 0
+    depth = ndimage.distance_transform_edt(alpha)
+    gy, gx = np.gradient(ndimage.gaussian_filter(depth, 3))
+    norm = np.hypot(gx, gy) + 1e-6
+    # The surface faces away from the inside: its normal is the downhill direction of depth.
+    facing = np.clip((gx / norm) * 0.6 + (gy / norm) * 0.8, 0, 1)
+    light = facing * np.exp(-depth / 70.0)
+    noise = Noise(640)
+    for y in range(h):
+        for x in range(w):
+            if not alpha[y, x]:
+                continue
+            v = light[y, x] + (noise(x / 5.0, y / 5.0) - 0.5) * 0.14
+            if v > 0.8:
+                put(img, x, y, "T2")
+            elif v > 0.55:
+                put(img, x, y, "T1")
+            elif v > 0.32:
+                put(img, x, y, "E1")
+            elif v > 0.14:
+                put(img, x, y, "C1")
+    cx = w * 0.45
+    for k, (row, bend) in enumerate(((h * 0.42, 34), (h * 0.58, 30), (h * 0.74, 26))):
+        for x in range(int(w * 0.12), int(w * 0.84)):
+            y = int(row + bend * math.cos((x - cx) / (w * 0.42) * math.pi / 2) - bend)
+            if 2 <= y < h - 4 and alpha[y, x] and alpha[y + 3, x]:
+                for d in (-2, -1, 0):
+                    put(img, x, y + d, "C0")
+                put(img, x, y + 1, "T1" if x < cx else "E1")
+                if noise(x / 4.0, k) > 0.3:
+                    put(img, x, y + 2, "E1" if x < cx else "C1")
+    gx0, gy0 = int(w * 0.64), int(h * 0.06)
+    for k in range(3):
+        for t in range(48):
+            x = gx0 + k * 9 + round(5 * math.sin(t / 8.0))
+            y = gy0 + t
+            if 0 <= x < w - 1 and 0 <= y < h and alpha[y, x]:
+                put(img, x, y, "C0")
+                if alpha[y, x + 1]:
+                    put(img, x + 1, y, "T1")
+
+
 def dagon_parts():
     parts = {}
-    parts["body"] = shade_part("Body")
+    body, offset = shade_part("Body")
+    body_form(body)
+    parts["body"] = (body, offset)
     parts["head"] = shade_part("Head")
     parts["crest"] = shade_part("Crest", rim_side=1)
     arm, offset = shade_part("Arm", rim_side=1)
     # The webbed hand: membranes between the fingers, and pale claws at their tips.
     parts["arm"] = (arm, offset)
     return parts
+
+
+# ---------------------------------------------------------------- the clue at the gap
+
+
+def crossing_carving():
+    """A panel of pale stone set in the rock, 80 x 48, with two scenes cut deep. Lines two pixels wide, figures ten
+    pixels tall: at 480 x 270 it reads from where the sailor stands below it."""
+    width, height = 80, 48
+    rng = random.Random(701)
+    noise = Noise(702)
+    points = [(2, 4), (10, 1), (40, 3), (70, 0), (78, 5), (79, 30), (77, 46), (50, 47), (20, 46), (1, 44), (0, 20)]
+    mask = mask_of(points, (0, 0), (width, height))
+    img = blank(width, height)
+    for y in range(height):
+        for x in range(width):
+            if mask.getpixel((x, y)):
+                value = 3.0 + 0.6 * (1 - y / height) + (noise.fractal(x / 9.0, y / 9.0, 2) - 0.5) * 0.9
+                put(img, x, y, ramp(STONE, value, x, y, 0.3))
+    for y in range(height):
+        row = [x for x in range(width) if mask.getpixel((x, y))]
+        if row:
+            put(img, row[0], y, "E1")
+            put(img, row[-1], y, "C7")
+
+    def cut(path, width_=2):
+        engrave(img, mask, path, width_)
+
+    def disc(cx, cy, r):
+        for y in range(cy - r, cy + r + 1):
+            for x in range(cx - r, cx + r + 1):
+                if (x - cx) ** 2 + (y - cy) ** 2 <= r * r and inside(mask, x, y):
+                    put(img, x, y, "E1")
+        put(img, cx - 1, cy - r - 1, "C7")
+        put(img, cx, cy - r - 1, "C7")
+
+    # The divider: a deep groove down the middle.
+    cut([(40, 6), (40, 42)], 2)
+    # Left: the beam on its stone, the near end raised high, and a round stone falling onto that end.
+    cut([(8, 40), (36, 40)], 1)
+    cut([(18, 39), (22, 33), (26, 39)], 1)
+    cut([(6, 22), (36, 38)], 2)
+    disc(9, 11, 3)
+    for y in (16, 18):
+        put(img, 9, y, "E1")
+    # Right: the same beam lying level, the stone resting on its near end, a figure walking over it.
+    cut([(44, 40), (76, 40)], 1)
+    cut([(56, 39), (60, 33), (64, 39)], 1)
+    cut([(44, 31), (76, 31)], 2)
+    disc(48, 27, 3)
+    disc(66, 15, 2)
+    cut([(66, 18), (66, 24)], 2)
+    cut([(66, 24), (63, 30)], 1)
+    cut([(66, 24), (69, 30)], 1)
+    cut([(66, 19), (63, 23)], 1)
+    cut([(66, 19), (70, 21)], 1)
+    # Weathering: a few chips and a crack, none across the figures.
+    for _ in range(14):
+        x, y = rng.randrange(3, 77), rng.randrange(3, 45)
+        if inside(mask, x, y) and not (5 < x < 37 and 8 < y < 41) and not (43 < x < 77 and 10 < y < 41):
+            put(img, x, y, "E2")
+    return img
+

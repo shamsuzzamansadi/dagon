@@ -5,8 +5,8 @@ Made by `project/tests/capture_m3.gd` on a private virtual display with software
 | Stills | What they show |
 |---|---|
 | `shore-*` | The Shore: the boat, the talisman, the ribcage and fish, and the arm with its suckers |
-| `section-*` | The finished reference section, from the cave entrance to where the greybox begins |
-| `act2-*` | The Abyss: the rib arch, the gap with the slab raised, the carved stone by it, the shelves and tablets |
+| `section-*` | The finished reference section, from the cave entrance to where the greybox begins, and the canyon wall past it |
+| `act2-*` | The Abyss: the rib arch, the gap with the slab raised, the carving at the ledges, the top ledge by the stone, the shelves and tablets |
 | `act3-*`, `awaken-*`, `mural-lit` | The canyon, the monolith's carvings from below, the stones, and the mural once lit |
 | `reveal-*` | The reveal: stillness, the water bursting, rising, the hand on the stone beside its carving, the eye, the head turning |
 | `flee-*`, `collapse-*` | The escape: rock coming down, the sea coming, and the collapse |
