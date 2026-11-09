@@ -809,8 +809,9 @@ void GameDirector::play_atmosphere(core::Beat p_beat, bool p_instant) {
 	}
 	atmosphere->play(clip);
 	if (p_instant) {
-		// Straight to where the clip ends. Its method keys are skipped, so no cue plays.
-		atmosphere->seek(atmosphere->get_animation(clip)->get_length(), true);
+		// Straight to where the clip ends, updating only its values. An outside seek would otherwise call the method
+		// key nearest the end, and replay a cue such as the cave's music.
+		atmosphere->seek(atmosphere->get_animation(clip)->get_length(), true, true);
 		atmosphere->stop(true);
 	}
 }

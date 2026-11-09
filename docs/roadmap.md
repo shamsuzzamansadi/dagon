@@ -72,11 +72,11 @@ starts only after M6 is green, and is time-boxed.
 |---|---|---|
 | Layout | Playable route, exploration and clue placement | Final environments, and a coherent transition beyond the Shore |
 | Narrative | Props, captions, and background-event logic | Final ritual imagery |
-| Reveal | Readable placeholder reveal, timing and collapse | Final Dagon art, animation, lighting and effects |
+| Reveal | Readable reveal, timing and collapse. **Since 2026-11-09:** the monolith carved, and the creature drawn over the reveal's shapes, with water and sound | Final Dagon animation, lighting and effects |
 | Controller | Vibration behaviour and settings | Tuning by feel, with the owner |
 | Narration | Playback and subtitle integration, and three voice samples for direction. **The owner finds them noticeably synthetic, so a direction is still to be chosen** | Approved final narration |
-| Audio | **Since 2026-11-09:** an initial sound pass across the route, music in four places, and a voice audition | The final mix, by ear, and anything the pass misses |
-| Art | **Since 2026-11-09:** one finished reference section, from the cave entrance to the first tablet | The rest of the route, and the final Dagon |
+| Audio | **Since 2026-11-09:** an initial sound pass across the route, music in five places, and a voice audition | The final mix, by ear, and anything the pass misses |
+| Art | **Since 2026-11-09:** one finished reference section, from the cave entrance to the first tablet; the monolith, the creature and the epilogue's pictures | The rest of the route |
 | Persistence | Save and restore correctness, with focused regression coverage | Kept green |
 
 **Cut order if the schedule slips (approved):**

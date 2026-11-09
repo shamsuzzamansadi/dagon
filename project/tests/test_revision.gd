@@ -21,7 +21,7 @@ const WITNESS_X := 4420.0
 const COLLAPSE_X := 3760.0
 const RIM_X := 2120.0
 const FAR_RIM_X := 2300.0
-const ONE_SHOTS := ["Monolith/StoneAccept", "Monolith/StoneReject", "Monolith/GateSound", "Sound/MusicAwaken", "Sound/MusicReveal", "Sound/WaterSurge", "Sound/CreatureCall", "Sound/CreatureTurn", "Sound/HandImpact", "Sound/BodyFall", "Sound/SeaRush", "Sound/RitualDrum", "Crossing/Sound", "Tide/Roar", "Rockfall/SoundNear", "Rockfall/SoundMid", "Rockfall/SoundFar", "Player/Gasp"]
+const ONE_SHOTS := ["Sound/MusicCave", "Sound/WaterCascade", "Monolith/StoneAccept", "Monolith/StoneReject", "Monolith/GateSound", "Sound/MusicAwaken", "Sound/MusicReveal", "Sound/WaterSurge", "Sound/CreatureCall", "Sound/CreatureTurn", "Sound/HandImpact", "Sound/BodyFall", "Sound/SeaRush", "Sound/RitualDrum", "Crossing/Sound", "Tide/Roar", "Rockfall/SoundNear", "Rockfall/SoundMid", "Rockfall/SoundFar", "Player/Gasp"]
 
 
 func _world(h, beat := 0) -> Node2D:
@@ -435,7 +435,7 @@ func test_the_shore_has_the_arm_and_the_carvings_echo_it(h) -> void:
 	h.check(arm.line_id == &"shore.tentacle", "the arm says %s" % arm.line_id)
 	h.check(world.get_node("Tentacle").texture != null, "the arm is not drawn")
 	h.check(narration_text("shore.tentacle").contains("sucker") and not narration_text("shore.tentacle").contains("Dagon"), "the arm's line overreaches")
-	h.check(narration_text("cave.carving").contains("arm") and narration_text("mural.after").contains("arms"), "the carvings do not echo the arm")
+	h.check(narration_text("cave.carving").contains("arm") and narration_text("mural.after").contains("arm wrapped round a standing stone"), "the carvings do not echo the arm")
 	for path in ["Props/Relief/Arm", "Monolith/MuralLit/ArmLeft", "Monolith/MuralLit/ArmRight"]:
 		h.check(world.get_node_or_null(path) != null, "%s is missing" % path)
 
@@ -449,3 +449,109 @@ func test_the_finished_section_is_clipped_to_itself_and_its_greybox_is_gone(h) -
 	for path in ["Props/CaveCarving", "Props/FossilA", "Props/TabletWave"]:
 		h.check(world.get_node(path).line_id != &"", "%s lost its line" % path)
 	h.check(world.get_node("ReferenceSection/MoonShaft").enabled, "the moonlight through the mouth is off")
+
+
+## ---- The payoff ----
+
+
+func test_the_tentacle_is_large_enough_to_read_and_its_caption_does_not_claim_to_know(h) -> void:
+	var world := await _world(h)
+	var arm: Sprite2D = world.get_node("Tentacle")
+	h.check(arm.texture.get_width() >= 80, "the arm is only %d px long" % arm.texture.get_width())
+	var line := narration_text("shore.tentacle")
+	h.check(line.contains("I told myself") and line.contains("could not see"), "the arm's caption is too sure: %s" % line)
+	for remains in ["Ribs", "FishByTheBoat", "FishOnTheRise", "FishByTheArm"]:
+		h.check(world.get_node(remains).texture != null, "%s is not on the Shore" % remains)
+
+
+func test_a_stone_by_the_gap_shows_how_it_is_crossed(h) -> void:
+	var world := await _world(h, ABYSS)
+	var mark: Node = world.get_node("Props/CrossingMark")
+	h.check(mark.global_position.x < world.get_node("Crossing").global_position.x - 60.0, "the clue stands past the gap, at %.0f" % mark.global_position.x)
+	await h.stand_at(_player(h), Vector2(mark.global_position.x, -2))
+	h.check(_player(h).get_node("Interactor").get_focus() == mark, "the clue cannot be examined from the rim")
+	h.check(narration_text("abyss.crossing_mark").contains("tilted beam") and narration_text("abyss.crossing_mark").contains("lying flat"), "the clue does not show both states")
+	for i in 4:
+		h.check(world.get_node("Crossing/Print%d" % i) != null, "no footprints on the slab")
+
+
+func test_the_monolith_and_the_creature_are_drawn_over_the_shapes_the_clips_move(h) -> void:
+	var world := await _world(h, AWAKENED)
+	h.check(world.get_node("Monolith/Art").visible and not world.get_node("Monolith/Back").visible, "the monolith is still the greybox block")
+	for part in ["Body", "Head", "Crest", "Arm"]:
+		var shape: Polygon2D = world.get_node("Dagon/" + part)
+		var art: Sprite2D = world.get_node("Dagon/%s/Art" % part)
+		h.check(is_zero_approx(shape.color.a), "the flat %s still draws over its art" % part)
+		h.check(art.texture != null, "%s has no art" % part)
+		var box := Rect2(shape.polygon[0], Vector2.ZERO)
+		for point in shape.polygon:
+			box = box.expand(point)
+		h.check(art.position.distance_to(box.position) <= 1.0, "%s's art is placed at %s, its shape at %s" % [part, art.position, box.position])
+
+
+## The great carving high on the stone, the lit mural, and the reveal show the same thing: an arm round a stone.
+func test_the_lit_mural_carries_the_motif_the_reveal_then_shows(h) -> void:
+	var world := await _world(h, AWAKENED)
+	var pillar: Polygon2D = world.get_node("Monolith/MuralLit/ArmRight")
+	var arm: Polygon2D = world.get_node("Monolith/MuralLit/ArmLeft")
+	var pillar_box := Rect2(pillar.polygon[0], Vector2.ZERO)
+	for point in pillar.polygon:
+		pillar_box = pillar_box.expand(point)
+	var arm_box := Rect2(arm.polygon[0], Vector2.ZERO)
+	for point in arm.polygon:
+		arm_box = arm_box.expand(point)
+	h.check(pillar_box.size.y > pillar_box.size.x * 2.0, "the stone on the mural is not a standing stone")
+	h.check(arm_box.position.x <= pillar_box.position.x + 1.0 and arm_box.end.x > pillar_box.end.x, "the arm on the mural does not reach round the stone")
+	var clip: Animation = world.get_node("Cinematics").get_animation(&"dagon_reveal")
+	var says := []
+	for track in clip.get_track_count():
+		if clip.track_get_type(track) == Animation.TYPE_METHOD:
+			for key in clip.track_get_key_count(track):
+				if clip.method_track_get_name(track, key) == &"say":
+					says.append(String(clip.method_track_get_params(track, key)[0]))
+	h.check(says.has("story.recoil") and narration_text("story.recoil").contains("same arm"), "the reveal does not name what he recognises")
+
+
+func test_the_cave_music_starts_on_the_way_in_and_never_on_restore(h) -> void:
+	var world := await _world(h, 0)
+	var music: AudioStreamPlayer = world.get_node("Sound/MusicCave")
+	h.check(not music.playing, "the cave's music plays on the Shore")
+	await h.stand_at(_player(h), Vector2(660, -2))
+	h.check(await _walk_hopping(h, KEY_D, func() -> bool: return _director(h).get_beat() == ABYSS, 600), "the sailor did not reach the cave")
+	await h.steps(5)
+	h.check(music.playing and music.bus == &"Music", "the cave's music did not start on the Music bus")
+	await h.unload_fixture()
+	world = await _world(h, ABYSS)
+	await h.steps(10)
+	h.check(not world.get_node("Sound/MusicCave").playing, "restoring in the cave replayed its music")
+
+
+func test_the_epilogue_shows_a_picture_for_each_line_over_the_sea(h) -> void:
+	var ending: Node = await h.load_main_fixture("res://scenes/ui/ending.tscn")
+	await h.steps(3)
+	var panels: Node = ending.get_node("Panels")
+	h.check(panels.get_child_count() == ending.ending_lines.size(), "%d pictures for %d lines" % [panels.get_child_count(), ending.ending_lines.size()])
+	for line in ending.ending_lines.size():
+		await h.steps(2)
+		var shown := []
+		for panel in panels.get_children():
+			if panel.visible:
+				shown.append(panel.name)
+		h.check(shown.size() == 1 and shown[0] == panels.get_child(line).name, "at line %d the pictures shown are %s" % [line, shown])
+		if line + 1 < ending.ending_lines.size():
+			await h.tap_key(KEY_ENTER)
+	h.check(ending.get_node("Sea").playing and ending.get_node("Sea").bus == &"Effects", "no sea under the epilogue")
+	h.check(ending.get_node("Music").playing and ending.get_node("Music").bus == &"Music", "no music under the epilogue")
+
+
+
+func test_the_prologue_card_stays_under_its_pictures(h) -> void:
+	var prologue: Node = await h.load_main_fixture("res://scenes/ui/prologue.tscn")
+	var viewport: Rect2 = prologue.get_viewport_rect()
+	for line in prologue.ending_lines.size():
+		await h.steps(2)
+		var card: Rect2 = prologue.get_node("Card").get_global_rect()
+		h.check(viewport.encloses(card), "line %d is clipped: %s" % [line, card])
+		h.check(card.position.y >= viewport.size.y * 0.66, "line %d's card covers its picture from y=%.0f" % [line, card.position.y])
+		if line + 1 < prologue.ending_lines.size():
+			prologue.advance_ending()

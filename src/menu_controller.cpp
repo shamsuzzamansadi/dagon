@@ -278,7 +278,7 @@ void MenuController::finish_prologue(bool p_skipped) {
 	start_session(core::Beat::Shore, true);
 }
 
-// Each line of the epilogue joins the card when the one before has been said or could be read, whether it has a
+// Each line of the epilogue takes the card when the one before has been said or could be read, whether it has a
 // voice or not. The card is the ending's text, so the subtitle switch does not hide it.
 void MenuController::show_next_ending_line() {
 	if (ending_line_ + 1 >= ending_lines_.size()) {
@@ -288,13 +288,11 @@ void MenuController::show_next_ending_line() {
 	const StringName id = ending_lines_[ending_line_];
 	const String text = narration::line_text(id);
 	if (Control *box = ending_box_path_.is_empty() ? nullptr : get_node<Control>(ending_box_path_)) {
-		// The prologue's card holds one line at a time, under its picture. The epilogue's lines gather.
-		if (mode_ == MODE_PROLOGUE) {
-			for (int i = box->get_child_count() - 1; i >= 0; i--) {
-				Node *old = box->get_child(i);
-				box->remove_child(old);
-				old->queue_free();
-			}
+		// The card holds one line at a time, low on the screen, under the picture that goes with it.
+		for (int i = box->get_child_count() - 1; i >= 0; i--) {
+			Node *old = box->get_child(i);
+			box->remove_child(old);
+			old->queue_free();
 		}
 		Label *label = memnew(Label);
 		label->set_text(text);

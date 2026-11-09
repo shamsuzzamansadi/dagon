@@ -11,7 +11,7 @@ prologue.dry|story|I slept at last. When I woke, the sea had gone.
 # The Shore
 shore.boat|optional|My boat lies on bare seabed. The sea has drawn back farther than any tide.
 shore.fish|optional|Dead fish, rotting where the water left them. They have not been dry for long.
-shore.tentacle|optional|Part of an arm, like a squid's but thicker than my leg, every sucker ringed with hooks. It is cold, and it has not begun to rot.
+shore.tentacle|optional|An arm, thicker than my leg, its suckers ringed with hooks. A squid's, I told myself. I could not see where it had been cut from.
 shore.talisman|optional|Something small, half sunk in the mud. An eye, cut above a line of waves. It is heavier than it should be, and someone wore it smooth.
 
 # The cave, and what can be seen from its far end
@@ -22,6 +22,7 @@ abyss.ritual|story|Figures, far off among the stones. Kneeling, all of them. All
 abyss.fossil_a|optional|A spine as long as the boat, with too many ribs. Nothing in any sea I know was built like this.
 abyss.tablet_wave|optional|A slab, cut with rising lines. "The waters rose first..."
 abyss.fossil_b|optional|A skull, under the great ribs. The jaw is wider than I am tall. It faces inland, the way I am walking.
+abyss.crossing_mark|optional|Two pictures cut into a stone by the gap. A figure climbing a tilted beam. Then the beam lying flat, and the figure walking over it.
 abyss.slab|optional|A long slab across the gap, balanced on one stone like the beam of a scale.
 abyss.crossing|story|It tipped under me, and came down level with a sound I felt in my teeth.
 abyss.tablet_kneel|optional|A second slab. A figure, bent double. "...and they bowed..."
@@ -35,12 +36,12 @@ abyss.tablet_eye|optional|A third slab. An open eye. "...and He saw them."
 canyon.statue|optional|A stone figure on its knees, hands raised, its head all wrong. It is looking at something far larger than I am.
 monolith.first|story|The canyon opens, and then there is only that. I do not know who could have raised it.
 mural.before|optional|Worn carvings, broken by the years. Water, perhaps. A bent shape. Something round. Ruins, and nothing more.
-mural.after|optional|Lit now, and whole. Rows of figures, bowing to a vast swimmer rising from the water, its arms reaching for them, and over it, that eye. These were never ruins.
+mural.after|optional|Lit now, and whole: a vast swimmer rising, one arm wrapped round a standing stone, figures bowing to it, and over it, that eye. Never ruins.
 story.awakened|story|The stones answered. Somewhere behind the rock, something gave way.
 
 # The Witness
 story.reveal|story|It was no ridge. It had been beside me the whole way.
-story.recoil|story|I could not breathe. I could not look away.
+story.recoil|story|The carving. The same arm, round the same stone.
 story.run|story|Its head turned. I ran.
 flee.back|story|Don't look back. Don't...
 flee.sea|story|The sea. The sea is coming back.

@@ -20,12 +20,14 @@ OUT = ROOT / "project" / "assets" / "shore"
 SCENE = ROOT / "project" / "scenes" / "level" / "shore.tscn"
 UI_OUT = ROOT / "project" / "assets" / "ui"
 # light.png is a light mask, not artwork: its values multiply the lantern colour.
-ARTWORK = ["sky", "clouds", "far", "glints", "flats", "bank", "terrain", "foreground", "fish", "boat", "sailor", "talisman", "tentacle"]
+ARTWORK = ["sky", "clouds", "far", "glints", "flats", "bank", "terrain", "foreground", "fish", "boat", "sailor", "talisman", "tentacle", "ribs"]
+REVEAL_OUT = ROOT / "project" / "assets" / "reveal"
+REVEAL_ARTWORK = ["monolith", "dagon_body", "dagon_head", "dagon_crest", "dagon_arm"]
 # The finished reference section, and the prologue. shaft.png is a light mask, like light.png.
 CAVE_OUT = ROOT / "project" / "assets" / "cave"
 CAVE_ARTWORK = ["cave_front", "cave_wall", "abyss_far", "ritual_far", "foreground_cave"]
 PROLOGUE_OUT = ROOT / "project" / "assets" / "prologue"
-PROLOGUE_ARTWORK = ["prologue_1_raider", "prologue_2_escape", "prologue_3_drift", "prologue_4_dry"]
+PROLOGUE_ARTWORK = ["prologue_1_raider", "prologue_2_escape", "prologue_3_drift", "prologue_4_dry", "ending_1_found", "ending_2_listen", "ending_3_shop", "ending_4_rising"]
 CAVE_X0 = 600
 CAVE_OPEN_GROUND = range(640, 1440)
 IDLE_FRAMES = 8
@@ -124,12 +126,12 @@ def main():
         image = Image.open(UI_OUT / f"{name}.png").convert("RGBA")
         if {c for _, c in image.getcolors(1 << 24) if c[3] != 0} - ALLOWED:
             problems.append(f"{name}.png has colours outside the palette")
-    for folder, names in ((CAVE_OUT, CAVE_ARTWORK), (PROLOGUE_OUT, PROLOGUE_ARTWORK)):
+    for folder, names in ((CAVE_OUT, CAVE_ARTWORK), (PROLOGUE_OUT, PROLOGUE_ARTWORK), (REVEAL_OUT, REVEAL_ARTWORK)):
         for name in names:
             image = Image.open(folder / f"{name}.png").convert("RGBA")
             if {c for _, c in image.getcolors(1 << 24) if c[3] != 0} - ALLOWED:
                 problems.append(f"{name}.png has colours outside the palette")
-    print(f"palette: checked {len(ARTWORK) + len(CAVE_ARTWORK) + len(PROLOGUE_ARTWORK) + 2} images against {len(ALLOWED)} colours")
+    print(f"palette: checked {len(ARTWORK) + len(CAVE_ARTWORK) + len(PROLOGUE_ARTWORK) + len(REVEAL_ARTWORK) + 2} images against {len(ALLOWED)} colours")
 
     # Each foot's sole has its own colour, so its position can be read from the shipped pixels.
     sheet = Image.open(OUT / "sailor.png").convert("RGBA")

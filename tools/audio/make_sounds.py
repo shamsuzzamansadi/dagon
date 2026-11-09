@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Synthesizes the game's first sound pass: ambience, footsteps, puzzle and cinematic effects, breathing and music.
 
-Everything is made here from noise, oscillators and filters, with fixed seeds, so the output is original, reproducible
+Everything is made here from noise, oscillators and filters, with fixed seeds, so the output is original, reproducible in content (Ogg gives each file a random stream serial, so the bytes differ),
 and the project's own. No recording, sample library or model is used. Needs numpy, scipy and soundfile.
 
     python tools/audio/make_sounds.py            writes project/assets/audio/**.ogg and prints a measurement table
@@ -597,6 +597,55 @@ def music_ending(rng):
     return fade(level(widen(reverb(x, 5.0, 3500, 0.5, rng)[:n], rng, 0.7), rms=-24), fade_out=5.0)
 
 
+def music_cave(rng):
+    """Restrained, for the cave: a low held fifth that hardly moves, and a few distant tones, far apart, like water
+    finding a note in the dark. Mostly space. Fades out as the cave opens."""
+    n = seconds(56.0)
+    t = t_axis(n)
+    drone = (np.sin(2 * np.pi * note(38) * t) + 0.6 * np.sin(2 * np.pi * note(45) * t * 1.0007)) * 0.25
+    drone *= np.minimum(t / 8.0, 1) * np.clip((56 - t) / 14.0, 0, 1)
+    tones = np.zeros(n)
+    for start, midi in ((6.0, 69), (15.5, 72), (24.0, 67), (33.5, 70), (44.0, 65)):
+        place(tones, pluck(seconds(6.0), midi) * 0.35, start)
+    x = filt(drone, "low", 700) + reverb(tones, 5.0, 2500, 0.7, rng)[:n]
+    return fade(level(widen(reverb(x, 4.0, 2000, 0.4, rng)[:n], rng, 0.7), rms=-28), fade_out=6.0)
+
+
+def amb_night_sea(rng):
+    """For the epilogue: the sea that never left. Small waves on a shingle shore at night, close and quiet."""
+    n = seconds(24)
+    out = []
+    for side in range(2):
+        wash = np.zeros(n)
+        time = 0.5 + side * 0.4
+        while time < 22.0:
+            m = seconds(rng.uniform(2.2, 3.4))
+            swell = np.sin(np.linspace(0, math.pi, m)) ** 2
+            place(wash, filt(pink(m, rng), "band", (150, 3200)) * swell, time)
+            time += rng.uniform(2.8, 4.2)
+        hiss = filt(white(n, rng), "band", (2500, 6000)) * 0.05
+        out.append(wash + hiss + filt(brown(n, rng), "low", 90) * 0.3)
+    return level(make_loop(stereo(*out), 2.0), rms=-30)
+
+
+def water_cascade(rng):
+    """Water pouring off something huge as it rises: a broad roar, breaking up into heavy falling sheets."""
+    n = seconds(7.0)
+    t = t_axis(n)
+    shape = np.minimum(t / 0.8, 1) * np.clip((7 - t) / 3.0, 0, 1)
+    out = []
+    for side in range(2):
+        roar = filt(pink(n, rng), "band", (180, 5000)) * shape
+        sheets = np.zeros(n)
+        time = 0.4
+        while time < 6.0:
+            m = seconds(0.5)
+            place(sheets, filt(white(m, rng), "band", (300, 2400)) * env_exp(m, 0.18) * rng.uniform(0.3, 0.8), time)
+            time += rng.uniform(0.15, 0.5)
+        out.append(roar + sheets * shape)
+    return fade(level(stereo(*out), peak=-3), fade_out=0.5)
+
+
 # ---------------------------------------------------------------- the list
 
 
@@ -637,6 +686,9 @@ SOUNDS = {
     "music/awaken.ogg": (music_awaken, False, "Music: the stones answer"),
     "music/reveal.ogg": (music_reveal, False, "Music: the reveal"),
     "music/ending.ogg": (music_ending, False, "Music: the ending"),
+    "music/cave.ogg": (music_cave, False, "Music: the cave, restrained"),
+    "ambience/night_sea.ogg": (amb_night_sea, True, "The epilogue: the sea at night, close and quiet"),
+    "effects/water_cascade.ogg": (water_cascade, False, "The reveal: water pouring off it as it rises"),
 }
 
 

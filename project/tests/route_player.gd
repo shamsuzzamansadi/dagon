@@ -82,7 +82,7 @@ func walk(key: Key, reached: Callable, max_steps: int, examine := false) -> bool
 			h.send(h.key_event(KEY_SPACE, false))
 			stalled = 0
 	h.send(h.key_event(key, false))
-	h.fail("walking did not arrive, at x=%.1f" % body.global_position.x)
+	h.fail("walking did not arrive, at x=%.1f, control %s, on floor %s, beat %d, cinematic %s, paused %s, time scale %.2f" % [body.global_position.x, body.is_control_enabled(), body.is_on_floor(), director().get_beat(), director().is_cinematic_active(), h.tree.paused, Engine.time_scale])
 	return false
 
 

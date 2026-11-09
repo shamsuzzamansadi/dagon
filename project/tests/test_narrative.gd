@@ -422,7 +422,6 @@ func test_restarting_at_the_abyss_lets_the_ritual_happen_again_exactly_once(h) -
 
 
 func test_no_new_save_state_comes_with_any_of_this(h) -> void:
-	await h.load_fixture("res://tests/fixtures/movement_arena.tscn")
 	var session: Node = (load(GAME) as PackedScene).instantiate()
 	session.set_start(ABYSS, true, false)
 	await h.load_with(session)

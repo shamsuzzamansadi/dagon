@@ -14,6 +14,14 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="12_hud"]
 [ext_resource type="PackedScene" path="res://scenes/ui/ending.tscn" id="13_ending"]
 [ext_resource type="Texture2D" path="res://assets/shore/talisman.png" id="14_talisman"]
+[ext_resource type="Texture2D" path="res://assets/reveal/monolith.png" id="r_monolith"]
+[ext_resource type="Texture2D" path="res://assets/reveal/dagon_body.png" id="r_dagon_body"]
+[ext_resource type="Texture2D" path="res://assets/reveal/dagon_head.png" id="r_dagon_head"]
+[ext_resource type="Texture2D" path="res://assets/reveal/dagon_crest.png" id="r_dagon_crest"]
+[ext_resource type="Texture2D" path="res://assets/reveal/dagon_arm.png" id="r_dagon_arm"]
+[ext_resource type="Texture2D" path="res://assets/shore/ribs.png" id="r_ribs"]
+[ext_resource type="AudioStream" path="res://assets/audio/effects/water_cascade.ogg" id="a_cascade"]
+[ext_resource type="AudioStream" path="res://assets/audio/music/cave.ogg" id="m_cave"]
 [ext_resource type="Texture2D" path="res://assets/cave/cave_front.png" id="r_cave_front"]
 [ext_resource type="Texture2D" path="res://assets/cave/cave_wall.png" id="r_cave_wall"]
 [ext_resource type="Texture2D" path="res://assets/cave/abyss_far.png" id="r_abyss_far"]
@@ -127,6 +135,20 @@ tracks/1/keys = {
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
 "values": [Vector2(1000, 0), Vector2(1000, 0), Vector2(960, 8)]
+}
+tracks/2/type = "method"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Sound/MusicCave")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.05),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [0.0],
+"method": &"play"
+}]
 }
 
 [sub_resource type="Animation" id="beat_monolith"]
@@ -901,6 +923,44 @@ tracks/28/keys = {
 "update": 0,
 "values": [0.0, -0.15, -0.05, 0.0]
 }
+tracks/29/type = "method"
+tracks/29/imported = false
+tracks/29/enabled = true
+tracks/29/path = NodePath("Sound/WaterCascade")
+tracks/29/interp = 1
+tracks/29/loop_wrap = true
+tracks/29/keys = {
+"times": PackedFloat32Array(3),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [0.0],
+"method": &"play"
+}]
+}
+tracks/30/type = "value"
+tracks/30/imported = false
+tracks/30/enabled = true
+tracks/30/path = NodePath("Trench/Splash:emitting")
+tracks/30/interp = 1
+tracks/30/loop_wrap = true
+tracks/30/keys = {
+"times": PackedFloat32Array(0, 2.6, 6.5),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [false, true, false]
+}
+tracks/31/type = "value"
+tracks/31/imported = false
+tracks/31/enabled = true
+tracks/31/path = NodePath("Dagon/Runoff:emitting")
+tracks/31/interp = 1
+tracks/31/loop_wrap = true
+tracks/31/keys = {
+"times": PackedFloat32Array(0, 3.2, 10.5),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [false, true, false]
+}
 
 [sub_resource type="Animation" id="clip_collapse"]
 resource_name = "collapse"
@@ -1475,11 +1535,40 @@ polygon = PackedVector2Array(640, -220, 1040, -220, 1040, -150, 1010, -120, 965,
 color = Color(0.05, 0.065, 0.09, 1)
 polygon = PackedVector2Array(2826, 0, 2826, -28, 2990, -28, 2990, 0)
 
+[node name="PrintDown0" type="Polygon2D" parent="ActArt"]
+color = Color(0.3, 0.36, 0.38, 1)
+polygon = PackedVector2Array(2150, 14, 2152, 13, 2154, 14, 2153, 15, 2151, 15)
+
+[node name="PrintDown1" type="Polygon2D" parent="ActArt"]
+color = Color(0.3, 0.36, 0.38, 1)
+polygon = PackedVector2Array(2156, 22, 2158, 21, 2160, 22, 2159, 23, 2157, 23)
+
+[node name="PrintDown2" type="Polygon2D" parent="ActArt"]
+color = Color(0.3, 0.36, 0.38, 1)
+polygon = PackedVector2Array(2162, 30, 2164, 29, 2166, 30, 2165, 31, 2163, 31)
+
 [node name="CanyonFigure" type="Polygon2D" parent="ActArt"]
 visible = false
 position = Vector2(3690, 0)
 color = Color(0.03, 0.04, 0.07, 1)
 polygon = PackedVector2Array(-3.6, 0, -3.6, -14.4, -4.8, -18, -2.4, -22.8, 2.4, -22.8, 4.8, -18, 3.6, -14.4, 3.6, 0)
+
+[node name="Splash" type="CPUParticles2D" parent="Trench"]
+z_index = 2
+position = Vector2(4620, 6)
+emitting = false
+amount = 120
+lifetime = 1.6
+emission_shape = 3
+emission_rect_extents = Vector2(150, 3)
+direction = Vector2(0, -1)
+spread = 30.0
+gravity = Vector2(0, 160)
+initial_velocity_min = 60.0
+initial_velocity_max = 140.0
+scale_amount_min = 2.0
+scale_amount_max = 3.0
+color = Color(0.62, 0.72, 0.74, 0.8)
 
 [node name="Dagon" type="Node2D" parent="."]
 position = Vector2(4700, 0)
@@ -1490,25 +1579,61 @@ polygon = PackedVector2Array(-330, 0, -326, -120, -296, -170, -250, -186, -214, 
 
 [node name="Body" type="Polygon2D" parent="Dagon"]
 visible = false
-color = Color(0.012, 0.018, 0.035, 1)
+color = Color(0.012, 0.018, 0.035, 0)
 polygon = PackedVector2Array(-360, 260, -345, -110, -300, -175, -235, -205, -150, -215, -100, -235, -80, -258, 60, -258, 80, -235, 140, -205, 230, -175, 290, -100, 330, 260)
+
+[node name="Art" type="Sprite2D" parent="Dagon/Body"]
+position = Vector2(-360, -258)
+texture = ExtResource("r_dagon_body")
+centered = false
 
 [node name="Head" type="Polygon2D" parent="Dagon"]
 visible = false
-color = Color(0.012, 0.018, 0.035, 1)
+color = Color(0.012, 0.018, 0.035, 0)
 polygon = PackedVector2Array(82, -262, 84, -300, 44, -360, -20, -385, -90, -378, -150, -345, -182, -314, -192, -296, -172, -270, -110, -252, -40, -246, 40, -250)
+
+[node name="Art" type="Sprite2D" parent="Dagon/Head"]
+position = Vector2(-192, -385)
+texture = ExtResource("r_dagon_head")
+centered = false
 
 [node name="Crest" type="Polygon2D" parent="Dagon"]
 visible = false
-color = Color(0.012, 0.018, 0.035, 1)
+color = Color(0.012, 0.018, 0.035, 0)
 polygon = PackedVector2Array(-60, -382, -54, -428, -32, -381, -14, -442, 4, -378, 24, -440, 40, -362, 66, -416, 74, -330, 106, -384, 96, -285, 70, -300)
+
+[node name="Art" type="Sprite2D" parent="Dagon/Crest"]
+position = Vector2(-60, -442)
+texture = ExtResource("r_dagon_crest")
+centered = false
 
 [node name="Arm" type="Polygon2D" parent="Dagon"]
 visible = false
 z_index = 1
 position = Vector2(50, 170)
-color = Color(0.012, 0.018, 0.035, 1)
+color = Color(0.012, 0.018, 0.035, 0)
 polygon = PackedVector2Array(-300, -192, -350, -216, -395, -250, -432, -266, -486, -274, -484, -266, -436, -254, -492, -252, -491, -244, -438, -240, -490, -228, -488, -220, -436, -226, -478, -204, -474, -197, -430, -212, -395, -205, -350, -170, -310, -140)
+
+[node name="Art" type="Sprite2D" parent="Dagon/Arm"]
+position = Vector2(-492, -274)
+texture = ExtResource("r_dagon_arm")
+centered = false
+
+[node name="Runoff" type="CPUParticles2D" parent="Dagon"]
+position = Vector2(-220, -200)
+emitting = false
+amount = 70
+lifetime = 1.4
+emission_shape = 3
+emission_rect_extents = Vector2(140, 30)
+direction = Vector2(0, 1)
+spread = 10.0
+gravity = Vector2(0, 240)
+initial_velocity_min = 10.0
+initial_velocity_max = 30.0
+scale_amount_min = 1.0
+scale_amount_max = 2.0
+color = Color(0.45, 0.62, 0.62, 0.7)
 
 [node name="Rims" type="Node2D" parent="Dagon"]
 visible = false
@@ -1562,7 +1687,7 @@ centered = false
 
 [node name="GreyboxGround" type="Polygon2D" parent="Terrain"]
 color = Color(0.2, 0.24, 0.28, 1)
-polygon = PackedVector2Array(1440, -3.33, 1480, -10, 1540, -10, 1600, 0, 2150, 0, 2150, 16, 2160, 16, 2160, 32, 2170, 32, 2170, 48, 2290, 48, 2290, 0, 2780, 0, 2780, -14, 2812, -14, 2812, 0, 3004, 0, 3004, -14, 3036, -14, 3036, 0, 3584, 0, 3584, -14, 3612, -14, 3612, 0, 4520, 0, 4520, -300, 4544, -300, 4544, 60, 1440, 60)
+polygon = PackedVector2Array(1440, -3.33, 1480, -10, 1540, -10, 1600, 0, 2150, 0, 2150, 16, 2160, 16, 2160, 32, 2170, 32, 2170, 48, 2290, 48, 2290, 0, 2780, 0, 2780, -14, 2812, -14, 2812, 0, 3004, 0, 3004, -14, 3036, -14, 3036, 0, 3584, 0, 3584, -14, 3612, -14, 3612, 0, 4544, 0, 4544, 60, 1440, 60)
 
 [node name="ReferenceSection" type="Node2D" parent="."]
 
@@ -1797,7 +1922,7 @@ line_id = &"shore.talisman"
 shape = SubResource("talisman_shape")
 
 [node name="Tentacle" type="Interactable" parent="Props"]
-position = Vector2(568, -6)
+position = Vector2(588, -6)
 collision_layer = 4
 collision_mask = 0
 monitoring = false
@@ -1806,6 +1931,37 @@ line_id = &"shore.tentacle"
 
 [node name="Shape" type="CollisionShape2D" parent="Props/Tentacle"]
 shape = SubResource("talisman_shape")
+
+[node name="CrossingMark" type="Interactable" parent="Props"]
+position = Vector2(2098, -14)
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+interaction_id = &"crossing_mark"
+line_id = &"abyss.crossing_mark"
+
+[node name="Shape" type="CollisionShape2D" parent="Props/CrossingMark"]
+shape = SubResource("talisman_shape")
+
+[node name="Stone" type="Polygon2D" parent="Props/CrossingMark"]
+color = Color(0.3, 0.34, 0.38, 1)
+polygon = PackedVector2Array(-16, 14, -17, -8, -12, -14, 12, -14, 17, -8, 16, 14)
+
+[node name="TiltedBeam" type="Polygon2D" parent="Props/CrossingMark"]
+color = Color(0.62, 0.72, 0.72, 1)
+polygon = PackedVector2Array(-14, 6, -2, -6, -1, -5, -13, 7)
+
+[node name="FigureOnIt" type="Polygon2D" parent="Props/CrossingMark"]
+color = Color(0.62, 0.72, 0.72, 1)
+polygon = PackedVector2Array(-5, -4, -5, -9, -3, -11, -2, -9, -2, -3)
+
+[node name="LevelBeam" type="Polygon2D" parent="Props/CrossingMark"]
+color = Color(0.62, 0.72, 0.72, 1)
+polygon = PackedVector2Array(2, 3, 15, 3, 15, 4, 2, 4)
+
+[node name="FigureAcross" type="Polygon2D" parent="Props/CrossingMark"]
+color = Color(0.62, 0.72, 0.72, 1)
+polygon = PackedVector2Array(10, 2, 10, -4, 12, -6, 13, -4, 13, 2)
 
 [node name="Slab" type="Interactable" parent="Props"]
 position = Vector2(2138, -14)
@@ -1934,14 +2090,23 @@ polygon = PackedVector2Array(-3.6, 22.8, -1.6, 20.8, 1.6, 20.8, 3.6, 22.8, 1.6, 
 [node name="Monolith" type="Node2D" parent="."]
 
 [node name="Back" type="Polygon2D" parent="Monolith"]
+visible = false
 color = Color(0.13, 0.155, 0.19, 1)
 polygon = PackedVector2Array(3830, 0, 3836, -240, 3860, -520, 4262, -520, 4290, -260, 4296, 0)
 
+[node name="Art" type="Sprite2D" parent="Monolith"]
+light_mask = 2
+position = Vector2(3830, -520)
+texture = ExtResource("r_monolith")
+centered = false
+
 [node name="Edge" type="Polygon2D" parent="Monolith"]
+visible = false
 color = Color(0.17, 0.2, 0.24, 1)
 polygon = PackedVector2Array(3830, 0, 3836, -240, 3860, -520, 3868, -520, 3846, -240, 3840, 0)
 
 [node name="MuralPanel" type="Polygon2D" parent="Monolith"]
+visible = false
 color = Color(0.3, 0.34, 0.38, 1)
 polygon = PackedVector2Array(3852, -6, 3852, -92, 3944, -92, 3944, -6)
 
@@ -2006,15 +2171,15 @@ polygon = PackedVector2Array(3923.8, -15.4, 3923.8, -17.2, 3926.2, -17.2, 3928, 
 
 [node name="Swimmer" type="Polygon2D" parent="Monolith/MuralLit"]
 color = Color(0.5, 0.92, 0.78, 1)
-polygon = PackedVector2Array(3858, -76, 3880, -88, 3916, -89, 3938, -80, 3926, -74, 3896, -69, 3868, -70)
+polygon = PackedVector2Array(3922, -79, 3921, -85, 3916, -86, 3914, -92, 3911, -86, 3907, -87, 3905, -93, 3902, -87, 3898, -88, 3896, -93, 3893, -87, 3886, -87, 3878, -84, 3884, -82, 3876, -80, 3884, -79, 3896, -78, 3910, -77)
 
 [node name="ArmLeft" type="Polygon2D" parent="Monolith/MuralLit"]
 color = Color(0.5, 0.92, 0.78, 1)
-polygon = PackedVector2Array(3866, -71, 3858, -64, 3854, -55, 3856, -48, 3860, -46, 3858, -52, 3860, -60, 3868, -68)
+polygon = PackedVector2Array(3910, -76, 3896, -71, 3880, -70, 3872, -72, 3862, -74, 3858, -70, 3862, -66, 3870, -65, 3871, -68, 3880, -67, 3896, -67, 3910, -72)
 
 [node name="ArmRight" type="Polygon2D" parent="Monolith/MuralLit"]
 color = Color(0.5, 0.92, 0.78, 1)
-polygon = PackedVector2Array(3930, -72, 3940, -66, 3944, -57, 3942, -50, 3938, -48, 3940, -54, 3937, -62, 3928, -69)
+polygon = PackedVector2Array(3864, -90, 3870, -90, 3871, -62, 3863, -62)
 
 [node name="Symbol" type="Polygon2D" parent="Monolith/MuralLit"]
 color = Color(0.5, 0.92, 0.78, 1)
@@ -2206,6 +2371,22 @@ polygon = PackedVector2Array(-24, -4, -22, -4, -22, 4, -24, 4)
 color = Color(0.62, 0.72, 0.72, 1)
 polygon = PackedVector2Array(36, -2, 40, -3, 44, -2, 48, -3, 52, -2, 52, -1, 48, -2, 44, -1, 40, -2, 36, -1)
 
+[node name="Print0" type="Polygon2D" parent="Crossing"]
+color = Color(0.4, 0.46, 0.48, 1)
+polygon = PackedVector2Array(-58, -4, -56, -5, -54, -4, -55, -3, -57, -3)
+
+[node name="Print1" type="Polygon2D" parent="Crossing"]
+color = Color(0.4, 0.46, 0.48, 1)
+polygon = PackedVector2Array(-38, -4, -36, -5, -34, -4, -35, -3, -37, -3)
+
+[node name="Print2" type="Polygon2D" parent="Crossing"]
+color = Color(0.4, 0.46, 0.48, 1)
+polygon = PackedVector2Array(-18, -4, -16, -5, -14, -4, -15, -3, -17, -3)
+
+[node name="Print3" type="Polygon2D" parent="Crossing"]
+color = Color(0.4, 0.46, 0.48, 1)
+polygon = PackedVector2Array(2, -4, 4, -5, 6, -4, 5, -3, 3, -3)
+
 [node name="Sound" type="AudioStreamPlayer2D" parent="Crossing"]
 stream = ExtResource("a_slab")
 bus = &"Effects"
@@ -2261,9 +2442,34 @@ position = Vector2(3838, 0)
 color = Color(0.55, 0.58, 0.58, 1)
 polygon = PackedVector2Array(-30, 0, -24, -9, -10, -14, 10, -14, 24, -9, 30, 0)
 
+[node name="Ribs" type="Sprite2D" parent="."]
+light_mask = 2
+position = Vector2(404, -44)
+texture = ExtResource("r_ribs")
+centered = false
+
+[node name="FishByTheBoat" type="Sprite2D" parent="."]
+light_mask = 2
+position = Vector2(118, -5)
+texture = ExtResource("9_fish")
+centered = false
+
+[node name="FishOnTheRise" type="Sprite2D" parent="."]
+light_mask = 2
+position = Vector2(452, -16)
+texture = ExtResource("9_fish")
+centered = false
+flip_h = true
+
+[node name="FishByTheArm" type="Sprite2D" parent="."]
+light_mask = 2
+position = Vector2(612, -5)
+texture = ExtResource("9_fish")
+centered = false
+
 [node name="Tentacle" type="Sprite2D" parent="."]
 light_mask = 2
-position = Vector2(548, -12)
+position = Vector2(546, -26)
 texture = ExtResource("r_tentacle")
 centered = false
 
@@ -2566,6 +2772,15 @@ bus = &"Effects"
 
 [node name="RitualDrum" type="AudioStreamPlayer" parent="Sound"]
 stream = ExtResource("a_drum")
+bus = &"Effects"
+
+[node name="MusicCave" type="AudioStreamPlayer" parent="Sound"]
+stream = ExtResource("m_cave")
+volume_db = -4.0
+bus = &"Music"
+
+[node name="WaterCascade" type="AudioStreamPlayer" parent="Sound"]
+stream = ExtResource("a_cascade")
 bus = &"Effects"
 
 [node name="MusicAwaken" type="AudioStreamPlayer" parent="Sound"]

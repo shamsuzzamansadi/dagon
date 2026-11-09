@@ -10,7 +10,7 @@ sailor you can walk and jump with, on exposed seabed beside a stranded boat, wit
 use a controller, with buttons named for the device in use.
 
 On the M3 branch, the whole route can be played: the prologue, Shore, Exposed Abyss, Monolith, Witness, the escape and the ending. There are clue tablets, side routes, a slab to bring down across a gap, a distant ritual, a three-stone puzzle, placeholder cinematics,
-the sea coming back after you in the escape, a save at each checkpoint, and optional controller vibration. **The Shore and the stretch from the cave entrance to the first tablet are finished art. Past x = 1440 it is unfinished greybox,** a stated boundary. The cinematics are placeholders. **There is a first sound pass across the route: ambience, footsteps, effects, breathing and music in four places. It is synthesized, not final, and has not been listened to by the developer.** Three narration lines have an AI voice for the owner's audition, not approved; the rest of the
+the sea coming back after you in the escape, a save at each checkpoint, and optional controller vibration. **The Shore and the stretch from the cave entrance to the first tablet are finished art, and so are the monolith, the creature and the epilogue's pictures. The rest past x = 1440 is unfinished greybox,** a stated boundary. The cinematics are a first pass. **There is a first sound pass across the route: ambience, footsteps, effects, breathing and music in five places. It is synthesized, not final, and has not been listened to by the developer.** Three narration lines have an AI voice for the owner's audition, not approved; the rest of the
 narration is captions. It is shorter than the finished game is meant to be. See
 [docs/roadmap.md](docs/roadmap.md), [docs/reviews/m3-review-package.md](docs/reviews/m3-review-package.md) and [docs/shore-preview.md](docs/shore-preview.md).
 
@@ -59,7 +59,7 @@ which are not targets.
 | `project/scenes/ui/title.tscn` | **Entry scene:** the main menu, which is what the standard build opens. |
 | `project/scenes/level/game.tscn` | The session: the world, which it can replace, and the pause menu. |
 | `project/scenes/level/shore.tscn` | The world: all four acts, despite the name. Art from x = 0 to 640, greybox from there to x = 4544. |
-| `project/scenes/ui/ending.tscn` | The epilogue, line by line, and the credits, which lead back to the main menu. |
+| `project/scenes/ui/ending.tscn` | The epilogue, line by line, each over its picture, and the credits, which lead back to the main menu. |
 | `project/narration/script.txt` | Every spoken line and its caption, by line ID. The one source for both. |
 | `project/scenes/level/level.tscn` | M1's movement test scene, with the same collision up to x = 980. Not exported. Run it with `godot --path project res://scenes/level/level.tscn`, or open it in the editor. |
 

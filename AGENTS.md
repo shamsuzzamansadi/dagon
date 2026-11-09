@@ -47,6 +47,8 @@ This file is for any coding agent working on this repository, whichever tool run
 - A test that sets out to cause an error names it with `h.expect_error(text)` (D53).
 - End a headless run with `DAGON_QUIT_AFTER_FRAMES=N`, keeping `--quit-after` only as a later backstop, and stop all sound before any quit a test makes. Otherwise the engine reports sound still playing at shutdown as leaked (D78).
 - Deliberate breakage goes through `tools/breakage.py`, which fails closed (D80). Its own tests are `tools/test_breakage.py`. A breakage that does not apply, build or complete never counts as caught.
+- Look at a capture of anything visual you change (`project/tests/capture_m3.gd`, on a private display). Passing tests do not show that a picture reads, or that nothing covers it.
+- Keep a review's evidence as it was reviewed. A new capture set goes in a folder of its own, not over images an earlier record cites.
 
 **Scope**
 - Before adding anything, check the milestone's scope in the roadmap and any exclusions in the handoff. If it needs more than was approved, write down a small concrete proposal and its schedule cost for the owner, and carry on with authorized work meanwhile.

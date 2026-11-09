@@ -286,7 +286,8 @@ func test_the_epilogue_fills_itself_in_without_anyone_pressing_anything(h) -> vo
 	await h.steps(3)
 	var total: int = ending.ending_lines.size()
 	h.check(_ending_lines(ending).size() == 1, "the card starts with %d lines" % _ending_lines(ending).size())
-	await h.wait_until(func() -> bool: return _ending_lines(ending).size() == total, 3600, "every line to show")
+	await h.wait_until(func() -> bool: return ending.get_ending_line() == total - 1, 3600, "every line to show")
+	h.check(_ending_lines(ending).size() == 1, "the card holds %d lines" % _ending_lines(ending).size())
 	h.check(ending.get_node("Center/Card").visible, "the card went away by itself")
 	h.check(_focus(h) == ending.get_node("Center/Card/Items/Continue"), "focus is on %s" % _focus(h))
 
@@ -294,9 +295,12 @@ func test_the_epilogue_fills_itself_in_without_anyone_pressing_anything(h) -> vo
 func test_the_epilogue_names_innsmouth_and_stands_on_its_own(h) -> void:
 	var ending: Node = await h.load_main_fixture("res://scenes/ui/ending.tscn")
 	await h.steps(3)
-	for i in ending.ending_lines.size() - 1:
-		await h.tap_key(KEY_ENTER)
-	var text := " ".join(_ending_lines(ending))
+	var said := []
+	for i in ending.ending_lines.size():
+		said.append_array(_ending_lines(ending))
+		if i + 1 < ending.ending_lines.size():
+			await h.tap_key(KEY_ENTER)
+	var text := " ".join(said)
 	for phrase in ["Innsmouth", "That eye, above those waves", "They tell me the sea never left", "finished rising"]:
 		h.check(text.contains(phrase), "the epilogue lacks '%s': %s" % [phrase, text])
 
@@ -304,14 +308,21 @@ func test_the_epilogue_names_innsmouth_and_stands_on_its_own(h) -> void:
 func test_the_ending_screens_fit_and_their_text_can_be_drawn(h) -> void:
 	var ending: Node = await h.load_main_fixture("res://scenes/ui/ending.tscn")
 	await h.steps(3)
-	for i in ending.ending_lines.size() - 1:
-		await h.tap_key(KEY_ENTER)
-	await h.steps(2)
 	var viewport: Rect2 = ending.get_viewport_rect()
-	h.check(_ending_lines(ending).size() == ending.ending_lines.size(), "not every line showed")
-	h.check(viewport.encloses(ending.get_node("Center/Card").get_global_rect()), "the epilogue is clipped: %s" % ending.get_node("Center/Card").get_global_rect())
+	var said := []
+	# One line at a time, low on the screen: the picture above it stays in view, and no line is cut off.
+	for i in ending.ending_lines.size():
+		await h.steps(2)
+		h.check(_ending_lines(ending).size() == 1, "at line %d the card holds %d lines" % [i, _ending_lines(ending).size()])
+		said.append_array(_ending_lines(ending))
+		var card: Rect2 = ending.get_node("Center/Card").get_global_rect()
+		h.check(viewport.encloses(card), "line %d is clipped: %s" % [i, card])
+		h.check(card.position.y >= viewport.size.y * 0.66, "line %d's card covers its picture from y=%.0f" % [i, card.position.y])
+		if i + 1 < ending.ending_lines.size():
+			await h.tap_key(KEY_ENTER)
+	h.check(said.size() == ending.ending_lines.size(), "not every line showed")
 	var font: Font = ending.get_node("Center/Credits/Items/Text").get_theme_font("font")
-	var text: String = "\n".join(_ending_lines(ending))
+	var text: String = "\n".join(said)
 	for i in text.length():
 		h.check(text.unicode_at(i) == 10 or text.unicode_at(i) == 32 or font.has_char(text.unicode_at(i)), "the font cannot draw '%s'" % text[i])
 	ending.open_credits()

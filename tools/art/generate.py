@@ -12,6 +12,7 @@ from PIL import Image
 import gen_boat
 import gen_sailor
 import gen_cave
+import gen_reveal
 import gen_prologue
 import gen_shore
 import gen_ui
@@ -20,6 +21,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 OUT = ROOT / "project" / "assets" / "shore"
 CAVE_OUT = OUT.parent / "cave"
 PROLOGUE_OUT = OUT.parent / "prologue"
+REVEAL_OUT = OUT.parent / "reveal"
 UI_OUT = ROOT / "project" / "assets" / "ui"
 RES = "res://assets/shore"
 
@@ -114,6 +116,11 @@ def main():
     gen_shore.fish_prop().save(OUT / "fish.png")
     gen_boat.draw().save(OUT / "boat.png")
     gen_cave.tentacle().save(OUT / "tentacle.png")
+    gen_cave.remains_ribs().save(OUT / "ribs.png")
+    REVEAL_OUT.mkdir(parents=True, exist_ok=True)
+    gen_reveal.monolith().save(REVEAL_OUT / "monolith.png")
+    for name, (image, _offset) in gen_reveal.dagon_parts().items():
+        image.save(REVEAL_OUT / f"dagon_{name}.png")
     CAVE_OUT.mkdir(parents=True, exist_ok=True)
     gen_cave.cave_front().save(CAVE_OUT / "cave_front.png")
     gen_cave.cave_wall().save(CAVE_OUT / "cave_wall.png")
@@ -123,6 +130,8 @@ def main():
     gen_cave.shaft().save(CAVE_OUT / "shaft.png")
     PROLOGUE_OUT.mkdir(parents=True, exist_ok=True)
     for name, draw in gen_prologue.PANELS.items():
+        draw().save(PROLOGUE_OUT / name)
+    for name, draw in gen_prologue.ENDING_PANELS.items():
         draw().save(PROLOGUE_OUT / name)
     write_sailor()
     write_glints()

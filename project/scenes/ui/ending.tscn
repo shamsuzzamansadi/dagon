@@ -2,6 +2,11 @@
 
 [ext_resource type="Theme" path="res://assets/ui/theme.tres" id="theme"]
 [ext_resource type="AudioStream" path="res://assets/audio/music/ending.ogg" id="music"]
+[ext_resource type="AudioStream" path="res://assets/audio/ambience/night_sea.ogg" id="sea"]
+[ext_resource type="Texture2D" path="res://assets/prologue/ending_1_found.png" id="e1"]
+[ext_resource type="Texture2D" path="res://assets/prologue/ending_2_listen.png" id="e2"]
+[ext_resource type="Texture2D" path="res://assets/prologue/ending_3_shop.png" id="e3"]
+[ext_resource type="Texture2D" path="res://assets/prologue/ending_4_rising.png" id="e4"]
 
 [node name="Ending" type="MenuController"]
 layout_mode = 3
@@ -20,6 +25,7 @@ credits_button_path = NodePath("Center/Card/Items/Continue")
 credits_back_button_path = NodePath("Center/Credits/Items/MainMenu")
 ending_box_path = NodePath("Center/Card/Items/Lines")
 voice_path = NodePath("Voice")
+panels_path = NodePath("Panels")
 ending_lines = PackedStringArray("ending.found", "ending.listen", "ending.innsmouth", "ending.rising")
 
 [node name="Voice" type="AudioStreamPlayer" parent="."]
@@ -31,6 +37,12 @@ volume_db = -3.0
 autoplay = true
 bus = &"Music"
 
+[node name="Sea" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("sea")
+volume_db = -6.0
+autoplay = true
+bus = &"Effects"
+
 [node name="Black" type="ColorRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
@@ -41,31 +53,102 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0.0392, 0.0549, 0.0941, 1)
 
-[node name="Center" type="CenterContainer" parent="."]
+[node name="Panels" type="Control" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 
-[node name="Card" type="VBoxContainer" parent="Center"]
-layout_mode = 2
+[node name="Found" type="TextureRect" parent="Panels"]
+visible = false
+modulate = Color(1, 1, 1, 0)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+texture = ExtResource("e1")
+stretch_mode = 5
+
+[node name="Listen" type="TextureRect" parent="Panels"]
+visible = false
+modulate = Color(1, 1, 1, 0)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+texture = ExtResource("e2")
+stretch_mode = 5
+
+[node name="Shop" type="TextureRect" parent="Panels"]
+visible = false
+modulate = Color(1, 1, 1, 0)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+texture = ExtResource("e3")
+stretch_mode = 5
+
+[node name="Rising" type="TextureRect" parent="Panels"]
+visible = false
+modulate = Color(1, 1, 1, 0)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+texture = ExtResource("e4")
+stretch_mode = 5
+
+[node name="Center" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Card" type="PanelContainer" parent="Center"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = -50.0
+offset_right = -24.0
+offset_bottom = -6.0
+grow_horizontal = 2
+grow_vertical = 0
 
 [node name="Items" type="VBoxContainer" parent="Center/Card"]
 layout_mode = 2
 
 [node name="Lines" type="VBoxContainer" parent="Center/Card/Items"]
-custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
 
 [node name="Continue" type="Button" parent="Center/Card/Items"]
 layout_mode = 2
+size_flags_horizontal = 8
 text = "Continue"
 
 [node name="Credits" type="PanelContainer" parent="Center"]
 visible = false
-layout_mode = 2
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="Items" type="VBoxContainer" parent="Center/Credits"]
 layout_mode = 2

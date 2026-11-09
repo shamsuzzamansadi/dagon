@@ -2,24 +2,27 @@
 
 Changing task state only. The lasting rules are in [AGENTS.md](../AGENTS.md). **Check this against `git log`, the pull request and CI before relying on it.**
 
-**Last updated:** 2026-11-09, during the owner's revision of M3.
+**Last updated:** 2026-11-09, at the end of the owner's refinements of M3.
 
 ## Where things are
 
 | | |
 |---|---|
-| **Milestone** | M3, expanded by the owner on 2026-11-09 ([D70](decisions.md)). **Implemented. Not owner-accepted. Independent follow-up review not yet done. Not merged** |
+| **Milestone** | M3, expanded by the owner on 2026-11-09 ([D70](decisions.md)) and refined the same day ([D82–D86](decisions.md)). **Implemented. Not owner-accepted. Independent follow-up review not yet done. Not merged** |
 | **Branch and pull request** | `m3/complete-gameplay`, draft [#3](https://github.com/shamsuzzamansadi/dagon/pull/3), based on `main` at `15ba96c` |
-| **Hold** | Do not merge, tag, publish, delete the branch, mark a release accepted, or start general M4 production. Stop at a reviewable result |
+| **The build to play, and its CI** | Named in the pull request, with the Windows artifact's SHA-256. Not recorded here, so that no commit is made only to record the last one's CI |
+| **Hold** | Do not merge, tag, publish, delete the branch, mark a release accepted, or start general M4 production. **Stopped at independent review and the owner's playtest** |
 | **Dependency** | ChatGPT's follow-up review, the owner's playtest, and the owner's choice of voice |
 
 ## Approved scope, and exclusions
 
-**In M3, as the owner expanded it on 2026-11-09:** a short skippable prologue, one environmental interaction in Act II, a visible returning sea in the escape, a stranded tentacle echoed in the carvings, the sailor's reactions, a script review for chronology, **an initial sound pass across the route with selective music, one visually finished reference section from the cave entrance, and a replacement voice audition.** Everything from before stays: the route, the puzzle, the cinematic contract, saves, narration plumbing, vibration.
+**In M3, as the owner expanded it on 2026-11-09:** a short skippable prologue, one environmental interaction in Act II, a visible returning sea in the escape, a stranded tentacle echoed in the carvings, the sailor's reactions, a script review for chronology, an initial sound pass across the route with selective music, one visually finished reference section from the cave entrance, and a replacement voice audition. **Then the ten refinements:** the opening, the exposed seabed and the arm, observation that helps at the gap, the monolith and the reveal as a payoff, the sailor's progression, a complete initial sound experience, the voice kept separate, the ending's consequence, bounded art, and validation. Everything from before stays.
 
-**Excluded by the owner:** a playable ship level, a sailing simulation, a new act, combat, enemy AI, inventory, branching story, a sanity meter, inverted controls, constant distortion. Lengthening play by slower movement, empty corridors, repeated puzzles or compulsory narration waits. Mass-producing narration with an unapproved voice. Spending money.
+**The owner's reference:** an illustrated adaptation of the story, for dramatic structure only. Nothing from it is used. ChatGPT inspected sampled frames of it and did not evaluate its soundtrack. That is not a review of this game.
 
-**Still with M4 and M5:** finished art beyond the reference section, the final Dagon, the final mix by ear, final narration once a voice is chosen.
+**Excluded by the owner:** a playable ship level, a sailing simulation, a new act, combat, enemy AI, inventory, branching story, a sanity meter, inverted controls, constant distortion. Lengthening play by slower movement, empty corridors, repeated puzzles or compulsory narration waits. Mass-producing narration with an unapproved voice. Cloning the reference's narrator or any person. Spending money.
+
+**Still with M4 and M5:** finished art for the rest of the route past x = 1440, the creature's own animation, the final mix by ear, final narration once a voice is chosen.
 
 **Not to reopen:** the release engineering work, which is complete and accepted. D78 changed three of its scripts only so that a run ends quietly.
 
@@ -27,35 +30,36 @@ Changing task state only. The lasting rules are in [AGENTS.md](../AGENTS.md). **
 
 - **2026-11-04:** improved but not engaging enough ([record](evidence/m3/owner-playtest-2026-11-04.md)).
 - **2026-11-09, on `5fe820b`, which the owner reports playing; no artifact checksum verified:** functional, but too brief, too passive and not atmospheric enough. The synthetic voice is not approved ([record](evidence/m3/owner-playtest-2026-11-09.md)).
-- **ChatGPT reviewed `5fe820b`:** independently ran the native and release-tool tests, the art check and the release record, verified CI, and did a limited static review. It did not rerun the integration suite, the exported route or breakage, and did not listen ([record](evidence/m3/review-chatgpt-at-5fe820b.md)).
+- **ChatGPT reviewed `5fe820b`** within stated limits ([record](evidence/m3/review-chatgpt-at-5fe820b.md)).
 - **Not accepted. No voice approved.**
 
-## Done in the revision
+## Done
 
-Commits `033c363`, `b4bd9c2` and `42b2193`, and any after them on the branch. D70–D81 record each choice. The review package's §13 sets out what changed, before and after.
+The revision and the refinements are on the branch. D70–D86 record each choice. **The review package's §0 sets out what changed, the pacing, the sound, the art, the tests and the owner's checklist.**
 
 ## Results, each with its commit
 
 | Result | Commit | Who | Outcome |
 |---|---|---|---|
-| Local check script: import, 11 classes, 407 integration tests, three smoke runs, no leak or error lines | `42b2193`'s tree | Developer | Pass |
-| Native tests: 127 cases | `033c363` onwards | Developer | Pass |
-| Breakage tool's own tests: 23 | `b4bd9c2` onwards | Developer | Pass |
-| Focused breakage of the revision, 23 entries, fail-closed | `b4bd9c2` | Developer, scripted | 19 caught, 2 not caught, 2 INFRA, being rerun. Controls held. See the package |
-| CI | `033c363`, `b4bd9c2` | CI | **Failed:** the test runner quit with sound playing, reported as a leak. Fixed in `42b2193` |
-| CI | `42b2193` | CI | **Running when this was written** |
+| Local check script: import, 11 classes, 414 integration tests, three smoke runs, no leak or error lines | The refinements' commit | Developer | Pass |
+| Native tests: 127 cases | The same | Developer | Pass |
+| Export check: 414 tests on the exported Linux pack | The same | Developer | Pass |
+| Exported Linux route, four runs, on a private virtual display | The same | Developer, scripted | Pass. Timings in the package's §0.2 |
+| CI on GCC, Clang and MSVC, with the exported routes on Linux and Windows | The refinements' commit | CI | **In the pull request** |
+| CI | `525a8b2` | CI | Pass. It corrected the route driver, which still waited for the boat's old caption and failed CI on `42b2193` |
+| Focused breakage of the revision, 23 entries, fail-closed | `b4bd9c2` | Developer, scripted | 21 caught, 2 not caught, which are unresolved interpretations for the reviewer. Controls held |
 | Earlier results | before `5fe820b` | | Kept in the package and `evidence/m3/`. Still valid for what did not change |
 
 ## Known problems
 
 - **First-time duration is unmeasured.** Scripted runs are not playtests.
 - **Nobody on the project has heard the sound pass or the voice candidates.**
-- **Art past x = 1440 is greybox,** by design of this revision.
+- **Art past x = 1440 is greybox,** apart from the monolith and the creature. The lit mural's panel, the slab and the carved stone by the gap are plain shapes.
 
 ## Owner decisions pending
 
-- **The voice:** A, B, a person, or neither ([audition](evidence/m3/voice-audition/README.md)).
-- **The schedule:** completion before 20 November; a move to 24 November is not approved. The dependencies are in the [roadmap](roadmap.md).
+- **The voice:** A, B, a person, or neither ([audition](evidence/m3/voice-audition/README.md)). Then the whole epilogue is narrated first.
+- **The schedule:** completion before 20 November; a move to 24 November is not approved. The concrete risks are in the package's §0.8.
 - **Acceptance of M3,** after the follow-up review and the owner's playtest.
 - **Physical checks:** Xbox vibration, and what is deferred to M6. The M2 J/caption event is still unresolved.
 
@@ -72,4 +76,4 @@ These may be gone. Everything finished is pushed.
 
 ## Next concrete action
 
-Finish the review package and the pull request, confirm CI on the final commit, and hand off for review and the owner's playtest. Then stop.
+None until the follow-up review and the owner's playtest report back. Then act on them, and on the owner's choice of voice.

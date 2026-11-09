@@ -461,30 +461,66 @@ def shaft():
 
 
 def tentacle():
-    """Something the sea left on the Shore: part of an arm, thick as a leg, its suckers ringed. Not a squid's."""
-    w, h = 40, 12
+    """Something the sea left on the Shore: part of an arm, thicker than a leg, curling, with two rows of ringed
+    suckers along its underside, and a clean cut at one end. Large enough to read for what it is, and no more."""
+    w, h = 84, 28
     img = blank(w, h)
     rng = random.Random(351)
     path = []
-    for i in range(36):
-        f = i / 35
-        path.append((2 + i, 8 - 3 * math.sin(f * math.pi * 1.2) + (2 if f > 0.85 else 0) * (f - 0.85) * 20))
-    for i, (x, y) in enumerate(path):
-        thick = 4.6 - i * 0.11
-        for k in range(-round(thick / 2), round(thick / 2) + 1):
-            yy = round(y + k)
-            put(img, round(x), yy, "S0" if k < 0 else ("E3" if k > thick / 2 - 1 else "S0"))
-        put(img, round(x), round(y - thick / 2) - 1 + 1, "S1" if i % 7 else "E5")
-        # Suckers along the underside, each a pale ring.
-        if i % 4 == 1 and i < 33:
-            yy = round(y + thick / 2) - 1
-            put(img, round(x), yy, "E5")
-            put(img, round(x) + 1, yy, "C6")
-            put(img, round(x), yy + 1, "E1")
-    # The cut end: clean, and dark inside.
-    x, y = path[0]
-    for k in range(-2, 3):
-        put(img, round(x) - 1, round(y) + k, "W0")
-    for _ in range(4):
-        put(img, rng.randrange(6, 34), h - 1, "T1")
+    for i in range(74):
+        f = i / 73
+        # Thick at the cut, thinning and curling up at the tip.
+        x = 4 + i
+        y = 17 - 5 * math.sin(f * math.pi * 1.1) - (7 * (f - 0.82) / 0.18 if f > 0.82 else 0)
+        path.append((x, y, 7.5 - f * 5.2))
+    for i, (x, y, thick) in enumerate(path):
+        top = round(y - thick / 2)
+        bottom = round(y + thick / 2)
+        for yy in range(top, bottom + 1):
+            shade = "S1" if yy == top else ("S0" if yy < y else "W1")
+            put(img, round(x), yy, shade)
+        put(img, round(x), top - 1, "E1")
+        # Suckers along the underside, standing out below it: pale discs with dark centres, big enough to read.
+        if i % 4 == 1 and i < 70:
+            size = 2 if i < 50 else 1
+            sx, sy = round(x), bottom + 1
+            for dx in range(-size, size + 1):
+                put(img, sx + dx, sy, "C8" if abs(dx) == size else "C7")
+                put(img, sx + dx, sy + 1, "C6")
+            put(img, sx, sy, "E0")
+            if size > 1:
+                put(img, sx, sy + 1, "E1")
+    # The cut end: clean, and dark inside, as if something sharp had done it.
+    x0, y0, thick0 = path[0]
+    for k in range(-round(thick0 / 2), round(thick0 / 2) + 1):
+        put(img, round(x0) - 1, round(y0) + k, "W0")
+        put(img, round(x0) - 2, round(y0) + k, "S0" if abs(k) < 2 else "W0")
+    for _ in range(6):
+        put(img, rng.randrange(6, 76), h - 1, "T1")
+    return img
+
+
+def remains_ribs():
+    """The ribs of something larger than a whale, half sunk in the mud of the Shore, bleached where the moon is."""
+    w, h = 96, 34
+    img = blank(w, h)
+    rng = random.Random(361)
+    for i in range(9):
+        base = 8 + i * 10
+        height = 14 + round(14 * math.sin((i + 0.5) / 9 * math.pi))
+        lean = 0.35 + i * 0.03
+        for k in range(height):
+            x = base + round(lean * k - (k / height) ** 2 * 7)
+            y = h - 1 - k
+            put(img, x, y, "E5" if k < height - 2 else "C7")
+            put(img, x + 1, y, "E3")
+        put(img, base, h - 1, "E1")
+    # The spine, mostly buried, a line of knuckled bone along the mud.
+    for x in range(4, w - 4):
+        if x % 4:
+            put(img, x, h - 2, "E4")
+        else:
+            put(img, x, h - 3, "C6")
+    for _ in range(18):
+        put(img, rng.randrange(w), h - 1 - rng.randrange(3), rng.choice(("T1", "T0", "E2")))
     return img
