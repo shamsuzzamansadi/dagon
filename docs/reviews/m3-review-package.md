@@ -25,7 +25,7 @@
 | **How narration sounds** | **The owner: noticeably synthetic, and not an approved final voice.** The developer cannot hear audio. ChatGPT looked at sampled video frames and did not listen (§5) |
 | **How vibration feels** | **Nobody yet.** Pending the owner (§10) |
 | Earlier builds of this branch | **The owner has played them at least twice.** One led to the narrative update, and a later one to [this feedback](../evidence/m3/owner-playtest-2026-11-04.md). **Neither is a first-time run.** A recording of the earlier one ran about 2 min 40 s with menus |
-| The three changes made after the second playtest | **No person has played them yet** (§2, §3) |
+| The three changes made after the second playtest | *Superseded on 2026-11-09:* the owner has since played `5fe820b`, which has them ([record](../evidence/m3/owner-playtest-2026-11-09.md)) |
 | A first-time player | **Nobody, on any build** |
 | Independent review | **Not yet done** |
 
@@ -365,7 +365,7 @@ The same checks passed again on `506a8f8`, which adds only documents and evidenc
 ## 8. Known issues, deferred checks and limits
 
 - **Not owner-accepted.** Not yet engaging enough, very linear, and short (§12). The largest open issue in this milestone.
-- **The three changes after the playtest have not been played by a person.** Whether they help is unknown.
+- *Superseded on 2026-11-09:* the owner has played the three changes, and still found the game too brief, too passive and not atmospheric enough ([record](../evidence/m3/owner-playtest-2026-11-09.md)).
 - **The Shore still cuts sharply to greybox, and the cave and later art is unfinished.** The owner has said so twice. It is M4's, by plan.
 - **Music and sound coverage is close to none.** Only three voice samples sound. M4 and M5.
 - **The voice is not approved.** A direction is still to be chosen. Nothing else in the game depends on which voice it is.

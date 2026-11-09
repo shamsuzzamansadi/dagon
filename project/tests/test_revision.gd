@@ -330,16 +330,29 @@ func test_no_one_shot_sound_plays_in_a_world_restored_at_any_beat(h) -> void:
 func test_footsteps_follow_walking_and_change_where_the_rock_begins(h) -> void:
 	var world := await _world(h)
 	var player := _player(h)
+	var steps: AudioStreamPlayer2D = world.get_node("Player/Footsteps")
 	h.check(player.surface_at(300.0) == 0 and player.surface_at(700.0) == 1, "the surfaces are %d and %d" % [player.surface_at(300.0), player.surface_at(700.0)])
 	await h.steps(10)
 	var before: int = player.get_footstep_count()
 	await h.steps(30)
 	h.check(player.get_footstep_count() == before, "standing still made footsteps")
-	h.send(h.key_event(KEY_D, true))
-	await h.steps(60)
-	h.send(h.key_event(KEY_D, false))
-	h.check(player.get_footstep_count() >= before + 3, "a second of walking made %d steps" % (player.get_footstep_count() - before))
-	h.check(world.get_node("Player/Footsteps").stream.resource_path.contains("sand"), "the Shore sounds like %s" % world.get_node("Player/Footsteps").stream.resource_path)
+	for leg in [[300.0, "sand"], [760.0, "rock"]]:
+		await h.stand_at(player, Vector2(leg[0], -2))
+		await h.steps(10)
+		var heard := {}
+		var sounding := [false]
+		before = player.get_footstep_count()
+		h.send(h.key_event(KEY_D, true))
+		for i in 60:
+			await h.steps(1)
+			if steps.playing and steps.stream != null:
+				sounding[0] = true
+				heard[steps.stream.resource_path.get_file()] = true
+		h.send(h.key_event(KEY_D, false))
+		h.check(player.get_footstep_count() >= before + 3, "a second of walking on %s made %d steps" % [leg[1], player.get_footstep_count() - before])
+		h.check(sounding[0], "the steps on %s made no sound" % leg[1])
+		h.check(not heard.is_empty() and heard.keys().all(func(file: String) -> bool: return file.begins_with(leg[1])), "walking on %s sounded like %s" % [leg[1], heard.keys()])
+		h.check(heard.size() >= 2, "every step on %s was the same sound: %s" % [leg[1], heard.keys()])
 
 
 func test_his_breathing_and_its_pace_follow_the_story(h) -> void:
