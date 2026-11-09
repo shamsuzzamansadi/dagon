@@ -56,12 +56,19 @@ class Outcome:
     passed: int | None
     failed: int | None
     failures: list = field(default_factory=list)
+    unit_built: bool = True
 
 
 def parse_unit(text):
     """The failed count from doctest's summary line, or None if it never printed one."""
     match = re.search(r"\[doctest\] test cases:\s*(\d+)\s*\|\s*(\d+) passed\s*\|\s*(\d+) failed", text)
     return int(match.group(3)) if match else None
+
+
+def unit_compiled(text):
+    """False only when a compile step of the native tests failed. scons says "building terminated" for failing tests
+    too, so that is not the sign: a failed object file is."""
+    return re.search(r"\*\*\* \[[^\]]*\.o\] Error", text) is None
 
 
 def parse_result(text):
@@ -74,7 +81,10 @@ def parse_result(text):
 
 
 def verdict(outcome):
-    """CAUGHT, NOT CAUGHT or INFRA, from one complete outcome. Never CAUGHT for a run that did not complete."""
+    """CAUGHT, NOT CAUGHT, BUILD FAILED or INFRA, from one outcome. Never CAUGHT for a run that did not complete."""
+    # The native tests are compiled with warnings as errors, so a breakage can fail there while the game builds.
+    if not outcome.unit_built:
+        return BUILD_FAILED
     if outcome.unit_exit is None or outcome.godot_exit is None:
         return INFRA
     if outcome.unit_cases_failed is None or outcome.passed is None or outcome.failed is None:
@@ -129,7 +139,8 @@ class Runner:
             subprocess.run(["rm", "-rf", "--", storage], check=False)
         passed, failed = parse_result(godot_out)
         failures = [line for line in godot_out.splitlines() if line.startswith("FAIL")][:40]
-        return Outcome(unit_exit, parse_unit(unit_out), godot_exit, passed, failed, failures)
+        unit_built = unit_compiled(unit_out)
+        return Outcome(unit_exit, parse_unit(unit_out), godot_exit, passed, failed, failures, unit_built)
 
     def read(self, path):
         with open(os.path.join(self.cwd, path)) as handle:
@@ -183,6 +194,10 @@ def run_worker(runner, jobs, results, log, lock):
             outcome = runner.test()
             results[order] = (name, verdict(outcome), outcome.failed, "\n".join(outcome.failures[:6]))
         say(f"=== {name}: {results[order][1]}" + (f" ({outcome.failed} failing)" if outcome and outcome.failed else ""))
+        if outcome is not None:
+            say(f"    unit exit={outcome.unit_exit} unit failed={outcome.unit_cases_failed}, runner exit={outcome.godot_exit} passed={outcome.passed} failed={outcome.failed}")
+            for line in outcome.failures[:4]:
+                say(f"    {line}")
         if not runner.restore(path):
             say(f"COULD NOT RESTORE {path}: stopping this worker")
             return False

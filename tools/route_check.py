@@ -380,7 +380,7 @@ def run_new_game_to_the_ending(game, read):
         game.read_what_is_offered()
     else:
         game.tap("examine")
-        game.wait_for("dagon: caption: The lifeboat")
+        game.wait_for("dagon: caption: My boat")
     time.sleep(0.2)
     game.shot(name("03-boat-caption"))
 

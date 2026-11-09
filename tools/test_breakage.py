@@ -86,6 +86,16 @@ class Verdicts(unittest.TestCase):
         self.assertEqual(breakage.verdict(Outcome(0, 0, 0, 97, 3)), INFRA)
         self.assertEqual(breakage.verdict(Outcome(1, 0, 0, 100, 0)), INFRA)
 
+    def test_native_tests_that_do_not_compile_are_build_failed_not_caught(self):
+        outcome = Outcome(2, None, 1, 403, 4, unit_built=False)
+        self.assertEqual(breakage.verdict(outcome), BUILD_FAILED)
+
+    def test_failing_native_tests_are_told_apart_from_native_tests_that_do_not_compile(self):
+        failing = "[doctest] test cases: 127 | 124 passed | 3 failed | 0 skipped\nscons: *** [unit_tests] Error 1\nscons: building terminated because of errors.\n"
+        broken = "src/core/flee.cpp:13: error: unused parameter\nscons: *** [build/tests/core/flee.o] Error 1\nscons: building terminated because of errors.\n"
+        self.assertTrue(breakage.unit_compiled(failing))
+        self.assertFalse(breakage.unit_compiled(broken))
+
     def test_a_run_of_no_tests_is_never_trusted(self):
         self.assertEqual(breakage.verdict(Outcome(0, 0, 0, 0, 0)), INFRA)
 

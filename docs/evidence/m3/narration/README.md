@@ -1,5 +1,7 @@
 # Narration samples: source, rights and status
 
+**Superseded on 2026-11-09.** The owner rejected this voice. Its three files now sit in [rejected-am_michael/](rejected-am_michael/), out of the game, and the replacement audition is in [voice-audition/](../voice-audition/README.md). What follows is the record as it was.
+
 **Status: three samples, retained for voice direction. The owner has heard them and says the narration sounds noticeably synthetic. It is not an approved final voice, and not final narration.** ChatGPT inspected video frames only, and has not listened to the audio. **No more lines will be generated with this voice.** The game's narration integration and text fallback stay, whatever voice is chosen. The other lines of the script stay as text until the owner accepts this direction, as they asked. **The developer cannot hear audio.** Everything below is measurement and reasoning. Naturalness, clarity and emotional fit can only be judged by listening, in the game.
 
 ## The samples

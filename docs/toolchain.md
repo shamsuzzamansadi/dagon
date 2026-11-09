@@ -213,6 +213,10 @@ python3 tools/route_check.py build/export/linux/dagon.x86_64 build/logs/route --
 **It will not use a desktop by accident:** without `--display` it stops on Linux, and on Windows it runs only with `--windows-ci` on a machine whose `CI` variable is `true`, because it posts keys to a
 real window. Storage goes to its own `dagon-test-*` folder.
 
+**Under WSL2, where `/tmp/.X11-unix` is WSLg's read-only mount** (found on 2026-11-09), a private Xvfb cannot make its socket there, and an Xvfb unpacked without root looks for `xkbcomp` at `/usr/bin`. Both are solved without root, and without touching the system or the desktop, by running the X server and the game inside a private user and mount namespace: `unshare -rm` a script that mounts a `tmpfs` over `/tmp/.X11-unix`, overlays `/usr/bin` with a directory holding `xkbcomp`, then starts `Xvfb :77` and runs the command with `DISPLAY=:77`. Nothing outside the namespace sees either mount, and the display is never the owner's.
+
+**Ending a headless run:** use `DAGON_QUIT_AFTER_FRAMES=N`, which the game honours by stopping all sound and quitting a moment later, and keep `--quit-after` only as a later backstop. With `--quit-after` alone, the engine shuts down in that frame, before its mixer can let go of a sound still playing, and reports it leaked ([D78](decisions.md)).
+
 ## 7. Useful verified CLI flags (Godot 4.7.2 `--help`)
 
 `--headless`, `--import`, `--script <path>` (editor/debug builds only),

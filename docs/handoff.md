@@ -2,92 +2,74 @@
 
 Changing task state only. The lasting rules are in [AGENTS.md](../AGENTS.md). **Check this against `git log`, the pull request and CI before relying on it.**
 
-**Last updated:** 2026-11-04, at the M3 review handoff.
+**Last updated:** 2026-11-09, during the owner's revision of M3.
 
 ## Where things are
 
 | | |
 |---|---|
-| **Milestone** | M3, complete gameplay in greybox. **Implemented. Not owner-accepted, not independently reviewed, not merged** |
+| **Milestone** | M3, expanded by the owner on 2026-11-09 ([D70](decisions.md)). **Implemented. Not owner-accepted. Independent follow-up review not yet done. Not merged** |
 | **Branch and pull request** | `m3/complete-gameplay`, draft [#3](https://github.com/shamsuzzamansadi/dagon/pull/3), based on `main` at `15ba96c` |
-| **Hold** | Do not merge, tag, publish, delete the branch or start general M4 production. Stop at a reviewable result |
-| **Dependency** | Independent review by ChatGPT, and the owner's decisions listed below |
+| **Hold** | Do not merge, tag, publish, delete the branch, mark a release accepted, or start general M4 production. Stop at a reviewable result |
+| **Dependency** | ChatGPT's follow-up review, the owner's playtest, and the owner's choice of voice |
 
 ## Approved scope, and exclusions
 
-**In M3:** the continuous four-act route, clue tablets, the Wave → Kneel → Eye puzzle, the full cinematic contract with placeholder clips, the flee and ending, checkpoint restore. From the owner's update of 2026-11-04: purposeful small route choices, the talisman, ritual and watcher, worship imagery, Innsmouth epilogue, staged reveal, narration plumbing with three samples, optional controller vibration.
+**In M3, as the owner expanded it on 2026-11-09:** a short skippable prologue, one environmental interaction in Act II, a visible returning sea in the escape, a stranded tentacle echoed in the carvings, the sailor's reactions, a script review for chronology, **an initial sound pass across the route with selective music, one visually finished reference section from the cave entrance, and a replacement voice audition.** Everything from before stays: the route, the puzzle, the cinematic contract, saves, narration plumbing, vibration.
 
-**Excluded by the owner:** a new act, combat, enemy AI, inventory, branching story. Slower movement, forced waiting, empty corridors, or more text as a way of adding time.
+**Excluded by the owner:** a playable ship level, a sailing simulation, a new act, combat, enemy AI, inventory, branching story, a sanity meter, inverted controls, constant distortion. Lengthening play by slower movement, empty corridors, repeated puzzles or compulsory narration waits. Mass-producing narration with an unapproved voice. Spending money.
 
-**Assigned to M4 and M5, and not to be started silently:** final environments and art, final Dagon, music, ambience, sound effects, final narration and the mix. See the [roadmap](roadmap.md).
+**Still with M4 and M5:** finished art beyond the reference section, the final Dagon, the final mix by ear, final narration once a voice is chosen.
 
-**Not to reopen:** the release engineering work, which is complete and accepted.
+**Not to reopen:** the release engineering work, which is complete and accepted. D78 changed three of its scripts only so that a run ends quietly.
 
-## Owner feedback, on the latest build they played
+## Owner feedback, and review
 
-Recorded in full in [evidence/m3/owner-playtest-2026-11-04.md](evidence/m3/owner-playtest-2026-11-04.md). **M3 is NOT owner-accepted.** That build came before `2ce855a`. In short: improved, but not yet a sufficiently engaging game. Very linear, and can be completed in under three minutes. Examine captions and props have not added enough meaningful activity. Cave and later art visibly unfinished. Music and sound insufficient. **The narration sounds noticeably synthetic and is not an approved final voice.** The reveal, escape and ending need a stronger payoff.
+- **2026-11-04:** improved but not engaging enough ([record](evidence/m3/owner-playtest-2026-11-04.md)).
+- **2026-11-09, on `5fe820b`, which the owner reports playing; no artifact checksum verified:** functional, but too brief, too passive and not atmospheric enough. The synthetic voice is not approved ([record](evidence/m3/owner-playtest-2026-11-09.md)).
+- **ChatGPT reviewed `5fe820b`:** independently ran the native and release-tool tests, the art check and the release record, verified CI, and did a limited static review. It did not rerun the integration suite, the exported route or breakage, and did not listen ([record](evidence/m3/review-chatgpt-at-5fe820b.md)).
+- **Not accepted. No voice approved.**
 
-ChatGPT inspected sampled video frames, but did not listen to the audio.
+## Done in the revision
 
-## Done
-
-Everything in the approved scope above has been built. After the owner's playtest, three small in-scope changes were added at `2ce855a` ([D67–D69](decisions.md)): clues placed so that routes matter, rock across the escape, the sea coming back over the ending. **No person has played them.** They do not answer the feedback in full. The review package is [reviews/m3-review-package.md](reviews/m3-review-package.md), and pull request #3 names the final commit and its CI run.
+Commits `033c363`, `b4bd9c2` and `42b2193`, and any after them on the branch. D70–D81 record each choice. The review package's §13 sets out what changed, before and after.
 
 ## Results, each with its commit
 
-**The tested code and the build to play are `2ce855a`,** fingerprint `sha256:8645ded9104896405f1df83694c40cf22321ba63b1287f925a2118adf9f18c2e`. Later commits add only documents and evidence.
-
-**The exact Windows build for the owner's playtest:** [`dagon-windows`, artifact 13316306928](https://github.com/shamsuzzamansadi/dagon/actions/runs/41818800097/artifacts/13316306928), from run `41818800097`, zip SHA-256 `d293bf4758f20fad1c39eb0765a67eec252ef77634968be4c07c24b32df1b566`.
-
 | Result | Commit | Who | Outcome |
 |---|---|---|---|
-| CI run `41818800097`: GCC, Clang, MSVC, exported pack, exported route on Linux and Windows, release tools | `2ce855a` | CI | **Green.** 120 native cases, 385 integration tests. Release job skipped, as it should be. Logs and builds expire 2027-02-02 |
-| CI runs `41828833074` (push) and `41828841443` (pull request): the same checks | `506a8f8`, documents and evidence only | CI | **Green.** Same counts. Pull request #3 names the CI of any later documents-only commit |
-| Fresh clone by the README, with 10 repeats of the suite and the exported route | `2ce855a` | Developer, scripted, software rendering | All pass. No tracked files changed. `evidence/m3/fresh-clone.txt` |
-| Focused deliberate breakage, 19 entries | `2ce855a` | Developer, scripted | 17 caught, 2 not. `evidence/m3/breakage.txt` |
-| Focused deliberate breakage, 58 entries. The pass the limit interrupted the reading of | `35ff084` | Developer, scripted | 54 caught, 4 not. `evidence/m3/breakage-focused-at-35ff084.txt` |
-| Full deliberate breakage, 84 entries | `2cae7bb` | Developer, scripted | `evidence/m3/breakage-first-pass-at-2cae7bb.txt` |
-| Exported route, scripted, knowing the puzzle | `2ce855a` | CI | About 2 min direct, about 4 min reading the ground route. **Not a playtest** |
-| Owner's playtest | A build before `2ce855a`, exact build not recorded | The owner | **Not accepted.** Under three minutes, by the owner's report |
-| First-time player | | **Nobody** | **Unknown** |
-| Independent review | | **Not yet done** | |
-| Xbox vibration by feel, PlayStation hardware, the M2 J/caption event | | **Not done** | Deferred or unresolved. Do not infer a pass |
-
-## Findings from the breakage passes
-
-- **Real gaps, closed at `75fe57e`:** "The voice goes on into the credits", which had no test, and "A background event replays on every crossing", whose test crossed back while the clip was still playing.
-- **Still not caught, read as changing nothing observable. A reading, not a proof:** "The gate changes in a physics callback" and "Restoring leaves the atmosphere clip running".
+| Local check script: import, 11 classes, 407 integration tests, three smoke runs, no leak or error lines | `42b2193`'s tree | Developer | Pass |
+| Native tests: 127 cases | `033c363` onwards | Developer | Pass |
+| Breakage tool's own tests: 23 | `b4bd9c2` onwards | Developer | Pass |
+| Focused breakage of the revision, 23 entries, fail-closed | `b4bd9c2` | Developer, scripted | 19 caught, 2 not caught, 2 INFRA, being rerun. Controls held. See the package |
+| CI | `033c363`, `b4bd9c2` | CI | **Failed:** the test runner quit with sound playing, reported as a leak. Fixed in `42b2193` |
+| CI | `42b2193` | CI | **Running when this was written** |
+| Earlier results | before `5fe820b` | | Kept in the package and `evidence/m3/`. Still valid for what did not change |
 
 ## Known problems
 
-- **Engagement:** see the owner's feedback, and the package §12. One real thing to work out in the whole game. A proposal is written. Not started, and it needs a decision.
-- **Art and sound:** nothing past the Shore is production art, and only three voice samples sound. M4 and M5.
-- **GitHub refused this machine's SSH key for a while** on 2026-11-04 (`Permission denied (publickey)`), then accepted it again later the same day. The cause is not established, so it may recur. If it does, pushing to the HTTPS URL with the logged-in `gh` as credential helper works, but `gh`'s token has no `workflow` scope, so a commit that changes `.github/workflows` needs SSH or the owner.
-
-## Remaining work
-
-**Independent work is complete until the decisions below.** Nothing else is authorized to start. After the review and the owner's answers: any review fixes, which void the fingerprint, then the owner's acceptance of an identified build, then the normal squash merge and the release record in its own pull request.
+- **First-time duration is unmeasured.** Scripted runs are not playtests.
+- **Nobody on the project has heard the sound pass or the voice candidates.**
+- **Art past x = 1440 is greybox,** by design of this revision.
 
 ## Owner decisions pending
 
-- **Voice direction.** The three samples are not approved. Do not generate more with this voice.
-- **Whether to add anything beyond the approved scope for engagement,** and whether the 10–15 minute target stays. The proposal is in the review package §12.
-- **The schedule.** The owner's target of completion before 20 November conflicts with the roadmap's dates. The roadmap has a proposed plan, which needs M3 closed by about 6 November.
-- **Physical checks:** Xbox vibration, and everything already deferred to M6. The M2 J/caption event is still unresolved, with no cause established.
+- **The voice:** A, B, a person, or neither ([audition](evidence/m3/voice-audition/README.md)).
+- **The schedule:** completion before 20 November; a move to 24 November is not approved. The dependencies are in the [roadmap](roadmap.md).
+- **Acceptance of M3,** after the follow-up review and the owner's playtest.
+- **Physical checks:** Xbox vibration, and what is deferred to M6. The M2 J/caption event is still unresolved.
 
 ## Temporary resources
 
-These may be gone. Nothing in them is the only copy of finished work unless stated.
+These may be gone. Everything finished is pushed.
 
 | What | Where |
 |---|---|
-| Native clone for builds and CI work | `/tmp/claude-1000/-mnt-c-Users-sadi-projects-dagon/621ac8dc-276d-4bbd-8143-03866a5a9d1a/scratchpad/work` (call its parent `$S`) |
-| Breakage tool and working clones. A copy of the tool and the results are committed under `evidence/m3/` | `$S/mut/` |
-| Package template and the script that fills it. The package itself is committed, so edit that instead | `$S/m3-package-template.md`, `$S/gen/fill_package.py` |
-| Fresh-clone script, Xvfb start script | `$S/fresh.sh`, `$S/xvfb-start.sh` |
-| Private X display, for local graphical runs | `:77`. Never use WSLg's `:0` |
-| Background task outputs | `/tmp/claude-1000/-mnt-c-Users-sadi-projects-dagon/621ac8dc-276d-4bbd-8143-03866a5a9d1a/tasks/` |
+| Native clone | `/tmp/claude-1000/-mnt-c-Users-sadi-projects-dagon/621ac8dc-276d-4bbd-8143-03866a5a9d1a/scratchpad/work` (call its parent `$S`) |
+| Breakage workers and results | `$S/brk/`, `$S/brk2/` |
+| Voice environment and models, for `tools/audio/make_audition.py` | `$S/tts/`, `$S/voice-models/`, `$S/hf/` |
+| Private X display | `$S/xns.sh`, run with `unshare -rm` (docs/toolchain.md §6a) |
 
 ## Next concrete action
 
-**Wait for independent review by ChatGPT and the owner's answers to the package §12:** engagement, voice, date, and whether M3 can be accepted with the proposal as follow-up work. Do not merge, tag, publish, delete the branch or start M4 meanwhile.
+Finish the review package and the pull request, confirm CI on the final commit, and hand off for review and the owner's playtest. Then stop.

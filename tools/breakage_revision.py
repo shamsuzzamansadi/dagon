@@ -12,8 +12,9 @@ BREAKAGES = [
     # The returning sea.
     ("The sea never comes on", F, "const double travelled = std::max(0.0, static_cast<double>(p_tide.speed)) * moving;", "const double travelled = 0.0 * moving;"),
     ("The sea goes the wrong way", F, "return static_cast<float>(static_cast<double>(p_tide.start_x) - travelled);", "return static_cast<float>(static_cast<double>(p_tide.start_x) + travelled);"),
-    ("Being reached never ends the flee", F, "	if (p_sailor_x >= tide_front(p_tide, p_elapsed) - p_tide.reach) {", "	if (false) {"),
-    ("The fallback never ends a flee", F, "	if (p_elapsed >= p_fallback_seconds) {", "	if (false) {"),
+    # Each keeps its parameters in use: the native tests are built with warnings as errors.
+    ("Being reached never ends the flee", F, "	if (p_sailor_x >= tide_front(p_tide, p_elapsed) - p_tide.reach) {", "	if (p_sailor_x != p_sailor_x && tide_front(p_tide, p_elapsed) < 0.0f) {"),
+    ("The fallback never ends a flee", F, "	if (p_elapsed >= p_fallback_seconds) {", "	if (p_elapsed < 0.0 && p_fallback_seconds < 0.0) {"),
     ("The sea's picture does not follow its rule", D, "		tide->set_global_position(Vector2(front, tide->get_global_position().y));\n", ""),
     ("The sea is never shown", D, "				tide->set_visible(true);\n", ""),
     # The crossing.

@@ -1,6 +1,6 @@
 # Evidence: M3
 
-Everything here is automated or scripted, with one exception. **The one human record in this folder is `owner-playtest-2026-11-04.md`.** Nothing else here is a human test, and none of it says how the game feels. The owner's manual check is in the [review package](../../reviews/m3-review-package.md), and its result will have its own record.
+Everything here is automated or scripted, with these exceptions. **The human records in this folder are the owner's playtests, `owner-playtest-2026-11-04.md` and `owner-playtest-2026-11-09.md`, and ChatGPT's review, `review-chatgpt-at-5fe820b.md`.** Nothing else here is a human test, and none of it says how the game feels. The owner's manual check is in the [review package](../../reviews/m3-review-package.md), and its result will have its own record.
 
 | File | What it is | How it was made |
 |---|---|---|
@@ -14,4 +14,9 @@ Everything here is automated or scripted, with one exception. **The one human re
 | `walk/` | Each stretch of the greybox, and stills of each stage of the reveal, reached by seeking the clips. **To judge staging only:** they cannot show timing | `tests/capture_m3.gd` on a private display, with software rendering |
 | `owner-playtest-2026-11-04.md` | **The owner's own feedback on the M3 build. Not accepted.** The one human record here | Written down as the owner gave it |
 | `narration/` | The voice samples' source, rights, direction, measurements and approval status. **The owner has heard them, and they are not an approved voice.** The developer cannot hear audio | [Its README](narration/README.md) |
+| `owner-playtest-2026-11-09.md` | **The owner's feedback on `5fe820b`, with recordings including 9 November. Not accepted.** The build is as the owner reported it, with no checksum verified | Written down as the owner gave it |
+| `review-chatgpt-at-5fe820b.md` | What ChatGPT's independent review ran, and what it did not | As the owner relayed it |
+| `audio/` | The first sound pass: what sounds where, what is silent on purpose, what is missing, and its measurements. **Measured, not listened to** | `tools/audio/make_sounds.py` |
+| `voice-audition/` | The replacement voice audition, both candidates' files, source, rights and status. **Not approved, and not heard by anyone on the project** | `tools/audio/make_audition.py` |
+| `breakage-revision.txt` | Deliberate breakage of the revision, with the fail-closed tool | `tools/breakage.py` with `tools/breakage_revision.py` |
 | `fresh-clone.txt` | A clean clone from GitHub, built and tested following the README, with the suite repeated | Developer's machine, Ubuntu 24.04 under WSL2 |
