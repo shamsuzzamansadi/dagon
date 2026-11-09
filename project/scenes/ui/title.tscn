@@ -227,7 +227,7 @@ horizontal_alignment = 1
 [node name="Text" type="Label" parent="Center/Credits/Items"]
 custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
-text = "DAGON: Beneath the Black Tide, for GitHub Game Off 2026.\n\nMade by shamsuzzamansadi, who directed, decided and playtested. The code, tests, pixel art scripts and text were written with AI assistance from Claude (Anthropic). ChatGPT (OpenAI) acted as an independent reviewer. No image generators or third-party art.\n\nBased on \"Dagon\" by H. P. Lovecraft (1919), in the public domain.\n\nMade with Godot Engine, (c) Godot Engine contributors, MIT License, and godot-cpp, MIT License.\n\nCode: MIT License. Original assets: CC BY 4.0."
+text = "DAGON: Beneath the Black Tide, for GitHub Game Off 2026.\n\nMade by shamsuzzamansadi, who directed, decided and playtested. The code, tests, pixel art scripts and text were written with AI assistance from Claude (Anthropic). ChatGPT (OpenAI) acted as an independent reviewer. No image generators or third-party art. Sound was synthesized by code written the same way. The spoken samples are an AI voice (Chatterbox and Kokoro-82M), for audition only.\n\nBased on \"Dagon\" by H. P. Lovecraft (1919), in the public domain.\n\nMade with Godot Engine, (c) Godot Engine contributors, MIT License, and godot-cpp, MIT License.\n\nCode: MIT License. Original assets: CC BY 4.0."
 autowrap_mode = 2
 
 [node name="Back" type="Button" parent="Center/Credits/Items"]

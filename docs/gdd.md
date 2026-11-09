@@ -55,10 +55,12 @@ checkpoint.
 
 ## 4. Structure and pacing (one continuous level)
 
+**A short prologue comes first, on New Game only (D71):** four pictures, one line each, skippable. A raider takes his ship in the war, he escapes in a small boat, drifts, and wakes with the sea gone, beside that same boat.
+
 | Act | Name             | Target time | Beats |
 |-----|------------------|-------------|-------|
 | I   | The Shore        | 2 min       | Wake on exposed seabed beside the stranded lifeboat. Teaches movement, a jump onto the boulder and the first interaction. Rotting fish on the mud, and the sea only a thin band far beyond the boat: the tide has drawn back unnaturally far and does not return ([D21](decisions.md)). No surf where it should be, only a faint, far-off sea that thins away as the player moves on. |
-| II  | The Exposed Abyss| 4–5 min     | Cracked black mud, fossils of creatures that should not exist, a whale-sized rib arch. Three **clue tablets** (one glyph each, see §5). A crevasse to hop. A distant shape moves once in the far parallax layer and is never mentioned. The ambience slowly loses its high frequencies. |
+| II  | The Exposed Abyss| 4–5 min     | Cracked black mud, fossils of creatures that should not exist, a whale-sized rib arch. Three **clue tablets** (one glyph each, see §5). **A wide gap with a slab balanced across it: down into the hollow, up the slab, and his weight brings it level (D72).** A distant shape moves once in the far parallax layer and is never mentioned. The ambience slowly loses its high frequencies. |
 | III | The Monolith     | 3–4 min     | A canyon opens and the monolith fills the frame. The camera pulls back on approach. Its mural is partly eroded. Three **glyph stones** at its base form the puzzle. When solved, the inscriptions glow and the mural can be read in full: figures bowing to a vast swimmer. |
 | IV  | The Witness      | 2 min       | The player steps onto the ledge behind the monolith. Control locks. Fog lifts, the camera zooms far out, and something rises from the trench water and embraces the monolith. Control returns and the sailor flees left under screen shake and roaring sound until he collapses. Fade to black, epilogue card, credits, main menu. |
 
@@ -73,6 +75,7 @@ far shorter, because timing is set later by adding content, not walking (risk R1
 | Where | What is there | If it is missed |
 |---|---|---|
 | The Shore | A **talisman**, washed up beyond the fish, with the mark on it. One prop and one caption, and nothing is collected | Nothing is lost |
+| The Shore, by the cave | **Part of an arm,** like a squid's but thicker than his leg, its suckers ringed with hooks. Echoed in the cave carving, the procession relief and the lit mural (D70). Never said to be the creature's | Nothing is lost |
 | The cave beyond the entrance | The same mark, **cut into the wall** and kept clean | Nothing is lost |
 | Where the cave opens | A **distant ritual:** kneeling figures among stones around the mark, and one standing figure that turns and moves off. About 13 seconds, at a distance, and never a threat. The stones stay when the figures have gone | The stones are still there. No clue depends on it |
 | The first shelf (Act II) | A **route choice with a stake.** Below: a recess, with a procession carved walking to the sea, **and the second tablet.** Above: a cairn looking back the way you came, and a **watcher** on the far ridge, seen only from there | Both rejoin. The second tablet can be gone back for, or the order worked out without it |
@@ -91,7 +94,7 @@ back over the same ground.
 - The way right is the trench edge, a solid rock wall, so moving the wrong way
   just presses against it.
 - Running left reaches the collapse point in about 8–10 s, **hopping over three falls of rock** that come down across the ground he walked in on. They are as high as the rocks he has been hopping onto, and can be crossed either way. Stopping at one costs time, and nothing else.
-- If the player waits or keeps pushing the wrong way, the sailor collapses
+- **The sea comes back** (D73): it rises out of the trench behind him, then comes on, slower than he can run. Running and hopping always outrun it. If the player waits or keeps pushing the wrong way, it reaches him, and the sailor collapses
   where he stands after 12 s (tunable).
 - Both cases play the same collapse and the same ending: he falls, **and the sea comes back over him** before the fade ("They found me in the shallows").
 
@@ -159,7 +162,7 @@ about 4 s and never pauses the game.
 
 ## 7. Audio direction
 
-**Status: planned, apart from three narration samples kept for voice direction, which the owner finds noticeably synthetic, so they are not an approved voice.** Music, ambience, footsteps and cues are M4 and M5. Direction from the owner, 2026-11-02: original,
+**Status, 2026-11-09: an initial sound pass across the whole route, brought forward by the owner (D70, D74), and a replacement voice audition, not approved (D79).** Neither is final. What sounds where, what is silent on purpose and what is missing: [audio record](evidence/m3/audio/README.md). Music, ambience, footsteps and cues are M4 and M5. Direction from the owner, 2026-11-02: original,
 cohesive audio with a Lovecraftian atmosphere, tied to environments and story triggers.
 
 **Sound communicates the world's change.** Familiar coastal sounds thin out or disappear as unnatural
@@ -188,8 +191,7 @@ game music. Nothing is purchased or commissioned without the owner's approval.
 event-to-sound list and a demonstration of the mix in gameplay, checked for loop seams, abrupt
 transitions, clipping, repeated-trigger stacking, and whether important cues stay audible. The
 transition beyond the Shore must also be coherent in sound. Separate music and effects volume settings
-are prepared in M2 and connected when audio exists (§11). Until then, Settings says "Narration samples only. No music or effects yet."
-That note changes as audio is connected, and goes when all of it is.
+are prepared in M2 and now connected (§11). Settings says "Sound is an early pass, not final." until the mix is.
 
 ### Narration (owner, 2026-11-04)
 

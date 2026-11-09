@@ -147,5 +147,12 @@ func _run() -> void:
 		failed += 1
 		print("FAIL the test run changed the player's real files in %s" % OS.get_user_data_dir())
 	OS.remove_logger(_trap)
+	# As the game does: stop every sound, and give the mixer real time to let go of it, or the engine reports it leaked.
+	for type in ["AudioStreamPlayer", "AudioStreamPlayer2D"]:
+		for sound in root.find_children("*", type, true, false):
+			sound.stop()
+	var until := Time.get_ticks_msec() + 200
+	while Time.get_ticks_msec() < until:
+		await process_frame
 	print("RESULT passed=%d failed=%d" % [passed, failed])
 	quit(0 if failed == 0 and passed > 0 else 1)

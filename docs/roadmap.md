@@ -47,7 +47,26 @@ starts only after M6 is green, and is time-boxed.
 
 **The owner played the M3 build on 2026-11-04 and did not accept it** ([record](evidence/m3/owner-playtest-2026-11-04.md)). The three small changes that fit M3's scope are D67–D69. **A proposal that goes beyond that scope, with its cost to this schedule, is in the [package](reviews/m3-review-package.md) §12, and waits for the owner.** Nothing in the table above has been moved because of it.
 
-**Who delivers what, as the owner set out on 2026-11-04:**
+**Schedule from 9 November, replacing the proposals above.** The owner played `5fe820b` and asked for a bounded revision of M3 that brings some M4 and M5 work forward ([D70](decisions.md)). **The owner's target is still completion before 20 November. A move to 24 November is not approved.** These are targets, with the dependencies that could break them named:
+
+| Window | Holds | Depends on, outside the developer's control |
+|---|---|---|
+| Nov 9–10 | This revision delivered. ChatGPT's follow-up review, the owner's playtest, **the owner's choice of voice** | The reviewer's turnaround. The owner's ear |
+| Nov 11–14, M4 | The rest of the route in the reference section's finished style: the Abyss, the shelves, the crossing, the canyon and the monolith. The sound mix, adjusted by the owner's ear. **Final narration, if a voice is chosen by 12 November** | The owner's verdict on the reference section, and on the voice |
+| Nov 15–17, M5 | Dagon's final art and animation, the reveal and the ending, and the final mix | Nothing new |
+| Nov 18–19, M6 | **Two external first-time playtests,** fixes, timing against 10–15 minutes, physical controllers, native runs on both systems | **Two external players, in two days** |
+| Nov 20, M7 | Page, notes, tag. The owner uploads and submits | The owner's time |
+
+**What could break it, and the tradeoffs, in the order they would be offered.** Essential validation is not on this list: CI on three compilers, the exported route, focused breakage when code changes, two external playtests, and the owner's acceptance of an identified build all stay.
+
+1. **Art beyond the reference section** is the largest piece of work. If it runs late, the canyon, monolith and reveal are finished first, and the Abyss's middle keeps the finished far view over simpler ground, still identified as unfinished.
+2. **The voice.** Generating is quick; a person reading takes a session to arrange. If no voice is chosen by 12 November, final narration lands after 20 November or not at all, and the owner decides which.
+3. **External playtesters.** Two first-time players are needed for M6. If they cannot be found by 18 November, M6 cannot pass as defined, and the owner decides whether to wait.
+4. **Polish that can go first:** extra music cues, interface sounds, more ambience variety, extra parallax.
+
+**The 10–15 minute target stays the design's aspiration.** Scripted runs cannot show it, and the revision does not claim it ([package](reviews/m3-review-package.md)).
+
+**Who delivers what, as the owner set out on 2026-11-04, and as changed on 2026-11-09 (D70):**
 
 | | M3 (this milestone) | M4 and M5 |
 |---|---|---|
@@ -56,7 +75,8 @@ starts only after M6 is green, and is time-boxed.
 | Reveal | Readable placeholder reveal, timing and collapse | Final Dagon art, animation, lighting and effects |
 | Controller | Vibration behaviour and settings | Tuning by feel, with the owner |
 | Narration | Playback and subtitle integration, and three voice samples for direction. **The owner finds them noticeably synthetic, so a direction is still to be chosen** | Approved final narration |
-| Audio | None beyond the samples | Music, ambience, footsteps, interaction and cinematic sounds, and the complete mix |
+| Audio | **Since 2026-11-09:** an initial sound pass across the route, music in four places, and a voice audition | The final mix, by ear, and anything the pass misses |
+| Art | **Since 2026-11-09:** one finished reference section, from the cave entrance to the first tablet | The rest of the route, and the final Dagon |
 | Persistence | Save and restore correctness, with focused regression coverage | Kept green |
 
 **Cut order if the schedule slips (approved):**

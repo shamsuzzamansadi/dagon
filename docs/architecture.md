@@ -7,7 +7,7 @@ Toolchain: see
 [toolchain.md](toolchain.md). The menu, settings and save design in §5 ([D26](decisions.md))
 came after that approval, and was approved for implementation with the reviewer's corrections included below.
 
-**Status: M1 and M2 are accepted. M3 is implemented, awaiting independent review, and not accepted by the owner.** Where M3 measured or chose
+**Status: M1 and M2 are accepted. M3 is implemented, awaiting independent review, and not accepted by the owner.** *The owner's revision of 2026-11-09 (D70–D81) added: a prologue mode in `MenuController`; the crossing, the returning sea, breathing and idle pace in `GameDirector`, with the sea's rules in plain C++ (`core::flee`); footsteps in `PlayerController`; and a quiet way out that stops all sound before quitting (`global_state`). Still 11 classes.* Where M3 measured or chose
 something this design left open, the section says so, and [decisions.md](decisions.md) §8 lists each one.
 
 ## 1. Principles
@@ -280,7 +280,7 @@ only, and nothing a clip does can be required for progress.
 | Awakened | `PuzzleSolved` | Checkpoint 3. **Open the gate:** gate `collision_layer = 0`, deferred. | glow, rumble, gate visual | `monolith_awaken` |
 | Witness | `witness` trigger | Control locked | Dagon rises | `dagon_reveal` |
 | Fleeing | `RevealDone`, raised by the reveal's finalizer **on every exit path**: normal completion, missing clip, looping clip refused, watchdog | Control unlocked. Start the flee timer. The sailor turns to face left, as the cue to run. **Rock comes down across the way back:** `Rockfall` gets its collision layer, deferred, and shows. The clip only drops it into view, so it is there with no clip. | `beat_fleeing`: shake, roar (fire-and-forget) | — |
-| Ended | `collapse` trigger **or** `FleeTimeout` | Control locked. After the collapse cinematic: `reset_global_state()`, then the scene changes to `ending_scene`, from the deferred step ([D50](decisions.md)) | fade to black, inside the clip | `collapse` |
+| Ended | `collapse` trigger **or** `FleeTimeout`, which since D73 means the returning sea has reached him, or the 30 s fallback | Control locked. After the collapse cinematic: `reset_global_state()`, then the scene changes to `ending_scene`, from the deferred step ([D50](decisions.md)) | fade to black, inside the clip | `collapse` |
 
 **Flee behaviour (single ending):**
 - After the reveal, the way right (towards the trench) is a solid rock wall,
