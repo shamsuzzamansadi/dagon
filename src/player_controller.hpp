@@ -4,11 +4,16 @@
 #include "node_ref.hpp"
 
 #include <godot_cpp/classes/animated_sprite2d.hpp>
+#include <godot_cpp/classes/audio_stream_player2d.hpp>
 #include <godot_cpp/classes/character_body2d.hpp>
 #include <godot_cpp/classes/node2d.hpp>
+#include <godot_cpp/variant/array.hpp>
 #include <godot_cpp/variant/node_path.hpp>
+#include <godot_cpp/variant/packed_float32_array.hpp>
 #include <godot_cpp/variant/packed_string_array.hpp>
 #include <godot_cpp/variant/string_name.hpp>
+
+#include <cstdint>
 
 namespace dagon {
 
@@ -66,12 +71,42 @@ public:
 	void set_walk_pixels_per_frame(float p_value) { walk_pixels_per_frame_ = p_value; }
 	float get_walk_pixels_per_frame() const { return walk_pixels_per_frame_; }
 
+	// How fast he breathes standing still: slow and spent at first, quicker as dread grows. 1 is the drawn pace.
+	void set_idle_speed(float p_value) { idle_speed_ = p_value; }
+	float get_idle_speed() const { return idle_speed_; }
+
+	// Footsteps: one array of variant streams per surface, and the x at which each next surface begins, in order.
+	// Picked here rather than by an AudioStreamRandomizer, whose playback the engine never lets go of.
+	void set_footsteps_path(const godot::NodePath &p_value) { footsteps_path_ = p_value; }
+	godot::NodePath get_footsteps_path() const { return footsteps_path_; }
+	void set_footstep_sets(const godot::Array &p_value) { footstep_sets_ = p_value; }
+	godot::Array get_footstep_sets() const { return footstep_sets_; }
+	void set_footstep_surface_edges(const godot::PackedFloat32Array &p_value) { footstep_surface_edges_ = p_value; }
+	godot::PackedFloat32Array get_footstep_surface_edges() const { return footstep_surface_edges_; }
+	void set_footstep_spacing(float p_value) { footstep_spacing_ = p_value; }
+	float get_footstep_spacing() const { return footstep_spacing_; }
+	int get_footstep_count() const { return footstep_count_; }
+	int surface_at(float p_x) const;
+
 protected:
 	static void _bind_methods();
 
 private:
 	void update_facing(float p_axis);
 	void update_sprite(float p_moved_pixels, float p_delta);
+	void update_footsteps(float p_moved_pixels, bool p_landed);
+	// The last variant of a set, if it has more than one, is the heavier landing.
+	void play_footstep(bool p_landing);
+
+	godot::NodePath footsteps_path_;
+	godot::Array footstep_sets_;
+	uint32_t footstep_seed_ = 7;
+	godot::PackedFloat32Array footstep_surface_edges_;
+	float footstep_spacing_ = 16.0f;
+	float footstep_distance_ = 0.0f;
+	int footstep_count_ = 0;
+	NodeRef<godot::AudioStreamPlayer2D> footsteps_;
+	float idle_speed_ = 1.0f;
 
 	core::MoveParams params_;
 	core::MoveState state_;

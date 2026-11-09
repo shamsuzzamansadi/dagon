@@ -1,6 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="Theme" path="res://assets/ui/theme.tres" id="theme"]
+[ext_resource type="AudioStream" path="res://assets/audio/music/ending.ogg" id="music"]
 
 [node name="Ending" type="MenuController"]
 layout_mode = 3
@@ -23,6 +24,12 @@ ending_lines = PackedStringArray("ending.found", "ending.listen", "ending.innsmo
 
 [node name="Voice" type="AudioStreamPlayer" parent="."]
 bus = &"Narration"
+
+[node name="Music" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("music")
+volume_db = -3.0
+autoplay = true
+bus = &"Music"
 
 [node name="Black" type="ColorRect" parent="."]
 layout_mode = 1

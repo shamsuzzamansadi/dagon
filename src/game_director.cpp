@@ -5,11 +5,16 @@
 #include "menu_controller.hpp"
 
 #include <godot_cpp/classes/animation.hpp>
+#include <godot_cpp/classes/audio_stream.hpp>
 #include <godot_cpp/classes/engine.hpp>
 #include <godot_cpp/classes/scene_tree.hpp>
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/core/error_macros.hpp>
 #include <godot_cpp/core/print_string.hpp>
+
+#include <algorithm>
+#include <cmath>
+#include <limits>
 
 using namespace godot;
 
@@ -71,6 +76,9 @@ void GameDirector::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("has_pending_event"), &GameDirector::has_pending_event);
 	ClassDB::bind_method(D_METHOD("is_recovery_pending"), &GameDirector::is_recovery_pending);
 	ClassDB::bind_method(D_METHOD("get_flee_elapsed"), &GameDirector::get_flee_elapsed);
+	ClassDB::bind_method(D_METHOD("get_tide_front"), &GameDirector::get_tide_front);
+	ClassDB::bind_method(D_METHOD("is_crossing_lowered"), &GameDirector::is_crossing_lowered);
+	ClassDB::bind_method(D_METHOD("is_crossing_moving"), &GameDirector::is_crossing_moving);
 	ClassDB::bind_method(D_METHOD("haptic_cue", "cue"), &GameDirector::haptic_cue);
 
 #define DAGON_BIND_PATH(m_name, m_type)                                                  \
@@ -89,6 +97,11 @@ void GameDirector::_bind_methods() {
 	DAGON_BIND_PATH(puzzle_path, "PuzzleController");
 	DAGON_BIND_PATH(mural_path, "Interactable");
 	DAGON_BIND_PATH(background_path, "AnimationPlayer");
+	DAGON_BIND_PATH(tide_path, "Node2D");
+	DAGON_BIND_PATH(crossing_path, "Node2D");
+	DAGON_BIND_PATH(crossing_trigger_path, "StoryTrigger");
+	DAGON_BIND_PATH(crossing_sound_path, "AudioStreamPlayer2D");
+	DAGON_BIND_PATH(breath_path, "AudioStreamPlayer2D");
 
 #undef DAGON_BIND_PATH
 
@@ -113,6 +126,30 @@ void GameDirector::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_flee_timeout", "seconds"), &GameDirector::set_flee_timeout);
 	ClassDB::bind_method(D_METHOD("get_flee_timeout"), &GameDirector::get_flee_timeout);
 	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "flee_timeout"), "set_flee_timeout", "get_flee_timeout");
+
+#define DAGON_BIND_FLOAT(m_name)                                                          \
+	ClassDB::bind_method(D_METHOD("set_" #m_name, "value"), &GameDirector::set_##m_name); \
+	ClassDB::bind_method(D_METHOD("get_" #m_name), &GameDirector::get_##m_name);          \
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, #m_name), "set_" #m_name, "get_" #m_name)
+
+	DAGON_BIND_FLOAT(tide_start_x);
+	DAGON_BIND_FLOAT(tide_speed);
+	DAGON_BIND_FLOAT(tide_delay);
+	DAGON_BIND_FLOAT(flee_look_ahead);
+	DAGON_BIND_FLOAT(crossing_raised_rotation);
+	DAGON_BIND_FLOAT(crossing_lower_seconds);
+
+#undef DAGON_BIND_FLOAT
+
+	ClassDB::bind_method(D_METHOD("set_breath_streams", "streams"), &GameDirector::set_breath_streams);
+	ClassDB::bind_method(D_METHOD("get_breath_streams"), &GameDirector::get_breath_streams);
+	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "breath_streams"), "set_breath_streams", "get_breath_streams");
+	ClassDB::bind_method(D_METHOD("set_crossing_line", "id"), &GameDirector::set_crossing_line);
+	ClassDB::bind_method(D_METHOD("get_crossing_line"), &GameDirector::get_crossing_line);
+	ADD_PROPERTY(PropertyInfo(Variant::STRING_NAME, "crossing_line"), "set_crossing_line", "get_crossing_line");
+	ClassDB::bind_method(D_METHOD("set_idle_speeds", "speeds"), &GameDirector::set_idle_speeds);
+	ClassDB::bind_method(D_METHOD("get_idle_speeds"), &GameDirector::get_idle_speeds);
+	ADD_PROPERTY(PropertyInfo(Variant::PACKED_FLOAT32_ARRAY, "idle_speeds"), "set_idle_speeds", "get_idle_speeds");
 
 	ADD_SIGNAL(MethodInfo("checkpoint_reached", PropertyInfo(Variant::INT, "index")));
 	ADD_SIGNAL(MethodInfo("player_respawned"));
@@ -148,6 +185,21 @@ void GameDirector::_ready() {
 	background_.set(background_path_.is_empty() ? nullptr : get_node<AnimationPlayer>(background_path_));
 	monolith_gate_.set(monolith_gate_path_.is_empty() ? nullptr : get_node<CollisionObject2D>(monolith_gate_path_));
 	rockfall_.set(rockfall_path_.is_empty() ? nullptr : get_node<CollisionObject2D>(rockfall_path_));
+	tide_node_.set(tide_path_.is_empty() ? nullptr : get_node<Node2D>(tide_path_));
+	crossing_.set(crossing_path_.is_empty() ? nullptr : get_node<Node2D>(crossing_path_));
+	crossing_sound_.set(crossing_sound_path_.is_empty() ? nullptr : get_node<AudioStreamPlayer2D>(crossing_sound_path_));
+	breath_.set(breath_path_.is_empty() ? nullptr : get_node<AudioStreamPlayer2D>(breath_path_));
+	if (Node2D *crossing = crossing_.get()) {
+		crossing->set_rotation(crossing_raised_rotation_);
+	}
+	if (!crossing_trigger_path_.is_empty()) {
+		if (StoryTrigger *trigger = get_node<StoryTrigger>(crossing_trigger_path_)) {
+			crossing_trigger_.set(trigger);
+			trigger->connect("triggered", callable_mp(this, &GameDirector::on_crossing_trigger));
+		} else {
+			ERR_PRINT("GameDirector: crossing_trigger_path does not point to a StoryTrigger.");
+		}
+	}
 	puzzle_.set(puzzle_path_.is_empty() ? nullptr : get_node<PuzzleController>(puzzle_path_));
 	mural_.set(mural_path_.is_empty() ? nullptr : get_node<Interactable>(mural_path_));
 
@@ -237,6 +289,7 @@ void GameDirector::restore_start_beat() {
 		}
 	}
 	play_atmosphere(beat, true);
+	play_breath(beat);
 	PlayerController *player = player_.get();
 	const std::size_t index = static_cast<std::size_t>(start_beat_);
 	if (start_beat_ > 0 && player != nullptr && index < checkpoints_.size()) {
@@ -281,11 +334,25 @@ void GameDirector::_process(double p_delta) {
 		return;
 	}
 	if (progress_.beat() == core::Beat::Fleeing) {
-		flee_elapsed_ += p_delta;
-		if (flee_elapsed_ >= flee_timeout_) {
-			process_event(core::Event::FleeTimeout, EventSource::Internal);
-		}
+		update_flee(p_delta);
 	}
+}
+
+// The consequence is decided here, in code: the water's picture only follows it, so a missing one changes nothing.
+void GameDirector::update_flee(double p_delta) {
+	flee_elapsed_ += p_delta;
+	const float front = core::tide_front(tide_, flee_elapsed_);
+	if (Node2D *tide = tide_node_.get()) {
+		tide->set_global_position(Vector2(front, tide->get_global_position().y));
+	}
+	const PlayerController *player = player_.get();
+	const float sailor_x = player != nullptr ? static_cast<float>(player->get_global_position().x) : -std::numeric_limits<float>::infinity();
+	const core::FleeEnd end = core::flee_end(tide_, flee_elapsed_, sailor_x, flee_timeout_);
+	if (end == core::FleeEnd::None) {
+		return;
+	}
+	print_verbose("dagon: flee ended by ", end == core::FleeEnd::Overtaken ? "the sea" : "the fallback", " after ", flee_elapsed_, " s");
+	process_event(core::Event::FleeTimeout, EventSource::Internal);
 }
 
 void GameDirector::_notification(int p_what) {
@@ -299,9 +366,12 @@ void GameDirector::_notification(int p_what) {
 }
 
 void GameDirector::_physics_process(double p_delta) {
-	(void)p_delta;
+	if (Engine::get_singleton()->is_editor_hint()) {
+		return;
+	}
+	update_crossing(p_delta);
 	// Starting a cinematic clears the flag, so this can never run during one.
-	if (Engine::get_singleton()->is_editor_hint() || !recheck_pending_) {
+	if (!recheck_pending_) {
 		return;
 	}
 	const uint64_t frame = Engine::get_singleton()->get_physics_frames();
@@ -384,6 +454,88 @@ void GameDirector::on_background_trigger(const StringName &p_trigger_id) {
 	background->play(p_trigger_id);
 }
 
+// A weight on its raised end brings the slab down level. It stays down, and nothing is saved: from the Monolith on,
+// the world is rebuilt with it down, as everyone who got there crossed it.
+void GameDirector::on_crossing_trigger(const StringName &p_trigger_id) {
+	(void)p_trigger_id;
+	lower_crossing(false);
+}
+
+void GameDirector::lower_crossing(bool p_instant) {
+	if (StoryTrigger *trigger = crossing_trigger_.get()) {
+		trigger->set_enabled(false);
+	}
+	Node2D *crossing = crossing_.get();
+	if (p_instant) {
+		crossing_lowered_ = true;
+		crossing_moving_ = false;
+		if (crossing != nullptr) {
+			crossing->set_rotation(0.0f);
+		}
+		return;
+	}
+	// Already down, or on its way: a second weight changes nothing, and plays nothing.
+	if (crossing_lowered_) {
+		return;
+	}
+	crossing_lowered_ = true;
+	print_verbose("dagon: crossing lowered");
+	if (crossing == nullptr || crossing_lower_seconds_ <= 0.0f) {
+		if (crossing != nullptr) {
+			crossing->set_rotation(0.0f);
+		}
+		return;
+	}
+	crossing_moving_ = true;
+	crossing_elapsed_ = 0.0;
+	if (AudioStreamPlayer2D *sound = crossing_sound_.get()) {
+		sound->play();
+	}
+	if (Hud *hud = hud_.get(); hud != nullptr && !crossing_line_.is_empty()) {
+		hud->say(crossing_line_);
+	}
+}
+
+void GameDirector::update_crossing(double p_delta) {
+	if (!crossing_moving_) {
+		return;
+	}
+	crossing_elapsed_ += p_delta;
+	const double t = std::clamp(crossing_elapsed_ / static_cast<double>(crossing_lower_seconds_), 0.0, 1.0);
+	// Slow to start, then down hard: something heavy giving way.
+	const double eased = t * t;
+	if (Node2D *crossing = crossing_.get()) {
+		crossing->set_rotation(static_cast<float>(static_cast<double>(crossing_raised_rotation_) * (1.0 - eased)));
+	}
+	if (t >= 1.0) {
+		crossing_moving_ = false;
+		if (CameraRig *camera = camera_rig_.get()) {
+			camera->add_trauma(0.45f);
+		}
+	}
+}
+
+void GameDirector::play_breath(core::Beat p_beat) {
+	const int index = static_cast<int>(p_beat);
+	if (PlayerController *player = player_.get(); player != nullptr && index < idle_speeds_.size()) {
+		player->set_idle_speed(idle_speeds_[index]);
+	}
+	AudioStreamPlayer2D *breath = breath_.get();
+	if (breath == nullptr) {
+		return;
+	}
+	const Ref<AudioStream> stream = index < breath_streams_.size() ? Ref<AudioStream>(breath_streams_[index]) : Ref<AudioStream>();
+	if (stream.is_null()) {
+		breath->stop();
+		return;
+	}
+	if (breath->get_stream() == stream && breath->is_playing()) {
+		return;
+	}
+	breath->set_stream(stream);
+	breath->play();
+}
+
 void GameDirector::on_puzzle_solved() {
 	process_event(core::Event::PuzzleSolved, EventSource::Internal);
 }
@@ -425,6 +577,7 @@ void GameDirector::consume_trigger(core::Event p_event) {
 }
 
 void GameDirector::enter_beat(core::Beat p_beat) {
+	play_breath(p_beat);
 	print_verbose("dagon: beat=", core::beat_name(p_beat));
 	emit_signal("beat_changed", static_cast<int>(p_beat));
 	switch (p_beat) {
@@ -463,6 +616,9 @@ void GameDirector::enter_beat(core::Beat p_beat) {
 
 void GameDirector::apply_outcome(core::Beat p_beat) {
 	switch (p_beat) {
+		case core::Beat::Monolith:
+			lower_crossing(true);
+			break;
 		case core::Beat::Awakened:
 			open_gate();
 			if (PuzzleController *puzzle = puzzle_.get()) {
@@ -486,10 +642,17 @@ void GameDirector::apply_outcome(core::Beat p_beat) {
 				player->face(-1);
 			}
 			bring_down_rockfall();
+			if (Node2D *tide = tide_node_.get()) {
+				tide->set_global_position(Vector2(core::tide_front(tide_, 0.0), tide->get_global_position().y));
+				tide->set_visible(true);
+			}
+			// The camera looks back the way he came, toward what is following him.
+			if (CameraRig *camera = camera_rig_.get()) {
+				camera->set_look_ahead(flee_look_ahead_);
+			}
 			break;
 		case core::Beat::Shore:
 		case core::Beat::Abyss:
-		case core::Beat::Monolith:
 		case core::Beat::Witness:
 		case core::Beat::Ended:
 			break;

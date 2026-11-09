@@ -14,6 +14,37 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="12_hud"]
 [ext_resource type="PackedScene" path="res://scenes/ui/ending.tscn" id="13_ending"]
 [ext_resource type="Texture2D" path="res://assets/shore/talisman.png" id="14_talisman"]
+[ext_resource type="Texture2D" path="res://assets/cave/cave_front.png" id="r_cave_front"]
+[ext_resource type="Texture2D" path="res://assets/cave/cave_wall.png" id="r_cave_wall"]
+[ext_resource type="Texture2D" path="res://assets/cave/abyss_far.png" id="r_abyss_far"]
+[ext_resource type="Texture2D" path="res://assets/cave/ritual_far.png" id="r_ritual_far"]
+[ext_resource type="Texture2D" path="res://assets/cave/foreground_cave.png" id="r_fg_cave"]
+[ext_resource type="Texture2D" path="res://assets/cave/shaft.png" id="r_shaft"]
+[ext_resource type="Texture2D" path="res://assets/shore/tentacle.png" id="r_tentacle"]
+[ext_resource type="AudioStream" path="res://assets/audio/ambience/shore_sea.ogg" id="a_shore_sea"]
+[ext_resource type="AudioStream" path="res://assets/audio/ambience/wind.ogg" id="a_wind"]
+[ext_resource type="AudioStream" path="res://assets/audio/ambience/cave.ogg" id="a_cave"]
+[ext_resource type="AudioStream" path="res://assets/audio/ambience/abyss.ogg" id="a_abyss"]
+[ext_resource type="AudioStream" path="res://assets/audio/ambience/monolith.ogg" id="a_monolith"]
+[ext_resource type="AudioStream" path="res://assets/audio/ambience/tide_roar.ogg" id="a_tide"]
+[ext_resource type="AudioStream" path="res://assets/audio/effects/stone_accept.ogg" id="a_accept"]
+[ext_resource type="AudioStream" path="res://assets/audio/effects/stone_reject.ogg" id="a_reject"]
+[ext_resource type="AudioStream" path="res://assets/audio/effects/gate_open.ogg" id="a_gate"]
+[ext_resource type="AudioStream" path="res://assets/audio/effects/slab_fall.ogg" id="a_slab"]
+[ext_resource type="AudioStream" path="res://assets/audio/effects/water_surge.ogg" id="a_surge"]
+[ext_resource type="AudioStream" path="res://assets/audio/effects/creature_call.ogg" id="a_call"]
+[ext_resource type="AudioStream" path="res://assets/audio/effects/hand_impact.ogg" id="a_hand"]
+[ext_resource type="AudioStream" path="res://assets/audio/effects/rock_fall_1.ogg" id="a_rock1"]
+[ext_resource type="AudioStream" path="res://assets/audio/effects/rock_fall_2.ogg" id="a_rock2"]
+[ext_resource type="AudioStream" path="res://assets/audio/effects/rock_fall_3.ogg" id="a_rock3"]
+[ext_resource type="AudioStream" path="res://assets/audio/effects/body_fall.ogg" id="a_body"]
+[ext_resource type="AudioStream" path="res://assets/audio/effects/sea_rush.ogg" id="a_sea_rush"]
+[ext_resource type="AudioStream" path="res://assets/audio/effects/ritual_drum.ogg" id="a_drum"]
+[ext_resource type="AudioStream" path="res://assets/audio/voice/breath_tired.ogg" id="a_breath_tired"]
+[ext_resource type="AudioStream" path="res://assets/audio/voice/breath_uneasy.ogg" id="a_breath_uneasy"]
+[ext_resource type="AudioStream" path="res://assets/audio/voice/breath_panic.ogg" id="a_breath_panic"]
+[ext_resource type="AudioStream" path="res://assets/audio/music/awaken.ogg" id="m_awaken"]
+[ext_resource type="AudioStream" path="res://assets/audio/music/reveal.ogg" id="m_reveal"]
 
 [sub_resource type="RectangleShape2D" id="lifeboat_shape"]
 size = Vector2(112, 28)
@@ -38,6 +69,9 @@ size = Vector2(18, 10)
 
 [sub_resource type="RectangleShape2D" id="low_tablet_shape"]
 size = Vector2(26, 12)
+
+[sub_resource type="RectangleShape2D" id="crossing_weight_shape"]
+size = Vector2(76, 60)
 
 [sub_resource type="RectangleShape2D" id="prop_shape"]
 size = Vector2(44, 28)
@@ -240,6 +274,91 @@ tracks/7/keys = {
 "update": 0,
 "values": [Color(1, 1, 1, 0), Color(1, 1, 1, 0.7), Color(1, 1, 1, 0)]
 }
+tracks/8/type = "method"
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/path = NodePath("Tide/Roar")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [0.0],
+"method": &"play"
+}]
+}
+tracks/9/type = "method"
+tracks/9/imported = false
+tracks/9/enabled = true
+tracks/9/path = NodePath("Rockfall/SoundNear")
+tracks/9/interp = 1
+tracks/9/loop_wrap = true
+tracks/9/keys = {
+"times": PackedFloat32Array(0.8),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [0.0],
+"method": &"play"
+}]
+}
+tracks/10/type = "method"
+tracks/10/imported = false
+tracks/10/enabled = true
+tracks/10/path = NodePath("Rockfall/SoundMid")
+tracks/10/interp = 1
+tracks/10/loop_wrap = true
+tracks/10/keys = {
+"times": PackedFloat32Array(2.6),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [0.0],
+"method": &"play"
+}]
+}
+tracks/11/type = "method"
+tracks/11/imported = false
+tracks/11/enabled = true
+tracks/11/path = NodePath("Rockfall/SoundFar")
+tracks/11/interp = 1
+tracks/11/loop_wrap = true
+tracks/11/keys = {
+"times": PackedFloat32Array(5.4),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [0.0],
+"method": &"play"
+}]
+}
+tracks/12/type = "method"
+tracks/12/imported = false
+tracks/12/enabled = true
+tracks/12/path = NodePath("Hud")
+tracks/12/interp = 1
+tracks/12/loop_wrap = true
+tracks/12/keys = {
+"times": PackedFloat32Array(3.2, 6.8),
+"transitions": PackedFloat32Array(1, 1),
+"values": [{
+"args": [&"flee.back"],
+"method": &"say"
+}, {
+"args": [&"flee.sea"],
+"method": &"say"
+}]
+}
+tracks/13/type = "value"
+tracks/13/imported = false
+tracks/13/enabled = true
+tracks/13/path = NodePath("Tide/Water:scale")
+tracks/13/interp = 1
+tracks/13/loop_wrap = true
+tracks/13/keys = {
+"times": PackedFloat32Array(0, 2.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(1, 0.1), Vector2(1, 1)]
+}
 
 [sub_resource type="Animation" id="clip_monolith_awaken"]
 resource_name = "monolith_awaken"
@@ -366,6 +485,34 @@ tracks/8/keys = {
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [Vector2(4700, 0), Vector2(4700, -12)]
+}
+tracks/9/type = "method"
+tracks/9/imported = false
+tracks/9/enabled = true
+tracks/9/path = NodePath("Sound/MusicAwaken")
+tracks/9/interp = 1
+tracks/9/loop_wrap = true
+tracks/9/keys = {
+"times": PackedFloat32Array(0.1),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [0.0],
+"method": &"play"
+}]
+}
+tracks/10/type = "method"
+tracks/10/imported = false
+tracks/10/enabled = true
+tracks/10/path = NodePath("Monolith/GateSound")
+tracks/10/interp = 1
+tracks/10/loop_wrap = true
+tracks/10/keys = {
+"times": PackedFloat32Array(1.4),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [0.0],
+"method": &"play"
+}]
 }
 
 [sub_resource type="Animation" id="clip_dagon_reveal"]
@@ -632,6 +779,128 @@ tracks/19/keys = {
 "update": 0,
 "values": [Vector2(4700, -12), Vector2(4700, -60)]
 }
+tracks/20/type = "method"
+tracks/20/imported = false
+tracks/20/enabled = true
+tracks/20/path = NodePath("Sound/MusicReveal")
+tracks/20/interp = 1
+tracks/20/loop_wrap = true
+tracks/20/keys = {
+"times": PackedFloat32Array(0.05),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [0.0],
+"method": &"play"
+}]
+}
+tracks/21/type = "method"
+tracks/21/imported = false
+tracks/21/enabled = true
+tracks/21/path = NodePath("Sound/WaterSurge")
+tracks/21/interp = 1
+tracks/21/loop_wrap = true
+tracks/21/keys = {
+"times": PackedFloat32Array(1.5),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [0.0],
+"method": &"play"
+}]
+}
+tracks/22/type = "method"
+tracks/22/imported = false
+tracks/22/enabled = true
+tracks/22/path = NodePath("Sound/CreatureCall")
+tracks/22/interp = 1
+tracks/22/loop_wrap = true
+tracks/22/keys = {
+"times": PackedFloat32Array(3.3),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [0.0],
+"method": &"play"
+}]
+}
+tracks/23/type = "method"
+tracks/23/imported = false
+tracks/23/enabled = true
+tracks/23/path = NodePath("Sound/HandImpact")
+tracks/23/interp = 1
+tracks/23/loop_wrap = true
+tracks/23/keys = {
+"times": PackedFloat32Array(7),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [0.0],
+"method": &"play"
+}]
+}
+tracks/24/type = "method"
+tracks/24/imported = false
+tracks/24/enabled = true
+tracks/24/path = NodePath("Player/Gasp")
+tracks/24/interp = 1
+tracks/24/loop_wrap = true
+tracks/24/keys = {
+"times": PackedFloat32Array(7.05),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [0.0],
+"method": &"play"
+}]
+}
+tracks/25/type = "method"
+tracks/25/imported = false
+tracks/25/enabled = true
+tracks/25/path = NodePath("Sound/CreatureTurn")
+tracks/25/interp = 1
+tracks/25/loop_wrap = true
+tracks/25/keys = {
+"times": PackedFloat32Array(11.4),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [0.0],
+"method": &"play"
+}]
+}
+tracks/26/type = "method"
+tracks/26/imported = false
+tracks/26/enabled = true
+tracks/26/path = NodePath("Hud")
+tracks/26/interp = 1
+tracks/26/loop_wrap = true
+tracks/26/keys = {
+"times": PackedFloat32Array(9.6),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [&"story.recoil"],
+"method": &"say"
+}]
+}
+tracks/27/type = "value"
+tracks/27/imported = false
+tracks/27/enabled = true
+tracks/27/path = NodePath("Player/Visual:position")
+tracks/27/interp = 1
+tracks/27/loop_wrap = true
+tracks/27/keys = {
+"times": PackedFloat32Array(7, 7.25, 9, 9.6),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(-5, 0), Vector2(-5, 0), Vector2(0, 0)]
+}
+tracks/28/type = "value"
+tracks/28/imported = false
+tracks/28/enabled = true
+tracks/28/path = NodePath("Player/Visual:rotation")
+tracks/28/interp = 1
+tracks/28/loop_wrap = true
+tracks/28/keys = {
+"times": PackedFloat32Array(7, 7.2, 8.2, 9.6),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [0.0, -0.15, -0.05, 0.0]
+}
 
 [sub_resource type="Animation" id="clip_collapse"]
 resource_name = "collapse"
@@ -762,6 +1031,34 @@ tracks/9/keys = {
 "method": &"add_trauma"
 }]
 }
+tracks/10/type = "method"
+tracks/10/imported = false
+tracks/10/enabled = true
+tracks/10/path = NodePath("Sound/BodyFall")
+tracks/10/interp = 1
+tracks/10/loop_wrap = true
+tracks/10/keys = {
+"times": PackedFloat32Array(0.6),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [0.0],
+"method": &"play"
+}]
+}
+tracks/11/type = "method"
+tracks/11/imported = false
+tracks/11/enabled = true
+tracks/11/path = NodePath("Sound/SeaRush")
+tracks/11/interp = 1
+tracks/11/loop_wrap = true
+tracks/11/keys = {
+"times": PackedFloat32Array(2.4),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [0.0],
+"method": &"play"
+}]
+}
 
 [sub_resource type="AnimationLibrary" id="atmosphere_library"]
 _data = {
@@ -842,6 +1139,20 @@ tracks/4/keys = {
 "values": [{
 "args": [&"abyss.ritual"],
 "method": &"say"
+}]
+}
+tracks/5/type = "method"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Sound/RitualDrum")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [0.0],
+"method": &"play"
 }]
 }
 
@@ -993,10 +1304,23 @@ position = Vector2(0, -220)
 texture = ExtResource("6_bank")
 centered = false
 
+[node name="AbyssView" type="Polygon2D" parent="."]
+clip_children = 1
+polygon = PackedVector2Array(600, -700, 1440, -700, 1440, 60, 600, 60)
+
+[node name="Far" type="Parallax2D" parent="AbyssView"]
+scroll_scale = Vector2(0.35, 1)
+
+[node name="Art" type="Sprite2D" parent="AbyssView/Far"]
+light_mask = 2
+position = Vector2(40, -220)
+texture = ExtResource("r_abyss_far")
+centered = false
+
 [node name="GreyboxBackdrop" type="Polygon2D" parent="."]
 light_mask = 2
 color = Color(0.0392157, 0.054902, 0.0941176, 1)
-polygon = PackedVector2Array(640, -700, 4544, -700, 4544, 60, 640, 60)
+polygon = PackedVector2Array(1440, -700, 4544, -700, 4544, 60, 1440, 60)
 
 [node name="Tint" type="CanvasModulate" parent="."]
 
@@ -1010,7 +1334,7 @@ polygon = PackedVector2Array(1276.1, -140, 1276.1, -155.6, 1274.8, -159.5, 1277.
 
 [node name="Silhouette" type="Polygon2D" parent="FarRidges"]
 color = Color(0.07, 0.09, 0.14, 1)
-polygon = PackedVector2Array(640, 60, 640, -40, 730, -50, 730, -70, 820, -68, 820, -55, 910, -41, 910, -95, 1000, -105, 1000, -60, 1090, -58, 1090, -120, 1180, -106, 1180, -80, 1270, -90, 1270, -140, 1360, -138, 1360, -90, 1450, -76, 1450, -110, 1540, -120, 1540, -70, 1630, -68, 1630, -150, 1720, -136, 1720, -100, 1810, -110, 1810, -165, 1900, -163, 1900, -120, 1990, -106, 1990, -180, 2080, -190, 2080, 60)
+polygon = PackedVector2Array(680, 60, 680, -44, 730, -50, 730, -70, 820, -68, 820, -55, 910, -41, 910, -95, 1000, -105, 1000, -60, 1090, -58, 1090, -120, 1180, -106, 1180, -80, 1270, -90, 1270, -140, 1360, -138, 1360, -90, 1450, -76, 1450, -110, 1540, -120, 1540, -70, 1630, -68, 1630, -150, 1720, -136, 1720, -100, 1810, -110, 1810, -165, 1900, -163, 1900, -120, 1990, -106, 1990, -180, 2080, -190, 2080, 60)
 
 [node name="DistantShape" type="Polygon2D" parent="FarRidges"]
 position = Vector2(1000, 0)
@@ -1020,11 +1344,19 @@ polygon = PackedVector2Array(0, -150, 26, -196, 50, -214, 80, -205, 104, -170, 1
 [node name="RitualLayer" type="Parallax2D" parent="."]
 scroll_scale = Vector2(0.5, 1)
 
+[node name="Backdrop" type="Sprite2D" parent="RitualLayer"]
+light_mask = 2
+position = Vector2(600, -220)
+texture = ExtResource("r_ritual_far")
+centered = false
+
 [node name="Rise" type="Polygon2D" parent="RitualLayer"]
+visible = false
 color = Color(0.06, 0.08, 0.115, 1)
 polygon = PackedVector2Array(610, 60, 610, -22, 660, -30, 720, -34, 800, -34, 860, -28, 910, -20, 910, 60)
 
 [node name="Haze" type="Polygon2D" parent="RitualLayer"]
+visible = false
 color = Color(0.2, 0.27, 0.3, 1)
 polygon = PackedVector2Array(650, -28, 655, -66, 690, -86, 740, -94, 800, -88, 845, -70, 862, -28)
 
@@ -1081,6 +1413,18 @@ polygon = PackedVector2Array(797.4, -36.5, 797.4, -39.6, 793.1, -39.6, 790, -45.
 color = Color(0.01, 0.015, 0.03, 1)
 polygon = PackedVector2Array(821.5, -28, 821.5, -46, 820, -50.5, 823, -56.5, 829, -56.5, 832, -50.5, 830.5, -46, 830.5, -28)
 
+[node name="CaveView" type="Polygon2D" parent="."]
+clip_children = 1
+polygon = PackedVector2Array(640, -700, 1050, -700, 1050, 60, 640, 60)
+
+[node name="Wall" type="Parallax2D" parent="CaveView"]
+scroll_scale = Vector2(0.9, 1)
+
+[node name="Art" type="Sprite2D" parent="CaveView/Wall"]
+position = Vector2(500, -220)
+texture = ExtResource("r_cave_wall")
+centered = false
+
 [node name="Trench" type="Node2D" parent="."]
 
 [node name="Sky" type="Polygon2D" parent="Trench"]
@@ -1118,10 +1462,12 @@ color = Color(0.085, 0.105, 0.145, 1)
 polygon = PackedVector2Array(3540, 0, 3540, -120, 3600, -190, 3680, -210, 3780, -330, 3820, -520, 4310, -520, 4400, -260, 4470, -170, 4544, -120, 4544, 0)
 
 [node name="CaveBack" type="Polygon2D" parent="ActArt"]
+visible = false
 color = Color(0.095, 0.115, 0.15, 1)
 polygon = PackedVector2Array(640, -130, 1010, -130, 1010, 0, 640, 0)
 
 [node name="CaveRoof" type="Polygon2D" parent="ActArt"]
+visible = false
 color = Color(0.14, 0.165, 0.2, 1)
 polygon = PackedVector2Array(640, -220, 1040, -220, 1040, -150, 1010, -120, 965, -96, 920, -106, 870, -88, 810, -102, 750, -92, 700, -112, 660, -104, 640, -128)
 
@@ -1207,7 +1553,7 @@ collision_layer = 1
 collision_mask = 0
 
 [node name="Ground" type="CollisionPolygon2D" parent="Terrain"]
-polygon = PackedVector2Array(0, -300, 24, -300, 24, 0, 200, 0, 200, -14, 240, -14, 240, 0, 360, 0, 420, -10, 480, -10, 540, 0, 640, 0, 640, 14, 710, 14, 710, 0, 900, 0, 900, -12, 930, -12, 930, -22, 980, -22, 980, 0, 1420, 0, 1480, -10, 1540, -10, 1600, 0, 2150, 0, 2150, 18, 2176, 18, 2176, 0, 2780, 0, 2780, -14, 2812, -14, 2812, 0, 3004, 0, 3004, -14, 3036, -14, 3036, 0, 3584, 0, 3584, -14, 3612, -14, 3612, 0, 4520, 0, 4520, -300, 4544, -300, 4544, 60, 0, 60)
+polygon = PackedVector2Array(0, -300, 24, -300, 24, 0, 200, 0, 200, -14, 240, -14, 240, 0, 360, 0, 420, -10, 480, -10, 540, 0, 640, 0, 640, 14, 710, 14, 710, 0, 900, 0, 900, -12, 930, -12, 930, -22, 980, -22, 980, 0, 1420, 0, 1480, -10, 1540, -10, 1600, 0, 2150, 0, 2150, 16, 2160, 16, 2160, 32, 2170, 32, 2170, 48, 2290, 48, 2290, 0, 2780, 0, 2780, -14, 2812, -14, 2812, 0, 3004, 0, 3004, -14, 3036, -14, 3036, 0, 3584, 0, 3584, -14, 3612, -14, 3612, 0, 4520, 0, 4520, -300, 4544, -300, 4544, 60, 0, 60)
 
 [node name="Art" type="Sprite2D" parent="Terrain"]
 position = Vector2(0, -220)
@@ -1216,7 +1562,47 @@ centered = false
 
 [node name="GreyboxGround" type="Polygon2D" parent="Terrain"]
 color = Color(0.2, 0.24, 0.28, 1)
-polygon = PackedVector2Array(640, 0, 640, 14, 710, 14, 710, 0, 900, 0, 900, -12, 930, -12, 930, -22, 980, -22, 980, 0, 1420, 0, 1480, -10, 1540, -10, 1600, 0, 2150, 0, 2150, 18, 2176, 18, 2176, 0, 2780, 0, 2780, -14, 2812, -14, 2812, 0, 3004, 0, 3004, -14, 3036, -14, 3036, 0, 3584, 0, 3584, -14, 3612, -14, 3612, 0, 4520, 0, 4520, -300, 4544, -300, 4544, 60, 640, 60)
+polygon = PackedVector2Array(1440, -3.33, 1480, -10, 1540, -10, 1600, 0, 2150, 0, 2150, 16, 2160, 16, 2160, 32, 2170, 32, 2170, 48, 2290, 48, 2290, 0, 2780, 0, 2780, -14, 2812, -14, 2812, 0, 3004, 0, 3004, -14, 3036, -14, 3036, 0, 3584, 0, 3584, -14, 3612, -14, 3612, 0, 4520, 0, 4520, -300, 4544, -300, 4544, 60, 1440, 60)
+
+[node name="ReferenceSection" type="Node2D" parent="."]
+
+[node name="Front" type="Sprite2D" parent="ReferenceSection"]
+position = Vector2(600, -220)
+texture = ExtResource("r_cave_front")
+centered = false
+
+[node name="MoonShaft" type="PointLight2D" parent="ReferenceSection"]
+position = Vector2(980, -108)
+color = Color(0.62, 0.72, 0.85, 1)
+energy = 0.6
+range_item_cull_mask = 1
+texture = ExtResource("r_shaft")
+
+[node name="Motes" type="CPUParticles2D" parent="ReferenceSection"]
+light_mask = 2
+position = Vector2(1000, -60)
+amount = 18
+lifetime = 7.0
+preprocess = 7.0
+emission_shape = 3
+emission_rect_extents = Vector2(36, 48)
+direction = Vector2(-1, 0.2)
+spread = 60.0
+gravity = Vector2(0, 2)
+initial_velocity_min = 1.0
+initial_velocity_max = 4.0
+color = Color(0.68, 0.74, 0.77, 0.45)
+
+[node name="Drips" type="CPUParticles2D" parent="ReferenceSection"]
+position = Vector2(830, -100)
+amount = 3
+lifetime = 1.2
+emission_shape = 3
+emission_rect_extents = Vector2(110, 2)
+gravity = Vector2(0, 260)
+initial_velocity_min = 0.0
+initial_velocity_max = 0.0
+color = Color(0.5, 0.66, 0.64, 0.8)
 
 [node name="Boat" type="Sprite2D" parent="."]
 position = Vector2(40, -43)
@@ -1272,11 +1658,13 @@ line_id = &"abyss.fossil_a"
 shape = SubResource("prop_shape")
 
 [node name="Art" type="Polygon2D" parent="Props/FossilA"]
+visible = false
 position = Vector2(0, 14)
 color = Color(0.47, 0.48, 0.45, 1)
 polygon = PackedVector2Array(-30, 0, -26, -8, -14, -13, 4, -12, 20, -7, 32, 0)
 
 [node name="Ribs" type="Polygon2D" parent="Props/FossilA"]
+visible = false
 position = Vector2(0, 14)
 color = Color(0.26, 0.28, 0.29, 1)
 polygon = PackedVector2Array(-18, -1, -16, -10, -13, -11, -14, -3, -6, -3, -5, -11, -2, -11, -2, -3, 6, -3, 7, -10, 10, -9, 9, -1)
@@ -1293,16 +1681,19 @@ line_id = &"abyss.tablet_wave"
 shape = SubResource("prop_shape")
 
 [node name="Art" type="Polygon2D" parent="Props/TabletWave"]
+visible = false
 position = Vector2(0, 14)
 color = Color(0.3, 0.34, 0.38, 1)
 polygon = PackedVector2Array(-11, 0, -12, -27, -7, -33, 7, -33, 12, -27, 11, 0)
 
 [node name="MarkA" type="Polygon2D" parent="Props/TabletWave"]
+visible = false
 position = Vector2(0, 14)
 color = Color(0.62, 0.72, 0.72, 1)
 polygon = PackedVector2Array(-8, -21, -4, -25, 0, -21, 4, -25, 8, -21, 8, -18, 4, -22, 0, -18, -4, -22, -8, -18)
 
 [node name="MarkB" type="Polygon2D" parent="Props/TabletWave"]
+visible = false
 position = Vector2(0, 14)
 color = Color(0.62, 0.72, 0.72, 1)
 polygon = PackedVector2Array(-8, -14, -4, -18, 0, -14, 4, -18, 8, -14, 8, -11, 4, -15, 0, -11, -4, -15, -8, -11)
@@ -1405,6 +1796,28 @@ line_id = &"shore.talisman"
 [node name="Shape" type="CollisionShape2D" parent="Props/Talisman"]
 shape = SubResource("talisman_shape")
 
+[node name="Tentacle" type="Interactable" parent="Props"]
+position = Vector2(568, -6)
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+interaction_id = &"tentacle"
+line_id = &"shore.tentacle"
+
+[node name="Shape" type="CollisionShape2D" parent="Props/Tentacle"]
+shape = SubResource("talisman_shape")
+
+[node name="Slab" type="Interactable" parent="Props"]
+position = Vector2(2138, -14)
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+interaction_id = &"slab"
+line_id = &"abyss.slab"
+
+[node name="Shape" type="CollisionShape2D" parent="Props/Slab"]
+shape = SubResource("talisman_shape")
+
 [node name="CaveCarving" type="Interactable" parent="Props"]
 position = Vector2(830, -14)
 collision_layer = 4
@@ -1417,18 +1830,22 @@ line_id = &"cave.carving"
 shape = SubResource("prop_shape")
 
 [node name="Panel" type="Polygon2D" parent="Props/CaveCarving"]
+visible = false
 color = Color(0.3, 0.34, 0.38, 1)
 polygon = PackedVector2Array(-22, -32, -24, 4, 24, 6, 22, -36)
 
 [node name="Eye" type="Polygon2D" parent="Props/CaveCarving"]
+visible = false
 color = Color(0.62, 0.72, 0.72, 1)
 polygon = PackedVector2Array(-10.8, -23.6, -4.8, -29.6, 4.8, -29.6, 10.8, -23.6, 4.8, -17.6, -4.8, -17.6)
 
 [node name="WaveTop" type="Polygon2D" parent="Props/CaveCarving"]
+visible = false
 color = Color(0.62, 0.72, 0.72, 1)
 polygon = PackedVector2Array(-9.6, -9.2, -4.8, -14, 0, -9.2, 4.8, -14, 9.6, -9.2, 9.6, -5.6, 4.8, -10.4, 0, -5.6, -4.8, -10.4, -9.6, -5.6)
 
 [node name="WaveLow" type="Polygon2D" parent="Props/CaveCarving"]
+visible = false
 color = Color(0.62, 0.72, 0.72, 1)
 polygon = PackedVector2Array(-9.6, -0.8, -4.8, -5.6, 0, -0.8, 4.8, -5.6, 9.6, -0.8, 9.6, 2.8, 4.8, -2, 0, 2.8, -4.8, -2, -9.6, 2.8)
 
@@ -1471,6 +1888,10 @@ polygon = PackedVector2Array(27.8, 10, 27.8, 1, 27, -1.2, 28.5, -4.2, 31.5, -4.2
 [node name="Sea" type="Polygon2D" parent="Props/Relief"]
 color = Color(0.62, 0.72, 0.72, 1)
 polygon = PackedVector2Array(26, 12, 26, 8, 40, 6, 40, 12)
+
+[node name="Arm" type="Polygon2D" parent="Props/Relief"]
+color = Color(0.62, 0.72, 0.72, 1)
+polygon = PackedVector2Array(34, 7, 35, 2, 33, -3, 35, -7, 38, -8, 37, -5, 36, -2, 38, 2, 37, 7)
 
 [node name="Cairn" type="Interactable" parent="Props"]
 position = Vector2(2960, -56)
@@ -1587,6 +2008,14 @@ polygon = PackedVector2Array(3923.8, -15.4, 3923.8, -17.2, 3926.2, -17.2, 3928, 
 color = Color(0.5, 0.92, 0.78, 1)
 polygon = PackedVector2Array(3858, -76, 3880, -88, 3916, -89, 3938, -80, 3926, -74, 3896, -69, 3868, -70)
 
+[node name="ArmLeft" type="Polygon2D" parent="Monolith/MuralLit"]
+color = Color(0.5, 0.92, 0.78, 1)
+polygon = PackedVector2Array(3866, -71, 3858, -64, 3854, -55, 3856, -48, 3860, -46, 3858, -52, 3860, -60, 3868, -68)
+
+[node name="ArmRight" type="Polygon2D" parent="Monolith/MuralLit"]
+color = Color(0.5, 0.92, 0.78, 1)
+polygon = PackedVector2Array(3930, -72, 3940, -66, 3944, -57, 3942, -50, 3938, -48, 3940, -54, 3937, -62, 3928, -69)
+
 [node name="Symbol" type="Polygon2D" parent="Monolith/MuralLit"]
 color = Color(0.5, 0.92, 0.78, 1)
 polygon = PackedVector2Array(3890.8, -63.4, 3894.8, -67.4, 3901.2, -67.4, 3905.2, -63.4, 3901.2, -59.4, 3894.8, -59.4)
@@ -1598,6 +2027,21 @@ polygon = PackedVector2Array(3971, -28, 3972.1, -29.1, 3973.9, -29.1, 3975, -28,
 [node name="EyesB" type="Polygon2D" parent="Monolith/MuralLit"]
 color = Color(0.5, 0.92, 0.78, 1)
 polygon = PackedVector2Array(4247, -28, 4248.1, -29.1, 4249.9, -29.1, 4251, -28, 4249.9, -26.9, 4248.1, -26.9)
+
+[node name="StoneAccept" type="AudioStreamPlayer2D" parent="Monolith"]
+position = Vector2(4080, -20)
+stream = ExtResource("a_accept")
+bus = &"Effects"
+
+[node name="StoneReject" type="AudioStreamPlayer2D" parent="Monolith"]
+position = Vector2(4080, -20)
+stream = ExtResource("a_reject")
+bus = &"Effects"
+
+[node name="GateSound" type="AudioStreamPlayer2D" parent="Monolith"]
+position = Vector2(4300, -60)
+stream = ExtResource("a_gate")
+bus = &"Effects"
 
 [node name="Mural" type="Interactable" parent="Monolith"]
 position = Vector2(3898, -16)
@@ -1741,6 +2185,35 @@ polygon = PackedVector2Array(3424, -36, 3570, -36, 3570, -28, 3424, -28)
 color = Color(0.2, 0.24, 0.28, 1)
 polygon = PackedVector2Array(3424, -36, 3570, -36, 3568, -28, 3426, -28)
 
+[node name="Crossing" type="AnimatableBody2D" parent="."]
+position = Vector2(2220, 4)
+rotation = -0.53
+collision_layer = 1
+collision_mask = 0
+
+[node name="Shape" type="CollisionPolygon2D" parent="Crossing"]
+polygon = PackedVector2Array(-80, -4, 80, -4, 80, 4, -80, 4)
+
+[node name="Slab" type="Polygon2D" parent="Crossing"]
+color = Color(0.3, 0.34, 0.38, 1)
+polygon = PackedVector2Array(-80, -4, 80, -4, 80, 4, -80, 4)
+
+[node name="Seam" type="Polygon2D" parent="Crossing"]
+color = Color(0.2, 0.24, 0.28, 1)
+polygon = PackedVector2Array(-24, -4, -22, -4, -22, 4, -24, 4)
+
+[node name="Mark" type="Polygon2D" parent="Crossing"]
+color = Color(0.62, 0.72, 0.72, 1)
+polygon = PackedVector2Array(36, -2, 40, -3, 44, -2, 48, -3, 52, -2, 52, -1, 48, -2, 44, -1, 40, -2, 36, -1)
+
+[node name="Sound" type="AudioStreamPlayer2D" parent="Crossing"]
+stream = ExtResource("a_slab")
+bus = &"Effects"
+
+[node name="Pillar" type="Polygon2D" parent="."]
+color = Color(0.16, 0.19, 0.23, 1)
+polygon = PackedVector2Array(2213, 48, 2213, 10, 2216, 7, 2224, 7, 2227, 10, 2227, 48)
+
 [node name="Rockfall" type="StaticBody2D" parent="."]
 visible = false
 collision_layer = 0
@@ -1788,6 +2261,27 @@ position = Vector2(3838, 0)
 color = Color(0.55, 0.58, 0.58, 1)
 polygon = PackedVector2Array(-30, 0, -24, -9, -10, -14, 10, -14, 24, -9, 30, 0)
 
+[node name="Tentacle" type="Sprite2D" parent="."]
+light_mask = 2
+position = Vector2(548, -12)
+texture = ExtResource("r_tentacle")
+centered = false
+
+[node name="SoundNear" type="AudioStreamPlayer2D" parent="Rockfall"]
+position = Vector2(4212, -10)
+stream = ExtResource("a_rock1")
+bus = &"Effects"
+
+[node name="SoundMid" type="AudioStreamPlayer2D" parent="Rockfall"]
+position = Vector2(4035, -10)
+stream = ExtResource("a_rock2")
+bus = &"Effects"
+
+[node name="SoundFar" type="AudioStreamPlayer2D" parent="Rockfall"]
+position = Vector2(3838, -10)
+stream = ExtResource("a_rock3")
+bus = &"Effects"
+
 [node name="Talisman" type="Sprite2D" parent="."]
 light_mask = 2
 position = Vector2(342, -9)
@@ -1817,6 +2311,12 @@ scroll_scale = Vector2(1.3, 1)
 light_mask = 2
 position = Vector2(0, -220)
 texture = ExtResource("11_foreground")
+centered = false
+
+[node name="Cave" type="Sprite2D" parent="Foreground"]
+light_mask = 2
+position = Vector2(880, -220)
+texture = ExtResource("r_fg_cave")
 centered = false
 
 [node name="Triggers" type="Node2D" parent="."]
@@ -1894,6 +2394,16 @@ spent_from_beat = 2
 [node name="Shape" type="CollisionShape2D" parent="Triggers/CanyonSight"]
 shape = SubResource("enter_abyss_shape")
 
+[node name="CrossingWeight" type="StoryTrigger" parent="Triggers"]
+position = Vector2(2262, -30)
+collision_layer = 8
+collision_mask = 2
+monitorable = false
+trigger_id = &"crossing_weight"
+
+[node name="Shape" type="CollisionShape2D" parent="Triggers/CrossingWeight"]
+shape = SubResource("crossing_weight_shape")
+
 [node name="KillPlane" type="StoryTrigger" parent="Triggers"]
 position = Vector2(2700, 130)
 collision_layer = 8
@@ -1926,6 +2436,23 @@ position = Vector2(4150, -30)
 [node name="Reveal" type="Marker2D" parent="CameraMarks"]
 position = Vector2(4304, -30)
 
+[node name="Tide" type="Node2D" parent="."]
+visible = false
+position = Vector2(4540, 0)
+
+[node name="Water" type="Polygon2D" parent="Tide"]
+color = Color(0.03, 0.08, 0.1, 0.94)
+polygon = PackedVector2Array(0, -30, 8, -38, 18, -33, 30, -41, 44, -34, 60, -39, 80, -34, 120, -37, 900, -36, 900, 60, 0, 60)
+
+[node name="Foam" type="Polygon2D" parent="Tide/Water"]
+color = Color(0.5, 0.62, 0.62, 0.9)
+polygon = PackedVector2Array(-4, -28, 8, -40, 18, -35, 30, -43, 44, -36, 60, -41, 80, -36, 120, -39, 120, -35, 80, -32, 60, -37, 44, -32, 30, -39, 18, -31, 8, -36, 2, -26)
+
+[node name="Roar" type="AudioStreamPlayer2D" parent="Tide"]
+stream = ExtResource("a_tide")
+bus = &"Effects"
+max_distance = 900.0
+
 [node name="ReturningSea" type="CanvasLayer" parent="."]
 layer = 4
 visible = false
@@ -1938,6 +2465,116 @@ polygon = PackedVector2Array(-40, 0, 40, -7, 120, -1, 200, -8, 280, -2, 360, -7,
 [node name="Foam" type="Polygon2D" parent="ReturningSea/Water"]
 color = Color(0.4, 0.54, 0.54, 0.85)
 polygon = PackedVector2Array(-40, 0, 40, -7, 120, -1, 200, -8, 280, -2, 360, -7, 440, -1, 520, -6, 520, -2, 440, 4, 360, -2, 280, 3, 200, -3, 120, 4, 40, -2, -40, 4)
+
+[node name="Sound" type="Node2D" parent="."]
+
+[node name="ShoreSea" type="AudioStreamPlayer2D" parent="Sound"]
+position = Vector2(300, -40)
+stream = ExtResource("a_shore_sea")
+volume_db = 0.0
+autoplay = true
+max_distance = 760.0
+panning_strength = 0.5
+bus = &"Effects"
+
+[node name="ShoreWind" type="AudioStreamPlayer2D" parent="Sound"]
+position = Vector2(420, -90)
+stream = ExtResource("a_wind")
+volume_db = -3.0
+autoplay = true
+max_distance = 700.0
+panning_strength = 0.5
+bus = &"Effects"
+
+[node name="Cave" type="AudioStreamPlayer2D" parent="Sound"]
+position = Vector2(840, -40)
+stream = ExtResource("a_cave")
+volume_db = 0.0
+autoplay = true
+max_distance = 340.0
+panning_strength = 0.5
+bus = &"Effects"
+
+[node name="AbyssNear" type="AudioStreamPlayer2D" parent="Sound"]
+position = Vector2(1500, -50)
+stream = ExtResource("a_abyss")
+volume_db = 0.0
+autoplay = true
+max_distance = 900.0
+panning_strength = 0.5
+bus = &"Effects"
+
+[node name="AbyssWind" type="AudioStreamPlayer2D" parent="Sound"]
+position = Vector2(2100, -90)
+stream = ExtResource("a_wind")
+volume_db = -6.0
+autoplay = true
+max_distance = 700.0
+panning_strength = 0.5
+bus = &"Effects"
+
+[node name="AbyssMid" type="AudioStreamPlayer2D" parent="Sound"]
+position = Vector2(2700, -50)
+stream = ExtResource("a_abyss")
+volume_db = 0.0
+autoplay = true
+max_distance = 900.0
+panning_strength = 0.5
+bus = &"Effects"
+
+[node name="AbyssFar" type="AudioStreamPlayer2D" parent="Sound"]
+position = Vector2(3400, -50)
+stream = ExtResource("a_abyss")
+volume_db = -2.0
+autoplay = true
+max_distance = 700.0
+panning_strength = 0.5
+bus = &"Effects"
+
+[node name="MonolithDrone" type="AudioStreamPlayer2D" parent="Sound"]
+position = Vector2(4050, -80)
+stream = ExtResource("a_monolith")
+volume_db = 0.0
+autoplay = true
+max_distance = 650.0
+panning_strength = 0.5
+bus = &"Effects"
+
+[node name="WaterSurge" type="AudioStreamPlayer" parent="Sound"]
+stream = ExtResource("a_surge")
+bus = &"Effects"
+
+[node name="CreatureCall" type="AudioStreamPlayer" parent="Sound"]
+stream = ExtResource("a_call")
+bus = &"Effects"
+
+[node name="CreatureTurn" type="AudioStreamPlayer" parent="Sound"]
+stream = ExtResource("a_call")
+bus = &"Effects"
+
+[node name="HandImpact" type="AudioStreamPlayer" parent="Sound"]
+stream = ExtResource("a_hand")
+bus = &"Effects"
+
+[node name="BodyFall" type="AudioStreamPlayer" parent="Sound"]
+stream = ExtResource("a_body")
+bus = &"Effects"
+
+[node name="SeaRush" type="AudioStreamPlayer" parent="Sound"]
+stream = ExtResource("a_sea_rush")
+bus = &"Effects"
+
+[node name="RitualDrum" type="AudioStreamPlayer" parent="Sound"]
+stream = ExtResource("a_drum")
+bus = &"Effects"
+
+[node name="MusicAwaken" type="AudioStreamPlayer" parent="Sound"]
+stream = ExtResource("m_awaken")
+bus = &"Music"
+
+[node name="MusicReveal" type="AudioStreamPlayer" parent="Sound"]
+stream = ExtResource("m_reveal")
+bus = &"Music"
 
 [node name="Hud" parent="." instance=ExtResource("12_hud")]
 interactor_path = NodePath("../Player/Interactor")
@@ -1962,6 +2599,15 @@ background_path = NodePath("../Background")
 background_triggers = [NodePath("../Triggers/RitualSight"), NodePath("../Triggers/WatcherSight"), NodePath("../Triggers/CanyonSight")]
 monolith_gate_path = NodePath("../Monolith/Gate")
 rockfall_path = NodePath("../Rockfall")
+tide_path = NodePath("../Tide")
+crossing_path = NodePath("../Crossing")
+crossing_trigger_path = NodePath("../Triggers/CrossingWeight")
+crossing_sound_path = NodePath("../Crossing/Sound")
+crossing_raised_rotation = -0.53
+crossing_line = &"abyss.crossing"
+breath_path = NodePath("../Player/Breath")
+breath_streams = [ExtResource("a_breath_tired"), null, ExtResource("a_breath_uneasy"), ExtResource("a_breath_uneasy"), null, ExtResource("a_breath_panic"), null]
+idle_speeds = PackedFloat32Array(0.7, 0.9, 1.15, 1.3, 1.0, 1.6, 1.0)
 puzzle_path = NodePath("../Monolith/Puzzle")
 mural_path = NodePath("../Monolith/Mural")
 checkpoints = [NodePath("../Checkpoints/Shore"), NodePath("../Checkpoints/PastTheTrench"), NodePath("../Checkpoints/Monolith"), NodePath("../Checkpoints/Awakened")]
@@ -1976,3 +2622,5 @@ ending_scene = ExtResource("13_ending")
 [connection signal="solved" from="Monolith/Puzzle" to="GameDirector" method="on_puzzle_solved"]
 [connection signal="step_accepted" from="Monolith/Puzzle" to="Hud" method="show_caption" unbinds=1 binds=["The stone lights, and holds."]]
 [connection signal="failed" from="Monolith/Puzzle" to="Hud" method="show_caption" binds=["The stones grind and go dark."]]
+[connection signal="step_accepted" from="Monolith/Puzzle" to="Monolith/StoneAccept" method="play" unbinds=1]
+[connection signal="failed" from="Monolith/Puzzle" to="Monolith/StoneReject" method="play"]

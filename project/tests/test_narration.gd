@@ -8,7 +8,7 @@ const GAME := "res://scenes/level/game.tscn"
 const SAVE_FILE := "save.dat"
 const SETTINGS_FILE := "settings.cfg"
 ## The three lines that have audio so far, as the owner asked before anything more is generated.
-const VOICED := {"shore.talisman": "Something small", "cave.carving": "The same eye", "ending.innsmouth": "at Innsmouth"}
+const VOICED := {"shore.talisman": "Something small", "cave.carving": "The same eye", "ending.innsmouth": "called Innsmouth"}
 const VOICED_LINE := &"shore.talisman"
 const TEXT_LINE := &"shore.fish"
 const OTHER_TEXT_LINE := &"shore.boat"
@@ -80,7 +80,9 @@ func test_every_line_in_the_script_is_used_and_every_id_used_is_in_the_script(h)
 			ids[String(interactable.line_id)] = true
 	ids["mural.after"] = true
 	ids["monolith.first"] = true
-	for player_name in ["Cinematics", "Background"]:
+	h.check(ids.has(String(world.get_node("GameDirector").crossing_line)), "the crossing's line is not in the script")
+	ids[String(world.get_node("GameDirector").crossing_line)] = true
+	for player_name in ["Cinematics", "Background", "Atmosphere"]:
 		var player: AnimationPlayer = world.get_node(player_name)
 		for clip in player.get_animation_list():
 			var animation := player.get_animation(clip)
@@ -92,11 +94,12 @@ func test_every_line_in_the_script_is_used_and_every_id_used_is_in_the_script(h)
 						var id := String(animation.method_track_get_params(track, key)[0])
 						h.check(ids.has(id), "%s says %s, which is not in the script" % [clip, id])
 						ids[id] = true
-	var ending: Node = (load("res://scenes/ui/ending.tscn") as PackedScene).instantiate()
-	for id in ending.ending_lines:
-		h.check(ids.has(id), "the ending uses %s, which is not in the script" % id)
-		ids[id] = true
-	ending.free()
+	for scene in ["res://scenes/ui/ending.tscn", "res://scenes/ui/prologue.tscn"]:
+		var sequence: Node = (load(scene) as PackedScene).instantiate()
+		for id in sequence.ending_lines:
+			h.check(ids.has(id), "%s uses %s, which is not in the script" % [scene, id])
+			ids[id] = true
+		sequence.free()
 	for id: String in ids:
 		h.check(ids[id], "nothing uses %s" % id)
 
@@ -107,7 +110,8 @@ func test_a_prop_shows_the_scripts_words_exactly(h) -> void:
 		h.check(world.get_node(pair[0]).caption == _script_text(pair[1]), "%s reads '%s'" % [pair[0], world.get_node(pair[0]).caption])
 
 
-func test_only_the_three_approved_samples_have_audio_so_far(h) -> void:
+## The audition: three lines only, until the owner chooses a voice. Nothing more is generated before that.
+func test_only_the_three_audition_lines_have_audio_so_far(h) -> void:
 	await h.load_fixture("res://tests/fixtures/movement_arena.tscn")
 	var files := DirAccess.get_files_at("res://assets/narration") as Array
 	var audio := files.filter(func(f: String) -> bool: return f.ends_with(".ogg") or f.ends_with(".ogg.remap") or f.ends_with(".ogg.import")).map(func(f: String) -> String: return f.get_slice(".ogg", 0))
@@ -115,7 +119,7 @@ func test_only_the_three_approved_samples_have_audio_so_far(h) -> void:
 		h.check(audio.has(id), "no audio for %s" % id)
 		h.check(_script_text(id).contains(VOICED[id]), "%s reads '%s'" % [id, _script_text(id)])
 	for id in audio:
-		h.check(VOICED.has(id), "audio for %s, before the direction was approved" % id)
+		h.check(VOICED.has(id), "audio for %s, before a voice was chosen" % id)
 
 
 ## ---- Playback ----

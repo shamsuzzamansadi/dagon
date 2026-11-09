@@ -51,6 +51,7 @@ void MenuController::_bind_methods() {
 	BIND_ENUM_CONSTANT(MODE_PAUSE);
 	BIND_ENUM_CONSTANT(MODE_TITLE);
 	BIND_ENUM_CONSTANT(MODE_ENDING);
+	BIND_ENUM_CONSTANT(MODE_PROLOGUE);
 
 	ClassDB::bind_method(D_METHOD("is_open"), &MenuController::is_open);
 	ClassDB::bind_method(D_METHOD("open"), &MenuController::open);
@@ -65,6 +66,8 @@ void MenuController::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("quit_now"), &MenuController::quit_now);
 	ClassDB::bind_method(D_METHOD("quit_to_main_menu"), &MenuController::quit_to_main_menu);
 	ClassDB::bind_method(D_METHOD("advance_ending"), &MenuController::advance_ending);
+	ClassDB::bind_method(D_METHOD("skip_prologue"), &MenuController::skip_prologue);
+	ClassDB::bind_method(D_METHOD("is_prologue_finished"), &MenuController::is_prologue_finished);
 	ClassDB::bind_method(D_METHOD("get_ending_line"), &MenuController::get_ending_line);
 	ClassDB::bind_method(D_METHOD("set_ending_lines", "ids"), &MenuController::set_ending_lines);
 	ClassDB::bind_method(D_METHOD("get_ending_lines"), &MenuController::get_ending_lines);
@@ -85,6 +88,9 @@ void MenuController::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_game_scene", "scene"), &MenuController::set_game_scene);
 	ClassDB::bind_method(D_METHOD("get_game_scene"), &MenuController::get_game_scene);
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "game_scene", PROPERTY_HINT_RESOURCE_TYPE, "PackedScene"), "set_game_scene", "get_game_scene");
+	ClassDB::bind_method(D_METHOD("set_prologue_scene", "scene"), &MenuController::set_prologue_scene);
+	ClassDB::bind_method(D_METHOD("get_prologue_scene"), &MenuController::get_prologue_scene);
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "prologue_scene", PROPERTY_HINT_RESOURCE_TYPE, "PackedScene"), "set_prologue_scene", "get_prologue_scene");
 	// A path, because the game scene and the main menu refer to each other.
 	ClassDB::bind_method(D_METHOD("set_title_scene_path", "path"), &MenuController::set_title_scene_path);
 	ClassDB::bind_method(D_METHOD("get_title_scene_path"), &MenuController::get_title_scene_path);
@@ -119,8 +125,17 @@ void MenuController::_bind_methods() {
 	DAGON_BIND_PATH(save_status_label_path);
 	DAGON_BIND_PATH(ending_box_path);
 	DAGON_BIND_PATH(voice_path);
+	DAGON_BIND_PATH(panels_path);
 
 #undef DAGON_BIND_PATH
+}
+
+void MenuController::_notification(int p_what) {
+	// Closing the window takes the quiet way out, from the title, the prologue and the ending alike.
+	if (p_what == NOTIFICATION_WM_CLOSE_REQUEST && mode_ != MODE_PAUSE && !quiet_) {
+		quiet_ = true;
+		quit_quietly(get_tree());
+	}
 }
 
 void MenuController::_ready() {
@@ -128,17 +143,20 @@ void MenuController::_ready() {
 		return;
 	}
 	storage::apply_settings(storage::load_settings());
+	if (mode_ != MODE_PAUSE) {
+		get_tree()->set_auto_accept_quit(false);
+	}
 
 	session_.set(session_path_.is_empty() ? nullptr : get_node<GameSession>(session_path_));
 	main_panel_.set(get_node<Control>(main_panel_path_));
-	// The ending has only its card and the credits.
-	if (mode_ != MODE_ENDING) {
+	// The ending has only its card and the credits, and the prologue only its card.
+	if (!is_sequence()) {
 		confirm_panel_.set(get_node<Control>(confirm_panel_path_));
 		controls_panel_.set(get_node<Control>(controls_panel_path_));
 		settings_menu_.set(get_node<SettingsMenu>(settings_menu_path_));
 		confirm_message_label_.set(get_node<Label>(confirm_message_label_path_));
 	}
-	if (main_panel_.get() == nullptr || (mode_ != MODE_ENDING && (confirm_panel_.get() == nullptr || controls_panel_.get() == nullptr || settings_menu_.get() == nullptr))) {
+	if (main_panel_.get() == nullptr || (!is_sequence() && (confirm_panel_.get() == nullptr || controls_panel_.get() == nullptr || settings_menu_.get() == nullptr))) {
 		ERR_PRINT("MenuController: a panel path is not set; the menu cannot open.");
 		main_panel_.set(nullptr);
 		return;
@@ -157,7 +175,17 @@ void MenuController::_ready() {
 		settings->set_cancel_label(input_labels::back_label(active_device_));
 	}
 
-	if (mode_ == MODE_ENDING) {
+	if (mode_ == MODE_PROLOGUE) {
+		voice_.set(voice_path_.is_empty() ? nullptr : get_node<AudioStreamPlayer>(voice_path_));
+		show_screen(Screen::Main);
+		focus_path(first_button_path_);
+		print_verbose("dagon: prologue shown");
+		show_next_ending_line();
+		// The export check has nobody to watch it, and needs play to start.
+		if (!OS::get_singleton()->get_environment(AUTOSTART_VARIABLE).is_empty()) {
+			call_deferred("skip_prologue");
+		}
+	} else if (mode_ == MODE_ENDING) {
 		credits_panel_.set(get_node<Control>(credits_panel_path_));
 		voice_.set(voice_path_.is_empty() ? nullptr : get_node<AudioStreamPlayer>(voice_path_));
 		show_screen(Screen::Main);
@@ -180,13 +208,74 @@ void MenuController::_ready() {
 }
 
 void MenuController::_process(double p_delta) {
-	if (Engine::get_singleton()->is_editor_hint() || mode_ != MODE_ENDING || screen_ != Screen::Main || ending_line_ + 1 >= ending_lines_.size()) {
+	if (Engine::get_singleton()->is_editor_hint()) {
+		return;
+	}
+	// The pause menu runs while the game is paused, so it is the one that can finish a Quit to Desktop from there.
+	if (is_quit_due()) {
+		get_tree()->quit();
+		return;
+	}
+	if (mode_ == MODE_PAUSE) {
+		return;
+	}
+	if (!quiet_ && is_run_over()) {
+		quiet_ = true;
+		print_verbose("dagon: run over, quitting");
+		quit_quietly(get_tree());
+	}
+	if (!is_sequence() || screen_ != Screen::Main || prologue_finished_) {
+		return;
+	}
+	// The epilogue waits on its last line for the player. The prologue goes on into the game by itself.
+	const bool last = ending_line_ + 1 >= ending_lines_.size();
+	if (last && mode_ != MODE_PROLOGUE) {
 		return;
 	}
 	ending_line_left_ -= p_delta;
 	if (ending_line_left_ <= 0.0) {
-		show_next_ending_line();
+		if (last) {
+			finish_prologue(false);
+		} else {
+			show_next_ending_line();
+		}
 	}
+}
+
+void MenuController::show_panel(int p_index) {
+	Control *panels = panels_path_.is_empty() ? nullptr : get_node<Control>(panels_path_);
+	if (panels == nullptr) {
+		return;
+	}
+	for (int i = 0; i < panels->get_child_count(); i++) {
+		CanvasItem *panel = Object::cast_to<CanvasItem>(panels->get_child(i));
+		if (panel == nullptr) {
+			continue;
+		}
+		const bool shown = i == p_index;
+		if (shown && !panel->is_visible()) {
+			panel->set_modulate(Color(1, 1, 1, 0));
+			panel->create_tween()->tween_property(panel, "modulate:a", 1.0, ENDING_LINE_FADE_SECONDS);
+		}
+		panel->set_visible(shown);
+	}
+}
+
+void MenuController::skip_prologue() {
+	finish_prologue(true);
+}
+
+void MenuController::finish_prologue(bool p_skipped) {
+	if (mode_ != MODE_PROLOGUE || prologue_finished_) {
+		return;
+	}
+	prologue_finished_ = true;
+	if (AudioStreamPlayer *voice = voice_.get()) {
+		voice->stop();
+	}
+	print_verbose("dagon: prologue finished skipped=", p_skipped);
+	// The new save was written before the prologue began, so finishing and skipping start the same game.
+	start_session(core::Beat::Shore, true);
 }
 
 // Each line of the epilogue joins the card when the one before has been said or could be read, whether it has a
@@ -199,6 +288,14 @@ void MenuController::show_next_ending_line() {
 	const StringName id = ending_lines_[ending_line_];
 	const String text = narration::line_text(id);
 	if (Control *box = ending_box_path_.is_empty() ? nullptr : get_node<Control>(ending_box_path_)) {
+		// The prologue's card holds one line at a time, under its picture. The epilogue's lines gather.
+		if (mode_ == MODE_PROLOGUE) {
+			for (int i = box->get_child_count() - 1; i >= 0; i--) {
+				Node *old = box->get_child(i);
+				box->remove_child(old);
+				old->queue_free();
+			}
+		}
 		Label *label = memnew(Label);
 		label->set_text(text);
 		label->set_custom_minimum_size(Vector2(ENDING_LINE_WIDTH, 0));
@@ -217,13 +314,21 @@ void MenuController::show_next_ending_line() {
 		voice->set_stream(stream);
 		voice->play();
 	}
-	print_verbose("dagon: ending line: ", id, " voiced=", voiced);
+	show_panel(ending_line_);
+	print_verbose(mode_ == MODE_PROLOGUE ? "dagon: prologue line: " : "dagon: ending line: ", id, " voiced=", voiced);
 	ending_line_left_ = core::line_seconds(static_cast<std::size_t>(text.length()), voiced ? stream->get_length() : 0.0, ENDING_LINE_MINIMUM_SECONDS) + ENDING_LINE_PAUSE_SECONDS;
 }
 
 void MenuController::advance_ending() {
+	if (prologue_finished_) {
+		return;
+	}
 	if (ending_line_ + 1 < ending_lines_.size()) {
 		show_next_ending_line();
+		return;
+	}
+	if (mode_ == MODE_PROLOGUE) {
+		finish_prologue(false);
 		return;
 	}
 	open_credits();
@@ -281,12 +386,14 @@ void MenuController::_unhandled_input(const Ref<InputEvent> &p_event) {
 	const bool pause_pressed = mode_ == MODE_PAUSE && p_event->is_action_pressed("pause");
 	// Esc is both of these, and it must still act only once.
 	if (pause_pressed || (is_open() && p_event->is_action_pressed("ui_cancel"))) {
+		// Taken first: skipping the prologue changes the scene, which takes this node out of the tree at once.
+		Viewport *viewport = get_viewport();
 		if (is_open()) {
 			back();
 		} else {
 			open();
 		}
-		get_viewport()->set_input_as_handled();
+		viewport->set_input_as_handled();
 		return;
 	}
 	if (!is_open()) {
@@ -483,7 +590,7 @@ void MenuController::confirm() {
 
 void MenuController::quit_now() {
 	haptics::stop(active_device_);
-	get_tree()->quit();
+	quit_quietly(get_tree());
 }
 
 void MenuController::quit_to_main_menu() {
@@ -529,6 +636,15 @@ void MenuController::write_new_game() {
 		ask_confirm(ConfirmAction::NewGame, NEW_GAME_FAILED_MESSAGE, "Retry");
 		return;
 	}
+	// The save is written first, so leaving during the prologue already leaves a game to Continue, at the Shore.
+	if (prologue_scene_.is_valid()) {
+		reset_global_state();
+		MenuController *prologue = Object::cast_to<MenuController>(prologue_scene_->instantiate());
+		ERR_FAIL_NULL_MSG(prologue, "MenuController: prologue_scene's root is not a MenuController.");
+		prologue->set_active_device(active_device_);
+		get_tree()->change_scene_to_node(prologue);
+		return;
+	}
 	start_session(fresh.beat, true);
 }
 
@@ -554,6 +670,8 @@ void MenuController::back() {
 		case Screen::Main:
 			if (mode_ == MODE_PAUSE) {
 				resume();
+			} else if (mode_ == MODE_PROLOGUE) {
+				skip_prologue();
 			}
 			break;
 		case Screen::Settings:

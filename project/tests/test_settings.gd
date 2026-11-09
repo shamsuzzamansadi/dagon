@@ -7,7 +7,7 @@ const ITEMS := "PauseLayer/PauseMenu/Settings/Center/Panel/Items/"
 const SETTINGS_FILE := "settings.cfg"
 const JUMP := 2
 const INTERACT := 3
-const AUDIO_NOTE := "Narration samples only. No music or effects yet."
+const AUDIO_NOTE := "Sound is an early pass, not final."
 
 
 func _setup(h) -> CharacterBody2D:

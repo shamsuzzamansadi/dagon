@@ -85,7 +85,8 @@ run_exported() {
 		log_arg="$(cygpath -w "$log_path")"
 	fi
 	rm -f "$log_path"
-	env DAGON_AUTOSTART="${2:-}" "$binary" --headless --verbose --quit-after 300 --log-file "$log_arg" \
+	# The game ends the run itself, stopping its sound first (D78). --quit-after is only a backstop.
+	env DAGON_AUTOSTART="${2:-}" DAGON_QUIT_AFTER_FRAMES=300 "$binary" --headless --verbose --quit-after 1200 --log-file "$log_arg" \
 		> "$logs/$name.stdout" 2> "$logs/$name.stderr"
 	code=$?
 	echo "$code" > "$logs/$name.exit"

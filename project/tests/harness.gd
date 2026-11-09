@@ -18,6 +18,9 @@ var _run_storage_dir: String
 var _expected_errors := {}
 
 
+## How many prologues wait_for_scene skipped on the way to a game, since the last fixture.
+var prologues_skipped := 0
+
 func _init(p_tree: SceneTree) -> void:
 	tree = p_tree
 	_run_storage_dir = OS.get_environment(STORAGE_VARIABLE)
@@ -82,6 +85,13 @@ func load_with(node: Node, as_main := false) -> Node:
 
 ## Waits for a scene change to finish, and returns the new scene.
 func wait_for_scene(type_name: String, max_steps := 60) -> Node:
+	# New Game shows the prologue before the game. A test waiting for the game skips it, as a player can, and the
+	# tests of the prologue itself say so. Continue never shows it, which they check too.
+	if type_name == "GameSession":
+		await wait_until(func() -> bool: return is_instance_valid(tree.current_scene) and tree.current_scene.is_node_ready() and (tree.current_scene.is_class(type_name) or tree.current_scene.has_method("skip_prologue")), max_steps, "the scene to change to %s" % type_name)
+		if is_instance_valid(tree.current_scene) and tree.current_scene.has_method("skip_prologue") and not tree.current_scene.is_class(type_name):
+			prologues_skipped += 1
+			tree.current_scene.skip_prologue()
 	await wait_until(func() -> bool: return is_instance_valid(tree.current_scene) and tree.current_scene.is_class(type_name) and tree.current_scene.is_node_ready(), max_steps, "the scene to change to %s" % type_name)
 	fixture = tree.current_scene
 	await steps(1)

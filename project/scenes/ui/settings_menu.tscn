@@ -106,7 +106,7 @@ value = 1.0
 [node name="AudioNote" type="Label" parent="Center/Panel/Items/Columns/Audio"]
 custom_minimum_size = Vector2(186, 0)
 layout_mode = 2
-text = "Narration samples only. No music or effects yet."
+text = "Sound is an early pass, not final."
 autowrap_mode = 2
 
 [node name="Subtitles" type="Button" parent="Center/Panel/Items/Columns/Audio"]

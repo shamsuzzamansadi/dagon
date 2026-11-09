@@ -5,6 +5,7 @@ extends "res://tests/test_level.gd"
 
 const SHORE := "res://scenes/level/shore.tscn"
 const ART_END_X := 640.0
+const SECTION_END_X := 1440.0
 const ROCK_LEFT := 200
 const ROCK_RIGHT := 240
 const ROCK_TOP := -14
@@ -80,16 +81,20 @@ func test_shore_keeps_the_greybox_level_up_to_where_the_acts_carry_on(h) -> void
 
 
 ## Past the art, the backdrop must hide every parallax layer running out, and no gap may show.
+## The Shore's art meets the finished reference section, which runs on to where the greybox begins.
 func test_art_ends_where_the_greybox_begins(h) -> void:
 	await _setup(h)
 	var art: Sprite2D = h.fixture.get_node("Terrain/Art")
 	h.check_near(art.position.x + art.texture.get_width(), ART_END_X, 0.0, "right edge of the terrain art")
+	var section: Sprite2D = h.fixture.get_node("ReferenceSection/Front")
+	h.check(section.position.x <= ART_END_X, "the reference section starts at %.0f, leaving a gap after the Shore" % section.position.x)
+	h.check_near(section.position.x + section.texture.get_width(), SECTION_END_X, 0.0, "right edge of the reference section")
 	var camera: Camera2D = h.fixture.get_node("CameraRig")
 	var ground: Rect2 = _bounds(h.fixture.get_node("Terrain/GreyboxGround").polygon)
-	h.check_near(ground.position.x, ART_END_X, 0.0, "left edge of the greybox ground")
+	h.check_near(ground.position.x, SECTION_END_X, 0.0, "left edge of the greybox ground")
 	h.check_near(ground.end.x, camera.limit_right, 0.0, "right edge of the greybox ground")
 	var backdrop: Rect2 = _bounds(h.fixture.get_node("GreyboxBackdrop").polygon)
-	h.check_near(backdrop.position.x, ART_END_X, 0.0, "left edge of the backdrop")
+	h.check_near(backdrop.position.x, SECTION_END_X, 0.0, "left edge of the backdrop")
 	h.check_near(backdrop.end.x, camera.limit_right, 0.0, "right edge of the backdrop")
 	h.check(backdrop.position.y <= camera.limit_top and backdrop.end.y >= camera.limit_bottom, "the backdrop does not fill the view's height")
 

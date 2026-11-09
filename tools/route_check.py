@@ -11,7 +11,7 @@ system: XTEST on Linux and window messages on Windows. What the driver knows com
 It plays four runs, each a new process on the same isolated storage:
   1. New Game to the ending, stopping to read everything that offers a prompt along the ground, and letting the epilogue finish.
   2. New Game to the ending again, reading nothing, as the shortest honest route.
-  3. Continue from the Awakened save to the ending, by standing still until the flee times out.
+  3. Continue from the Awakened save to the ending, by standing still until the returning sea reaches him.
   4. Continue from the same save, to show it is still there after the ending.
 
 Runs 1 and 2 report how long each act took. These are scripted, by a driver that knows the puzzle. They are not playtests,
@@ -31,7 +31,8 @@ from pathlib import Path
 PHASE_SECONDS = 240.0
 HOP_HOLD_SECONDS = 0.2
 HOP_EVERY_SECONDS = 0.7
-FLEE_TIMEOUT_SECONDS = 12.0
+# Standing still at the ledge, the returning sea reaches him in about 4.3 s of game time (D73).
+SEA_REACHES_SECONDS = 4.3
 # Wall clock over a real window, so generous on the slow side only.
 FLEE_MAX_SECONDS = 16.0
 
@@ -45,6 +46,7 @@ KEYS = {
     "menu_down": ("Down", 0x28, 0x50),
     "menu_up": ("Up", 0x26, 0x48),
     "menu_right": ("Right", 0x27, 0x4D),
+    "escape": ("Escape", 0x1B, 0x01),
 }
 EXTENDED_KEYS = ("menu_down", "menu_up", "menu_right")
 
@@ -311,7 +313,7 @@ def first_time(game, text, after=0.0):
     raise RouteFailed(f"the timing has no '{text}'")
 
 
-def report_timing(game, profile, begun):
+def report_timing(game, profile, begun, prologue_seconds):
     """How the run's time was spent, from when each line arrived. Scripted, knowing the puzzle: not a playtest."""
     abyss = first_time(game, "dagon: beat=abyss")
     monolith = first_time(game, "dagon: beat=monolith")
@@ -330,11 +332,13 @@ def report_timing(game, profile, begun):
             cinematics += arrived - start
             start = None
     solving = solved - stones
-    exploring = (ended - begun) - cinematics - solving - game.reading_seconds
+    # The crossing: from first seeing the slab to its coming down level.
+    crossing = first_time(game, "dagon: crossing lowered") - first_time(game, "dagon: focus: abyss.slab")
+    exploring = (ended - begun) - cinematics - solving - crossing - game.reading_seconds
     text = (
-        f"ROUTE_TIMING profile={profile} puzzle=known-to-the-script one-deliberate-mistake total={menu - begun:.0f}s to-ending-card={card - begun:.0f}s"
+        f"ROUTE_TIMING profile={profile} puzzle=known-to-the-script one-deliberate-mistake prologue={prologue_seconds:.0f}s total={menu - begun:.0f}s to-ending-card={card - begun:.0f}s"
         f" | acts: shore={abyss - begun:.0f}s abyss={monolith - abyss:.0f}s monolith={witness - monolith:.0f}s witness-and-escape={ended - witness:.0f}s collapse={card - ended:.0f}s epilogue-and-credits={menu - card:.0f}s"
-        f" | spent: walking={exploring:.0f}s reading={game.reading_seconds:.0f}s solving={solving:.0f}s cinematics={cinematics:.0f}s"
+        f" | spent: walking={exploring:.0f}s reading={game.reading_seconds:.0f}s crossing={crossing:.0f}s solving={solving:.0f}s cinematics={cinematics:.0f}s"
     )
     print(text)
     game.transcript.write(text + "\n")
@@ -353,9 +357,20 @@ def run_new_game_to_the_ending(game, read):
         time.sleep(0.3)
         game.tap("menu_right")
     game.tap("enter")
+    # New Game shows the prologue. The reading run lets it play through at its own pace; the direct run skips it.
+    shown = time.monotonic()
+    game.wait_for("dagon: prologue shown")
+    time.sleep(0.5)
+    game.shot(name("02-prologue"))
+    if read:
+        game.wait_for("dagon: prologue finished skipped=false", 120)
+    else:
+        game.tap("escape")
+        game.wait_for("dagon: prologue finished skipped=true", 10)
+    prologue_seconds = time.monotonic() - shown
     game.wait_for("dagon: introduction shown")
     time.sleep(0.5)
-    game.shot(name("02-introduction"))
+    game.shot(name("03-introduction"))
     game.tap("enter")
     begun = time.monotonic()
 
@@ -433,7 +448,7 @@ def run_new_game_to_the_ending(game, read):
     game.wait_for("dagon: save status=", 20)
     time.sleep(0.5)
     game.shot(name("18-main-menu-after-the-ending"))
-    report_timing(game, profile, begun)
+    report_timing(game, profile, begun, prologue_seconds)
     game.quit_from_main_menu()
 
 
@@ -453,12 +468,13 @@ def run_continue_and_wait_out_the_flee(game):
     game.walk_until("right", "dagon: beat=witness", hop=False)
     game.wait_for("dagon: beat=fleeing", 30)
     started = time.monotonic()
-    # No input at all from here.
-    game.wait_for("dagon: beat=ended", FLEE_MAX_SECONDS)
+    # No input at all from here. The sea comes, and the game ends as if he had run.
+    game.wait_for("dagon: flee ended by the sea", FLEE_MAX_SECONDS)
+    game.wait_for("dagon: beat=ended", 5)
     took = time.monotonic() - started
-    game._note(time.monotonic(), f"the flee timed out after {took:.2f} s of wall clock")
-    if took < FLEE_TIMEOUT_SECONDS - 1.0:
-        raise RouteFailed(f"the flee timed out after only {took:.2f} s")
+    game._note(time.monotonic(), f"the sea reached him after {took:.2f} s of wall clock")
+    if took < SEA_REACHES_SECONDS - 1.0:
+        raise RouteFailed(f"the sea reached him after only {took:.2f} s")
     game.wait_for("dagon: ending card shown", 20)
     for _ in range(3):
         time.sleep(0.4)

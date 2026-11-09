@@ -30,7 +30,10 @@ PLATFORMS = {
     },
 }
 LEGAL = ("LICENSE", "CREDITS.md")
+# The game ends the run itself after this many frames, stopping its sound first (D78). --quit-after is only a backstop:
+# the engine shuts down in that frame, before the mixer can let go of a sound still playing.
 QUIT_AFTER_FRAMES = "300"
+QUIT_BACKSTOP_FRAMES = "1200"
 
 
 def package_name(platform, version):
@@ -89,9 +92,9 @@ def extract(package_path, into):
 
 def run_headless(binary, work, name, autostart=""):
     log = Path(work, f"{name}.log")
-    environment = dict(os.environ, DAGON_STORAGE_DIR=Path(work, "storage").as_posix(), DAGON_AUTOSTART=autostart)
+    environment = dict(os.environ, DAGON_STORAGE_DIR=Path(work, "storage").as_posix(), DAGON_AUTOSTART=autostart, DAGON_QUIT_AFTER_FRAMES=QUIT_AFTER_FRAMES)
     result = subprocess.run(
-        [str(binary), "--headless", "--verbose", "--quit-after", QUIT_AFTER_FRAMES, "--log-file", str(log)],
+        [str(binary), "--headless", "--verbose", "--quit-after", QUIT_BACKSTOP_FRAMES, "--log-file", str(log)],
         env=environment,
         cwd=binary.parent,
         capture_output=True,

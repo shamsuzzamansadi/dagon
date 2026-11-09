@@ -1,6 +1,7 @@
 #pragma once
 
 #include "camera_rig.hpp"
+#include "core/flee.hpp"
 #include "core/story_progress.hpp"
 #include "hud.hpp"
 #include "interactable.hpp"
@@ -10,13 +11,16 @@
 #include "story_trigger.hpp"
 
 #include <godot_cpp/classes/animation_player.hpp>
+#include <godot_cpp/classes/audio_stream_player2d.hpp>
 #include <godot_cpp/classes/canvas_item.hpp>
 #include <godot_cpp/classes/collision_object2d.hpp>
 #include <godot_cpp/classes/marker2d.hpp>
+#include <godot_cpp/classes/node2d.hpp>
 #include <godot_cpp/classes/node.hpp>
 #include <godot_cpp/classes/packed_scene.hpp>
 #include <godot_cpp/variant/array.hpp>
 #include <godot_cpp/variant/node_path.hpp>
+#include <godot_cpp/variant/packed_float32_array.hpp>
 #include <godot_cpp/variant/packed_string_array.hpp>
 #include <godot_cpp/variant/string.hpp>
 #include <godot_cpp/variant/string_name.hpp>
@@ -68,6 +72,10 @@ public:
 	bool has_pending_event() const { return pending_.has_value(); }
 	bool is_recovery_pending() const { return recovery_pending_; }
 	double get_flee_elapsed() const { return flee_elapsed_; }
+	// Where the returning sea has reached, this far into the flee.
+	float get_tide_front() const { return core::tide_front(tide_, flee_elapsed_); }
+	bool is_crossing_lowered() const { return crossing_lowered_; }
+	bool is_crossing_moving() const { return crossing_moving_; }
 
 	void fade_in();
 	void show_notice(const godot::String &p_text);
@@ -111,6 +119,36 @@ public:
 	godot::Ref<godot::PackedScene> get_ending_scene() const { return ending_scene_; }
 	void set_flee_timeout(double p_value) { flee_timeout_ = p_value; }
 	double get_flee_timeout() const { return flee_timeout_; }
+	void set_tide_path(const godot::NodePath &p_value) { tide_path_ = p_value; }
+	godot::NodePath get_tide_path() const { return tide_path_; }
+	void set_tide_start_x(float p_value) { tide_.start_x = p_value; }
+	float get_tide_start_x() const { return tide_.start_x; }
+	void set_tide_speed(float p_value) { tide_.speed = p_value; }
+	float get_tide_speed() const { return tide_.speed; }
+	void set_tide_delay(float p_value) { tide_.delay = p_value; }
+	float get_tide_delay() const { return tide_.delay; }
+	void set_flee_look_ahead(float p_value) { flee_look_ahead_ = p_value; }
+	float get_flee_look_ahead() const { return flee_look_ahead_; }
+	void set_crossing_path(const godot::NodePath &p_value) { crossing_path_ = p_value; }
+	godot::NodePath get_crossing_path() const { return crossing_path_; }
+	void set_crossing_trigger_path(const godot::NodePath &p_value) { crossing_trigger_path_ = p_value; }
+	godot::NodePath get_crossing_trigger_path() const { return crossing_trigger_path_; }
+	void set_crossing_sound_path(const godot::NodePath &p_value) { crossing_sound_path_ = p_value; }
+	godot::NodePath get_crossing_sound_path() const { return crossing_sound_path_; }
+	void set_crossing_raised_rotation(float p_value) { crossing_raised_rotation_ = p_value; }
+	float get_crossing_raised_rotation() const { return crossing_raised_rotation_; }
+	void set_crossing_line(const godot::StringName &p_value) { crossing_line_ = p_value; }
+	godot::StringName get_crossing_line() const { return crossing_line_; }
+	void set_crossing_lower_seconds(float p_value) { crossing_lower_seconds_ = p_value; }
+	float get_crossing_lower_seconds() const { return crossing_lower_seconds_; }
+	void set_breath_path(const godot::NodePath &p_value) { breath_path_ = p_value; }
+	godot::NodePath get_breath_path() const { return breath_path_; }
+	// One per beat, in beat order. An empty entry is silence in that beat.
+	void set_breath_streams(const godot::Array &p_value) { breath_streams_ = p_value; }
+	godot::Array get_breath_streams() const { return breath_streams_; }
+	// How fast he breathes standing still, per beat, in the same order.
+	void set_idle_speeds(const godot::PackedFloat32Array &p_value) { idle_speeds_ = p_value; }
+	godot::PackedFloat32Array get_idle_speeds() const { return idle_speeds_; }
 
 protected:
 	static void _bind_methods();
@@ -131,6 +169,7 @@ private:
 
 	void on_story_trigger(const godot::StringName &p_trigger_id);
 	void on_background_trigger(const godot::StringName &p_trigger_id);
+	void on_crossing_trigger(const godot::StringName &p_trigger_id);
 	void on_out_of_bounds(const godot::StringName &p_trigger_id);
 	void on_animation_finished(const godot::StringName &p_clip);
 
@@ -148,6 +187,10 @@ private:
 	void restore_camera();
 	void open_gate();
 	void bring_down_rockfall();
+	void lower_crossing(bool p_instant);
+	void update_crossing(double p_delta);
+	void update_flee(double p_delta);
+	void play_breath(core::Beat p_beat);
 	void play_atmosphere(core::Beat p_beat, bool p_instant);
 	void consume_trigger(core::Event p_event);
 	void report_contract_error(const godot::String &p_message);
@@ -171,7 +214,20 @@ private:
 	godot::Array background_trigger_paths_;
 	godot::Array awakened_visual_paths_;
 	godot::Ref<godot::PackedScene> ending_scene_;
-	double flee_timeout_ = 12.0;
+	// No longer the end of the flee, which is the sea's: a bounded guard so that nothing can leave it running.
+	double flee_timeout_ = 30.0;
+	godot::NodePath tide_path_;
+	core::TideParams tide_;
+	float flee_look_ahead_ = -60.0f;
+	godot::NodePath crossing_path_;
+	godot::NodePath crossing_trigger_path_;
+	godot::NodePath crossing_sound_path_;
+	float crossing_raised_rotation_ = 0.0f;
+	float crossing_lower_seconds_ = 0.5f;
+	godot::StringName crossing_line_;
+	godot::NodePath breath_path_;
+	godot::Array breath_streams_;
+	godot::PackedFloat32Array idle_speeds_;
 
 	NodeRef<PlayerController> player_;
 	NodeRef<Hud> hud_;
@@ -182,6 +238,11 @@ private:
 	NodeRef<godot::AnimationPlayer> background_;
 	NodeRef<godot::CollisionObject2D> monolith_gate_;
 	NodeRef<godot::CollisionObject2D> rockfall_;
+	NodeRef<godot::Node2D> tide_node_;
+	NodeRef<godot::Node2D> crossing_;
+	NodeRef<StoryTrigger> crossing_trigger_;
+	NodeRef<godot::AudioStreamPlayer2D> crossing_sound_;
+	NodeRef<godot::AudioStreamPlayer2D> breath_;
 	NodeRef<PuzzleController> puzzle_;
 	NodeRef<Interactable> mural_;
 	std::vector<NodeRef<godot::CanvasItem>> awakened_visuals_;
@@ -201,6 +262,9 @@ private:
 	bool recovery_pending_ = false;
 	double flee_elapsed_ = 0.0;
 	bool ending_started_ = false;
+	bool crossing_lowered_ = false;
+	bool crossing_moving_ = false;
+	double crossing_elapsed_ = 0.0;
 };
 
 } // namespace dagon

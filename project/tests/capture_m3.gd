@@ -4,9 +4,14 @@ extends SceneTree
 
 const SPOTS := [
 	["shore-talisman", 330.0, -40.0],
-	["cave-mouth", 700.0, -40.0],
-	["cave-carving", 830.0, -40.0],
-	["act2-first-tablet", 1320.0, -40.0],
+	["shore-tentacle", 560.0, -40.0],
+	["section-1-cave-entrance", 680.0, -40.0],
+	["section-2-cave-carving", 830.0, -40.0],
+	["section-3-the-mouth", 990.0, -40.0],
+	["section-4-out-on-the-seabed", 1130.0, -40.0],
+	["section-5-first-tablet", 1320.0, -40.0],
+	["section-6-where-the-greybox-begins", 1440.0, -40.0],
+	["act2-the-slab-raised", 2160.0, -40.0],
 	["act2-rib-arch", 1880.0, -40.0],
 	["act2-crevasse", 2120.0, -40.0],
 	["act2-shelf-from-below", 2908.0, -6.0],
@@ -36,6 +41,7 @@ const STILLS := [
 	["flee-1-rock-coming-down", "Atmosphere", &"beat_fleeing", 0.65, Vector2(4364, -2)],
 	["flee-2-rock-across-the-way", "Atmosphere", &"beat_fleeing", 2.8, Vector2(4240, -2)],
 	["flee-3-the-last-rock", "Atmosphere", &"beat_fleeing", 5.6, Vector2(3990, -2)],
+	["flee-4-the-sea-coming", "Atmosphere", &"beat_fleeing", 4.0, Vector2(4330, -2)],
 	["collapse-1-falling", "Cinematics", &"collapse", 1.0, Vector2(3760, -2)],
 	["collapse-2-lying-still", "Cinematics", &"collapse", 2.4, Vector2(3760, -2)],
 	["collapse-3-the-sea-comes", "Cinematics", &"collapse", 3.6, Vector2(3760, -2)],
@@ -81,6 +87,13 @@ func _run() -> void:
 		clips.pause()
 		await _frames(30)
 		_save(out, still[0])
+	# As the game does: stop every sound, and give the mixer real time to let go of it before quitting.
+	for type in ["AudioStreamPlayer", "AudioStreamPlayer2D"]:
+		for sound in root.find_children("*", type, true, false):
+			sound.stop()
+	var until := Time.get_ticks_msec() + 150
+	while Time.get_ticks_msec() < until:
+		await process_frame
 	quit(0)
 
 
@@ -91,6 +104,11 @@ func _show_as_it_would_be(world: Node, still: Array) -> void:
 	if clip == "beat_fleeing":
 		world.get_node("Rockfall").show()
 		world.get_node("Rockfall").set_deferred("collision_layer", 1)
+		# The sea's place is the director's to set, by its rule. Shown here where the rule has it at this moment.
+		var director: Node = world.get_node("GameDirector")
+		var tide: Node2D = world.get_node("Tide")
+		tide.show()
+		tide.global_position.x = director.tide_start_x - director.tide_speed * maxf(0.0, still[3] - director.tide_delay)
 
 
 func _save(out: String, shot: String) -> void:

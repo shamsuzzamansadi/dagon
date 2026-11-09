@@ -2,6 +2,7 @@
 
 #include "core/body_pose.hpp"
 
+#include <godot_cpp/classes/audio_stream.hpp>
 #include <godot_cpp/classes/engine.hpp>
 #include <godot_cpp/classes/input.hpp>
 #include <godot_cpp/classes/input_map.hpp>
@@ -66,6 +67,26 @@ void PlayerController::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_walk_pixels_per_frame"), &PlayerController::get_walk_pixels_per_frame);
 	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "walk_pixels_per_frame"), "set_walk_pixels_per_frame", "get_walk_pixels_per_frame");
 
+	ClassDB::bind_method(D_METHOD("set_idle_speed", "value"), &PlayerController::set_idle_speed);
+	ClassDB::bind_method(D_METHOD("get_idle_speed"), &PlayerController::get_idle_speed);
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "idle_speed"), "set_idle_speed", "get_idle_speed");
+	ADD_GROUP("Footsteps", "footstep");
+	ClassDB::bind_method(D_METHOD("set_footsteps_path", "path"), &PlayerController::set_footsteps_path);
+	ClassDB::bind_method(D_METHOD("get_footsteps_path"), &PlayerController::get_footsteps_path);
+	ADD_PROPERTY(PropertyInfo(Variant::NODE_PATH, "footsteps_path", PROPERTY_HINT_NODE_PATH_VALID_TYPES, "AudioStreamPlayer2D"), "set_footsteps_path", "get_footsteps_path");
+	ClassDB::bind_method(D_METHOD("set_footstep_sets", "sets"), &PlayerController::set_footstep_sets);
+	ClassDB::bind_method(D_METHOD("get_footstep_sets"), &PlayerController::get_footstep_sets);
+	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "footstep_sets"), "set_footstep_sets", "get_footstep_sets");
+	ClassDB::bind_method(D_METHOD("set_footstep_surface_edges", "edges"), &PlayerController::set_footstep_surface_edges);
+	ClassDB::bind_method(D_METHOD("get_footstep_surface_edges"), &PlayerController::get_footstep_surface_edges);
+	ADD_PROPERTY(PropertyInfo(Variant::PACKED_FLOAT32_ARRAY, "footstep_surface_edges"), "set_footstep_surface_edges", "get_footstep_surface_edges");
+	ClassDB::bind_method(D_METHOD("set_footstep_spacing", "pixels"), &PlayerController::set_footstep_spacing);
+	ClassDB::bind_method(D_METHOD("get_footstep_spacing"), &PlayerController::get_footstep_spacing);
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "footstep_spacing"), "set_footstep_spacing", "get_footstep_spacing");
+	ADD_GROUP("", "");
+	ClassDB::bind_method(D_METHOD("get_footstep_count"), &PlayerController::get_footstep_count);
+	ClassDB::bind_method(D_METHOD("surface_at", "x"), &PlayerController::surface_at);
+
 	ADD_SIGNAL(MethodInfo("jumped"));
 	ADD_SIGNAL(MethodInfo("landed"));
 }
@@ -89,6 +110,14 @@ void PlayerController::_ready() {
 			ERR_PRINT("PlayerController: visual_path does not point to a Node2D; facing will not be shown.");
 		}
 		visual_.set(visual);
+	}
+
+	if (!footsteps_path_.is_empty()) {
+		AudioStreamPlayer2D *footsteps = get_node<AudioStreamPlayer2D>(footsteps_path_);
+		if (footsteps == nullptr) {
+			ERR_PRINT("PlayerController: footsteps_path does not point to an AudioStreamPlayer2D; he walks in silence.");
+		}
+		footsteps_.set(footsteps);
 	}
 
 	if (!sprite_path_.is_empty()) {
@@ -134,6 +163,7 @@ void PlayerController::_physics_process(double p_delta) {
 
 	update_facing(input.axis);
 	update_sprite(get_global_position().x - previous_x, static_cast<float>(p_delta));
+	update_footsteps(get_global_position().x - previous_x, result.landed);
 
 	if (result.landed) {
 		emit_signal("landed");
@@ -155,6 +185,12 @@ void PlayerController::set_control_enabled(bool p_enabled) {
 	control_enabled_ = p_enabled;
 	if (!p_enabled) {
 		core::clear_jump_intent(state_);
+		return;
+	}
+	// A cinematic may have moved or tilted him, and a clip stopped early may not have put him back.
+	if (Node2D *visual = visual_.get()) {
+		visual->set_position(Vector2());
+		visual->set_rotation(0.0f);
 	}
 }
 
@@ -192,6 +228,7 @@ void PlayerController::update_sprite(float p_moved_pixels, float p_delta) {
 			if (sprite->get_animation() != StringName("idle") || !sprite->is_playing()) {
 				sprite->play("idle");
 			}
+			sprite->set_speed_scale(idle_speed_);
 			break;
 		case core::BodyPose::Jump:
 		case core::BodyPose::Fall: {
@@ -204,6 +241,58 @@ void PlayerController::update_sprite(float p_moved_pixels, float p_delta) {
 		}
 	}
 	was_walking_ = pose == core::BodyPose::Walk;
+}
+
+int PlayerController::surface_at(float p_x) const {
+	int surface = 0;
+	for (int i = 0; i < footstep_surface_edges_.size(); i++) {
+		if (p_x >= footstep_surface_edges_[i]) {
+			surface = i + 1;
+		}
+	}
+	return surface;
+}
+
+// A step each time he has walked its length on the ground, the first soon after he sets off, and one on landing.
+void PlayerController::update_footsteps(float p_moved_pixels, bool p_landed) {
+	if (p_landed) {
+		play_footstep(true);
+		footstep_distance_ = 0.0f;
+		return;
+	}
+	if (!is_on_floor() || std::abs(p_moved_pixels) < 0.01f) {
+		footstep_distance_ = footstep_spacing_ * 0.6f;
+		return;
+	}
+	footstep_distance_ += std::abs(p_moved_pixels);
+	if (footstep_distance_ >= footstep_spacing_) {
+		footstep_distance_ -= footstep_spacing_;
+		play_footstep(false);
+	}
+}
+
+void PlayerController::play_footstep(bool p_landing) {
+	AudioStreamPlayer2D *footsteps = footsteps_.get();
+	if (footsteps == nullptr) {
+		return;
+	}
+	const int surface = surface_at(static_cast<float>(get_global_position().x));
+	const Array variants = surface < footstep_sets_.size() ? Array(footstep_sets_[surface]) : Array();
+	if (variants.is_empty()) {
+		return;
+	}
+	// A small fixed-seed generator: the same walk sounds the same, and no step repeats the one before.
+	footstep_seed_ = footstep_seed_ * 1664525u + 1013904223u;
+	const int steps = variants.size() > 1 ? variants.size() - 1 : 1;
+	const int pick = p_landing && variants.size() > 1 ? variants.size() - 1 : static_cast<int>((footstep_seed_ >> 16) % static_cast<uint32_t>(steps));
+	const Ref<AudioStream> stream = variants[pick];
+	if (stream.is_null()) {
+		return;
+	}
+	footsteps->set_stream(stream);
+	footsteps->set_pitch_scale(0.94f + 0.12f * static_cast<float>((footstep_seed_ >> 8) & 0xff) / 255.0f);
+	footsteps->play();
+	footstep_count_++;
 }
 
 void PlayerController::update_facing(float p_axis) {

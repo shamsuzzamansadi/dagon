@@ -3,6 +3,7 @@
 [ext_resource type="Theme" path="res://assets/ui/theme.tres" id="theme"]
 [ext_resource type="PackedScene" path="res://scenes/ui/settings_menu.tscn" id="1_settings"]
 [ext_resource type="PackedScene" path="res://scenes/level/game.tscn" id="2_game"]
+[ext_resource type="PackedScene" path="res://scenes/ui/prologue.tscn" id="3_prologue"]
 [ext_resource type="Texture2D" path="res://assets/shore/sky.png" id="3_sky"]
 [ext_resource type="Texture2D" path="res://assets/shore/clouds.png" id="4_clouds"]
 [ext_resource type="Texture2D" path="res://assets/shore/far.png" id="5_far"]
@@ -21,6 +22,7 @@ grow_vertical = 2
 theme = ExtResource("theme")
 mode = 1
 game_scene = ExtResource("2_game")
+prologue_scene = ExtResource("3_prologue")
 main_panel_path = NodePath("Center/Main")
 credits_panel_path = NodePath("Center/Credits")
 confirm_panel_path = NodePath("Center/Confirm")

@@ -15,6 +15,9 @@ func _initialize() -> void:
 func _wait_for_session() -> Node:
 	for i in 120:
 		await physics_frame
+		# New Game shows the prologue first. Skipping it starts the same game.
+		if is_instance_valid(current_scene) and current_scene.has_method("skip_prologue") and current_scene.is_node_ready():
+			current_scene.skip_prologue()
 		if is_instance_valid(current_scene) and current_scene.is_class("GameSession") and current_scene.is_node_ready():
 			return current_scene
 	return null
@@ -90,7 +93,7 @@ func _run() -> void:
 	var session := await _wait_for_session()
 	if session == null:
 		print("PROBE no session")
-		quit(1)
+		await _quit_quietly(1)
 		return
 	session.get_node("PauseLayer/PauseMenu").resume()
 	var player: Node2D = session.get_world().get_node("Player")
@@ -119,4 +122,15 @@ func _run() -> void:
 		player.teleport(Vector2(COLLAPSE_X, -2))
 		await _wait_for(func() -> bool: return is_instance_valid(current_scene) and current_scene.has_method("open_credits") and current_scene.get_node_or_null("Center/Card") != null, 400)
 		print("PROBE ending reached" if current_scene.get_node_or_null("Center/Card") != null else "PROBE no ending")
-	quit(0)
+	await _quit_quietly(0)
+
+
+## As the game does: stop every sound and give the mixer real time to let go of it, or it is reported as leaked.
+func _quit_quietly(code: int) -> void:
+	for type in ["AudioStreamPlayer", "AudioStreamPlayer2D"]:
+		for player in root.find_children("*", type, true, false):
+			player.stop()
+	var until := Time.get_ticks_msec() + 150
+	while Time.get_ticks_msec() < until:
+		await process_frame
+	quit(code)

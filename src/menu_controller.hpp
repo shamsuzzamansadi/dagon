@@ -28,12 +28,15 @@ public:
 		MODE_PAUSE,
 		MODE_TITLE,
 		MODE_ENDING,
+		// Shown by New Game only, between writing the new save and the Shore. Continue never comes here.
+		MODE_PROLOGUE,
 	};
 
 	void _ready() override;
 	void _process(double p_delta) override;
 	void _input(const godot::Ref<godot::InputEvent> &p_event) override;
 	void _unhandled_input(const godot::Ref<godot::InputEvent> &p_event) override;
+	void _notification(int p_what);
 
 	// Keyboard, or a controller's device number. This node keeps running while the game is paused, so
 	// it is what notices a change of device, and it passes the news on.
@@ -63,6 +66,9 @@ public:
 	// Ending: the next line of the epilogue, or the credits after the last. Never makes anyone wait.
 	void advance_ending();
 	int get_ending_line() const { return ending_line_; }
+	// Skipping and finishing lead to the same place, by the same call.
+	void skip_prologue();
+	bool is_prologue_finished() const { return prologue_finished_; }
 
 	// Both.
 	void open_settings();
@@ -76,6 +82,8 @@ public:
 	int get_mode() const { return mode_; }
 	void set_game_scene(const godot::Ref<godot::PackedScene> &p_value) { game_scene_ = p_value; }
 	godot::Ref<godot::PackedScene> get_game_scene() const { return game_scene_; }
+	void set_prologue_scene(const godot::Ref<godot::PackedScene> &p_value) { prologue_scene_ = p_value; }
+	godot::Ref<godot::PackedScene> get_prologue_scene() const { return prologue_scene_; }
 	void set_ending_lines(const godot::PackedStringArray &p_value) { ending_lines_ = p_value; }
 	godot::PackedStringArray get_ending_lines() const { return ending_lines_; }
 	void set_title_scene_path(const godot::String &p_value) { title_scene_path_ = p_value; }
@@ -109,6 +117,7 @@ public:
 	DAGON_PATH_PROPERTY(save_status_label_path)
 	DAGON_PATH_PROPERTY(ending_box_path)
 	DAGON_PATH_PROPERTY(voice_path)
+	DAGON_PATH_PROPERTY(panels_path)
 
 #undef DAGON_PATH_PROPERTY
 
@@ -143,10 +152,16 @@ private:
 	void write_new_game();
 	void start_session(core::Beat p_beat, bool p_show_intro);
 	void show_next_ending_line();
+	bool is_sequence() const { return mode_ == MODE_ENDING || mode_ == MODE_PROLOGUE; }
+	void show_panel(int p_index);
+	void finish_prologue(bool p_skipped);
 	godot::Control *panel(const NodeRef<godot::Control> &p_panel) const { return p_panel.get(); }
 
 	Mode mode_ = MODE_PAUSE;
 	godot::Ref<godot::PackedScene> game_scene_;
+	godot::Ref<godot::PackedScene> prologue_scene_;
+	bool prologue_finished_ = false;
+	bool quiet_ = false;
 	godot::String title_scene_path_;
 
 	godot::NodePath session_path_;
@@ -172,6 +187,7 @@ private:
 	godot::NodePath credits_back_button_path_;
 	godot::NodePath save_status_label_path_;
 	godot::NodePath ending_box_path_;
+	godot::NodePath panels_path_;
 	godot::NodePath voice_path_;
 	godot::PackedStringArray ending_lines_;
 

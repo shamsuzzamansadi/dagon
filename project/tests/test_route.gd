@@ -10,6 +10,8 @@ const AWAKENED_SAVE := "dagon_save=1\nbeat=awakened\ncheckpoint=Awakened\n"
 const SHORE_SAVE := "dagon_save=1\nbeat=shore\ncheckpoint=Shore\n"
 const ENDED := 6
 const FLEE_FRAMES := 720
+# The sea starts at x = 4540 after 2.5 s and comes on at 64 px/s: about 4.3 s to a sailor standing at the ledge.
+const SEA_FRAMES := 270
 
 
 func _title(h) -> Control:
@@ -152,8 +154,8 @@ func test_the_whole_game_can_be_played_from_new_game_to_the_ending_and_back_to_a
 	h.check(again.director().get_beat() == 1, "the new game is at beat %d" % again.director().get_beat())
 
 
-## Waiting out the 12 seconds ends the game exactly as running does.
-func test_waiting_out_the_flee_reaches_the_same_ending_at_twelve_seconds(h) -> void:
+## Standing still, the returning sea reaches him within a few seconds, and the game ends exactly as running does.
+func test_standing_still_the_sea_reaches_him_and_the_ending_is_the_same(h) -> void:
 	h.write_storage_file(SAVE_FILE, AWAKENED_SAVE.to_utf8_buffer())
 	await _title(h)
 	await h.tap_key(KEY_ENTER)
@@ -169,10 +171,10 @@ func test_waiting_out_the_flee_reaches_the_same_ending_at_twelve_seconds(h) -> v
 	route.director().beat_changed.connect(func(beat: int) -> void:
 		if beat == ENDED:
 			ended_at[0] = Engine.get_physics_frames())
-	await h.wait_until(func() -> bool: return ended_at[0] >= 0, FLEE_FRAMES + 60, "the flee to time out")
-	# wait_for_control spends a few frames after control returned, so this is the timer's remainder.
-	h.check(ended_at[0] - from_frame <= FLEE_FRAMES, "the flee lasted %d frames after control returned" % (ended_at[0] - from_frame))
-	h.check(ended_at[0] - from_frame >= FLEE_FRAMES - 10, "the flee ended after only %d frames" % (ended_at[0] - from_frame))
+	await h.wait_until(func() -> bool: return ended_at[0] >= 0, SEA_FRAMES + 120, "the sea to reach him")
+	# wait_for_control spends a few frames after control returned, so this is the sea's remainder.
+	h.check(ended_at[0] - from_frame <= SEA_FRAMES, "the sea took %d frames after control returned" % (ended_at[0] - from_frame))
+	h.check(ended_at[0] - from_frame >= SEA_FRAMES - 60, "the flee ended after only %d frames" % (ended_at[0] - from_frame))
 	var ending: Node = await h.wait_for_scene("MenuController", 400)
 	_check_ending(h, ending, "waiting")
 	h.check(h.read_storage_file(SAVE_FILE) == AWAKENED_SAVE, "the ending changed the save")
@@ -189,10 +191,11 @@ func test_pushing_against_the_wall_reaches_the_same_ending(h) -> void:
 	await route.walk_into_the_reveal()
 	await route.wait_for_control()
 	h.send(h.key_event(KEY_D, true))
-	await h.steps(FLEE_FRAMES - 30)
+	# Pressed against the wall he is nearer the trench, so the sea has him sooner than standing at the ledge.
+	await h.steps(120)
 	h.check(route.director().get_beat() == 5, "the flee ended early")
 	h.check(route.player().global_position.x < 4520.0, "the player got past the wall")
-	var ending: Node = await h.wait_for_scene("MenuController", 400)
+	var ending: Node = await h.wait_for_scene("MenuController", 600)
 	h.send(h.key_event(KEY_D, false))
 	_check_ending(h, ending, "pushing")
 
@@ -206,16 +209,23 @@ func test_pausing_during_the_flee_does_not_use_up_its_time(h) -> void:
 	await h.landed_on_floor(route.player())
 	await route.walk_into_the_reveal()
 	await route.wait_for_control()
-	await h.steps(300)
+	# Running a little first, so that the sea has started to come on before the pause.
+	h.send(h.key_event(KEY_A, true))
+	await h.steps(170)
+	h.send(h.key_event(KEY_A, false))
+	var front: float = route.director().get_tide_front()
+	h.check(front < 4540.0, "the sea had not started to come on: %.1f" % front)
 	await h.tap_key(KEY_ESCAPE)
 	h.check(h.tree.paused, "Esc did not pause")
 	await h.steps(900)
 	h.check(route.director().get_beat() == 5, "the flee ended while paused")
+	h.check_near(route.director().get_tide_front(), front, 0.01, "the sea while paused")
 	await h.tap_key(KEY_ESCAPE)
 	h.check(not h.tree.paused, "Esc did not resume")
-	await h.steps(300)
+	await h.steps(20)
 	h.check(route.director().get_beat() == 5, "the flee used up paused time")
-	await h.wait_for_scene("MenuController", 600)
+	h.check(route.director().get_tide_front() < front, "the sea did not come on again after resuming")
+	await h.wait_for_scene("MenuController", 900)
 
 
 ## Abandoning a cinematic through the pause menu, and starting over from nothing.

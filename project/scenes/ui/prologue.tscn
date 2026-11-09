@@ -1,0 +1,132 @@
+[gd_scene format=3]
+
+[ext_resource type="Theme" path="res://assets/ui/theme.tres" id="theme"]
+[ext_resource type="PackedScene" path="res://scenes/level/game.tscn" id="game"]
+[ext_resource type="Texture2D" path="res://assets/prologue/prologue_1_raider.png" id="p1"]
+[ext_resource type="Texture2D" path="res://assets/prologue/prologue_2_escape.png" id="p2"]
+[ext_resource type="Texture2D" path="res://assets/prologue/prologue_3_drift.png" id="p3"]
+[ext_resource type="Texture2D" path="res://assets/prologue/prologue_4_dry.png" id="p4"]
+[ext_resource type="AudioStream" path="res://assets/audio/music/prologue.ogg" id="music"]
+
+[node name="Prologue" type="MenuController"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("theme")
+mode = 3
+game_scene = ExtResource("game")
+main_panel_path = NodePath("Card")
+first_button_path = NodePath("Card/Items/Buttons/Continue")
+ending_box_path = NodePath("Card/Items/Lines")
+voice_path = NodePath("Voice")
+panels_path = NodePath("Panels")
+ending_lines = PackedStringArray("prologue.raider", "prologue.escape", "prologue.drift", "prologue.dry")
+
+[node name="Voice" type="AudioStreamPlayer" parent="."]
+bus = &"Narration"
+
+[node name="Music" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("music")
+volume_db = -4.0
+autoplay = true
+bus = &"Music"
+
+[node name="Black" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.0392, 0.0549, 0.0941, 1)
+
+[node name="Panels" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Raider" type="TextureRect" parent="Panels"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+texture = ExtResource("p1")
+stretch_mode = 5
+
+[node name="Escape" type="TextureRect" parent="Panels"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+texture = ExtResource("p2")
+stretch_mode = 5
+
+[node name="Drift" type="TextureRect" parent="Panels"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+texture = ExtResource("p3")
+stretch_mode = 5
+
+[node name="Dry" type="TextureRect" parent="Panels"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+texture = ExtResource("p4")
+stretch_mode = 5
+
+[node name="Card" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = -84.0
+offset_right = -24.0
+offset_bottom = -6.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="Items" type="VBoxContainer" parent="Card"]
+layout_mode = 2
+
+[node name="Lines" type="VBoxContainer" parent="Card/Items"]
+layout_mode = 2
+
+[node name="Buttons" type="HBoxContainer" parent="Card/Items"]
+layout_mode = 2
+size_flags_horizontal = 8
+
+[node name="Continue" type="Button" parent="Card/Items/Buttons"]
+layout_mode = 2
+focus_neighbor_left = NodePath("../Skip")
+focus_neighbor_right = NodePath("../Skip")
+text = "Continue"
+
+[node name="Skip" type="Button" parent="Card/Items/Buttons"]
+layout_mode = 2
+focus_neighbor_left = NodePath("../Continue")
+focus_neighbor_right = NodePath("../Continue")
+text = "Skip"
+
+[connection signal="pressed" from="Card/Items/Buttons/Continue" to="." method="advance_ending"]
+[connection signal="pressed" from="Card/Items/Buttons/Skip" to="." method="skip_prologue"]

@@ -20,6 +20,8 @@ class GameSession : public godot::Node {
 
 public:
 	void _ready() override;
+	void _process(double p_delta) override;
+	void _notification(int p_what);
 
 	// Set by the main menu before this node enters the tree. It never reads the save itself.
 	void set_start(int p_beat, bool p_persisted, bool p_show_intro);
@@ -55,6 +57,7 @@ protected:
 	static void _bind_methods();
 
 private:
+	bool quiet_ = false;
 	void build_world();
 	void remove_world();
 	void on_checkpoint_reached(int p_beat);

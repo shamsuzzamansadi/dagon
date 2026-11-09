@@ -79,34 +79,28 @@ func test_a_closed_gate_cannot_be_jumped(h) -> void:
 
 
 ## Nobody can fall somewhere they cannot get out of. Pillar 3.
-func test_the_crevasse_can_be_hopped_and_a_fall_into_it_can_be_climbed_out_of(h) -> void:
+## The gap in Act II: wider than any hop, with a way down into it on the near side and a way back out, so nobody is
+## ever stuck in it. Crossing it is the slab's job (test_revision.gd).
+func test_the_gap_cannot_be_hopped_and_a_fall_into_it_can_always_be_climbed_out_of(h) -> void:
 	var world := await _world(h, 1)
 	var player: CharacterBody2D = world.get_node("Player")
-	# Dropped in from above, as a fall would. stand_at waits for real contact: is_on_floor() is stale after a teleport.
-	await h.stand_at(player, Vector2(2163.0, 6.0))
-	h.check(player.global_position.y > 10.0, "not in the crevasse: y=%.1f" % player.global_position.y)
-	var out_right: bool = await _walk(h, player, KEY_D, func() -> bool: return player.global_position.x > 2190.0, 200)
-	h.check(out_right, "could not climb out to the right, at x=%.1f" % player.global_position.x)
-	await h.stand_at(player, Vector2(2163.0, 6.0))
-	h.check(player.global_position.y > 10.0, "not in the crevasse: y=%.1f" % player.global_position.y)
-	var out_left: bool = await _walk(h, player, KEY_A, func() -> bool: return player.global_position.x < 2144.0, 200)
-	h.check(out_left, "could not climb out to the left, at x=%.1f" % player.global_position.x)
-
-	# And a running hop clears it in both directions, without touching the bottom.
-	for leg in [[2120.0, KEY_D, 2146.0], [2206.0, KEY_A, 2180.0]]:
-		await h.stand_at(player, Vector2(leg[0], -2))
-		var going_right: bool = leg[1] == KEY_D
-		h.send(h.key_event(leg[1], true))
-		await h.wait_until(func() -> bool: return player.global_position.x >= leg[2] if going_right else player.global_position.x <= leg[2], 60, "the run-up from x=%.0f" % leg[0])
-		h.send(h.key_event(KEY_SPACE, true))
-		var lowest: float = player.global_position.y
-		for i in 45:
-			await h.steps(1)
-			lowest = maxf(lowest, player.global_position.y)
-		h.send(h.key_event(KEY_SPACE, false))
-		h.send(h.key_event(leg[1], false))
-		h.check(lowest < 6.0, "the hop from x=%.0f fell in, down to y=%.1f" % [leg[0], lowest])
-		h.check(player.global_position.x > 2176.0 if going_right else player.global_position.x < 2150.0, "the hop from x=%.0f stopped at x=%.1f" % [leg[0], player.global_position.x])
+	# A running hop from the near rim falls short, onto the slab or into the hollow.
+	await h.stand_at(player, Vector2(2120.0, -2))
+	h.send(h.key_event(KEY_D, true))
+	await h.wait_until(func() -> bool: return player.global_position.x >= 2146.0, 60, "the run-up")
+	h.send(h.key_event(KEY_SPACE, true))
+	await h.steps(45)
+	h.send(h.key_event(KEY_SPACE, false))
+	h.send(h.key_event(KEY_D, false))
+	await h.steps(30)
+	h.check(player.global_position.x < 2290.0 or player.global_position.y > 4.0, "a hop crossed the gap: at %s" % player.global_position)
+	# Down in the hollow, on the slab's low end, the steps on the near side lead back up, by walking and hopping.
+	# The slab is held raised here, so nothing tips it while this is checked.
+	world.get_node("Triggers/CrossingWeight").enabled = false
+	await h.stand_at(player, Vector2(2160.0, 24.0))
+	h.check(player.global_position.y > 20.0, "not down in the hollow: y=%.1f" % player.global_position.y)
+	var out_left: bool = await _walk(h, player, KEY_A, func() -> bool: return player.global_position.x < 2144.0 and player.global_position.y < 2.0, 300)
+	h.check(out_left, "could not climb out to the left, at %s" % player.global_position)
 
 
 func test_the_way_right_ends_in_a_solid_wall_the_player_presses_against(h) -> void:
@@ -154,9 +148,14 @@ func test_running_left_from_the_witness_reaches_collapse_in_eight_to_ten_seconds
 	h.check(seconds < director.flee_timeout, "the run is longer than the flee's %.1f seconds" % director.flee_timeout)
 
 
-func test_the_default_flee_timeout_is_twelve_seconds(h) -> void:
+## The sea ends the flee now. The timeout is only the bounded guard behind it (D73).
+func test_the_flee_fallback_is_long_enough_never_to_end_a_flee_first(h) -> void:
 	var world := await _world(h)
-	h.check_near(world.get_node("GameDirector").flee_timeout, 12.0, 0.0, "the flee timeout")
+	var director: Node = world.get_node("GameDirector")
+	h.check_near(director.flee_timeout, 30.0, 0.0, "the fallback")
+	# Even standing still, the sea arrives long before the fallback.
+	var standing_caught: float = director.tide_delay + (director.tide_start_x - 4426.0) / director.tide_speed
+	h.check(standing_caught < director.flee_timeout / 4.0, "the sea takes %.1f s to reach a sailor who stands still" % standing_caught)
 
 
 func test_the_kill_plane_catches_a_fall_at_each_act(h) -> void:
