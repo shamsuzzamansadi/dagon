@@ -1,7 +1,7 @@
 # M3 Review Package
 
 **To:** ChatGPT (independent reviewer), and the owner for the manual check. **Date:** 2026-11-04, revised 2026-11-09.
-**Status: implemented, expanded, refined and given a focused completion pass by the owner on 2026-11-09. The ending's voice waits for the owner's choice. Awaiting ChatGPT's follow-up review and the owner's playtest. Not accepted. No voice approved.** M3 is not merged, and no tag or release has been made. **[§0](#0-the-owners-revision-of-2026-11-09-read-this-first) is the revision and the build to play; sections 1 to 12 are the record of `5fe820b`.** Any reviewer, please state which checks you rerun and which rely on the supplied CI evidence.
+**Status: implemented, expanded, refined and given a focused completion pass by the owner on 2026-11-09. The owner chose voice A on 2026-11-10, and the epilogue is now fully voiced. Awaiting ChatGPT's follow-up review and the owner's playtest. Not accepted.** M3 is not merged, and no tag or release has been made. **[§0](#0-the-owners-revision-of-2026-11-09-read-this-first) is the revision and the build to play; sections 1 to 12 are the record of `5fe820b`.** Any reviewer, please state which checks you rerun and which rely on the supplied CI evidence.
 
 | | |
 |---|---|
@@ -35,19 +35,19 @@ The owner played `5fe820b` and found the game functional but **too brief, too pa
 
 This section is the revision as it now stands. **Sections 1 to 12 below are the record of `5fe820b`,** kept as they were.
 
-**M3 is not accepted, and no voice is approved.** Green CI is technical evidence only. It says nothing about whether the game is engaging or sounds good.
+**M3 is not accepted.** The owner chose voice A on 2026-11-10 ([D94](../decisions.md)): a choice of voice, not an approval of the finished narration or the mix. Green CI is technical evidence only. It says nothing about whether the game is engaging or sounds good.
 
 | | |
 |---|---|
 | **The build to play** | The push run's `dagon-windows` artifact for the commit that adds this text. **Pull request [#3](https://github.com/shamsuzzamansadi/dagon/pull/3) names the commit, the run, the artifact and its zip SHA-256.** A file cannot name its own commit, and the owner asked for no commit made only to record the last one's CI ([D93](../decisions.md)) |
 | **The earlier hashes** | `b379c5…` and `34102e74…` are both builds of `53e8d23`: the push run's and the pull-request run's, from identical source ([record](../evidence/m3/build-identity-53e8d23.md)) |
-| **To listen to** | [The listening package](../evidence/m3/listening/README.md): the two voices on the same passages at the same loudness, and a 5 min 23 s recording of the game playing, with its sound, cut by stage |
+| **To listen to** | [The listening package](../evidence/m3/listening/README.md): **the complete ending, fully voiced, recorded from the game with its sound**; the two voices on the same passages at the same loudness; and a 5 min 23 s recording of the game playing, cut by stage |
 
 ### 0.1 What changed, against the owner's concerns
 
 | Concern | What was done | What is still open |
 |---|---|---|
-| **The ending's narration** | The plumbing for a fully voiced epilogue is in place and tested: each line plays with its caption on the card, the card waits for the line, moving on or opening the credits stops it, nothing leaks into the credits or the menu, the card's text shows whatever the subtitle setting. `tools/audio/make_audition.py --speak` speaks named lines in the chosen voice, and nothing else | **Three of the four lines have no voice.** They wait for the owner's choice of voice. **The epilogue is not fully voiced** |
+| **The ending's narration** | **Done, in voice A, the owner's choice** ([D94](../decisions.md)): all four lines spoken, each under its own words on the card. Each recording was transcribed by a local speech recogniser and matches the script word for word, apart from "Innsmouth", heard as "Insemouth", for the owner's ear; the rescue line's first take, heard as "foul me", was replaced. Tested: each line's own recording plays on the Narration bus, the card waits for it, Continue moves on and the next voice replaces the last, the credits and the main menu are silent of it, the card shows the words with subtitles off, and the Narration volume sets its bus. [Recorded with its sound](../evidence/m3/listening/ending-voiced.mp4) | The owner's judgment of it by ear |
 | **Uneven visual quality** | **The boundary at x = 1440** now begins as a canyon wall rising from the seabed, its edge ragged and faintly lit, and the seabed's colours carry onto the greybox ground ([D89](../decisions.md)). **The reveal:** the creature's body has form now, moonlit at the shoulder, plated across the chest, with gills; and as its hand comes down beside its carving, the carving is lit ([D90](../decisions.md)). **The opening:** see below. Earlier in this revision: the carved monolith, the creature drawn over the reveal's shapes, the Shore's remains, the epilogue's pictures | Everything listed in §0.4 as greybox |
 | **Limited active play** | **The crossing is now a stone dropped on a raised beam** ([D87](../decisions.md)). The slab's near end is up, out of reach. A carving at the foot of three ledges shows a stone falling on the raised end of a beam, then the beam level and a man walking over it. You climb the ledges, push the stone, it falls, and the slab comes down. Walking the ground, under the ledges, gets you only into the hollow, which you can climb out of | Active play is still about a minute and a half, scripted (§0.2). Nobody has measured a first-time player |
 | **Audio without a listening review** | **A listening package and a recording of play with sound** ([D92](../decisions.md)). **The mix was measured on that recording, and fixed where it failed:** the reveal clipped, so the Master bus has a −1 dB limiter and the reveal's sounds were lowered; the ends of the prologue and the ending cut sound off, so both fade now ([D91](../decisions.md)). The prologue has sound of its own now | **No one has listened yet** (§0.3) |
@@ -64,8 +64,8 @@ This section is the revision as it now stands. **Sections 1 to 12 below are the 
 | **Optional reading** | 108 s | 0 |
 | **Cinematics** | 28 s | 28 s |
 | The collapse, to the epilogue card | 6 s | 6 s |
-| Epilogue and credits | 46 s, each line played out | 4 s, pressed through |
-| **New Game to the main menu** | **about 5 min 4 s** | **2 min 6 s** |
+| Epilogue and credits | 46 s, each line played out; **53 s since the epilogue was voiced**, as each line now waits for its voice | 4 s, pressed through |
+| **New Game to the main menu** | **about 5 min 4 s**, before the epilogue was voiced | **2 min 6 s** |
 
 **The climb and the push take the script about 2 s, because it knows what to do.** Active play rose from about 80 s to about 86 s scripted. A first-time player has to see the raised end, read or guess the carving, find the ledges and push: how long that takes is unmeasured. The crossing is timed from the start of the climb; reading the carving first counts as reading.
 
@@ -83,13 +83,13 @@ This section is the revision as it now stands. **Sections 1 to 12 below are the 
 | Reveal: surge, cascade, call, hand, gasp, music | Yes, lowered in this pass | Yes: clipped before, not now | As above | No |
 | Escape and collapse: the sea, rock, breathing, fall | Yes | Yes | As above | No |
 | Ending: music and the sea under the lines, fading under the credits | Yes | Yes | As above | No |
-| Voice, candidate A, three lines in the game | Yes | Yes | Owner judged the earlier voice synthetic; A and B unheard | **Pending the owner's choice** |
-| Voice for the other three epilogue lines | **No** | — | — | **Pending the owner's choice** |
+| Voice A, six lines: the talisman, the carving, the whole epilogue | Yes | Yes, and transcribed against the script | Owner chose A from the matched samples; the finished lines not yet reviewed by ear | **Chosen 2026-11-10;** the finished narration not yet judged |
+| Voice for the rest of the script: the prologue, the escape's fragments, other lines | No, captions | — | — | **Deferred to M5,** in voice A |
 | Interface sounds, a sound for examining | **No** | — | — | — |
 
 *Objectively checked* means measured: files ([measurements](../evidence/m3/audio/measurements.txt): 40, no clipping, no DC offset, every loop joining) and the mix during play ([report](../evidence/m3/listening/mix-check.txt): true peak −1.0 dBTP, loudness by stage, no clicks, silence while paused, the two expected cuts at pause and resume, no cut at either end of the story). And tested: pause, scene changes, restore, stacking, missing files, the three volume controls, one line at a time, the epilogue's line stopping. **I cannot hear. None of this says that anything sounds good.**
 
-**The decision I need: the voice.** A, B, a person reading, or neither, from the [listening package](../evidence/m3/listening/README.md). The rest of the epilogue is spoken first, in that voice, and nothing is generated in bulk before then.
+**The voice is chosen:** A, by the owner on 2026-11-10. What remains is the owner's ear on the result: the [voiced ending](../evidence/m3/listening/ending-voiced.mp4), and the mix in play.
 
 ### 0.4 The art: finished, and still greybox
 
@@ -111,9 +111,10 @@ This section is the revision as it now stands. **Sections 1 to 12 below are the 
 | What | Who | Result |
 |---|---|---|
 | Native unit tests: 127 cases | Developer; CI | 127 of 127 locally. CI: in the pull request |
-| Integration: 421 tests, including new ones for the crossing, the prologue's pictures, the carving's light, the limiter and the fades, from source and on the exported pack | Developer; CI on GCC, Clang and MSVC | 421 of 421 from source. On the exported Linux pack, 420 of 420, run before the last test (the epilogue with subtitles off) was added locally, from source and on the exported Linux pack. CI: in the pull request |
+| Integration: 421 tests, including ones for the crossing, the prologue's pictures, the carving's light, the limiter, the fades, and every line of the epilogue spoken in its own recording | Developer; CI on GCC, Clang and MSVC | 421 of 421 locally, from source and on the exported Linux pack. CI: in the pull request |
 | The exported build played from New Game through the prologue, the climb and the push, the puzzle, the reveal and the sea, to the ending and back; then Continue twice | Developer on Linux, on a private display; CI on Linux and Windows | 4 of 4 runs locally. CI: in the pull request |
-| A recording of the game playing, with sound, both escape outcomes | Developer, scripted, Movie Maker | Made, measured, and looked at frame by frame. Not listened to |
+| A recording of the game playing, with sound, both escape outcomes; and of the voiced ending | Developer, scripted, Movie Maker | Made, measured, and looked at frame by frame. Not listened to |
+| The six spoken lines, transcribed by a local speech recogniser and compared with the script | Developer, Whisper `small.en` | Word for word, but for "Innsmouth", heard as "Insemouth". The rescue line's first two takes were not, and were replaced |
 | Deliberate breakage of the revision, 23 entries, fail-closed | Developer, scripted, at `b4bd9c2` | 21 caught, 2 not caught, both unresolved interpretations for the reviewer ([record](../evidence/m3/breakage-revision.txt)) |
 
 **No new breakage campaign, and why:** the logic that changed is small and pinned by tests that failed on the way. Restoring the stone's place failed its test until the slab's transform was worked out rather than read back. The prologue's last-line timing failed its test until the man sat up sooner. The fades and the limiter are checked by their own tests and by the recording's measurements.
@@ -121,29 +122,29 @@ This section is the revision as it now stands. **Sections 1 to 12 below are the 
 ### 0.6 Known issues and unmet requirements
 
 - **Not accepted.** First-time duration unmeasured.
-- **The epilogue is one line voiced in four,** pending the owner's choice of voice.
-- **No documented listening review** of the sound or of the voices.
+- **The voiced epilogue and the mix have not been judged by ear** by anyone yet. "Innsmouth" is heard by a speech recogniser as "Insemouth": the owner's ear decides whether that is the voice or the machine.
+- **No documented listening review** of the sound pass or the mix.
 - **Art past x = 1440 is greybox** apart from what §0.4 lists as finished.
 - **The reveal is about 15 LU louder than the quiet stretches.** Measured, deliberate, and the first thing to judge by ear.
 - The shutdown leak is the engine's, and quitting through the game avoids it. Carried over: deferred physical checks on PlayStation and individual Xbox actions, and the unresolved M2 J/caption event.
 
 ### 0.7 Schedule
 
-**The owner's target is completion before 20 November; a move to 24 November is not approved.** The risks now: **the voice,** which needs a choice by about 12 November for the epilogue and the rest to be spoken and checked in time; the follow-up review and the owner's listening, which may ask for more; **the greybox past x = 1440,** the largest piece of work left, and M4's; and **two external first-time players** on 18–19 November. Essential validation is not traded away; polish goes first.
+**The owner's target is completion before 20 November; a move to 24 November is not approved.** The risks now: the follow-up review and the owner's playtest and listening, which may ask for more; **the greybox past x = 1440,** the largest piece of work left, and M4's; the rest of the script in voice A, M5's; and **two external first-time players** on 18–19 November. The voice, the risk named before, is resolved. Essential validation is not traded away; polish goes first.
 
 ### 0.8 Owner's playtest checklist
 
 **Use exactly the build the pull request names, with its checksum.** Extract the whole zip into a new, empty folder and run `dagon.exe`. **Please do not change your system's keyboard layout for this check.**
 
 1. **The full opening:** New Game, and let the prologue play to the end without pressing anything. Do the pictures alone tell it: taken, escaping, drifting, waking on dry seabed? Then a second New Game, and **Skip**.
-2. **Voice and mix:** the [listening package](../evidence/m3/listening/README.md) first. **A, B, a person, or neither?** Then, in play: the sea, the cave's music, the stones, the reveal.
+2. **Voice and mix:** the [voiced ending](../evidence/m3/listening/ending-voiced.mp4) and the [listening package](../evidence/m3/listening/README.md). Then, in play: the sea, the cave's music, the stones, the reveal. **Does the reveal's loudness feel right? Does "Innsmouth" sound right?**
 3. **The crossing:** without help. Did the carving tell you what to do? How long did it take?
 4. **The reveal:** do you see the hand come down beside its carving, and the carving lit?
 5. **Both escape outcomes:** run once; another time, stand still at the ledge and let the sea come.
 6. **The complete ending:** let the four pictures and lines play through, then the credits. Is anything cut off?
 7. **Continue:** quit mid-game, Continue. No prologue, nothing replays, nothing of the cave's music restarts.
 
-**Please report:** that you used this build; what you skipped; anything wrong; your choice of voice; and your answers to 1, 3 and 6.
+**Please report:** that you used this build; what you skipped; anything wrong; and your answers to 1, 2, 3 and 6.
 
 ## 1. Delivered
 

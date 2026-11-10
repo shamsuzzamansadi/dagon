@@ -43,7 +43,7 @@ Every sound is synthesized by [`tools/audio/make_sounds.py`](../../../../tools/a
 
 - **The interface:** no sound for menus, buttons or the pause.
 - **Examining:** no sound when a caption appears.
-- **Spoken lines:** only the three audition lines have a voice. Everything else, including three of the epilogue's four lines, the fragments in the escape and the prologue, is captions until a voice is chosen. **Once one is, every line of the epilogue is narrated first.**
+- **Spoken lines:** voice A, the owner's choice, speaks the talisman, the carving and all four lines of the epilogue. Everything else, including the fragments in the escape and the prologue, is captions until M5.
 - **The mix by ear,** and every level here, which the owner may well want changed.
 
 ## How sound behaves

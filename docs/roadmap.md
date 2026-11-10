@@ -74,8 +74,8 @@ starts only after M6 is green, and is time-boxed.
 | Narrative | Props, captions, and background-event logic | Final ritual imagery |
 | Reveal | Readable reveal, timing and collapse. **Since 2026-11-09:** the monolith carved, and the creature drawn over the reveal's shapes, with water and sound | Final Dagon animation, lighting and effects |
 | Controller | Vibration behaviour and settings | Tuning by feel, with the owner |
-| Narration | Playback and subtitle integration, and three voice samples for direction. **The owner finds them noticeably synthetic, so a direction is still to be chosen** | Approved final narration |
-| Audio | **Since 2026-11-09:** an initial sound pass across the route, music in five places, and a voice audition | The final mix, by ear, and anything the pass misses |
+| Narration | Playback and subtitle integration. **Voice A, the owner's choice of 2026-11-10, speaks the talisman, the carving and the whole epilogue** | The remaining spoken lines in voice A, and the owner's judgment of it by ear |
+| Audio | **Since 2026-11-09:** an initial sound pass across the route, music in five places, a voice audition, and a listening package | The final mix, by ear, and anything the pass misses |
 | Art | **Since 2026-11-09:** one finished reference section, from the cave entrance to the first tablet; its boundary into the canyon; the monolith, the creature, the carving at the crossing, and the prologue's and epilogue's pictures | The rest of the route: listed below |
 | Persistence | Save and restore correctness, with focused regression coverage | Kept green |
 

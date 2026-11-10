@@ -162,7 +162,7 @@ about 4 s and never pauses the game.
 
 ## 7. Audio direction
 
-**Status, 2026-11-09: an initial sound pass across the whole route, brought forward by the owner (D70, D74), and a replacement voice audition, not approved (D79).** Neither is final. What sounds where, what is silent on purpose and what is missing: [audio record](evidence/m3/audio/README.md). Music, ambience, footsteps and cues are M4 and M5. Direction from the owner, 2026-11-02: original,
+**Status, 2026-11-09: an initial sound pass across the whole route, brought forward by the owner (D70, D74), and a replacement voice audition (D79), from which the owner chose voice A on 2026-11-10 (D94).** Neither is final. What sounds where, what is silent on purpose and what is missing: [audio record](evidence/m3/audio/README.md). Music, ambience, footsteps and cues are M4 and M5. Direction from the owner, 2026-11-02: original,
 cohesive audio with a Lovecraftian atmosphere, tied to environments and story triggers.
 
 **Sound communicates the world's change.** Familiar coastal sounds thin out or disappear as unnatural
@@ -201,7 +201,7 @@ One English narrator, as the sailor, in the first person: **intimate, restrained
 
 **Rules, all implemented in M3 ([architecture §5](architecture.md)):** one script, with line IDs, for both voice and caption, so spoken words match the text. A caption stays through its line and a brief margin. **No queue.** A story moment replaces anything, and something optional replaces something optional, but cannot touch a story moment, and is simply dropped. Pressing Examine again skips, and does nothing else. Everything pauses with the game, and stops with the world. A line with no audio is a text line, so nothing depends on a file. Subtitles are on by default, and can be switched off, which only ever hides what can be heard.
 
-**Which voice is the owner's decision.** Three samples are in the build. The rest are generated only once the direction is accepted, and that final production and mix belong to M4 and M5.
+**The owner chose voice A (D94).** It speaks the talisman, the carving and the whole epilogue. The rest of the script is captions until M5, which speaks the remaining lines in the same voice; the final mix by ear belongs to M4 and M5.
 
 ### Controller vibration (owner, 2026-11-04)
 

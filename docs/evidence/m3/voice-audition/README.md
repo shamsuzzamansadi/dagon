@@ -1,6 +1,19 @@
 # The replacement voice audition
 
-**Status: for the owner's listening decision. No voice is approved.** The earlier voice, Kokoro's `am_michael`, was rejected by the owner as noticeably synthetic, and its samples are [kept for the record](../narration/rejected-am_michael/), out of the game. **The developer cannot hear, so neither candidate has been listened to by anyone on the project.** Measurements only.
+**Status: the owner chose candidate A on 2026-11-10** ([D94](../../../decisions.md)), from the [listening package](../listening/README.md)'s matched samples. A now speaks six lines in the game: the talisman, the carving and all four lines of the epilogue. **The choice is of a voice. Whether the finished narration and the mix work is the owner's to judge by ear;** the developer cannot hear. The earlier voice, Kokoro's `am_michael`, was rejected by the owner as noticeably synthetic, and its samples are [kept for the record](../narration/rejected-am_michael/), out of the game.
+
+## The epilogue in voice A
+
+Made with `python tools/audio/make_audition.py --models DIR --speak A ending.found ending.listen ending.rising`, trimmed and levelled like the rest, and checked by transcribing each with a local speech recogniser (Whisper `small.en`) against the script:
+
+| Line | Length | Pace | Take | Transcript against the script |
+|---|---|---|---|---|
+| `ending.found` | 15.3 s | 12.7 chars/s | seed 9 | Word for word. Seed 7 was heard as "a steamer **foul** me", seed 8 as "adrift **in** raving"; both discarded |
+| `ending.listen` | 5.6 s | 14.3 chars/s | seed 7 | Word for word |
+| `ending.innsmouth` | 16.0 s | 12.5 chars/s | the audition's | Word for word except the name, heard as "Insemouth": a recogniser's guess at a rare name, or the voice. **For the owner's ear** |
+| `ending.rising` | 8.0 s | 15.2 chars/s | seed 7 | Word for word |
+
+All six lines sit between −23.7 and −24.2 LUFS. A transcript says which words a machine hears; it does not say whether the voice sounds right.
 
 Three lines, as asked: the Shore, the cave and the ending. Their words come from `project/narration/script.txt`, so they match the captions exactly.
 

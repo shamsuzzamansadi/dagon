@@ -15,9 +15,15 @@
 
 *Measured:* each set to −23.0 LUFS integrated (ITU-R BS.1770), true peak −2.3 to −7.7 dBTP, so neither wins by being louder. As made, they were already within 0.4 LU of each other. The full audition, its rights and its watermark are in [../voice-audition/](../voice-audition/README.md).
 
-**The question for the owner: A, B, a person reading, or neither?** Then the rest of the epilogue, three lines, is spoken in that voice first. Nothing more is generated before that choice.
+**The owner chose A on 2026-11-10** ([D94](../../../decisions.md)). A now speaks the whole epilogue; its new lines and how they were checked are in [the audition record](../voice-audition/README.md).
 
-## 2. The mix, during play
+## 2. The ending, fully voiced
+
+**[ending-voiced.mp4](ending-voiced.mp4)**, about a minute: the epilogue as it plays after the collapse, every line in voice A at its own pace with nothing pressed, its four pictures, the music and the sea under it, then the credits and the main menu. Recorded by Movie Maker from the game (`project/tests/record_ending.gd`).
+
+*Measured* ([report](ending-check.txt)): the lines −21 to −22 LUFS with the voice roughly 8 to 20 LU above the music and sea under it (90th against 10th percentile of 400 ms loudness), the credits fading to about −42 LUFS, the main menu silent, true peak −3.2 dBTP, no sudden changes, no clicks. **Not listened to by the developer.**
+
+## 3. The mix, during play
 
 **[in-game-capture.mp4](in-game-capture.mp4)**, 5 min 23 s, picture and sound together, recorded by Godot's Movie Maker from the game itself (`project/tests/record_play.gd`). It is the game playing, with its real mix. **It is not a person playing:** a script plays the route, reads everything it passes and lets each line run to its end, pauses once on the Shore, pushes one wrong stone, runs from the sea, then Continues and stands still until the sea comes. Software-rendered, at the game's own 480 × 270, shown at twice that size.
 
@@ -33,10 +39,10 @@ The same soundtrack, cut by stage:
 | [mix/06-stones-and-gate.ogg](mix/06-stones-and-gate.ogg) | The Abyss to the Monolith, a wrong stone, the right ones, the stones answering, the gate |
 | [mix/07-reveal.ogg](mix/07-reveal.ogg) | The water, the cascade, its call, the hand on the stone, his gasp, the music |
 | [mix/08-escape-running.ogg](mix/08-escape-running.ogg) | The roar behind him, the rock, his breathing, the fall, the sea over him |
-| [mix/09-ending.ogg](mix/09-ending.ogg) | Music and the sea under the four lines, one of them voiced, then the credits fading |
+| [mix/09-ending.ogg](mix/09-ending.ogg) | Music and the sea under the four lines, then the credits fading. **Recorded before the choice of voice, so only one line is spoken here;** the voiced ending is [ending-voiced.mp4](ending-voiced.mp4) |
 | [mix/10-escape-standing-still.ogg](mix/10-escape-standing-still.ogg) | The other outcome: standing still at the ledge until the sea comes |
 
-## 3. What was measured, and what that does not say
+## 4. What was measured, and what that does not say
 
 *Measured on the recording's soundtrack* ([full report](mix-check.txt)):
 
@@ -60,5 +66,5 @@ The same soundtrack, cut by stage:
 | Who | What |
 |---|---|
 | The developer (Claude) | **Cannot hear.** Made every sound by synthesis, measured the files and the mix, wrote the tests above. No listening judgment |
-| The owner | **Has played builds with sound,** including `5fe820b` and a build of `53e8d23`, and judged the earlier narration voice noticeably synthetic. **No documented listening review of this sound pass, of candidates A and B, or of this package yet** |
+| The owner | **Has played builds with sound,** including `5fe820b` and a build of `53e8d23`, and judged the earlier narration voice noticeably synthetic. **Chose candidate A on 2026-11-10.** No documented listening review yet of the sound pass, the mix or the voiced ending |
 | ChatGPT | Reviewed sampled video frames of the game and of the owner's illustrated reference. **Did not evaluate the soundtrack** |

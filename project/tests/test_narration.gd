@@ -8,7 +8,8 @@ const GAME := "res://scenes/level/game.tscn"
 const SAVE_FILE := "save.dat"
 const SETTINGS_FILE := "settings.cfg"
 ## The three lines that have audio so far, as the owner asked before anything more is generated.
-const VOICED := {"shore.talisman": "Something small", "cave.carving": "The same eye", "ending.innsmouth": "called Innsmouth"}
+## The lines spoken in voice A, the owner's choice of 2026-11-10: the three of the audition, and the rest of the epilogue.
+const VOICED := {"shore.talisman": "Something small", "cave.carving": "The same eye", "ending.found": "A steamer found me", "ending.listen": "I have stopped arguing", "ending.innsmouth": "called Innsmouth", "ending.rising": "finished rising"}
 const VOICED_LINE := &"shore.talisman"
 const TEXT_LINE := &"shore.fish"
 const OTHER_TEXT_LINE := &"shore.boat"
@@ -110,8 +111,9 @@ func test_a_prop_shows_the_scripts_words_exactly(h) -> void:
 		h.check(world.get_node(pair[0]).caption == _script_text(pair[1]), "%s reads '%s'" % [pair[0], world.get_node(pair[0]).caption])
 
 
-## The audition: three lines only, until the owner chooses a voice. Nothing more is generated before that.
-func test_only_the_three_audition_lines_have_audio_so_far(h) -> void:
+## Only the lines the owner has had spoken in the chosen voice have audio: the audition's three, and the epilogue.
+## Nothing else is generated in bulk.
+func test_only_the_lines_spoken_in_the_chosen_voice_have_audio(h) -> void:
 	await h.load_fixture("res://tests/fixtures/movement_arena.tscn")
 	var files := DirAccess.get_files_at("res://assets/narration") as Array
 	var audio := files.filter(func(f: String) -> bool: return f.ends_with(".ogg") or f.ends_with(".ogg.remap") or f.ends_with(".ogg.import")).map(func(f: String) -> String: return f.get_slice(".ogg", 0))
@@ -119,7 +121,7 @@ func test_only_the_three_audition_lines_have_audio_so_far(h) -> void:
 		h.check(audio.has(id), "no audio for %s" % id)
 		h.check(_script_text(id).contains(VOICED[id]), "%s reads '%s'" % [id, _script_text(id)])
 	for id in audio:
-		h.check(VOICED.has(id), "audio for %s, before a voice was chosen" % id)
+		h.check(VOICED.has(id), "audio for %s, which was not asked for" % id)
 
 
 ## ---- Playback ----
@@ -390,31 +392,50 @@ func test_quitting_to_the_main_menu_stops_the_voice(h) -> void:
 ## ---- The epilogue ----
 
 
-func test_the_epilogues_voiced_line_plays_and_moving_on_stops_it(h) -> void:
+## Every line of the epilogue is spoken, in its own recording, under its own words. The card waits for the voice; Continue
+## moves on and the next voice replaces the last; the credits and the main menu are silent of it.
+func test_every_line_of_the_epilogue_is_spoken_and_moving_on_replaces_it(h) -> void:
 	var ending: Node = await h.load_main_fixture("res://scenes/ui/ending.tscn")
-	await h.steps(3)
 	var voice: AudioStreamPlayer = ending.get_node("Voice")
 	h.check(voice.bus == &"Narration", "the voice is on %s" % voice.bus)
-	h.check(not voice.playing, "the first line has no sample yet, and something played")
-	await h.tap_key(KEY_ENTER)
-	await h.tap_key(KEY_ENTER)
-	h.check(ending.ending_lines[ending.get_ending_line()] == "ending.innsmouth", "the line is %s" % ending.ending_lines[ending.get_ending_line()])
-	h.check(voice.playing, "the Innsmouth sample is not playing")
-	await h.tap_key(KEY_ENTER)
-	h.check(not voice.playing, "moving on did not stop it")
+	for line in ending.ending_lines.size():
+		await h.steps(2)
+		var id: String = ending.ending_lines[line]
+		var path := "res://assets/narration/%s.ogg" % id
+		h.check(ResourceLoader.exists(path), "%s has no recording" % id)
+		if not ResourceLoader.exists(path):
+			continue
+		var stream: AudioStream = load(path)
+		h.check(voice.playing and voice.stream == stream, "%s is not being spoken" % id)
+		var words: String = ending.get_node("Center/Card/Items/Lines").get_child(0).text
+		var script_text := FileAccess.get_file_as_string("res://narration/script.txt")
+		h.check(script_text.contains("%s|story|%s" % [id, words]), "the card under %s does not show its line" % id)
+		# A recording much faster or slower than speech cannot be those words.
+		var pace := words.length() / stream.get_length()
+		h.check(pace > 9.0 and pace < 17.0, "%s: %.1f characters a second" % [id, pace])
+		# The card does not move on before the voice could have ended.
+		await h.steps(int((stream.get_length() - 0.3) * 60.0))
+		h.check(ending.get_ending_line() == line, "%s was cut short by the next line" % id)
+		if line + 1 < ending.ending_lines.size():
+			await h.tap_key(KEY_ENTER)
+			h.check(ending.get_ending_line() == line + 1, "Continue did not move on from %s" % id)
 	await h.tap_key(KEY_ENTER)
 	h.check(ending.get_node("Center/Credits").visible, "no credits")
 	h.check(not voice.playing, "the voice went on into the credits")
+	await h.tap_key(KEY_ENTER)
+	var menu: Node = await h.wait_for_scene("MenuController")
+	await h.steps(3)
+	h.check(menu.has_method("continue_game") and menu.get_node_or_null("Voice") == null or not menu.get_node("Voice").playing, "a voice plays on the main menu")
+	h.check(h.tree.root.find_children("*", "AudioStreamPlayer", true, false).filter(func(player: AudioStreamPlayer) -> bool: return player.playing and player.bus == &"Narration").is_empty(), "narration still plays on the main menu")
 
 
-## The line before the credits has no voice yet, so this goes straight there from one that does.
 func test_opening_the_credits_stops_a_voiced_line(h) -> void:
 	var ending: Node = await h.load_main_fixture("res://scenes/ui/ending.tscn")
 	await h.steps(3)
 	var voice: AudioStreamPlayer = ending.get_node("Voice")
 	await h.tap_key(KEY_ENTER)
 	await h.tap_key(KEY_ENTER)
-	h.check(voice.playing, "the Innsmouth sample is not playing")
+	h.check(voice.playing, "the Innsmouth line is not being spoken")
 	ending.open_credits()
 	h.check(not voice.playing, "the voice went on into the credits")
 
