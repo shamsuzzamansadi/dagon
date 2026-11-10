@@ -1,0 +1,51 @@
+cave.carving: word for word
+   12.15 s, 12.5 chars/s, -24.0 dB RMS, peak -5.9 dBFS
+   script: The same eye. The same waves, cut deep into the rock, and an arm coiled round them, each sucker cut with care. It isn't worn. Someone has kept it clean.
+   heard:  the same eye, the same waves cut deep into the rock and an arm coiled round them, each sucker cut with care. It isn't worn. Someone has kept it clean.
+   words:  the@0.00 same@0.20 eye,@0.50 the@1.52 same@1.64 waves@2.00 cut@2.58 deep@3.16 into@3.56 the@3.92 rock@4.06 and@4.42 an@4.88 arm@5.04 coiled@5.46 round@6.00 them,@6.30 each@7.00 sucker@7.26 cut@7.62 with@7.94 care.@8.22 It@9.02 isn't@9.24 worn.@9.58 Someone@10.52 has@10.76 kept@10.98 it@11.22 clean.@11.42
+ending.found: word for word
+   15.31 s, 12.7 chars/s, -24.0 dB RMS, peak -3.2 dBFS
+   script: I do not remember reaching the boat. A steamer found me in it, they say, adrift and raving, days from any land. They tell me the sea never left. There was no shore, no stone, no tide drawn back.
+   heard:  I do not remember reaching the boat. A steamer found me in it, they say, adrift and raving, days from any land. They tell me the sea never left. There was no shore, no stone, no tide drawn back.
+   words:  I@0.00 do@0.22 not@0.38 remember@0.60 reaching@1.06 the@1.46 boat.@1.74 A@2.70 steamer@2.76 found@3.24 me@3.60 in@3.86 it,@4.04 they@4.22 say,@4.32 adrift@5.00 and@5.38 raving,@5.62 days@6.30 from@6.60 any@6.94 land.@7.22 They@8.26 tell@8.48 me@8.74 the@9.02 sea@9.22 never@9.54 left.@9.86 There@10.74 was@10.92 no@11.14 shore,@11.48 no@12.40 stone,@12.62 no@13.50 tide@13.70 drawn@14.12 back.@14.50
+ending.innsmouth: word for word (a recorded exception: 'innsmouth' heard as 'insemouth')
+   16.05 s, 13.8 chars/s, -24.0 dB RMS, peak -5.0 dBFS
+   script: Years later, in a fishing town called Innsmouth, I saw a bracelet in a shop window. That eye, above those waves. The man behind the counter asked how far out I had been. I did not tell him. He did not seem to need telling.
+   heard:  Years later, in a fishing-town called Insemouth, I saw a bracelet in a shop window, that eye above those waves. The man behind the counter asked how far out I had been. I did not tell him. He did not seem to need telling.
+   words:  Years@0.00 later,@0.34 in@1.04 a@1.18 fishing@1.32 -town@1.62 called@1.98 Insemouth,@2.46 I@3.62 saw@3.82 a@4.02 bracelet@4.26 in@4.54 a@4.78 shop@4.92 window,@5.14 that@6.08 eye@6.30 above@6.62 those@7.06 waves.@7.40 The@8.46 man@8.80 behind@9.04 the@9.40 counter@9.56 asked@9.90 how@10.24 far@10.50 out@10.82 I@11.04 had@11.20 been.@11.36 I@12.22 did@12.48 not@12.62 tell@12.84 him.@13.12 He@13.76 did@13.94 not@14.06 seem@14.28 to@14.58 need@14.84 telling.@15.10
+ending.listen: word for word
+   5.61 s, 14.3 chars/s, -24.0 dB RMS, peak -5.0 dBFS
+   script: I have stopped arguing. At night I listen to the water, and what moves under it.
+   heard:  I have stopped arguing. At night I listen to the water and what moves under it.
+   words:  I@0.00 have@0.24 stopped@0.34 arguing.@0.64 At@1.82 night@2.00 I@2.32 listen@2.64 to@2.86 the@3.14 water@3.28 and@3.60 what@4.14 moves@4.44 under@4.82 it.@5.10
+ending.rising: word for word
+   8.01 s, 15.2 chars/s, -24.0 dB RMS, peak -3.8 dBFS
+   script: Those figures bowed for a reason. Whatever rose that night did not rise for me, and I do not think it has finished rising.
+   heard:  Those figures bowed for a reason. Whatever rose that night did not rise for me, and I do not think it has finished rising.
+   words:  Those@0.00 figures@0.40 bowed@0.88 for@1.38 a@1.78 reason.@1.96 Whatever@2.84 rose@3.10 that@3.46 night@3.74 did@4.02 not@4.20 rise@4.46 for@4.78 me,@5.06 and@5.48 I@5.62 do@5.76 not@5.90 think@6.12 it@6.34 has@6.50 finished@6.72 rising.@7.16
+prologue.drift: word for word
+   8.00 s, 13.2 chars/s, -24.0 dB RMS, peak -3.2 dBFS
+   script: After that there was only the sea, and the sun, and no land in any direction. I stopped counting the days.
+   heard:  After that there was only the sea and the sun and no land in any direction. I stopped counting the days.
+   words:  After@0.00 that@0.42 there@0.74 was@1.04 only@1.24 the@1.64 sea@1.86 and@2.18 the@2.58 sun@2.74 and@3.08 no@3.68 land@3.96 in@4.36 any@4.58 direction.@4.84 I@5.90 stopped@6.12 counting@6.48 the@7.02 days.@7.28
+prologue.dry: word for word
+   3.70 s, 12.7 chars/s, -24.0 dB RMS, peak -4.7 dBFS
+   script: I slept at last. When I woke, the sea had gone.
+   heard:  I slept at last. When I woke, the sea had gone.
+   words:  I@0.00 slept@0.20 at@0.46 last.@0.68 When@1.58 I@1.76 woke,@1.90 the@2.64 sea@2.68 had@2.94 gone.@3.14
+prologue.escape: word for word (same sound: 'rowed' heard as 'rode')
+   7.86 s, 15.1 chars/s, -24.0 dB RMS, peak -2.9 dBFS
+   script: One night the watch was careless. I took a boat, a little water and some bread, and rowed until their lights were gone.
+   heard:  One night the watch was careless. I took a boat, a little water and some bread, and rode until their lights were gone.
+   words:  One@0.00 night@0.28 the@0.60 watch@0.92 was@1.22 careless.@1.64 I@2.82 took@3.02 a@3.18 boat,@3.34 a@3.78 little@3.86 water@4.00 and@4.40 some@4.64 bread,@4.86 and@5.40 rode@5.62 until@6.02 their@6.40 lights@6.60 were@6.88 gone.@7.12
+prologue.raider: word for word
+   7.39 s, 14.5 chars/s, -24.0 dB RMS, peak -4.4 dBFS
+   script: The war was two years old when a raider took our ship. They kept us below, and fed us when they remembered.
+   heard:  The war was two years old when a raider took our ship. They kept us below and fed us when they remembered.
+   words:  The@0.00 war@0.18 was@0.46 two@0.72 years@0.98 old@1.22 when@1.56 a@1.78 raider@1.94 took@2.22 our@2.48 ship.@2.74 They@3.86 kept@4.14 us@4.42 below@4.74 and@5.12 fed@5.58 us@5.90 when@6.12 they@6.30 remembered.@6.44
+shore.talisman: word for word
+   9.76 s, 13.7 chars/s, -24.0 dB RMS, peak -3.1 dBFS
+   script: Something small, half sunk in the mud. An eye, cut above a line of waves. It is heavier than it should be, and someone wore it smooth.
+   heard:  Something small, half sunk in the mud, an eye cut above a line of waves. It is heavier than it should be, and someone wore it smooth.
+   words:  Something@0.00 small,@0.48 half@1.64 sunk@1.72 in@2.06 the@2.30 mud,@2.42 an@3.16 eye@3.28 cut@3.62 above@4.10 a@4.38 line@4.58 of@4.80 waves.@4.98 It@5.86 is@6.08 heavier@6.28 than@6.56 it@6.90 should@7.06 be,@7.26 and@7.84 someone@8.06 wore@8.52 it@8.88 smooth.@9.06
+10 lines, 0 differing

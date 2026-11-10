@@ -1,6 +1,6 @@
 # M4 plan: Atmosphere
 
-**Status: proposed, 2026-11-10, for the owner.** From the [roadmap](roadmap.md)'s M4 (atmosphere: the rest of the route in the finished style, ambience, the mix by ear, final narration) and the owner's priorities on accepting M3: **the prologue's spoken narration and continuity first, then the remaining environment art, then audio polish.** M3 is closed and is not reopened; its deferrals are this milestone's input.
+**Status: approved by the owner on 2026-11-10,** who authorized implementation within this scope, in this order, stopping at independent review and owner acceptance. Proposed the same day. From the [roadmap](roadmap.md)'s M4 (atmosphere: the rest of the route in the finished style, ambience, the mix by ear, final narration) and the owner's priorities on accepting M3: **the prologue's spoken narration and continuity first, then the remaining environment art, then audio polish.** M3 is closed and is not reopened; its deferrals are this milestone's input.
 
 **Window:** 11–14 November, then M5 on 15–17 November, by the roadmap's schedule from 9 November. **The owner's target is still completion before 20 November.**
 

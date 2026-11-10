@@ -428,7 +428,7 @@ This is a guard plus one deferred step, not an event framework.
   `dagon::reset_global_state()` (review finding 4). See §7 rule 8.
 
 ### Narration (`src/narration.*`, `src/core/narration.*`, in `Hud` and `MenuController`)
-**One script, `project/narration/script.txt`:** each line is `id|optional or story|words`. The game shows those words and `tools/audio/make_narration.py` speaks them, so they cannot drift apart. An `Interactable` names a `line_id`, and takes its caption from the script. A line's audio, if it has any, is `res://assets/narration/<id>.ogg`. A line with no file is a text line, so nothing depends on audio being there.
+**One script, `project/narration/script.txt`:** each line is `id|optional or story|words`. The game shows those words, and the voice tool (`tools/audio/make_audition.py --speak`, since the owner's choice of voice) speaks them, so they cannot drift apart; `tools/audio/check_narration.py` transcribes each recording and compares it with the script. An `Interactable` names a `line_id`, and takes its caption from the script. A line's audio, if it has any, is `res://assets/narration/<id>.ogg`. A line with no file is a text line, so nothing depends on audio being there.
 
 **Rules, in plain C++ and unit-tested:**
 - `decide_line`: there is no queue. Nothing speaking: start. The same line: ignored, never restarted. A story line replaces anything. An optional line replaces an optional one, and is dropped during a story line.
@@ -442,7 +442,7 @@ This is a guard plus one deferred step, not an event framework.
 
 **Who starts a line:** the player, by examining. A clip's method track at its moment (`Hud.say`), which cannot happen on restore, as no clip plays then. And `GameDirector` on the way into the Monolith beat only, which a restored world does not pass through. **So restoring speaks nothing.**
 
-**The epilogue:** `MenuController` in Ending mode shows `ending_lines` one at a time on the card, each with its audio if any and over its own picture (`panels_path`), as the prologue does, moving on by itself after `line_seconds`. Continue moves on at once, and goes to the credits after the last, so nobody is made to wait.
+**The epilogue:** `MenuController` in Ending mode shows `ending_lines` one at a time on the card, each with its audio if any and over its own picture (`panels_path`), as the prologue does, moving on by itself after `line_seconds`. Both are fully spoken, the prologue since M4: the card waits for each recording, and Continue, Skip and the credits each stop the one playing. Continue moves on at once, and goes to the credits after the last, so nobody is made to wait.
 
 ### Controller vibration (`src/haptics.*`)
 Stateless, with three named cues, each under a second. `GameDirector::haptic_cue(name)` plays one on the device in use, if it is a controller and the setting is on, and clips call it through a method track at their moment. **It alone stops them,** on `NOTIFICATION_PAUSED`, on a change of device, and on leaving the tree, and a cue is never resumed. A new cue replaces the last, as `Input` holds one per device. A paused or stopped clip cannot reach its key, so a stale cue cannot fire. Tests read `Input.get_joy_vibration_strength`, which proves requests only, and says nothing about feel or hardware.

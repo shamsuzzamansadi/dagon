@@ -13,6 +13,11 @@ anything sounds. That needs a person listening.
     listening.py check RECORDING.wav RUN.log
         Measures that soundtrack: peak and true peak, loudness per stage, sudden drops and jumps, clicks, silence
         while paused, and what is still sounding on the main menu. Prints a report.
+
+    listening.py narration MIX.wav VOICE.wav BED.wav RUN.log
+        For a recording with spoken lines, such as project/tests/record_prologue.gd's: how loud each line is, how loud
+        the music and effects are beneath it, and how far they duck for it. MIX is the game's real mix. VOICE and BED
+        are the same run recorded with DAGON_RECORD_ONLY=voice and =bed. The stages are the "line-..." marks.
 """
 
 import math
@@ -211,6 +216,70 @@ def check(recording, log_path):
     return 1 if problems else 0
 
 
+def level_db(x):
+    """Plain RMS over everything given, in dBFS."""
+    power = float(np.mean(x**2)) if len(x) else 0.0
+    return 10 * math.log10(power) if power > 0 else -120.0
+
+
+def narration(mix_path, voice_path, bed_path, log_path):
+    """The voice against what plays beneath it, line by line. The bed beneath a line is the real mix less the voice
+    alone, which holds because Movie Maker renders each run from the same first sample."""
+    mix, rate = read(mix_path)
+    voice, _ = read(voice_path)
+    bed, _ = read(bed_path)
+    n = min(len(mix), len(voice), len(bed))
+    mix, voice, bed = mix[:n], voice[:n], bed[:n]
+    under = mix - voice
+    marks = stages(log_path)
+    first = min(marks.values())
+    order = sorted(marks.items(), key=lambda kv: kv[1])
+    window = int(0.05 * rate)
+    problems = 0
+    print(f"recordings: {n / rate:.1f} s, {rate} Hz. Levels are RMS in dBFS unless marked LUFS.")
+    pk, tp = peak_db(mix), true_peak_db(mix, rate)
+    print(f"the mix: peak {pk:.1f} dBFS, true peak {tp:.1f} dBTP{'  <- clipping' if pk >= -0.1 else ''}")
+    problems += pk >= -0.1
+    print(f"\n{'line':28} {'spoken':>7} {'voice':>7} {'voice':>7} {'beneath':>8} {'unducked':>9} {'ducked':>7} {'voice':>9} {'between':>8}")
+    print(f"{'':28} {'s':>7} {'LUFS':>7} {'dB':>7} {'dB':>8} {'dB':>9} {'by dB':>7} {'above dB':>9} {'lines dB':>8}")
+    for (stage, frame), nxt in zip(order, order[1:]):
+        if not stage.startswith("line-"):
+            continue
+        start, end = int((frame - first) / FPS * rate), int((nxt[1] - first) / FPS * rate)
+        speaking = np.zeros(end - start, dtype=bool)
+        for at in range(0, end - start - window, window):
+            if level_db(voice[start + at : start + at + window]) > -50.0:
+                speaking[at : at + window] = True
+        if not speaking.any():
+            print(f"{stage:28} no voice in this line  <- not spoken")
+            problems += 1
+            continue
+        last = int(np.nonzero(speaking)[0][-1])
+        said = slice(start, start + last)
+        quiet = slice(start + last + int(0.3 * rate), end)
+        voice_lufs = integrated(voice[said], rate)
+        voice_db = level_db(voice[said][speaking[:last]])
+        beneath = level_db(under[said][speaking[:last]])
+        unducked = level_db(bed[said][speaking[:last]])
+        between = level_db(mix[quiet])
+        spoken = last / rate
+        flag = ""
+        if voice_db - beneath < 6.0:
+            flag = "  <- the voice is less than 6 dB above what is beneath it"
+            problems += 1
+        if beneath < -70.0:
+            flag = "  <- nothing beneath the voice"
+            problems += 1
+        print(f"{stage:28} {spoken:7.2f} {voice_lufs:7.1f} {voice_db:7.1f} {beneath:8.1f} {unducked:9.1f} {unducked - beneath:7.1f} {voice_db - beneath:9.1f} {between:8.1f}{flag}")
+    # That the subtraction is sound: where nobody speaks, the real mix and the bed alone should be the same recording.
+    silent = np.array([level_db(voice[i : i + window]) < -90.0 for i in range(0, n - window, window)])
+    residual = [level_db(under[i * window : (i + 1) * window] - bed[i * window : (i + 1) * window]) - level_db(bed[i * window : (i + 1) * window]) for i in np.nonzero(silent)[0] if level_db(bed[i * window : (i + 1) * window]) > -60.0]
+    if residual:
+        print(f"\nwhere nobody speaks, the mix differs from the bed alone by {np.median(residual):.1f} dB relative to it (median of {len(residual)} windows)")
+    print(f"\nNARRATION_CHECK problems={problems}")
+    return 1 if problems else 0
+
+
 def where(marks, first, t):
     frame = first + t * FPS
     before = [s for s, f in marks.items() if f <= frame]
@@ -224,6 +293,8 @@ def main(argv):
         return excerpts(Path(argv[1]), argv[2], Path(argv[3]))
     if len(argv) >= 3 and argv[0] == "check":
         return check(Path(argv[1]), argv[2])
+    if len(argv) >= 5 and argv[0] == "narration":
+        return narration(Path(argv[1]), Path(argv[2]), Path(argv[3]), argv[4])
     print(__doc__)
     return 2
 

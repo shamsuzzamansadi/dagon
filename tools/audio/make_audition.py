@@ -23,7 +23,9 @@ Once the owner has chosen a candidate, and only then, the same voice speaks furt
 
 --speak makes only the lines it names, in the chosen candidate's voice and settings, trimmed and levelled as above,
 into project/assets/narration/<id>.ogg. There is deliberately no option to speak every line at once. --seed makes
-another take, for a line that comes out unclear; the take used for each line is recorded with the evidence.
+another take, for a line that comes out unclear or hurried, and --into DIR writes takes to a folder outside the game,
+so several can be compared (tools/audio/check_narration.py --folder DIR) before one is copied in. The take used for
+each line is recorded with the evidence.
 """
 
 import argparse
@@ -87,6 +89,7 @@ def main():
     parser.add_argument("--speak", nargs="+", metavar=("CANDIDATE", "LINE"), help="after the owner's choice: speak these lines in that voice, into the game")
     parser.add_argument("--out", type=Path, default=ROOT / "docs" / "evidence" / "m3" / "voice-audition")
     parser.add_argument("--seed", type=int, default=7, help="with --speak: another take of the same lines, when one comes out unclear")
+    parser.add_argument("--into", type=Path, help="with --speak: write the takes to this folder instead of the game, to compare takes before one is kept")
     args = parser.parse_args()
     if args.speak and (args.speak[0] not in CANDIDATES or len(args.speak) < 2):
         parser.error("--speak needs a candidate, A or B, then one or more line ids")
@@ -117,7 +120,7 @@ def main():
         timbre, rate = kokoro.create(TIMBRE_TEXT, voice=spec["timbre_voice"], speed=spec["timbre_speed"], lang=spec["lang"])
         timbre_path = args.models / f"timbre_{name}.wav"
         sf.write(timbre_path, timbre, rate)
-        target = ROOT / "project" / "assets" / "narration"
+        target = args.into or ROOT / "project" / "assets" / "narration"
         target.mkdir(parents=True, exist_ok=True)
         for line_id in line_ids:
             torch.manual_seed(args.seed)
