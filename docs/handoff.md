@@ -2,7 +2,7 @@
 
 Changing task state only. The lasting rules are in [AGENTS.md](../AGENTS.md). **Check this against `git log`, the pull request and CI before relying on it.**
 
-**Last updated:** 2026-11-10, at the start of M4.
+**Last updated:** 2026-11-10, during M4, after its first item.
 
 ## Where things are
 
@@ -13,7 +13,7 @@ Changing task state only. The lasting rules are in [AGENTS.md](../AGENTS.md). **
 | **Acceptance fingerprint** | `sha256:892b1072136b806ee25340c4cc3f8cefaa36880ae5d7399bd70e6e42f744e453` |
 | **Releases** | **None.** `release/v0.1.0-pre-alpha.1.json` stays `planned`. Do not tag or publish without the owner asking |
 | **Merged** | Squash commit `ad6df8c` on `main`, through [#3](https://github.com/shamsuzzamansadi/dagon/pull/3). `main`'s CI, run [42817688574](https://github.com/shamsuzzamansadi/dagon/actions/runs/42817688574), passed: GCC, Clang, MSVC, the release tools, and the release gate, which found the record `planned` and published nothing. The M3 branch is deleted, locally and remotely |
-| **Now** | **M4, Atmosphere, on `m4/atmosphere`,** from `ad6df8c`. **[The plan](m4-plan.md) is proposed, for the owner.** Nothing is implemented yet |
+| **Now** | **M4, Atmosphere, on `m4/atmosphere`,** from `ad6df8c`. **The owner approved [the plan](m4-plan.md) on 2026-11-10** and authorized its implementation in order, stopping at independent review and owner acceptance: no merge, tag, release or itch.io submission. **Window: 11–14 November. The owner's target is still completion before 20 November** |
 
 ## M3 requirements: done and accepted
 
@@ -55,16 +55,40 @@ Changing task state only. The lasting rules are in [AGENTS.md](../AGENTS.md). **
 - **2026-11-09, on a build of `53e8d23`:** improved substantially; four concerns, answered by D87–D93.
 - **2026-11-10:** chose voice A; then accepted M3 at `3980bc3`.
 
+## M4 progress
+
+| # | Item of [the plan](m4-plan.md) | State | Commit |
+|---|---|---|---|
+| 1 | The prologue spoken in voice A | **Done.** Four lines, each transcribed word for word; tests; a recording with sound; the voice measured at 8.9 to 18.9 dB above the music and sea beneath it ([narration record](evidence/m4/narration/README.md), [recording and measurements](evidence/m4/prologue/README.md), D95, D96). **Not listened to by anyone yet** | `2ccde53` |
+| 2 | Continuity from the prologue into the Shore; the Shore's first lines voiced | **Next.** Design settled, nothing committed: see below | |
+| 3 | Environment art past x = 1440, in route order | Not started | |
+| 4 | Audio polish | Not started | |
+| 5 | Further narration | Not started | |
+| 6 | Validation, review package, identified build | Not started. **No draft pull request yet** | |
+
+**Results on `2ccde53`:** `tools/run_godot_checks.sh` on the native Linux clone, GCC debug build of the unchanged C++: import, classes, integration **424 passed, 0 failed**, three smoke runs, all ok. CI has not run on it yet. No C++ changed, so the library is M3's.
+
+**The design for item 2, decided but not built:**
+- The How to Play card moves to the main menu, before the prologue: New Game, How to Play, Begin, prologue, Shore. Nothing then sits between the last picture and the game. Continue is unchanged.
+- The last picture becomes the Shore's own opening view, with the man lying, then sitting, where the sailor starts.
+- In the game, a new game opens on a short cinematic under the existing contract (`shore_wake`): he rises from sitting. `PlayerController` gets a pose that only shows while control is locked, and is cleared when control returns, so a stuck clip cannot leave him on the ground. Continue and Restart never play it.
+- `shore.boat` and `shore.fish` spoken in voice A.
+- Tests, the route player, `record_play.gd`, `session_probe.gd` and `tools/route_check.py` expect the card after the prologue, and change with it.
+
+**Risks, as of this update:** art is the largest item and has not started; the window is four days. The voice tools run only from the temporary folder below, which a reboot would remove; rebuilding it takes about half an hour.
+
 ## Temporary resources
 
 These may be gone. Everything finished is pushed.
 
 | What | Where |
 |---|---|
-| Native clone | `/tmp/claude-1000/-mnt-c-Users-sadi-projects-dagon/621ac8dc-276d-4bbd-8143-03866a5a9d1a/scratchpad/work` (call its parent `$S`) |
-| Voice environment and models, for `tools/audio/make_audition.py --speak` | `$S/tts/`, `$S/voice-models/`, `$S/hf/`; speech data linked from `~/.cache/dagon-voice-short/data` |
+| Native clone, where M4 is being built and tested | `/tmp/claude-1000/-mnt-c-Users-sadi-projects-dagon/621ac8dc-276d-4bbd-8143-03866a5a9d1a/scratchpad/work` (call its parent `$S`) |
+| Voice environment and models, for `tools/audio/make_audition.py --speak` and `check_narration.py` | `$S/tts/`, `$S/voice-models/`, `$S/hf/` (set `HF_HOME=$S/hf HF_HUB_OFFLINE=1`); speech data linked from `~/.cache/dagon-voice-short/data` (set `ESPEAK_DATA_PATH` to it) |
+| Encoder for recordings | the `ffmpeg` inside `$S/venv`'s `imageio_ffmpeg` |
+| The prologue's rejected takes | the M4 session's scratch folder, `takes/seed-7` to `seed-10`; not kept in the repository |
 | Private X display | `$S/xns.sh`, run with `unshare -rm` (docs/toolchain.md §6a). One at a time |
 
 ## Next concrete action
 
-The owner's word on [the M4 plan](m4-plan.md). Then its first item: the prologue spoken in voice A.
+Item 2 of [the plan](m4-plan.md): build the continuity into the Shore as designed above, starting with the pose in `PlayerController` and the `shore_wake` clip, then the card's move and the tests that follow it. Open the draft pull request once it holds together.
