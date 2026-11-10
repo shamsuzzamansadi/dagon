@@ -1,0 +1,9 @@
+ROUTE_TIMING profile=reading puzzle=known-to-the-script one-deliberate-mistake total=240s to-ending-card=198s | acts: shore=35s abyss=99s monolith=34s witness-and-escape=24s collapse=6s epilogue-and-credits=42s | spent: walking=72s reading=85s solving=8s cinematics=27s
+ROUTE new-game-reading-everything: ok
+ROUTE_TIMING profile=direct puzzle=known-to-the-script one-deliberate-mistake total=114s to-ending-card=110s | acts: shore=9s abyss=46s monolith=25s witness-and-escape=24s collapse=6s epilogue-and-credits=4s | spent: walking=70s reading=0s solving=8s cinematics=27s
+ROUTE new-game-direct: ok
+ROUTE continue-and-wait-out-the-flee: ok
+ROUTE continue-after-the-ending: ok
+ROUTE save.dat: dagon_save=1 beat=awakened checkpoint=Awakened 
+ROUTE save.bak: dagon_save=1 beat=monolith checkpoint=Monolith 
+ROUTE_RESULT runs=4 failed=0

@@ -1,9 +1,12 @@
 #include "game_session.hpp"
 
+#include "global_state.hpp"
+
 #include "menu_controller.hpp"
 #include "storage.hpp"
 
 #include <godot_cpp/classes/engine.hpp>
+#include <godot_cpp/classes/scene_tree.hpp>
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/core/error_macros.hpp>
 #include <godot_cpp/core/print_string.hpp>
@@ -28,6 +31,7 @@ void GameSession::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("retry_save"), &GameSession::retry_save);
 	ClassDB::bind_method(D_METHOD("is_checkpoint_saved"), &GameSession::is_checkpoint_saved);
 	ClassDB::bind_method(D_METHOD("has_any_save"), &GameSession::has_any_save);
+	ClassDB::bind_method(D_METHOD("is_in_final_sequence"), &GameSession::is_in_final_sequence);
 	ClassDB::bind_method(D_METHOD("get_session_beat"), &GameSession::get_session_beat);
 	ClassDB::bind_method(D_METHOD("get_persisted_beat"), &GameSession::get_persisted_beat);
 	ClassDB::bind_method(D_METHOD("get_world"), &GameSession::get_world);
@@ -57,7 +61,33 @@ void GameSession::set_active_device(int p_device) {
 	}
 }
 
+void GameSession::_process(double p_delta) {
+	(void)p_delta;
+	if (Engine::get_singleton()->is_editor_hint()) {
+		return;
+	}
+	if (!quiet_ && is_run_over()) {
+		quiet_ = true;
+		print_verbose("dagon: run over, quitting");
+		quit_quietly(get_tree());
+	}
+	if (is_quit_due()) {
+		get_tree()->quit();
+	}
+}
+
+void GameSession::_notification(int p_what) {
+	// Closing the window takes the quiet way out too.
+	if (p_what == NOTIFICATION_WM_CLOSE_REQUEST && !quiet_) {
+		quiet_ = true;
+		quit_quietly(get_tree());
+	}
+}
+
 void GameSession::_ready() {
+	if (!Engine::get_singleton()->is_editor_hint()) {
+		get_tree()->set_auto_accept_quit(false);
+	}
 	if (Engine::get_singleton()->is_editor_hint()) {
 		return;
 	}
@@ -134,6 +164,11 @@ void GameSession::on_checkpoint_reached(int p_beat) {
 }
 
 bool GameSession::write_session_checkpoint() {
+	// Never during a cinematic, or with the player locked. Closing then returns to the previous checkpoint.
+	const GameDirector *director = director_.get();
+	if (director != nullptr && !director->is_safe_to_save()) {
+		return false;
+	}
 	core::SaveData save;
 	save.beat = static_cast<core::Beat>(session_beat_);
 	if (!storage::save_game(save)) {

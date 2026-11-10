@@ -1,12 +1,24 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="1_player"]
 [ext_resource type="SpriteFrames" path="res://assets/shore/sailor_frames.tres" id="2_frames"]
 [ext_resource type="Texture2D" path="res://assets/shore/light.png" id="3_light"]
+[ext_resource type="AudioStream" path="res://assets/audio/footsteps/sand_1.ogg" id="sand1"]
+[ext_resource type="AudioStream" path="res://assets/audio/footsteps/sand_2.ogg" id="sand2"]
+[ext_resource type="AudioStream" path="res://assets/audio/footsteps/sand_3.ogg" id="sand3"]
+[ext_resource type="AudioStream" path="res://assets/audio/footsteps/sand_4.ogg" id="sand4"]
+[ext_resource type="AudioStream" path="res://assets/audio/footsteps/rock_1.ogg" id="rock1"]
+[ext_resource type="AudioStream" path="res://assets/audio/footsteps/rock_2.ogg" id="rock2"]
+[ext_resource type="AudioStream" path="res://assets/audio/footsteps/rock_3.ogg" id="rock3"]
+[ext_resource type="AudioStream" path="res://assets/audio/footsteps/rock_4.ogg" id="rock4"]
+[ext_resource type="AudioStream" path="res://assets/audio/voice/gasp.ogg" id="6_gasp"]
 
 [node name="Player" instance=ExtResource("1_player")]
 sprite_path = NodePath("Visual/Sailor")
 walk_pixels_per_frame = 4.0
+footsteps_path = NodePath("Footsteps")
+footstep_sets = [[ExtResource("sand1"), ExtResource("sand2"), ExtResource("sand3"), ExtResource("sand4")], [ExtResource("rock1"), ExtResource("rock2"), ExtResource("rock3"), ExtResource("rock4")]]
+footstep_surface_edges = PackedFloat32Array(622)
 
 [node name="Silhouette" parent="Visual" index="0"]
 visible = false
@@ -27,3 +39,15 @@ color = Color(1, 0.68, 0.34, 1)
 energy = 0.5
 range_item_cull_mask = 1
 texture = ExtResource("3_light")
+
+[node name="Footsteps" type="AudioStreamPlayer2D" parent="."]
+volume_db = -3.0
+bus = &"Effects"
+
+[node name="Breath" type="AudioStreamPlayer2D" parent="."]
+volume_db = -4.0
+bus = &"Effects"
+
+[node name="Gasp" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("6_gasp")
+bus = &"Effects"

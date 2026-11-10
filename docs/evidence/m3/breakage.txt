@@ -1,0 +1,387 @@
+Deliberate breakage, focused, at commit 2ce855a. One change at a time, in scratch clones with isolated storage. Simulated input only.
+
+caught              1 failing  The voice goes on into the credits
+caught              1 failing  A background event replays on every crossing
+NOT CAUGHT          0 failing  The gate changes in a physics callback, not deferred
+caught              9 failing  Restoring leaves the atmosphere at the start
+NOT CAUGHT          0 failing  Restoring leaves the atmosphere clip running
+caught              4 failing  The rock never comes down
+caught              3 failing  The rock can be seen but not stood on
+caught              2 failing  The rock cannot be seen
+caught              2 failing  The rock blocks the way from the start
+caught              4 failing  The rock is too high to hop
+caught              1 failing  A rock lands when a run could be under it
+caught              1 failing  A rock is drawn away from where it collides
+caught              2 failing  The third tablet can be read from the ground
+caught              1 failing  The second tablet can be read from the shelf
+caught              1 failing  The second shelf gets back its near rock
+caught              2 failing  The sea never rises
+caught              1 failing  The fade comes before the sea
+caught              2 failing  The water stops short of the top
+caught              1 failing  The mural's fragments lose the order
+
+commit 2ce855a, 19 breakages: {'caught': 17, 'NOT CAUGHT': 2}
+
+---- Full output of each worker, with its control before and after
+
+########## worker 0
+=== control: no change
+[doctest] test cases:  120 |  120 passed | 0 failed | 0 skipped
+RESULT passed=385 failed=0
+
+=== A background event replays on every crossing
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=384 failed=1
+
+=== The rock never comes down
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=381 failed=4
+
+=== The rock is too high to hop
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=381 failed=4
+
+=== The second shelf gets back its near rock
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=384 failed=1
+
+=== The water stops short of the top
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=383 failed=2
+
+=== control after, worker 0
+[doctest] test cases:  120 |  120 passed | 0 failed | 0 skipped
+RESULT passed=385 failed=0
+
+########## worker 1
+=== control: no change
+[doctest] test cases:  120 |  120 passed | 0 failed | 0 skipped
+RESULT passed=385 failed=0
+
+=== Restoring leaves the atmosphere at the start
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=376 failed=9
+
+=== The rock cannot be seen
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=383 failed=2
+
+=== A rock is drawn away from where it collides
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=384 failed=1
+
+=== The sea never rises
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=383 failed=2
+
+=== control after, worker 1
+[doctest] test cases:  120 |  120 passed | 0 failed | 0 skipped
+RESULT passed=385 failed=0
+
+########## worker 2
+=== control: no change
+[doctest] test cases:  120 |  120 passed | 0 failed | 0 skipped
+RESULT passed=385 failed=0
+
+=== The gate changes in a physics callback, not deferred
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=385 failed=0
+NOT CAUGHT
+
+=== The rock can be seen but not stood on
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=382 failed=3
+
+=== A rock lands when a run could be under it
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=384 failed=1
+
+=== The second tablet can be read from the shelf
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=384 failed=1
+
+=== The mural's fragments lose the order
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=384 failed=1
+
+=== control after, worker 2
+[doctest] test cases:  120 |  120 passed | 0 failed | 0 skipped
+RESULT passed=385 failed=0
+
+########## worker 3
+=== control: no change
+[doctest] test cases:  120 |  120 passed | 0 failed | 0 skipped
+RESULT passed=385 failed=0
+
+=== The voice goes on into the credits
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=384 failed=1
+
+=== Restoring leaves the atmosphere clip running
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=385 failed=0
+NOT CAUGHT
+
+=== The rock blocks the way from the start
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=383 failed=2
+
+=== The third tablet can be read from the ground
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=383 failed=2
+
+=== The fade comes before the sea
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+       [2] _arena (res://tests/test_cinematics.gd:27)
+       [3] landed_on_floor (res://tests/harness.gd:163)
+       [4] wait_until (res://tests/harness.gd:154)
+       [5] _physics_process (res://tests/step_probe.gd:24)
+       [0] _solve (res://tests/test_cinematics.gd:84)
+       [1] _check_awaken_recovered (res://tests/test_cinematics.gd:308)
+RESULT passed=384 failed=1
+
+=== control after, worker 3
+[doctest] test cases:  120 |  120 passed | 0 failed | 0 skipped
+RESULT passed=385 failed=0
+

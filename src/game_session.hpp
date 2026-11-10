@@ -20,6 +20,8 @@ class GameSession : public godot::Node {
 
 public:
 	void _ready() override;
+	void _process(double p_delta) override;
+	void _notification(int p_what);
 
 	// Set by the main menu before this node enters the tree. It never reads the save itself.
 	void set_start(int p_beat, bool p_persisted, bool p_show_intro);
@@ -35,6 +37,9 @@ public:
 	bool retry_save();
 	bool is_checkpoint_saved() const { return persisted_beat_ == session_beat_; }
 	bool has_any_save() const { return persisted_beat_ >= 0; }
+
+	// Whether quitting now loses a final sequence that will play again.
+	bool is_in_final_sequence() const { return director_.get() != nullptr && director_.get()->is_in_final_sequence(); }
 
 	int get_session_beat() const { return session_beat_; }
 	int get_persisted_beat() const { return persisted_beat_; }
@@ -52,6 +57,7 @@ protected:
 	static void _bind_methods();
 
 private:
+	bool quiet_ = false;
 	void build_world();
 	void remove_world();
 	void on_checkpoint_reached(int p_beat);

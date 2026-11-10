@@ -9,9 +9,6 @@
 
 namespace dagon::core {
 
-// The last beat this build has content for. M3 moves this as the level grows.
-inline constexpr Beat LAST_BUILT_BEAT = Beat::Abyss;
-
 // Stable progress only: no node references, no positions between checkpoints and no cutscene state.
 struct SaveData {
 	Beat beat = Beat::Shore;

@@ -1,0 +1,166 @@
+    3.64  dagon: extension initialized build=release compiler=MSVC 194435229 __cplusplus=202002
+    3.72  dagon: save status=1 backup=false
+    4.34  dagon: save status=1 backup=false
+    4.36  dagon: session start beat=0 persisted=0
+    4.36  dagon: introduction shown
+    6.16  dagon: focus: shore.boat
+    6.16  dagon: prompt: [E] Examine
+    6.74  dagon: line: shore.boat voiced=false seconds=5.26666666666667
+    6.74  dagon: caption: The lifeboat lies on bare seabed. The sea has drawn back farther than any tide.
+    6.74  dagon: prompt hidden
+    7.13  dagon: focus: shore.boat
+    7.13  dagon: prompt: [E] Examine
+   12.59  dagon: focus: shore.fish
+   12.59  dagon: prompt: [E] Examine
+   12.86  dagon: line: shore.fish voiced=false seconds=5.2
+   12.86  dagon: caption: Dead fish, rotting where the water left them. They have not been dry for long.
+   12.86  dagon: focus: shore.boat
+   12.86  dagon: prompt: [E] Examine
+   13.24  dagon: focus: shore.fish
+   13.24  dagon: prompt: [E] Examine
+   19.17  dagon: prompt hidden
+   20.87  dagon: focus: shore.talisman
+   20.87  dagon: prompt: [E] Examine
+   21.14  dagon: line: shore.talisman voiced=true seconds=11.4793336868286
+   21.14  dagon: caption: Something small, half sunk in the mud. An eye, cut above a line of waves. It is heavier than it should be, and someone wore it smooth.
+   21.14  dagon: prompt hidden
+   21.52  dagon: focus: shore.talisman
+   21.52  dagon: prompt: [E] Examine
+   33.65  dagon: prompt hidden
+   40.45  dagon: beat=abyss
+   40.45  dagon: notice: Checkpoint saved
+   41.26  dagon: focus: cave.carving
+   41.26  dagon: prompt: [E] Examine
+   41.55  dagon: line: cave.carving voiced=true seconds=9.48200016021729
+   41.55  dagon: caption: The same eye. The same waves, cut deep into the rock. It isn't worn. Someone has kept it clean.
+   41.55  dagon: prompt hidden
+   41.92  dagon: focus: cave.carving
+   41.92  dagon: prompt: [E] Examine
+   52.51  dagon: prompt hidden
+   55.31  dagon: background event: ritual_tableau
+   57.82  dagon: line: abyss.ritual voiced=false seconds=4.66666666666667
+   57.82  dagon: caption: Figures, far off among the stones. Kneeling, all of them. All but one.
+   59.86  dagon: focus: abyss.fossil_a
+   59.86  dagon: prompt: [E] Examine
+   60.11  dagon: line skipped: abyss.ritual
+   61.36  dagon: line: abyss.fossil_a voiced=false seconds=6.33333333333333
+   61.36  dagon: caption: A spine as long as the boat, with too many ribs. Nothing in any sea I know was built like this.
+   61.36  dagon: prompt hidden
+   61.75  dagon: focus: abyss.fossil_a
+   61.75  dagon: prompt: [E] Examine
+   69.17  dagon: prompt hidden
+   70.54  dagon: focus: abyss.tablet_wave
+   70.54  dagon: prompt: [E] Examine
+   70.81  dagon: line: abyss.tablet_wave voiced=false seconds=4.0
+   70.81  dagon: caption: A slab, cut with rising lines. "The waters rose first..."
+   70.81  dagon: prompt hidden
+   71.18  dagon: focus: abyss.tablet_wave
+   71.18  dagon: prompt: [E] Examine
+   76.32  dagon: prompt hidden
+   82.92  dagon: focus: abyss.fossil_b
+   82.92  dagon: prompt: [E] Examine
+   83.18  dagon: line: abyss.fossil_b voiced=false seconds=6.8
+   83.18  dagon: caption: A skull, under the great ribs. The jaw is wider than I am tall. It faces inland, the way I am walking.
+   83.18  dagon: prompt hidden
+   83.56  dagon: focus: abyss.fossil_b
+   83.56  dagon: prompt: [E] Examine
+   91.54  dagon: prompt hidden
+  100.35  dagon: focus: abyss.footprint
+  100.35  dagon: prompt: [E] Examine
+  100.63  dagon: line: abyss.footprint voiced=false seconds=5.26666666666667
+  100.63  dagon: caption: A print in the mud, still wet at the edges. Webbed. I could lie down inside it.
+  100.63  dagon: prompt hidden
+  101.00  dagon: focus: abyss.footprint
+  101.00  dagon: prompt: [E] Examine
+  107.38  dagon: prompt hidden
+  110.30  dagon: focus: abyss.tablet_kneel
+  110.30  dagon: prompt: [E] Examine
+  110.57  dagon: line: abyss.tablet_kneel voiced=false seconds=4.0
+  110.57  dagon: caption: A second slab. A figure, bent double. "...and they bowed..."
+  110.57  dagon: prompt hidden
+  110.96  dagon: focus: abyss.tablet_kneel
+  110.96  dagon: prompt: [E] Examine
+  115.66  dagon: focus: abyss.relief
+  115.66  dagon: prompt: [E] Examine
+  115.92  dagon: line: abyss.relief voiced=false seconds=6.86666666666667
+  115.92  dagon: caption: Down here, out of the wind, a long procession cut into the rock. They are all walking toward the water.
+  115.92  dagon: focus: abyss.tablet_kneel
+  115.92  dagon: prompt: [E] Examine
+  116.30  dagon: focus: abyss.relief
+  116.30  dagon: prompt: [E] Examine
+  124.29  dagon: prompt hidden
+  124.81  dagon: focus: abyss.cairn
+  124.81  dagon: prompt: [E] Examine
+  125.00  dagon: prompt hidden
+  133.27  dagon: focus: abyss.tablet_eye
+  133.27  dagon: prompt: [E] Examine
+  133.39  dagon: prompt hidden
+  137.23  dagon: background event: canyon_figure
+  139.14  dagon: beat=monolith
+  139.14  dagon: notice: Checkpoint saved
+  139.14  dagon: line: monolith.first voiced=false seconds=5.73333333333333
+  139.14  dagon: caption: The canyon opens, and then there is only that. I do not know who could have raised it.
+  141.12  dagon: event rejected at beat=monolith
+  142.37  dagon: focus: mural.before
+  142.37  dagon: prompt: [E] Examine
+  142.65  dagon: line skipped: monolith.first
+  143.91  dagon: line: mural.before voiced=false seconds=7.13333333333333
+  143.91  dagon: caption: Worn carvings, broken by the years. Water, perhaps. A bent shape. Something round. Ruins, and nothing more.
+  143.91  dagon: prompt hidden
+  144.28  dagon: focus: mural.before
+  144.28  dagon: prompt: [E] Examine
+  152.92  dagon: prompt: [E] Press the kneeling stone
+  153.15  dagon: puzzle rejected
+  153.15  dagon: caption: The stones grind and go dark.
+  153.15  dagon: prompt hidden
+  154.16  dagon: prompt: [E] Press the kneeling stone
+  154.91  dagon: prompt hidden
+  155.18  dagon: prompt: [E] Press the eye stone
+  156.17  dagon: prompt hidden
+  156.46  dagon: prompt: [E] Press the wave stone
+  156.68  dagon: puzzle accepted step=0
+  156.68  dagon: caption: The stone lights, and holds.
+  156.68  dagon: prompt hidden
+  157.07  dagon: prompt: [E] Press the wave stone
+  157.55  dagon: prompt hidden
+  157.81  dagon: prompt: [E] Press the eye stone
+  158.81  dagon: prompt hidden
+  159.07  dagon: prompt: [E] Press the kneeling stone
+  159.30  dagon: puzzle accepted step=1
+  159.30  dagon: caption: The stone lights, and holds.
+  159.30  dagon: prompt hidden
+  159.68  dagon: prompt: [E] Press the kneeling stone
+  160.16  dagon: prompt hidden
+  160.45  dagon: prompt: [E] Press the eye stone
+  160.67  dagon: puzzle solved
+  160.67  dagon: caption: The stone lights, and holds.
+  160.67  dagon: beat=awakened
+  160.67  dagon: cinematic start clip=monolith_awaken generation=1
+  160.67  dagon: prompt hidden
+  160.88  dagon: line: story.awakened voiced=false seconds=4.46666666666667
+  160.88  dagon: caption: The stones answered. Somewhere behind the rock, something gave way.
+  167.60  dagon: cinematic finalized clip=monolith_awaken generation=1
+  167.60  dagon: notice: Checkpoint saved
+  173.11  dagon: beat=witness
+  173.11  dagon: cinematic start clip=dagon_reveal generation=2
+  177.67  dagon: line: story.reveal voiced=false seconds=4.0
+  177.67  dagon: caption: It was no ridge. It had been beside me the whole way.
+  185.26  dagon: line: story.run voiced=false seconds=4.0
+  185.26  dagon: caption: Its head turned. I ran.
+  187.05  dagon: cinematic finalized clip=dagon_reveal generation=2
+  187.05  dagon: beat=fleeing
+  194.51  dagon: focus: mural.after
+  194.51  dagon: prompt: [E] Examine
+  196.18  dagon: prompt hidden
+  197.20  dagon: beat=ended
+  197.20  dagon: cinematic start clip=collapse generation=3
+  203.16  dagon: cinematic finalized clip=collapse generation=3
+  203.16  dagon: ending
+  203.17  dagon: ending card shown
+  203.17  dagon: ending line: ending.found voiced=false
+  213.72  dagon: ending line: ending.listen voiced=false
+  219.70  dagon: ending line: ending.innsmouth voiced=true
+  238.00  dagon: ending line: ending.rising voiced=false
+  245.41  dagon: save status=0 backup=false
+ROUTE_TIMING profile=reading puzzle=known-to-the-script one-deliberate-mistake total=240s to-ending-card=198s | acts: shore=35s abyss=99s monolith=34s witness-and-escape=24s collapse=6s epilogue-and-credits=42s | spent: walking=72s reading=85s solving=8s cinematics=27s
+  247.81  exit 0

@@ -17,15 +17,23 @@ const SUITES: Array[Script] = [
 	preload("res://tests/test_session.gd"),
 	preload("res://tests/test_title.gd"),
 	preload("res://tests/test_controller.gd"),
+	preload("res://tests/test_cinematics.gd"),
+	preload("res://tests/test_revision.gd"),
+	preload("res://tests/test_puzzle.gd"),
+	preload("res://tests/test_world.gd"),
+	preload("res://tests/test_restore.gd"),
+	preload("res://tests/test_route.gd"),
+	preload("res://tests/test_narration.gd"),
+	preload("res://tests/test_narrative.gd"),
 ]
-const REQUIRED_CLASSES: Array[String] = ["PlayerController", "CameraRig", "Interactable", "Interactor", "StoryTrigger", "Hud", "GameDirector", "GameSession", "MenuController", "SettingsMenu"]
+const REQUIRED_CLASSES: Array[String] = ["PlayerController", "CameraRig", "Interactable", "Interactor", "StoryTrigger", "Hud", "PuzzleController", "GameDirector", "GameSession", "MenuController", "SettingsMenu"]
 const STORAGE_VARIABLE := "DAGON_STORAGE_DIR"
 const STORAGE_MARKER := "dagon-test-"
 ## Set by tools/export_check.sh. Export rewrites scenes, so the same tests also run on what actually ships.
 const PACK_VARIABLE := "DAGON_TEST_PACK"
 
 ## Watchdog in rendered frames, so a broken await cannot hang the run forever.
-const MAX_FRAMES := 40000
+const MAX_FRAMES := 400000
 
 ## A GDScript runtime error silently aborts the running test function, which
 ## would otherwise count as a pass. Any engine or script error fails the test.
@@ -106,6 +114,11 @@ func _run() -> void:
 	var passed := 0
 	var failed := 0
 	for suite in SUITES:
+		# A suite that does not compile would otherwise hang the run until the watchdog.
+		if not suite.can_instantiate():
+			failed += 1
+			print("FAIL %s does not compile" % suite.resource_path)
+			continue
 		var instance: RefCounted = suite.new()
 		var suite_name: String = suite.resource_path.get_file().get_basename()
 		for method in instance.get_method_list():
@@ -117,7 +130,10 @@ func _run() -> void:
 			await instance.call(test_name, harness)
 			await harness.unload_fixture()
 			for error in _trap.take():
-				harness.fail("logged error: %s" % error)
+				if not harness.accepts_error(error):
+					harness.fail("logged error: %s" % error)
+			for text in harness.unseen_expected_errors():
+				harness.fail("expected an error that never came: %s" % text)
 			if harness.failures.is_empty():
 				passed += 1
 				print("PASS %s.%s" % [suite_name, test_name])
@@ -131,5 +147,12 @@ func _run() -> void:
 		failed += 1
 		print("FAIL the test run changed the player's real files in %s" % OS.get_user_data_dir())
 	OS.remove_logger(_trap)
+	# As the game does: stop every sound, and give the mixer real time to let go of it, or the engine reports it leaked.
+	for type in ["AudioStreamPlayer", "AudioStreamPlayer2D"]:
+		for sound in root.find_children("*", type, true, false):
+			sound.stop()
+	var until := Time.get_ticks_msec() + 200
+	while Time.get_ticks_msec() < until:
+		await process_frame
 	print("RESULT passed=%d failed=%d" % [passed, failed])
 	quit(0 if failed == 0 and passed > 0 else 1)

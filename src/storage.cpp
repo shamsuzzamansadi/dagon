@@ -3,6 +3,7 @@
 #include <godot_cpp/classes/audio_server.hpp>
 #include <godot_cpp/classes/dir_access.hpp>
 #include <godot_cpp/classes/display_server.hpp>
+#include <godot_cpp/classes/engine.hpp>
 #include <godot_cpp/classes/file_access.hpp>
 #include <godot_cpp/classes/global_constants.hpp>
 #include <godot_cpp/classes/input_event_key.hpp>
@@ -26,6 +27,8 @@ const char *const SAVE_FILE = "save.dat";
 const char *const SAVE_BACKUP_FILE = "save.bak";
 const char *const TEMPORARY_SUFFIX = ".tmp";
 const char *const STORAGE_DIR_VARIABLE = "DAGON_STORAGE_DIR";
+const char *const SUBTITLES_META = "dagon_subtitles";
+const char *const VIBRATION_META = "dagon_vibration";
 
 // Left and Right stay on movement whatever the player rebinds (core::is_reserved_key).
 bool is_fixed_key(const StringName &p_action, int p_key) {
@@ -141,9 +144,21 @@ bool save_settings(const core::Settings &p_settings) {
 void apply_settings(const core::Settings &p_settings) {
 	set_bus_level("Music", p_settings.music_volume);
 	set_bus_level("Effects", p_settings.effects_volume);
+	set_bus_level("Narration", p_settings.narration_volume);
+	Engine *engine = Engine::get_singleton();
+	engine->set_meta(SUBTITLES_META, p_settings.subtitles);
+	engine->set_meta(VIBRATION_META, p_settings.vibration);
 	for (int i = 0; i < core::GAME_ACTION_COUNT; i++) {
 		set_action_key(core::action_name(static_cast<core::GameAction>(i)), p_settings.keys[static_cast<std::size_t>(i)]);
 	}
+}
+
+bool subtitles_enabled() {
+	return Engine::get_singleton()->get_meta(SUBTITLES_META, true);
+}
+
+bool vibration_enabled() {
+	return Engine::get_singleton()->get_meta(VIBRATION_META, true);
 }
 
 LoadedSave load_game() {

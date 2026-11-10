@@ -16,6 +16,9 @@ constexpr int SETTINGS_VERSION = 1;
 constexpr std::string_view VERSION_FIELD = "dagon_settings";
 constexpr std::string_view MUSIC_FIELD = "music_volume";
 constexpr std::string_view EFFECTS_FIELD = "effects_volume";
+constexpr std::string_view NARRATION_FIELD = "narration_volume";
+constexpr std::string_view SUBTITLES_FIELD = "subtitles";
+constexpr std::string_view VIBRATION_FIELD = "vibration";
 constexpr std::string_view KEY_FIELD_PREFIX = "key_";
 constexpr int MAX_KEY_CODE = 0x7FFFFFF;
 
@@ -36,6 +39,16 @@ std::optional<float> parse_volume(std::string_view p_text) {
 		return std::nullopt;
 	}
 	return value;
+}
+
+std::optional<bool> parse_switch(std::string_view p_text) {
+	if (p_text == "1") {
+		return true;
+	}
+	if (p_text == "0") {
+		return false;
+	}
+	return std::nullopt;
 }
 
 bool keys_are_valid(const std::array<int, GAME_ACTION_COUNT> &p_keys) {
@@ -110,16 +123,28 @@ ParsedSettings parse_settings(std::string_view p_text) {
 		}
 		const std::string_view field = trim(line.substr(0, equals));
 		const std::string_view value = trim(line.substr(equals + 1));
-		if (field == MUSIC_FIELD || field == EFFECTS_FIELD) {
+		if (field == MUSIC_FIELD || field == EFFECTS_FIELD || field == NARRATION_FIELD) {
 			const std::optional<float> volume = parse_volume(value);
 			if (!volume.has_value()) {
 				repaired = true;
 			} else if (field == MUSIC_FIELD) {
 				parsed.settings.music_volume = *volume;
 				music_found = true;
-			} else {
+			} else if (field == EFFECTS_FIELD) {
 				parsed.settings.effects_volume = *volume;
 				effects_found = true;
+			} else {
+				parsed.settings.narration_volume = *volume;
+			}
+		} else if (field == SUBTITLES_FIELD || field == VIBRATION_FIELD) {
+			// A file from before these existed simply lacks them, and gets their defaults with no complaint.
+			const std::optional<bool> enabled = parse_switch(value);
+			if (!enabled.has_value()) {
+				repaired = true;
+			} else if (field == SUBTITLES_FIELD) {
+				parsed.settings.subtitles = *enabled;
+			} else {
+				parsed.settings.vibration = *enabled;
 			}
 		} else if (field.substr(0, KEY_FIELD_PREFIX.size()) == KEY_FIELD_PREFIX) {
 			const std::string_view name = field.substr(KEY_FIELD_PREFIX.size());
@@ -149,6 +174,9 @@ std::string serialize_settings(const Settings &p_settings) {
 	text.append(VERSION_FIELD).append("=").append(std::to_string(SETTINGS_VERSION)).append("\n");
 	append_number(text, MUSIC_FIELD, p_settings.music_volume);
 	append_number(text, EFFECTS_FIELD, p_settings.effects_volume);
+	append_number(text, NARRATION_FIELD, p_settings.narration_volume);
+	text.append(SUBTITLES_FIELD).append(p_settings.subtitles ? "=1\n" : "=0\n");
+	text.append(VIBRATION_FIELD).append(p_settings.vibration ? "=1\n" : "=0\n");
 	for (const GameAction action : ALL_ACTIONS) {
 		text.append(KEY_FIELD_PREFIX).append(action_name(action)).append("=").append(std::to_string(p_settings.keys[index_of(action)])).append("\n");
 	}

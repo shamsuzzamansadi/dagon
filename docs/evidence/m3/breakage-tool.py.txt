@@ -1,0 +1,319 @@
+#!/usr/bin/env python3
+"""Deliberate breakage of M3's work, one change at a time, each in a scratch clone with isolated storage. Evidence only."""
+import os, subprocess, sys, threading, queue, re, tempfile, shutil, time
+S = os.environ["S"]
+ROOT = f"{S}/mut"
+SOURCE = f"{S}/work"
+SCONS = f"{S}/venv/bin/scons"
+GODOT = os.path.expanduser("~/bin/godot")
+ENV = dict(os.environ, SCONS_CACHE=os.path.expanduser("~/.cache/dagon-scons/"), TMPDIR=f"{S}/tmp")
+
+D = "src/game_director.cpp"
+P = "src/core/sequence_puzzle.cpp"
+PC = "src/puzzle_controller.cpp"
+ST = "src/core/story_progress.cpp"
+G = "src/game_session.cpp"
+M = "src/menu_controller.cpp"
+C = "src/camera_rig.cpp"
+W = "project/scenes/level/shore.tscn"
+E = "project/scenes/ui/ending.tscn"
+S_ = "src/core/save_data.cpp"
+
+H = "src/hud.cpp"
+N = "src/core/narration.cpp"
+HP = "src/haptics.cpp"
+I = "src/interactable.cpp"
+ST2 = "src/storage.cpp"
+SD = "src/core/settings_data.cpp"
+SM = "src/settings_menu.cpp"
+HS = "project/scenes/ui/hud.tscn"
+
+BREAKAGES = [
+ # Narration rules.
+ ("An optional line interrupts a story moment", N, "	if (p_priority == LinePriority::Optional && p_current == LinePriority::Story) {\n		return LineDecision::Ignore;\n	}\n", ""),
+ ("Asking for the same line restarts it", N, "	if (p_current_id == p_id) {\n		return LineDecision::Ignore;\n	}\n", ""),
+ ("A story moment cannot replace what is being said", N, "	return LineDecision::Start;\n}\n\ndouble", "	return LineDecision::Ignore;\n}\n\ndouble"),
+ ("A voiced caption ends as the voice does, with no margin", N, "constexpr double AUDIO_MARGIN_SECONDS = 0.8;", "constexpr double AUDIO_MARGIN_SECONDS = 0.0;"),
+ ("Text gets no reading time", N, "	return std::max(reading, p_minimum_seconds);", "	return p_minimum_seconds;"),
+ ("A damaged script line is guessed at", N, "		if (second == std::string_view::npos) {\n			parsed.problems++;\n			continue;\n		}\n", "		if (second == std::string_view::npos) {\n			continue;\n		}\n"),
+ # Playback and skipping.
+ ("The voice outlives its caption", H, "	if (AudioStreamPlayer *voice = voice_.get()) {\n		voice->stop();\n	}\n	speaking_ = false;", "	speaking_ = false;"),
+ ("Skipping also examines", H, "	hide_caption();\n	get_viewport()->set_input_as_handled();", "	hide_caption();"),
+ ("A press at something else only skips", H, "		if (is_a_move_in_the_game || starts_another_optional_line) {", "		if (is_a_move_in_the_game) {"),
+ ("A press during a story moment examines", H, " && current_priority_ == core::LinePriority::Optional;", ";"),
+ ("Speech swallows a press at a stone", H, "		if (is_a_move_in_the_game || starts_another_optional_line) {", "		if (starts_another_optional_line) {"),
+ ("Subtitles off hides text lines too", H, "	const bool visible = !voiced || storage::subtitles_enabled();", "	const bool visible = storage::subtitles_enabled();"),
+ ("The subtitle setting is ignored", H, "	const bool visible = !voiced || storage::subtitles_enabled();", "	const bool visible = true;"),
+ ("Feedback waits behind what is being said", H, "void Hud::show_caption(const String &p_text) {\n	hide_caption();\n", "void Hud::show_caption(const String &p_text) {\n	if (speaking_) {\n		return;\n	}\n	hide_caption();\n"),
+ ("A fall leaves the line going", D, "	if (Hud *hud = hud_.get()) {\n		hud->hide_caption();\n	}\n	fade_in();", "	fade_in();"),
+ ("A prop ignores its line", I, "		caption_ = narration::line_text(line_id_);\n	}\n}", "	}\n}"),
+ ("The voice is not on the Narration bus", HS, 'bus = &"Narration"\n', ""),
+ ("The Monolith line is said on restore too", D, "	play_atmosphere(beat, true);\n	PlayerController *player = player_.get();", "	play_atmosphere(beat, true);\n	if (beat == core::Beat::Monolith) {\n		if (Hud *hud = hud_.get()) {\n			hud->say(LINE_MONOLITH);\n		}\n	}\n	PlayerController *player = player_.get();"),
+ # The epilogue.
+ ("Continue skips the rest of the epilogue", M, "	if (ending_line_ + 1 < ending_lines_.size()) {\n		show_next_ending_line();\n		return;\n	}\n	open_credits();", "	open_credits();"),
+ ("The epilogue never moves on by itself", M, "	if (ending_line_left_ <= 0.0) {\n		show_next_ending_line();\n	}\n", ""),
+ ("The voice goes on into the credits", M, "void MenuController::open_credits() {\n	if (AudioStreamPlayer *voice = voice_.get()) {\n		voice->stop();\n	}\n", "void MenuController::open_credits() {\n"),
+ ("Moving on in the epilogue leaves the last line speaking", M, "	if (voice != nullptr) {\n		voice->stop();\n	}\n	if (voiced) {", "	if (voiced) {"),
+ # Settings.
+ ("The narration volume sets no bus", ST2, '	set_bus_level("Narration", p_settings.narration_volume);\n', ""),
+ ("The subtitle switch never reaches the game", ST2, "	engine->set_meta(SUBTITLES_META, p_settings.subtitles);\n", ""),
+ ("The vibration switch never reaches the game", ST2, "	engine->set_meta(VIBRATION_META, p_settings.vibration);\n", ""),
+ ("The subtitle switch is not saved", SD, '	text.append(SUBTITLES_FIELD).append(p_settings.subtitles ? "=1\\n" : "=0\\n");\n', ""),
+ ("Toggling subtitles does nothing", SM, "	settings_.subtitles = !settings_.subtitles;\n", ""),
+ ("Restore Defaults leaves vibration off", SM, "	settings_ = core::Settings{};\n	state_ = State::Idle;", "	const bool vibration = settings_.vibration;\n	settings_ = core::Settings{};\n	settings_.vibration = vibration;\n	state_ = State::Idle;"),
+ # Vibration.
+ ("Vibration ignores the setting", HP, "	if (p_device <= NO_CONTROLLER || !storage::vibration_enabled()) {", "	if (p_device <= NO_CONTROLLER) {"),
+ ("A keyboard player's cue vibrates", HP, "	if (p_device <= NO_CONTROLLER || !storage::vibration_enabled()) {", "	if (!storage::vibration_enabled()) {"),
+ ("A cue lasts far too long", HP, '{ "reveal", 0.3f, 0.7f, 0.9f }', '{ "reveal", 0.3f, 0.7f, 5.0f }'),
+ ("A cue is far too strong", HP, '{ "reveal", 0.3f, 0.7f, 0.9f }', '{ "reveal", 1.0f, 1.0f, 0.9f }'),
+ ("Pausing leaves it vibrating", D, "p_what == NOTIFICATION_PAUSED || p_what == NOTIFICATION_EXIT_TREE", "p_what == NOTIFICATION_EXIT_TREE"),
+ ("Leaving the world leaves it vibrating", D, "p_what == NOTIFICATION_PAUSED || p_what == NOTIFICATION_EXIT_TREE", "p_what == NOTIFICATION_PAUSED"),
+ ("Changing device leaves the old one vibrating", D, "	if (p_device != input_device_) {\n		haptics::stop(input_device_);\n	}\n", ""),
+ ("A cinematic has lost its cue", W, 'tracks/2/path = NodePath("GameDirector")', 'tracks/2/path = NodePath("Tint")'),
+ # Background events and routes.
+ ("A background event replays on every crossing", D, "		if (trigger != nullptr && trigger->get_trigger_id() == p_trigger_id) {\n			trigger->set_enabled(false);\n		}\n	}\n	print_verbose(\"dagon: background event: \"", "	}\n	print_verbose(\"dagon: background event: \""),
+ ("A background event runs during a cinematic", D, "	if (active_.has_value() || background == nullptr || background->is_playing()) {", "	if (background == nullptr || background->is_playing()) {"),
+ ("A restored world replays what is behind it", D, "		if (trigger != nullptr && trigger->get_spent_from_beat() <= start_beat_) {\n			trigger->set_enabled(false);\n		}\n", ""),
+ ("The sailor does not turn back", D, "				player->face(-1);\n", "				(void)player;\n"),
+ ("The ritual has left the director's triggers", W, 'background_triggers = [NodePath("../Triggers/RitualSight"), ', 'background_triggers = ['),
+ ("The shelf cannot be stood on", W, 'polygon = PackedVector2Array(2826, -36, 2990, -36, 2990, -28, 2826, -28)', 'polygon = PackedVector2Array(2826, -36, 2826, -36, 2826, -36, 2826, -36)'),
+ ("The relief can be read from the shelf above", W, 'position = Vector2(0, 6)\nshape = SubResource("relief_shape")', 'position = Vector2(0, -6)\nshape = SubResource("relief_shape")'),
+ ("A prop names a line that is not in the script", W, 'line_id = &"abyss.footprint"', 'line_id = &"abyss.print"'),
+ ("The hand is drawn behind the monolith", W, 'visible = false\nz_index = 1\nposition = Vector2(50, 170)', 'visible = false\nposition = Vector2(50, 170)'),
+ ("The hand misses the monolith", W, '"values": [Vector2(50, 170), Vector2(0, 0)]', '"values": [Vector2(50, 170), Vector2(300, 0)]'),
+ ("The epilogue loses Innsmouth", E, '"ending.listen", "ending.innsmouth", "ending.rising"', '"ending.listen", "ending.rising"'),
+
+ # The puzzle rules.
+ ("A wrong stone keeps the attempt's progress", P, "	rejecting_until_ = p_now + reset_delay_;\n	progress_ = 0;", "	rejecting_until_ = p_now + reset_delay_;"),
+ ("A repeated press counts as a wrong stone", P, "	if (std::find(solution_.begin(), accepted_end, p_id) != accepted_end) {\n		return PuzzleResult::Ignored;\n	}\n", "	(void)accepted_end;\n"),
+ ("Presses during the lockout count", P, "state_ == PuzzleState::Solved || state_ == PuzzleState::Rejecting || !knows(p_id)", "state_ == PuzzleState::Solved || !knows(p_id)"),
+ ("The lockout never ends", P, "	if (state_ != PuzzleState::Rejecting || p_now < rejecting_until_) {\n		return false;\n	}\n	state_ = PuzzleState::Idle;\n	return true;", "	(void)p_now;\n	return false;"),
+ ("Reset can undo a solved puzzle", P, "	if (state_ == PuzzleState::Solved) {\n		return;\n	}\n	progress_ = 0;", "	progress_ = 0;"),
+ # The adapter.
+ ("A wrong stone leaves the lights on", PC, "			show_lit(0);\n			set_stones_enabled(false);\n			print_verbose(\"dagon: puzzle rejected\");", "			set_stones_enabled(false);\n			print_verbose(\"dagon: puzzle rejected\");"),
+ ("A wrong stone leaves the prompts up during the lockout", PC, "			show_lit(0);\n			set_stones_enabled(false);\n			print_verbose(\"dagon: puzzle rejected\");", "			show_lit(0);\n			print_verbose(\"dagon: puzzle rejected\");"),
+ ("The stones stay usable after the lockout never returns them", PC, "	if (puzzle_.update(elapsed_)) {\n		set_stones_enabled(true);\n	}", "	puzzle_.update(elapsed_);"),
+ ("Solved stones keep reacting", PC, "			show_lit(puzzle_.progress());\n			set_stones_enabled(false);\n			print_verbose(\"dagon: puzzle solved\");", "			show_lit(puzzle_.progress());\n			print_verbose(\"dagon: puzzle solved\");"),
+ ("Restoring leaves the stones dark", PC, "	show_lit(puzzle_.progress());\n	set_stones_enabled(false);\n}\n\nvoid PuzzleController::show_lit", "	set_stones_enabled(false);\n}\n\nvoid PuzzleController::show_lit"),
+ ("An unknown stone goes unreported and is treated as wrong", PC, "		ERR_PRINT(\"PuzzleController: a stone submitted an id that is not in the solution.\");\n		return;\n", "		show_lit(0);\n		emit_signal(\"failed\");\n		return;\n"),
+ # Story rules.
+ ("The flee's timeout does not end the game", ST, "		case Event::Collapse:\n		case Event::FleeTimeout:\n			return Beat::Ended;", "		case Event::Collapse:\n			return Beat::Ended;\n		case Event::FleeTimeout:\n			return Beat::Fleeing;"),
+ ("A fall during the final sequence has nowhere to return to", ST, "	return is_savable(p_beat) ? p_beat : Beat::Awakened;", "	return p_beat;"),
+ ("Control is given back as soon as the reveal finalizes, before RevealDone", ST, "	return p_beat != Beat::Witness && p_beat != Beat::Ended;", "	return p_beat != Beat::Ended;"),
+ ("The Witness may be saved", ST, "	return p_beat == Beat::Shore || p_beat == Beat::Abyss || p_beat == Beat::Monolith || p_beat == Beat::Awakened;", "	return p_beat == Beat::Shore || p_beat == Beat::Abyss || p_beat == Beat::Monolith || p_beat == Beat::Awakened || p_beat == Beat::Witness;"),
+ ("The flee awaits no trigger", ST, "		case Beat::Fleeing:\n			return \"collapse\";\n", ""),
+ # Triggers and events.
+ ("A rejected trigger is consumed", D, "	// A rejection changes nothing, and the trigger stays armed.\n	const std::optional<core::Beat> beat = progress_.apply(p_event);", "	consume_trigger(p_event);\n	const std::optional<core::Beat> beat = progress_.apply(p_event);"),
+ ("An accepted trigger is not consumed", D, "	consume_trigger(p_event);\n	enter_beat(*beat);", "	enter_beat(*beat);"),
+ ("A trigger during a cinematic moves the story", D, "	if (active_.has_value()) {\n		// A trigger is dropped and stays armed: the recheck after finalization finds it again.\n		if (p_source == EventSource::Internal) {", "	if (active_.has_value() && p_source == EventSource::Internal) {\n		{"),
+ ("A trigger during a cinematic is consumed", D, "		// A trigger is dropped and stays armed: the recheck after finalization finds it again.\n		if (p_source == EventSource::Internal) {", "		if (p_source == EventSource::Trigger) { consume_trigger(p_event); }\n		if (p_source == EventSource::Internal) {"),
+ ("A second pending event silently replaces the first", D, "				report_contract_error(\"GameDirector: more than one event pending during a cinematic.\");", "				pending_ = p_event;"),
+ ("A pending event is dropped", D, "	if (pending_.has_value()) {\n		const core::Event event = *pending_;\n		pending_.reset();\n		process_event(event, EventSource::Internal);", "	if (pending_.has_value()) {\n		pending_.reset();"),
+ # The cinematic contract.
+ ("No generation guard: a stale finalize ends the newer cinematic", D, "	if (!active_.has_value() || p_generation != active_->generation) {\n		return;\n	}\n	const ActiveCinematic finished", "	(void)p_generation;\n	if (!active_.has_value()) {\n		return;\n	}\n	const ActiveCinematic finished"),
+ ("A completion for another clip finalizes this one", D, "	if (active_.has_value() && p_clip == active_->clip) {", "	(void)p_clip;\n	if (active_.has_value()) {"),
+ ("A second start replaces the running cinematic", D, "		report_contract_error(String(\"GameDirector: cinematic '\") + p_clip + \"' refused, because '\" + active_->clip + \"' is active.\");\n		return false;\n", "		report_contract_error(String(\"GameDirector: cinematic '\") + p_clip + \"' refused, because '\" + active_->clip + \"' is active.\");\n"),
+ ("A missing clip is never finalized", D, "		report_contract_error(String(\"GameDirector: cinematic clip '\") + p_clip + \"' is missing.\");\n		finalize_cinematic(generation_);\n		return true;", "		report_contract_error(String(\"GameDirector: cinematic clip '\") + p_clip + \"' is missing.\");\n		active_->deadline = 100000.0;\n		return true;"),
+ ("A looping clip is played", D, "	if (animation->get_loop_mode() != Animation::LOOP_NONE) {", "	if (false) {"),
+ ("The watchdog never fires", D, "		if (active_->elapsed >= active_->deadline) {", "		if (false) {"),
+ ("The watchdog ignores the margin and fires at the clip's length", D, "constexpr double WATCHDOG_MARGIN_SECONDS = 2.0;", "constexpr double WATCHDOG_MARGIN_SECONDS = 0.0;"),
+ ("Finalizing leaves a stuck clip playing", D, "	if (player != nullptr && player->get_assigned_animation() == finished.clip) {\n		player->stop(true);\n	}\n", ""),
+ ("Finalizing does not put the camera back", D, "	apply_outcome(finished.beat);\n	restore_camera();\n", "	apply_outcome(finished.beat);\n"),
+ ("Finalizing gives control back whatever the beat", D, "	set_player_control(core::has_player_control(finished.beat));", "	set_player_control(true);"),
+ ("The follow-up runs inside the finalizer, not deferred", D, "	callable_mp(this, &GameDirector::after_cinematic).call_deferred(finished.clip);", "	after_cinematic(finished.clip);"),
+ ("A deferred step acts on a world that has left the tree", D, "	if (!is_inside_tree()) {\n		return;\n	}\n	// The scene change", "	// The scene change"),
+ ("RevealDone is not raised", D, "	if (p_clip == StringName(CLIP_REVEAL)) {\n		process_event(core::Event::RevealDone, EventSource::Internal);\n		if (active_.has_value()) {\n			return;\n		}\n	}\n", ""),
+ ("The recheck after a cinematic is never scheduled", D, "	// call_deferred runs in this frame's flush, with overlap lists from before the camera and player moved.\n	schedule_recheck();", ""),
+ ("The recheck on entering a beat is never scheduled", D, "			emit_signal(\"checkpoint_reached\", static_cast<int>(p_beat));\n			schedule_recheck();", "			emit_signal(\"checkpoint_reached\", static_cast<int>(p_beat));"),
+ ("The recheck waits only one frame", D, "constexpr uint64_t RECHECK_FRAMES = 3;", "constexpr uint64_t RECHECK_FRAMES = 1;"),
+ ("The recheck waits two frames, as first designed", D, "constexpr uint64_t RECHECK_FRAMES = 3;", "constexpr uint64_t RECHECK_FRAMES = 2;"),
+ # Outcomes.
+ ("The gate opens only in the clip", D, "			open_gate();\n			if (PuzzleController", "			if (PuzzleController"),
+ ("The gate is hidden but stays solid", D, "		gate->set_deferred(\"collision_layer\", 0);\n", ""),
+ ("The gate changes in a physics callback, not deferred", D, "		gate->set_deferred(\"collision_layer\", 0);", "		gate->set_collision_layer(0);"),
+ ("The mural keeps its first caption", D, "				mural->set_caption(mural_solved_caption_);", "				(void)mural;"),
+ ("The mural is not lit", D, "					visual->set_visible(true);\n", ""),
+ ("Fleeing leaves control locked", D, "		case core::Beat::Fleeing:\n			set_player_control(true);\n			flee_elapsed_ = 0.0;", "		case core::Beat::Fleeing:\n			flee_elapsed_ = 0.0;"),
+ ("The flee timer never runs out", D, "		if (flee_elapsed_ >= flee_timeout_) {", "		if (false) {"),
+ ("The flee's default is 20 seconds", "src/game_director.hpp", "double flee_timeout_ = 12.0;", "double flee_timeout_ = 20.0;"),
+ ("The ending leaves a time scale behind", D, "	reset_global_state();\n	Node *ending = ending_scene_->instantiate();", "	Node *ending = ending_scene_->instantiate();"),
+ ("The scene changes inside the finalizer, not deferred", D, "	apply_outcome(finished.beat);\n	restore_camera();\n	set_player_control(core::has_player_control(finished.beat));\n	active_.reset();", "	apply_outcome(finished.beat);\n	restore_camera();\n	set_player_control(core::has_player_control(finished.beat));\n	active_.reset();\n	if (finished.beat == core::Beat::Ended) { go_to_ending(); }"),
+ ("The ending forgets the active device", D, "		menu->set_active_device(input_device_);\n", "		(void)menu;\n"),
+ # Out of bounds.
+ ("A fall while locked is forgotten", D, "		recovery_pending_ = true;\n		return;", "		return;"),
+ ("The recheck does not look in the kill plane for itself", D, "	if (recovery_pending_ || (kill_plane != nullptr && kill_plane->is_player_inside())) {", "	(void)kill_plane;\n	if (recovery_pending_) {"),
+ ("A fall while locked teleports at once", D, "	if (active_.has_value()) {\n		recovery_pending_ = true;\n		return;\n	}\n	restart_checkpoint();", "	restart_checkpoint();"),
+ # Restoring and saving.
+ ("Restoring plays the awakening again", D, "	play_atmosphere(beat, true);\n	PlayerController *player = player_.get();", "	play_atmosphere(beat, true);\n	if (beat == core::Beat::Awakened) { start_cinematic(CLIP_AWAKEN); }\n	PlayerController *player = player_.get();"),
+ ("Restoring forgets the outcomes", D, "	for (int reached = 0; reached <= start_beat_; reached++) {\n		apply_outcome(static_cast<core::Beat>(reached));\n	}\n", ""),
+ ("Restoring brings spent triggers back", D, "		if (event.has_value() && static_cast<int>(core::beat_after(*event)) <= start_beat_) {\n			trigger->set_enabled(false);\n		}\n", ""),
+ ("Restoring leaves the atmosphere at the start", D, "	play_atmosphere(beat, true);\n	PlayerController *player = player_.get();", "	PlayerController *player = player_.get();"),
+ ("Restoring leaves the atmosphere clip running", D, "		atmosphere->seek(atmosphere->get_animation(clip)->get_length(), true);\n		atmosphere->stop(true);\n", "		atmosphere->seek(atmosphere->get_animation(clip)->get_length(), true);\n"),
+ ("Restoring does not teleport", D, "	if (start_beat_ > 0 && player != nullptr && index < checkpoints_.size()) {", "	if (false && player != nullptr && index < checkpoints_.size()) {"),
+ ("The Awakened save is written as the cinematic starts", D, "		case core::Beat::Awakened:\n			start_cinematic(CLIP_AWAKEN);", "		case core::Beat::Awakened:\n			emit_signal(\"checkpoint_reached\", static_cast<int>(p_beat));\n			start_cinematic(CLIP_AWAKEN);"),
+ ("The Awakened save is never written", D, "	if (finished.clip == StringName(CLIP_AWAKEN)) {\n		emit_signal(\"checkpoint_reached\", static_cast<int>(finished.beat));\n	}\n", ""),
+ ("Saving is allowed during a cinematic", G, "	if (director != nullptr && !director->is_safe_to_save()) {\n		return false;\n	}\n", ""),
+ ("The quit text does not mention the final sequence", M, "		message += session->is_in_final_sequence() ? QUIT_FINAL_SEQUENCE_MESSAGE : QUIT_SAVED_MESSAGE;", "		message += QUIT_SAVED_MESSAGE;"),
+ ("A monolith save is refused as incompatible", S_, "	if (!beat.has_value() || !is_savable(*beat) || *checkpoint_text != checkpoint_id(*beat)) {\n		return rejected(SaveStatus::Corrupt);\n	}\n", "	if (!beat.has_value() || !is_savable(*beat) || *checkpoint_text != checkpoint_id(*beat)) {\n		return rejected(SaveStatus::Corrupt);\n	}\n	if (*beat == Beat::Monolith) {\n		return rejected(SaveStatus::Incompatible);\n	}\n"),
+ # The camera.
+ ("restore_view keeps the clip's zoom", C, "	set_zoom(default_zoom_);\n", ""),
+ ("restore_view keeps the clip's limits", C, "	set_limit(SIDE_TOP, default_limit_top_);\n", ""),
+ ("restore_view keeps the shake", C, "	trauma_ = 0.0f;\n	set_offset(Vector2());\n", ""),
+ ("restore_view keeps the clip's target", C, "void CameraRig::restore_view(Node2D *p_target) {\n	set_target(p_target);\n", "void CameraRig::restore_view(Node2D *p_target) {\n	(void)p_target;\n"),
+ # The world.
+ ("A stone is not connected to the puzzle", W, '[connection signal="interacted" from="Monolith/GlyphEye" to="Monolith/Puzzle" method="submit"]\n', ""),
+ ("The puzzle is not connected to the director", W, '[connection signal="solved" from="Monolith/Puzzle" to="GameDirector" method="on_puzzle_solved"]\n', ""),
+ ("A wrong stone shows no caption", W, '[connection signal="failed" from="Monolith/Puzzle" to="Hud" method="show_caption" binds=["The stones grind and go dark."]]\n', ""),
+ ("The stones' solution is in the wrong order", W, 'solution = PackedStringArray("glyph_wave", "glyph_kneel", "glyph_eye")', 'solution = PackedStringArray("glyph_kneel", "glyph_wave", "glyph_eye")'),
+ ("Collapse is left out of the director's triggers", W, 'NodePath("../Triggers/Witness"), NodePath("../Triggers/Collapse")]', 'NodePath("../Triggers/Witness")]'),
+ ("Collapse sits too near the Witness for the GDD's run", W, 'position = Vector2(3760, -30)', 'position = Vector2(4100, -30)'),
+ ("The gate has no collision", W, 'position = Vector2(4300, -150)\ncollision_layer = 1', 'position = Vector2(4300, -150)\ncollision_layer = 0'),
+ ("A clip's track points at a renamed node", W, 'NodePath("Monolith/Gate/Visual:position")', 'NodePath("Monolith/GateVisual:position")'),
+ ("A clip calls a method that does not exist", W, '"method": &"aim_at"', '"method": &"aim_toward"'),
+ ("The collapse clip loops", W, 'resource_name = "collapse"\nlength = 3\n', 'resource_name = "collapse"\nlength = 3\nloop_mode = 1\n'),
+ ("The crevasse is too deep to climb out of", W, '2150, 0, 2150, 18, 2176, 18, 2176, 0', '2150, 0, 2150, 40, 2176, 40, 2176, 0'),
+ ("The lockout runs on while paused", W, '[node name="Puzzle" type="PuzzleController" parent="Monolith"]\n', '[node name="Puzzle" type="PuzzleController" parent="Monolith"]\nprocess_mode = 3\n'),
+ ("The flee timer and watchdog run on while paused", W, '[node name="GameDirector" type="GameDirector" parent="."]\n', '[node name="GameDirector" type="GameDirector" parent="."]\nprocess_mode = 3\n'),
+ ("Clips run on while paused", W, '[node name="Cinematics" type="AnimationPlayer" parent="."]\n', '[node name="Cinematics" type="AnimationPlayer" parent="."]\nprocess_mode = 3\n'),
+ ("A polygon crosses itself and is silently not drawn", W, 'PackedVector2Array(-16, 0, -19, -3, -10, -5, -7, -11, -4, -5, 0, -12, 4, -5, 8, -10, 10, -5, 18, -3, 15, 0)', 'PackedVector2Array(-16, 0, 15, -5, -16, -5, 15, 0)'),
+ ("The ending has no way to the main menu", E, '[connection signal="pressed" from="Center/Credits/Items/MainMenu" to="." method="quit_to_main_menu"]\n', ""),
+ ("The ending's Back works at its root and leaves", M, "			if (mode_ == MODE_PAUSE) {\n				resume();\n			}\n			break;", "			if (mode_ == MODE_PAUSE) {\n				resume();\n			} else if (mode_ == MODE_ENDING) {\n				quit_to_main_menu();\n			}\n			break;"),
+]
+
+# After the owner's playtest: the clues off the main line, the rockfall and the sea.
+BREAKAGES += [
+ ("The rock never comes down", D, "			bring_down_rockfall();\n", ""),
+ ("The rock can be seen but not stood on", D, '		rockfall->set_deferred("collision_layer", WORLD_COLLISION_LAYER);\n', ""),
+ ("The rock cannot be seen", D, "		rockfall->set_visible(true);\n", ""),
+ ("The rock blocks the way from the start", W, '[node name="Rockfall" type="StaticBody2D" parent="."]\nvisible = false\ncollision_layer = 0', '[node name="Rockfall" type="StaticBody2D" parent="."]\nvisible = false\ncollision_layer = 1'),
+ ("The rock is too high to hop", W, "polygon = PackedVector2Array(4196, 0, 4198, -8, 4206, -15, 4217, -14, 4225, -9, 4228, 0)", "polygon = PackedVector2Array(4196, 0, 4198, -48, 4206, -55, 4217, -54, 4225, -49, 4228, 0)"),
+ ("A rock lands when a run could be under it", W, "PackedFloat32Array(0, 2.15, 2.6)", "PackedFloat32Array(0, 6.15, 6.6)"),
+ ("A rock is drawn away from where it collides", W, '[node name="RockFar" type="Polygon2D" parent="Rockfall"]\nposition = Vector2(3838, 0)', '[node name="RockFar" type="Polygon2D" parent="Rockfall"]\nposition = Vector2(3900, 0)'),
+ ("The third tablet can be read from the ground", W, '[node name="TabletEye" type="Interactable" parent="Props"]\nposition = Vector2(3445, -56)', '[node name="TabletEye" type="Interactable" parent="Props"]\nposition = Vector2(3445, -20)'),
+ ("The second tablet can be read from the shelf", W, "size = Vector2(26, 12)", "size = Vector2(26, 90)"),
+ ("The second shelf gets back its near rock", W, "3036, 0, 3584, 0, 3584, -14", "3036, 0, 3380, 0, 3380, -14, 3410, -14, 3410, 0, 3584, 0, 3584, -14"),
+ ("The sea never rises", W, 'tracks/8/path = NodePath("ReturningSea/Water:position")', 'tracks/8/path = NodePath("ReturningSea/Water:scale")'),
+ ("The fade comes before the sea", W, '"times": PackedFloat32Array(4.3, 5.8),', '"times": PackedFloat32Array(2.6, 3.6),'),
+ ("The water stops short of the top", W, "Vector2(-16, 150), Vector2(-40, -20)]", "Vector2(-16, 150), Vector2(-40, 120)]"),
+ ("The mural's fragments lose the order", "project/narration/script.txt", "Water, perhaps. A bent shape. Something round.", "Something round. A bent shape. Water, perhaps."),
+]
+
+
+def run(cmd, cwd, env=ENV, timeout=None):
+    return subprocess.run(cmd, cwd=cwd, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, errors="replace", timeout=timeout)
+
+def build(cwd):
+    result = run([SCONS, "platform=linux", "target=template_debug", "-j3"], cwd)
+    return result.returncode == 0, result.stdout
+
+def test(cwd):
+    lines = []
+    unit = run([SCONS, "unit_tests"], cwd)
+    for line in unit.stdout.splitlines():
+        if "ERROR: CHECK" in line or "ERROR: REQUIRE" in line:
+            lines.append(line[:170])
+        if line.startswith("[doctest] test cases"):
+            lines.append(line)
+    storage = tempfile.mkdtemp(prefix="dagon-test-", dir=ENV["TMPDIR"])
+    env = dict(ENV, DAGON_STORAGE_DIR=storage)
+    try:
+        started = time.time()
+        godot = run([GODOT, "--headless", "--path", "project", "--fixed-fps", "60", "--script", "res://tests/run_tests.gd"], cwd, env=env, timeout=900)
+        stdout = godot.stdout
+    except subprocess.TimeoutExpired as error:
+        stdout = (error.stdout or "") if isinstance(error.stdout, str) else ""
+        stdout += "\nTIMED OUT\n"
+    finally:
+        shutil.rmtree(storage, ignore_errors=True)
+    tests = [line for line in stdout.splitlines() if line.startswith("FAIL") or line.startswith("     ") or line.startswith("RESULT") or "TIMED OUT" in line or "Parse Error" in line]
+    return lines, tests, unit.returncode
+
+def caught(unit_lines, tests):
+    fails = [l for l in tests if l.startswith("FAIL")]
+    unit_failed = any("ERROR:" in l for l in unit_lines) or any("| 0 failed" not in l for l in unit_lines if l.startswith("[doctest]"))
+    result = [l for l in tests if l.startswith("RESULT")]
+    clean = result and result[-1].endswith("failed=0")
+    return bool(fails) or unit_failed or not clean
+
+results = {}
+def worker(index, jobs, out):
+    cwd = f"{ROOT}/w{index}"
+    out.write(f"########## worker {index}\n=== control: no change\n"); out.flush()
+    ok, log = build(cwd)
+    if not ok:
+        out.write("CONTROL DID NOT BUILD\n" + log[-2000:]); return
+    run(["sh", "tools/prepare_project.sh"], cwd)
+    run([GODOT, "--headless", "--path", "project", "--import"], cwd)
+    unit, tests, _ = test(cwd)
+    out.write("\n".join(unit + [l for l in tests if l.startswith(("FAIL", "RESULT"))]) + "\n\n"); out.flush()
+    while True:
+        try:
+            item = jobs.get_nowait()
+        except queue.Empty:
+            break
+        order, (name, path, old, new) = item
+        full = os.path.join(cwd, path)
+        text = open(full).read()
+        if old not in text:
+            out.write(f"=== {name}\nNOT APPLIED: the text was not found in {path}\n\n"); out.flush()
+            results[order] = (name, "not applied", 0)
+            continue
+        open(full, "w").write(text.replace(old, new, 1))
+        section = [f"=== {name}"]
+        verdict = "caught"
+        count = 0
+        ok, log = build(cwd) if path.startswith("src") else (True, "")
+        if not ok:
+            errs = [l for l in log.splitlines() if " error" in l or "error:" in l][:3]
+            section += ["DID NOT COMPILE, so this is not a result:"] + [e[:200] for e in errs]
+            verdict = "did not compile"
+        else:
+            unit, tests, _ = test(cwd)
+            shown = [l for l in unit if "ERROR" in l][:3] + tests[:14]
+            section += [l[:230] for l in shown]
+            result = [l for l in tests if l.startswith("RESULT")]
+            if result:
+                section.append(result[-1])
+            count = sum(1 for l in tests if l.startswith("FAIL"))
+            if not caught(unit, tests):
+                verdict = "NOT CAUGHT"
+                section.append("NOT CAUGHT")
+        out.write("\n".join(section) + "\n\n"); out.flush()
+        results[order] = (name, verdict, count)
+        run(["git", "checkout", "--", path], cwd)
+        if path.startswith("src"):
+            build(cwd)
+    out.write(f"=== control after, worker {index}\n")
+    unit, tests, _ = test(cwd)
+    out.write("\n".join(unit + [l for l in tests if l.startswith(("FAIL", "RESULT"))]) + "\n\n"); out.flush()
+
+def main():
+    workers = int(sys.argv[1])
+    only = sys.argv[2:]  # optional substrings to run a subset
+    # What the first full pass at 2cae7bb did not catch, and the replacements for its two invalid entries.
+    gaps = ("A wrong stone leaves the prompts up", "Solved stones keep reacting", "The flee awaits no trigger", "A looping clip is played",
+            "The gate changes in a physics callback", "The scene changes inside the finalizer", "Restoring leaves the atmosphere clip running",
+            "The lockout runs on while paused", "The flee timer and watchdog run on while paused", "Clips run on while paused", "A polygon crosses itself")
+    new_from = next(i for i, b in enumerate(BREAKAGES) if b[0] == "A wrong stone keeps the attempt's progress")
+    items = BREAKAGES[:new_from] + [b for b in BREAKAGES[new_from:] if any(g in b[0] for g in gaps)]
+    if only:
+        items = [b for b in BREAKAGES if any(o in b[0] for o in only)]
+    jobs = queue.Queue()
+    for pair in enumerate(items):
+        jobs.put(pair)
+    commit = run(["git", "rev-parse", "--short", "HEAD"], f"{ROOT}/w0").stdout.strip()
+    files = [open(f"{ROOT}/out-{i}.txt", "w") for i in range(workers)]
+    threads = [threading.Thread(target=worker, args=(i, jobs, files[i])) for i in range(workers)]
+    for t in threads: t.start()
+    for t in threads: t.join()
+    for f in files: f.close()
+    with open(f"{ROOT}/summary.txt", "w") as summary:
+        tally = {}
+        for order in sorted(results):
+            name, verdict, count = results[order]
+            tally[verdict] = tally.get(verdict, 0) + 1
+            summary.write(f"{verdict:16} {count:4} failing  {name}\n")
+        summary.write(f"\ncommit {commit}, {len(results)} breakages: {tally}\n")
+    print(open(f"{ROOT}/summary.txt").read())
+
+main()

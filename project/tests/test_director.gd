@@ -176,7 +176,7 @@ func test_examining_shows_the_caption_and_never_pauses(h) -> void:
 	await h.steps(20)
 	Input.action_release("move_right")
 	h.check(player.global_position.x > start_x + 5.0, "the player could not move during a caption")
-	await h.wait_until(func() -> bool: return not caption.visible, 300, "the caption to fade")
+	await h.wait_until(func() -> bool: return not caption.visible, 420, "the caption to fade")
 
 
 func test_a_new_caption_replaces_the_old_one_and_restarts_its_time(h) -> void:

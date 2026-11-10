@@ -113,7 +113,7 @@ String controls_text(int p_active_device, bool p_short, const Ref<Font> &p_font)
 	const int described = p_active_device != KEYBOARD ? p_active_device : first_connected_controller();
 	const std::string controller = described != KEYBOARD ? core::controller_controls_text(family_of(described)) : core::any_controller_controls_text();
 	String text = keyboard_text(p_font) + "\n\n" + to_godot(controller);
-	text += "\n\nSettings changes keyboard keys. Controller buttons are fixed.";
+	text += "\n\nExamining again skips what is being said. Settings changes keyboard keys. Controller buttons are fixed.";
 	return text;
 }
 

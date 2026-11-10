@@ -24,6 +24,71 @@ starts only after M6 is green, and is time-boxed.
 | M7 Publication prep | Nov 28–29 | itch page assets, README, CREDITS, licenses, release notes, AI disclosure text (jam.md §5), tag | The owner uploads and submits. **Internal target: submitted by Nov 29 21:37 UTC.** Downloaded build verified on both OSes. |
 | Buffer | Nov 30 – Dec 1 21:37 UTC | Only fixes to upload or packaging problems. No features. | — |
 
+**Conflict with the owner's target, flagged 2026-11-04.** The owner wants completion **before 20 November.** In the table above, M5 starts on 20 November and M7 ends on 29 November, so these dates cannot stand. They stay as recorded until the owner decides. **Proposed plan, which only works if M3's review and acceptance close by about 6 November:**
+
+| Gate | Proposed window | What it holds | What it depends on, outside the developer's control |
+|---|---|---|---|
+| M3 review and acceptance | to Nov 6 | As delivered | The reviewer's round trip, and the owner's check |
+| M4 Atmosphere | Nov 7–11 | Environments past the Shore, the transition, fog and light, ambience, footsteps | The first-section visual review |
+| M5 Cinematic horror | Nov 12–15 | Dagon's art, the reveal, story cues, **final narration** | **The owner's answer on the voice.** Generating is quick, but judging it by ear is not |
+| M6 Stabilization | Nov 16–18 | Two external playtests, timing, physical controllers, native runs | **Two external players in three days** |
+| M7 Publication prep | Nov 19 | Page, notes, tag | Owner uploads and submits |
+
+**Concrete cuts to reach it, in this order, all to optional embellishment.** Gameplay, validation, readable clues and the reveal are not on this list:
+
+1. All stretch work. Web build, perception shaders, gamma.
+2. Extra parallax beyond two layers past the Shore, and the shelf's watcher event, keeping the ritual and the canyon figure.
+3. Elaborate fog. A flat haze stands in, as it does now.
+4. Sailor animation beyond a landing and a turn, and any creature animation beyond the rise and the hand.
+5. **Narration down to about ten lines:** the talisman, the carving, the three tablets, the mural twice, the reveal, the run and the epilogue, with the rest as text. A reduction the owner would have to accept, as the mix then has more silence.
+6. Unique footsteps per surface.
+
+**If it still does not fit, the owner chooses** between a later date, which the jam allows until 1 December, and cutting more. Key rebinding and save support are never removed silently (D28).
+
+**The owner played the M3 build on 2026-11-04 and did not accept it** ([record](evidence/m3/owner-playtest-2026-11-04.md)). The three small changes that fit M3's scope are D67–D69. **A proposal that goes beyond that scope, with its cost to this schedule, is in the [package](reviews/m3-review-package.md) §12, and waits for the owner.** Nothing in the table above has been moved because of it.
+
+**Schedule from 9 November, replacing the proposals above.** The owner played `5fe820b` and asked for a bounded revision of M3 that brings some M4 and M5 work forward ([D70](decisions.md)). **The owner's target is still completion before 20 November. A move to 24 November is not approved.** These are targets, with the dependencies that could break them named:
+
+| Window | Holds | Depends on, outside the developer's control |
+|---|---|---|
+| Nov 9–10 | This revision delivered. ChatGPT's follow-up review, the owner's playtest, **the owner's choice of voice** | The reviewer's turnaround. The owner's ear |
+| Nov 11–14, M4 | The rest of the route in the reference section's finished style: the Abyss, the shelves, the crossing, the canyon and the monolith. The sound mix, adjusted by the owner's ear. **Final narration, if a voice is chosen by 12 November** | The owner's verdict on the reference section, and on the voice |
+| Nov 15–17, M5 | Dagon's final art and animation, the reveal and the ending, and the final mix | Nothing new |
+| Nov 18–19, M6 | **Two external first-time playtests,** fixes, timing against 10–15 minutes, physical controllers, native runs on both systems | **Two external players, in two days** |
+| Nov 20, M7 | Page, notes, tag. The owner uploads and submits | The owner's time |
+
+**What could break it, and the tradeoffs, in the order they would be offered.** Essential validation is not on this list: CI on three compilers, the exported route, focused breakage when code changes, two external playtests, and the owner's acceptance of an identified build all stay.
+
+1. **Art beyond the reference section** is the largest piece of work. If it runs late, the canyon, monolith and reveal are finished first, and the Abyss's middle keeps the finished far view over simpler ground, still identified as unfinished.
+2. **The voice.** Generating is quick; a person reading takes a session to arrange. If no voice is chosen by 12 November, final narration lands after 20 November or not at all, and the owner decides which.
+3. **External playtesters.** Two first-time players are needed for M6. If they cannot be found by 18 November, M6 cannot pass as defined, and the owner decides whether to wait.
+4. **Polish that can go first:** extra music cues, interface sounds, more ambience variety, extra parallax.
+
+**The 10–15 minute target stays the design's aspiration.** Scripted runs cannot show it, and the revision does not claim it ([package](reviews/m3-review-package.md)).
+
+**Who delivers what, as the owner set out on 2026-11-04, and as changed on 2026-11-09 (D70):**
+
+| | M3 (this milestone) | M4 and M5 |
+|---|---|---|
+| Layout | Playable route, exploration and clue placement | Final environments, and a coherent transition beyond the Shore |
+| Narrative | Props, captions, and background-event logic | Final ritual imagery |
+| Reveal | Readable reveal, timing and collapse. **Since 2026-11-09:** the monolith carved, and the creature drawn over the reveal's shapes, with water and sound | Final Dagon animation, lighting and effects |
+| Controller | Vibration behaviour and settings | Tuning by feel, with the owner |
+| Narration | Playback and subtitle integration. **Voice A, the owner's choice of 2026-11-10, speaks the talisman, the carving and the whole epilogue** | The remaining spoken lines in voice A, and the owner's judgment of it by ear |
+| Audio | **Since 2026-11-09:** an initial sound pass across the route, music in five places, a voice audition, and a listening package | The final mix, by ear, and anything the pass misses |
+| Art | **Since 2026-11-09:** one finished reference section, from the cave entrance to the first tablet; its boundary into the canyon; the monolith, the creature, the carving at the crossing, and the prologue's and epilogue's pictures | The rest of the route: listed below |
+| Persistence | Save and restore correctness, with focused regression coverage | Kept green |
+
+**The art still greybox at the end of M3, for M4 and M5** (the M3 review package, §0.4, keeps the same list):
+1. The Exposed Abyss past x = 1440: ground, canyon walls, rib arch, far view.
+2. The shelves and tablets of Acts II and III, and the canyon figure's ground.
+3. The ledges, slab and stone at the crossing.
+4. The trench, the gate and the stones at the monolith.
+5. The lit mural's panel.
+6. The creature's own animation.
+7. The ritual and the watcher, as more than silhouettes.
+8. The escape's rockfall and returning sea.
+
 **Cut order if the schedule slips (approved):**
 1. Stretch work.
 2. Optional props.
@@ -59,7 +124,19 @@ rebinding and save support are never removed silently (risk R20).
 - [x] **M2: accepted by the owner on 2026-11-03, with documented deferrals** ([record](evidence/m2/owner-acceptance-2026-11-03.md),
   [package](reviews/m2-review-package.md)). The main menu and save moved here from M3 (D36). Audio is volume controls and buses
   prepared, and nothing more (D42). M3–M7 not started.
+- [x] **M3 Complete gameplay, accepted by the owner on 2026-11-10 at `3980bc3`, as the agreed milestone, with the M4/M5, hardware and playtesting deferrals** ([record](evidence/m3/owner-acceptance-2026-11-10.md)). Package: [m3-review-package.md](reviews/m3-review-package.md). Milestone acceptance, not approval of a finished game. No release has been made. M4–M7 not started.
 - **Every later playtest identifies the exact artifact or run it tested.**
+
+## M3 implementation sequence (recorded 2026-11-04, as the owner asked)
+
+1. Plain-C++ rules: `core::SequencePuzzle`, the flee's second way to Ended, and the awaited-trigger, checkpoint and control rules in `StoryProgress`, with native tests.
+2. Adapters: `PuzzleController`, `CameraRig`'s retargeting, shake and restoration, and `GameDirector`'s whole progression and cinematic contract.
+3. The world: the greybox acts in `shore.tscn`, the placeholder clips, and the Ending scene through `MenuController`.
+4. Saving for Monolith and Awakened through the one restore path, with wording for the final sequence. The format stays as it is.
+5. Regression suites for architecture §8: the contract, the puzzle, the level, restoring each beat, and whole routes played with keys.
+6. `tools/route_check.py`: the shipped build, played to the ending with real window-system keys, in CI on both shipping builds.
+7. Evidence: deliberate breakage, a fresh clone and repeats. Documents and the review package. **Then stop:** no merge, tag, release or M4.
+8. **Added by the owner, 2026-11-04, after trying the first build:** route choices and narrative connections, a staged reveal and collapse, spoken lines with captions and three voice samples, and controller vibration. Sequence: rules first, then playback, then content, tests and the measured route. **Final narration waits for the owner's judgment of the samples.**
 
 ## Review follow-ups by milestone (Phase A final review, 2026-10-28)
 
@@ -68,9 +145,10 @@ rebinding and save support are never removed silently (risk R20).
 | M1 | Test observation point: `SceneTree.physics_frame` fires *before* node `_physics_process`. Use the `StepProbe` post-step point and **verify** its ordering with a test. | architecture §8 |
 | M1 | Re-collect the import-crash evidence on the real project with `reproduce.sh`-style capture (exit status, stdout and stderr per run). | toolchain §5, evidence README |
 | M2 | Test Interactor delivery and consumption with `Input.parse_input_event()` and `InputEventAction`. `action_press` covers polled input only. | architecture §8 |
-| M3 | `call_deferred` does not wait for a physics frame. Overlap re-checks wait for a completed physics step (`physics_frames >= recorded + 2`). | architecture §5, GameDirector |
-| M3 | Out-of-bounds during a cinematic is kept as `recovery_pending`, then re-checked after finalization. Regression: entering the kill plane while control is locked. | architecture §5 and §8 |
-| M3–M4 | The art ends at x = 640, at a straight edge of the right cliff, and its cleft is a placeholder way through. Replace both as the later environments arrive, in the accepted Shore style. | [shore-preview.md](shore-preview.md) |
+| M3 | `call_deferred` does not wait for a physics frame. Overlap re-checks wait for a completed physics step. **Done, and measured: `recorded + 3`, not `+ 2`** ([D49](decisions.md)). | architecture §5, GameDirector |
+| M3 | Out-of-bounds during a cinematic is kept as `recovery_pending`, then re-checked after finalization. Regression: entering the kill plane while control is locked. **Done.** | architecture §5 and §8 |
+| M4 | The art ends at x = 640, at a straight edge of the right cliff, and its cleft is a placeholder way through. Replace both as the later environments arrive, in the accepted Shore style. M3's greybox runs from there. | [shore-preview.md](shore-preview.md) |
+| M6 | **Timing:** the acts are shorter than the GDD's 10–15 minutes, even after the owner's update. The [package](reviews/m3-review-package.md) has the scripted measurements, which are not playtests. Adjust content density, not walking length (R11), once a person has played it. | GDD §4 |
 | M4 | Sailor animation: stop, turn and landing frames, coat motion, and turning that mirrors the lantern to the other hand. The walk speed stays unchanged: the owner's general feedback so far is positive. | [shore-preview.md](shore-preview.md) |
 | M4 | Rest of the first M4 deliverable: sound, caption and prompt styling, fog and lantern pass, readability on a second display, and the sailor's size on screen. | GDD §8, [shore-preview.md](shore-preview.md) |
 
@@ -92,7 +170,7 @@ documents. No dimension-switching mechanic, no wider scope ([jam.md](jam.md) §4
 - Keyboard and gamepad menu navigation, reliable focus, and a usable Back/Cancel action.
 - Basic persistent settings, saved separately from game progress: music volume, effects volume and key
   bindings. M2 delivers volume controls and buses prepared, not audio. They are connected when audio exists (M4), and until
-  then Settings says "This build has no audio yet." ([D42](decisions.md)).
+  then Settings says so ([D42](decisions.md)).
 - Keyboard rebinding for gameplay actions. Conflicts are explained, defaults can be restored, and menu
   navigation and Back cannot be rebound, so nobody can trap themselves.
 
@@ -113,8 +191,8 @@ documents. No dimension-switching mechanic, no wider scope ([jam.md](jam.md) §4
 done before M2's gate instead, so **no target date moves, and M3 gets lighter by this much.** The cost is one that dates do not
 show: M2 now has more to review, and M3 cannot start until M2 is accepted, so a long review round takes time directly from the
 4-act greybox, which is the part of the game that matters most. If that gate runs past about Nov 9, the first thing to give way is
-the Nov 15 start of M4's polish, by the existing cut order, not the playable loop. Only the Shore and Abyss beats are built, so **the checks below
-for later beats stay in M3,** as those beats arrive.
+the Nov 15 start of M4's polish, by the existing cut order, not the playable loop. Only the Shore and Abyss beats were built then, so **the checks below
+for later beats stayed in M3,** which now has them.
 
 - Main menu on launch: New Game, Continue, Settings, Controls, Credits, Quit to Desktop. It is the main scene.
 - The pause menu gains Controls and Quit to Main Menu.
@@ -170,8 +248,9 @@ Each is a GitHub prerelease, published when its gates pass, and not because a mi
   the cliff opening.
 - Deliver a compact event-to-sound list and show the mix in gameplay. Check loop seams, abrupt transitions,
   clipping, repeated-trigger stacking and whether important cues stay audible.
-- Connect the music and effects volume settings prepared in M2. **When audio is connected, remove the temporary Settings note,
-  "This build has no audio yet.", and its tests** ([D42](decisions.md)).
+- Connect the music and effects volume settings prepared in M2. **As audio is connected, update the Settings note,
+  now "Narration samples only. No music or effects yet.", and its tests, and remove them when all of it is** ([D42](decisions.md)).
+- Tune the ducking prepared on the Music and Effects buses by ear, so speech stays clear ([D65](decisions.md)).
 - **Audio is not marked complete until a person has heard it in gameplay.** Automated checks cannot do this.
 
 ### M6 verification

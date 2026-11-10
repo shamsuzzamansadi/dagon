@@ -20,6 +20,9 @@ public:
 	godot::StringName get_trigger_id() const { return trigger_id_; }
 	void set_enabled(bool p_value) { enabled_ = p_value; }
 	bool is_enabled() const { return enabled_; }
+	// For a background event: a world rebuilt at this beat or later treats it as already past.
+	void set_spent_from_beat(int p_value) { spent_from_beat_ = p_value; }
+	int get_spent_from_beat() const { return spent_from_beat_; }
 
 protected:
 	static void _bind_methods();
@@ -29,6 +32,7 @@ private:
 
 	godot::StringName trigger_id_;
 	bool enabled_ = true;
+	int spent_from_beat_ = 100; // Never.
 };
 
 } // namespace dagon

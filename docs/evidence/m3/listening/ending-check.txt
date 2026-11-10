@@ -1,0 +1,16 @@
+recording: 62.5 s, 2 channels, 48000 Hz
+peak -3.2 dBFS, true peak -3.2 dBTP
+
+loudness by stage (integrated LUFS, and the loudest 3 s)
+  line-1-ending.found          0.0-   16.8 s    -21.3 LUFS  max short-term  -19.6
+  line-2-ending.listen        16.8-   24.0 s    -21.6 LUFS  max short-term  -20.5
+  line-3-ending.innsmouth     24.0-   41.5 s    -20.8 LUFS  max short-term  -18.4
+  line-4-ending.rising        41.5-   53.6 s    -21.8 LUFS  max short-term  -20.3
+  credits                     53.6-   59.6 s    -41.6 LUFS  max short-term  -41.7
+  main-menu                   59.6-   61.6 s   -120.0 LUFS  max short-term -120.0
+
+sudden changes over 30 dB within 20 ms: 0
+
+isolated sample steps (possible clicks): 0
+
+MIX_CHECK problems=0

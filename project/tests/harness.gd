@@ -15,7 +15,11 @@ var probe: Node
 var failures: PackedStringArray = []
 var storage_dir: String
 var _run_storage_dir: String
+var _expected_errors := {}
 
+
+## How many prologues wait_for_scene skipped on the way to a game, since the last fixture.
+var prologues_skipped := 0
 
 func _init(p_tree: SceneTree) -> void:
 	tree = p_tree
@@ -67,12 +71,53 @@ func load_main_fixture(path: String) -> Node:
 	return fixture
 
 
+## A world or a session, built with its start value in place before it enters the tree, as the game builds them.
+func load_with(node: Node, as_main := false) -> Node:
+	fixture = node
+	probe = StepProbe.new()
+	tree.root.add_child(probe)
+	tree.root.add_child(node)
+	if as_main:
+		tree.current_scene = node
+	await steps(1)
+	return node
+
+
 ## Waits for a scene change to finish, and returns the new scene.
-func wait_for_scene(type_name: String) -> Node:
-	await wait_until(func() -> bool: return is_instance_valid(tree.current_scene) and tree.current_scene.is_class(type_name) and tree.current_scene.is_node_ready(), 60, "the scene to change to %s" % type_name)
+func wait_for_scene(type_name: String, max_steps := 60) -> Node:
+	# New Game shows the prologue before the game. A test waiting for the game skips it, as a player can, and the
+	# tests of the prologue itself say so. Continue never shows it, which they check too.
+	if type_name == "GameSession":
+		await wait_until(func() -> bool: return is_instance_valid(tree.current_scene) and tree.current_scene.is_node_ready() and (tree.current_scene.is_class(type_name) or tree.current_scene.has_method("skip_prologue")), max_steps, "the scene to change to %s" % type_name)
+		if is_instance_valid(tree.current_scene) and tree.current_scene.has_method("skip_prologue") and not tree.current_scene.is_class(type_name):
+			prologues_skipped += 1
+			tree.current_scene.skip_prologue()
+	await wait_until(func() -> bool: return is_instance_valid(tree.current_scene) and tree.current_scene.is_class(type_name) and tree.current_scene.is_node_ready(), max_steps, "the scene to change to %s" % type_name)
 	fixture = tree.current_scene
 	await steps(1)
 	return fixture
+
+
+## For a test that sets out to cause an engine error. The runner fails a test on any error it logs, except one whose
+## text contains this. It also fails the test if no such error ever came, so a test cannot expect something by habit.
+func expect_error(text: String) -> void:
+	_expected_errors[text] = false
+
+
+func accepts_error(error: String) -> bool:
+	for text: String in _expected_errors:
+		if error.contains(text):
+			_expected_errors[text] = true
+			return true
+	return false
+
+
+func unseen_expected_errors() -> Array[String]:
+	var unseen: Array[String] = []
+	for text: String in _expected_errors:
+		if not _expected_errors[text]:
+			unseen.append(text)
+	return unseen
 
 
 func unload_fixture() -> void:
@@ -84,7 +129,10 @@ func unload_fixture() -> void:
 		tree.current_scene.queue_free()
 	tree.current_scene = null
 	InputMap.load_from_project_settings()
-	for bus in ["Music", "Effects"]:
+	Engine.remove_meta(&"dagon_subtitles")
+	Engine.remove_meta(&"dagon_vibration")
+	Input.stop_joy_vibration(0)
+	for bus in ["Music", "Effects", "Narration"]:
 		var index := AudioServer.get_bus_index(bus)
 		AudioServer.set_bus_mute(index, false)
 		AudioServer.set_bus_volume_db(index, 0.0)

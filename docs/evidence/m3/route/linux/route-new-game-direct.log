@@ -1,0 +1,115 @@
+    0.27  dagon: extension initialized build=release compiler=gcc 110400 __cplusplus=202002
+    0.30  dagon: save status=0 backup=false
+    1.39  dagon: save status=0 backup=false
+    2.25  dagon: session start beat=0 persisted=0
+    2.25  dagon: introduction shown
+    3.22  dagon: focus: shore.boat
+    3.22  dagon: prompt: [E] Examine
+    3.63  dagon: line: shore.boat voiced=false seconds=5.26666666666667
+    3.63  dagon: caption: The lifeboat lies on bare seabed. The sea has drawn back farther than any tide.
+    3.63  dagon: prompt hidden
+    4.03  dagon: focus: shore.boat
+    4.03  dagon: prompt: [E] Examine
+    4.42  dagon: focus: shore.fish
+    4.42  dagon: prompt: [E] Examine
+    5.17  dagon: prompt hidden
+    6.85  dagon: focus: shore.talisman
+    6.85  dagon: prompt: [E] Examine
+    7.02  dagon: prompt hidden
+    7.29  dagon: focus: shore.talisman
+    7.29  dagon: prompt: [E] Examine
+    7.80  dagon: prompt hidden
+   12.87  dagon: beat=abyss
+   12.87  dagon: notice: Checkpoint saved
+   13.88  dagon: focus: cave.carving
+   13.88  dagon: prompt: [E] Examine
+   15.19  dagon: prompt hidden
+   18.07  dagon: background event: ritual_tableau
+   20.57  dagon: line: abyss.ritual voiced=false seconds=4.66666666666667
+   20.57  dagon: caption: Figures, far off among the stones. Kneeling, all of them. All but one.
+   22.78  dagon: focus: abyss.fossil_a
+   22.78  dagon: prompt: [E] Examine
+   24.08  dagon: prompt hidden
+   25.49  dagon: focus: abyss.tablet_wave
+   25.49  dagon: prompt: [E] Examine
+   26.79  dagon: prompt hidden
+   33.49  dagon: focus: abyss.fossil_b
+   33.49  dagon: prompt: [E] Examine
+   34.78  dagon: prompt hidden
+   44.03  dagon: focus: abyss.footprint
+   44.03  dagon: prompt: [E] Examine
+   45.36  dagon: prompt hidden
+   48.29  dagon: focus: abyss.tablet_kneel
+   48.29  dagon: prompt: [E] Examine
+   49.38  dagon: focus: abyss.relief
+   49.38  dagon: prompt: [E] Examine
+   50.65  dagon: prompt hidden
+   51.36  dagon: focus: abyss.cairn
+   51.36  dagon: prompt: [E] Examine
+   51.50  dagon: prompt hidden
+   57.13  dagon: focus: abyss.tablet_eye
+   57.13  dagon: prompt: [E] Examine
+   57.29  dagon: prompt hidden
+   58.41  dagon: background event: canyon_figure
+   60.18  dagon: beat=monolith
+   60.18  dagon: notice: Checkpoint saved
+   60.18  dagon: line: monolith.first voiced=false seconds=5.73333333333333
+   60.18  dagon: caption: The canyon opens, and then there is only that. I do not know who could have raised it.
+   62.36  dagon: event rejected at beat=monolith
+   63.63  dagon: focus: mural.before
+   63.63  dagon: prompt: [E] Examine
+   65.27  dagon: prompt: [E] Press the kneeling stone
+   65.53  dagon: puzzle rejected
+   65.53  dagon: caption: The stones grind and go dark.
+   65.53  dagon: prompt hidden
+   66.54  dagon: prompt: [E] Press the kneeling stone
+   67.45  dagon: prompt hidden
+   67.72  dagon: prompt: [E] Press the eye stone
+   68.72  dagon: prompt hidden
+   68.98  dagon: prompt: [E] Press the wave stone
+   69.23  dagon: puzzle accepted step=0
+   69.23  dagon: caption: The stone lights, and holds.
+   69.23  dagon: prompt hidden
+   69.61  dagon: prompt: [E] Press the wave stone
+   70.23  dagon: prompt hidden
+   70.46  dagon: prompt: [E] Press the eye stone
+   71.51  dagon: prompt hidden
+   71.77  dagon: prompt: [E] Press the kneeling stone
+   72.03  dagon: puzzle accepted step=1
+   72.03  dagon: caption: The stone lights, and holds.
+   72.03  dagon: prompt hidden
+   72.41  dagon: prompt: [E] Press the kneeling stone
+   73.03  dagon: prompt hidden
+   73.29  dagon: prompt: [E] Press the eye stone
+   73.53  dagon: puzzle solved
+   73.53  dagon: caption: The stone lights, and holds.
+   73.53  dagon: beat=awakened
+   73.53  dagon: cinematic start clip=monolith_awaken generation=1
+   73.53  dagon: prompt hidden
+   73.74  dagon: line: story.awakened voiced=false seconds=4.46666666666667
+   73.74  dagon: caption: The stones answered. Somewhere behind the rock, something gave way.
+   80.55  dagon: cinematic finalized clip=monolith_awaken generation=1
+   80.55  dagon: notice: Checkpoint saved
+   86.25  dagon: beat=witness
+   86.25  dagon: cinematic start clip=dagon_reveal generation=2
+   90.86  dagon: line: story.reveal voiced=false seconds=4.0
+   90.86  dagon: caption: It was no ridge. It had been beside me the whole way.
+   98.45  dagon: line: story.run voiced=false seconds=4.0
+   98.45  dagon: caption: Its head turned. I ran.
+  100.27  dagon: cinematic finalized clip=dagon_reveal generation=2
+  100.27  dagon: beat=fleeing
+  107.81  dagon: focus: mural.after
+  107.81  dagon: prompt: [E] Examine
+  109.53  dagon: prompt hidden
+  110.54  dagon: beat=ended
+  110.54  dagon: cinematic start clip=collapse generation=3
+  116.56  dagon: cinematic finalized clip=collapse generation=3
+  116.56  dagon: ending
+  116.56  dagon: ending card shown
+  116.56  dagon: ending line: ending.found voiced=false
+  117.68  dagon: ending line: ending.listen voiced=false
+  118.35  dagon: ending line: ending.innsmouth voiced=true
+  119.04  dagon: ending line: ending.rising voiced=false
+  120.68  dagon: save status=0 backup=false
+ROUTE_TIMING profile=direct puzzle=known-to-the-script one-deliberate-mistake total=117s to-ending-card=113s | acts: shore=10s abyss=47s monolith=26s witness-and-escape=24s collapse=6s epilogue-and-credits=4s | spent: walking=72s reading=0s solving=8s cinematics=27s
+  123.39  exit 0

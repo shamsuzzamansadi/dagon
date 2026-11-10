@@ -20,7 +20,16 @@ OUT = ROOT / "project" / "assets" / "shore"
 SCENE = ROOT / "project" / "scenes" / "level" / "shore.tscn"
 UI_OUT = ROOT / "project" / "assets" / "ui"
 # light.png is a light mask, not artwork: its values multiply the lantern colour.
-ARTWORK = ["sky", "clouds", "far", "glints", "flats", "bank", "terrain", "foreground", "fish", "boat", "sailor"]
+ARTWORK = ["sky", "clouds", "far", "glints", "flats", "bank", "terrain", "foreground", "fish", "boat", "sailor", "talisman", "tentacle", "ribs"]
+REVEAL_OUT = ROOT / "project" / "assets" / "reveal"
+REVEAL_ARTWORK = ["monolith", "dagon_body", "dagon_head", "dagon_crest", "dagon_arm", "crossing_carving"]
+# The finished reference section, and the prologue. shaft.png is a light mask, like light.png.
+CAVE_OUT = ROOT / "project" / "assets" / "cave"
+CAVE_ARTWORK = ["cave_front", "cave_wall", "abyss_far", "ritual_far", "foreground_cave"]
+PROLOGUE_OUT = ROOT / "project" / "assets" / "prologue"
+PROLOGUE_ARTWORK = ["prologue_1_raider", "prologue_2_escape", "prologue_3_drift", "prologue_4_dry", "prologue_1_lamp", "prologue_2_lamp", "prologue_2_boat", "prologue_2_oars_0", "prologue_2_oars_1", "prologue_3_boat", "prologue_4_lying", "prologue_4_sitting", "ending_1_found", "ending_2_listen", "ending_3_shop", "ending_4_rising"]
+CAVE_X0 = 600
+CAVE_OPEN_GROUND = range(640, 1440)
 IDLE_FRAMES = 8
 WALK_FRAMES = 8
 # Walkable columns between the feet of the side cliffs, and the space a figure stands in above them.
@@ -77,6 +86,34 @@ def check_surface(problems):
     print(f"surface: compared {len(OPEN_GROUND)} columns with the collision in {SCENE.name}, {near_rock} of them beside the rock")
 
 
+def check_cave_surface(problems):
+    """The reference section's drawn ground against the collision, column by column, including its steps."""
+    front = Image.open(CAVE_OUT / "cave_front.png").convert("RGBA")
+    polygon = collision_polygon()
+    checked = 0
+    for x in CAVE_OPEN_GROUND:
+        top = collision_top(polygon, x + 0.5)
+        surface = round(top) + GROUND_ROW
+        column = x - CAVE_X0
+        solid = [y for y in range(surface - HEADROOM_ROWS, front.height) if front.getpixel((column, y))[3] != 0]
+        # The roof hangs above the walkable space, so only the run of solid rows reaching the bottom counts.
+        first = front.height
+        while first - 1 >= surface - HEADROOM_ROWS and front.getpixel((column, first - 1))[3] != 0:
+            first -= 1
+        if not solid or first == front.height:
+            problems.append(f"cave column {x} has no ground drawn")
+            continue
+        if not surface - DRESSING_ROWS <= first <= surface + 1:
+            # The cave's jamb and steps stand on the ground: their faces are drawn, not walked on.
+            above = [y for y in range(first, surface) if front.getpixel((column, y))[3] != 0]
+            if first > surface + 1:
+                problems.append(f"cave column {x} is drawn from row {first}, below its collision top at row {surface}")
+            elif not above:
+                problems.append(f"cave column {x} is drawn from row {first}, but its collision top is row {surface}")
+        checked += 1
+    print(f"cave surface: compared {checked} columns with the collision")
+
+
 def main():
     problems = []
     for name in ARTWORK:
@@ -89,7 +126,12 @@ def main():
         image = Image.open(UI_OUT / f"{name}.png").convert("RGBA")
         if {c for _, c in image.getcolors(1 << 24) if c[3] != 0} - ALLOWED:
             problems.append(f"{name}.png has colours outside the palette")
-    print(f"palette: checked {len(ARTWORK) + 2} images against {len(ALLOWED)} colours")
+    for folder, names in ((CAVE_OUT, CAVE_ARTWORK), (PROLOGUE_OUT, PROLOGUE_ARTWORK), (REVEAL_OUT, REVEAL_ARTWORK)):
+        for name in names:
+            image = Image.open(folder / f"{name}.png").convert("RGBA")
+            if {c for _, c in image.getcolors(1 << 24) if c[3] != 0} - ALLOWED:
+                problems.append(f"{name}.png has colours outside the palette")
+    print(f"palette: checked {len(ARTWORK) + len(CAVE_ARTWORK) + len(PROLOGUE_ARTWORK) + len(REVEAL_ARTWORK) + 2} images against {len(ALLOWED)} colours")
 
     # Each foot's sole has its own colour, so its position can be read from the shipped pixels.
     sheet = Image.open(OUT / "sailor.png").convert("RGBA")
@@ -111,6 +153,7 @@ def main():
             problems.append(f"walk frame {f} has no foot on the ground")
 
     check_surface(problems)
+    check_cave_surface(problems)
 
     for problem in problems:
         print(f"PROBLEM {problem}")

@@ -61,6 +61,8 @@ if grep -aq "scenes/level/level\.tscn" "$pack"; then
 fi
 grep -aq "assets/shore/" "$pack" || fail "the Shore art is missing from $stem.pck"
 grep -aq "assets/ui/" "$pack" || fail "the UI assets are missing from $stem.pck"
+grep -aq "narration/script.txt" "$pack" || fail "the narration script is missing from $stem.pck"
+grep -aq "assets/narration/" "$pack" || fail "the narration samples are missing from $stem.pck"
 echo "export-$platform: created"
 ls -la "$out"
 
@@ -83,7 +85,8 @@ run_exported() {
 		log_arg="$(cygpath -w "$log_path")"
 	fi
 	rm -f "$log_path"
-	env DAGON_AUTOSTART="${2:-}" "$binary" --headless --verbose --quit-after 300 --log-file "$log_arg" \
+	# The game ends the run itself, stopping its sound first (D78). --quit-after is only a backstop.
+	env DAGON_AUTOSTART="${2:-}" DAGON_QUIT_AFTER_FRAMES=300 "$binary" --headless --verbose --quit-after 1200 --log-file "$log_arg" \
 		> "$logs/$name.stdout" 2> "$logs/$name.stderr"
 	code=$?
 	echo "$code" > "$logs/$name.exit"

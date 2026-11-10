@@ -1,0 +1,98 @@
+Deliberate breakage of the owner's revision of 2026-11-09, at b4bd9c2, with tools/breakage.py, which fails closed (D80).
+One change at a time, in isolated clones, with each worker's control built and passing before and after. Simulated input only.
+
+==== Result, over both runs below: 21 caught, 2 not caught, every control held.
+
+Not caught, and why:
+  The slab comes down again for each weight: the first weight already disarms the trigger, so this guard is a second line of
+    defence that no input can reach. Nothing observable changes.
+  Standing still makes footsteps: mis-aimed. Without that line standing still is still silent, as no distance accumulates; it only
+    changes when the first step after a stop sounds. No test should pin that.
+
+INFRA in the first run, then caught: Being reached never ends the flee, The fallback never ends a flee. Their first versions used
+  if (false), which left parameters unused, so the native tests, built with warnings as errors, did not compile. The tool refused to
+  count them, as it should. It now labels such a case BUILD FAILED, and the entries were rewritten to compile. Rerun below.
+
+==== First run, 23 entries
+
+CAUGHT           5  The sea never comes on
+CAUGHT           5  The sea goes the wrong way
+INFRA            4  Being reached never ends the flee
+INFRA            4  The fallback never ends a flee
+CAUGHT           1  The sea's picture does not follow its rule
+CAUGHT           1  The sea is never shown
+CAUGHT           2  A weight never brings the slab down
+NOT CAUGHT       0  The slab comes down again for each weight
+CAUGHT           2  A restored world keeps the slab up
+CAUGHT           1  The slab never settles level
+CAUGHT           5  The crossing's line is not in the script
+CAUGHT           2  New Game skips the prologue
+CAUGHT           7  Skipping the prologue starts without the introduction
+CAUGHT           1  The prologue never ends by itself
+CAUGHT           3  The prologue loses its last line
+CAUGHT           1  Footsteps are counted but never heard
+CAUGHT           1  Every surface sounds like the Shore
+NOT CAUGHT       0  Standing still makes footsteps
+CAUGHT           1  Every step is the same sound
+CAUGHT           1  He breathes the same in every beat
+CAUGHT           1  Control returns with him still staggered
+CAUGHT           1  A one-shot sound plays on restore
+CAUGHT           1  The cave's greybox shows through the finished art
+
+commit b4bd9c2, 23 breakages, {'CAUGHT': 19, 'INFRA': 2, 'NOT CAUGHT': 2}, controls held, summary complete, 749 s
+
+---- Full output, each worker
+control before: NOT CAUGHT passed=407 failed=0 unit_failed=0
+=== The sea never comes on: CAUGHT (5 failing)
+=== A weight never brings the slab down: CAUGHT (2 failing)
+=== The crossing's line is not in the script: CAUGHT (5 failing)
+=== Skipping the prologue starts without the introduction: CAUGHT (7 failing)
+=== Standing still makes footsteps: NOT CAUGHT
+=== Control returns with him still staggered: CAUGHT (1 failing)
+control after: NOT CAUGHT passed=407 failed=0
+control before: NOT CAUGHT passed=407 failed=0 unit_failed=0
+=== Being reached never ends the flee: INFRA (4 failing)
+=== The sea is never shown: CAUGHT (1 failing)
+=== The slab never settles level: CAUGHT (1 failing)
+=== The prologue loses its last line: CAUGHT (3 failing)
+=== Every surface sounds like the Shore: CAUGHT (1 failing)
+=== A one-shot sound plays on restore: CAUGHT (1 failing)
+control after: NOT CAUGHT passed=407 failed=0
+control before: NOT CAUGHT passed=407 failed=0 unit_failed=0
+=== The fallback never ends a flee: INFRA (4 failing)
+=== The slab comes down again for each weight: NOT CAUGHT
+=== New Game skips the prologue: CAUGHT (2 failing)
+=== Footsteps are counted but never heard: CAUGHT (1 failing)
+=== He breathes the same in every beat: CAUGHT (1 failing)
+control after: NOT CAUGHT passed=407 failed=0
+control before: NOT CAUGHT passed=407 failed=0 unit_failed=0
+=== The sea goes the wrong way: CAUGHT (5 failing)
+=== The sea's picture does not follow its rule: CAUGHT (1 failing)
+=== A restored world keeps the slab up: CAUGHT (2 failing)
+=== The prologue never ends by itself: CAUGHT (1 failing)
+=== Every step is the same sound: CAUGHT (1 failing)
+=== The cave's greybox shows through the finished art: CAUGHT (1 failing)
+control after: NOT CAUGHT passed=407 failed=0
+
+==== Second run, the two rewritten entries, with the corrected tool
+
+CAUGHT           4  Being reached never ends the flee
+CAUGHT           4  The fallback never ends a flee
+
+commit b4bd9c2, 2 breakages, {'CAUGHT': 2}, controls held, summary complete, 357 s
+
+---- Full output
+control before: NOT CAUGHT passed=407 failed=0 unit_failed=0
+=== Being reached never ends the flee: CAUGHT (4 failing)
+    unit exit=2 unit failed=3, runner exit=1 passed=403 failed=4
+    FAIL test_revision.test_with_its_picture_gone_the_sea_still_ends_the_flee
+    FAIL test_route.test_standing_still_the_sea_reaches_him_and_the_ending_is_the_same
+    FAIL test_route.test_pushing_against_the_wall_reaches_the_same_ending
+    FAIL test_route.test_pausing_during_the_flee_does_not_use_up_its_time
+=== The fallback never ends a flee: CAUGHT (4 failing)
+    unit exit=2 unit failed=1, runner exit=1 passed=403 failed=4
+    FAIL test_cinematics.test_the_flee_timer_ends_the_flee_at_its_timeout
+    FAIL test_cinematics.test_pausing_stops_the_flee_timer
+    FAIL test_revision.test_the_fallback_ends_a_flee_that_the_sea_cannot
+    FAIL test_narrative.test_walking_into_a_rock_and_stopping_there_times_out_to_the_same_end
+control after: NOT CAUGHT passed=407 failed=0

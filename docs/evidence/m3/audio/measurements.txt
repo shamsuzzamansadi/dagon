@@ -1,0 +1,42 @@
+file                                    s ch    peak     rms  seam  use
+ambience/shore_sea.ogg              23.00  2   -17.8   -30.0  0.63  The Shore: a thin, far-off sea
+ambience/wind.ogg                   27.00  2   -17.0   -32.1  1.12  The Shore and the open abyss: wind
+ambience/cave.ogg                   20.50  2   -19.0   -31.0  0.37  The cave: still air, a low resonance, drips
+ambience/abyss.ogg                  29.00  2   -15.2   -28.0  1.69  The Exposed Abyss: wind on mud, far groans, settling mud
+ambience/monolith.ogg               21.00  2   -20.1   -29.0  1.27  The monolith: a held drone
+ambience/tide_roar.ogg              12.00  2    -7.0   -20.0  1.09  The escape: the returning sea, following him
+footsteps/sand_1.ogg                 0.22  1   -12.2   -29.9  0.00  Footstep, wet sand and mud
+footsteps/sand_2.ogg                 0.22  1   -11.6   -29.1  0.00  Footstep, wet sand and mud
+footsteps/sand_3.ogg                 0.22  1   -12.6   -30.7  0.00  Footstep, wet sand and mud
+footsteps/sand_4.ogg                 0.32  1    -7.8   -26.2  0.00  Landing, wet sand and mud
+footsteps/rock_1.ogg                 0.16  1   -18.4   -37.3  0.00  Footstep, rock
+footsteps/rock_2.ogg                 0.16  1   -18.4   -36.2  0.00  Footstep, rock
+footsteps/rock_3.ogg                 0.16  1   -14.2   -34.0  0.00  Footstep, rock
+footsteps/rock_4.ogg                 0.25  1   -12.1   -30.2  0.00  Landing, rock
+effects/stone_accept.ogg             4.20  1    -5.9   -20.6  0.00  A stone accepts: a slide and a soft tone
+effects/stone_reject.ogg             2.80  1    -5.3   -21.1  0.00  The stones reject: a grind and a thud
+effects/gate_open.ogg                4.20  1    -3.9   -15.8  0.00  The gate rises
+effects/slab_fall.ogg                3.00  1    -3.0   -19.3  0.00  The slab comes down across the gap
+effects/water_surge.ogg              6.00  2    -3.4   -19.3  0.00  The reveal: water displaced
+effects/creature_call.ogg           10.50  2    -3.3   -18.5  0.00  The reveal: its call, deep and rhythmic
+effects/hand_impact.ogg              5.00  2    -1.4   -19.5  0.00  The reveal: the hand on the stone
+effects/rock_fall_1.ogg              1.60  1    -5.0   -21.2  0.00  The escape: rock comes down
+effects/rock_fall_2.ogg              1.60  1    -4.1   -18.7  0.00  The escape: rock comes down
+effects/rock_fall_3.ogg              1.60  1    -4.6   -20.4  0.00  The escape: rock comes down
+effects/body_fall.ogg                1.20  1    -6.5   -23.1  0.00  The collapse: he falls
+effects/sea_rush.ogg                 4.00  2    -2.7   -20.4  0.00  The collapse: the sea comes over him
+effects/ritual_drum.ogg             13.00  2   -12.9   -27.1  0.00  The ritual, far off: a drum and a low hum
+voice/breath_tired.ogg              12.00  1   -14.2   -34.3  0.00  His breathing, spent
+voice/breath_uneasy.ogg              8.60  1   -11.5   -33.2  0.00  His breathing, uneasy
+voice/breath_panic.ogg               6.40  1    -8.7   -26.2  0.00  His breathing, running
+voice/gasp.ogg                       0.90  1    -9.3   -26.7  0.00  His gasp at the reveal
+music/prologue.ogg                  42.00  2    -7.2   -23.0  0.00  Music: the prologue
+music/awaken.ogg                     9.00  2    -7.3   -20.2  0.00  Music: the stones answer
+music/reveal.ogg                    16.00  2    -2.1   -19.1  0.00  Music: the reveal
+music/ending.ogg                    48.00  2    -9.9   -24.0  0.00  Music: the ending
+music/cave.ogg                      56.00  2    -7.9   -28.0  0.00  Music: the cave, restrained
+ambience/night_sea.ogg              22.00  2   -14.3   -30.1  0.03  The epilogue: the sea at night, close and quiet
+effects/water_cascade.ogg            7.00  2    -3.7   -19.3  0.00  The reveal: water pouring off it as it rises
+effects/oars.ogg                     2.90  2    -8.8   -27.1  0.07  The prologue's escape: rowing
+ambience/lapping.ogg                14.50  2    -9.3   -34.2  0.01  The prologue's drift: a calm sea against the hull
+SOUNDS files=40 problems=0

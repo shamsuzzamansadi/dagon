@@ -8,6 +8,9 @@ moonlit sky, coastal palette and environment ([D19](decisions.md)).
 The owner has played the standard Windows build and liked it
 ([record](evidence/m1/windows-playtest-2026-11-02-standard-build.md)).
 
+**Since M3** (implemented, awaiting independent review, and not accepted by the owner), `shore.tscn` holds all four acts, on to x = 4544, and the table below describes the part M1 and M2 built. Up to x = 980 the
+collision is still M1's, point for point. Past the art it is all greybox, and the accepted art itself did not change ([D48](decisions.md)).
+
 ## What the standard build contains
 
 The entry scene is `project/scenes/level/shore.tscn`. It keeps the M1 test level's whole collision, so

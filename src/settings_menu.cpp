@@ -29,6 +29,9 @@ void SettingsMenu::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("restore_defaults"), &SettingsMenu::restore_defaults);
 	ClassDB::bind_method(D_METHOD("set_music_volume", "value"), &SettingsMenu::set_music_volume);
 	ClassDB::bind_method(D_METHOD("set_effects_volume", "value"), &SettingsMenu::set_effects_volume);
+	ClassDB::bind_method(D_METHOD("set_narration_volume", "value"), &SettingsMenu::set_narration_volume);
+	ClassDB::bind_method(D_METHOD("toggle_subtitles"), &SettingsMenu::toggle_subtitles);
+	ClassDB::bind_method(D_METHOD("toggle_vibration"), &SettingsMenu::toggle_vibration);
 	ClassDB::bind_method(D_METHOD("is_capturing"), &SettingsMenu::is_capturing);
 	ClassDB::bind_method(D_METHOD("has_conflict"), &SettingsMenu::has_conflict);
 	ClassDB::bind_method(D_METHOD("describe_key", "key", "layout_label"), &SettingsMenu::describe_key);
@@ -40,6 +43,9 @@ void SettingsMenu::_bind_methods() {
 
 	DAGON_BIND_PATH(music_slider_path);
 	DAGON_BIND_PATH(effects_slider_path);
+	DAGON_BIND_PATH(narration_slider_path);
+	DAGON_BIND_PATH(subtitles_button_path);
+	DAGON_BIND_PATH(vibration_button_path);
 	DAGON_BIND_PATH(message_label_path);
 	DAGON_BIND_PATH(conflict_row_path);
 	DAGON_BIND_PATH(swap_button_path);
@@ -59,6 +65,9 @@ void SettingsMenu::_ready() {
 	}
 	music_slider_.set(get_node<HSlider>(music_slider_path_));
 	effects_slider_.set(get_node<HSlider>(effects_slider_path_));
+	narration_slider_.set(get_node<HSlider>(narration_slider_path_));
+	subtitles_button_.set(get_node<Button>(subtitles_button_path_));
+	vibration_button_.set(get_node<Button>(vibration_button_path_));
 	message_label_.set(get_node<Label>(message_label_path_));
 	conflict_row_.set(get_node<Control>(conflict_row_path_));
 	swap_button_.set(get_node<Button>(swap_button_path_));
@@ -224,6 +233,21 @@ void SettingsMenu::set_effects_volume(double p_value) {
 	commit();
 }
 
+void SettingsMenu::set_narration_volume(double p_value) {
+	settings_.narration_volume = static_cast<float>(p_value);
+	commit();
+}
+
+void SettingsMenu::toggle_subtitles() {
+	settings_.subtitles = !settings_.subtitles;
+	commit();
+}
+
+void SettingsMenu::toggle_vibration() {
+	settings_.vibration = !settings_.vibration;
+	commit();
+}
+
 void SettingsMenu::commit() {
 	storage::apply_settings(settings_);
 	refresh_controls();
@@ -244,6 +268,15 @@ void SettingsMenu::refresh_controls() {
 	}
 	if (HSlider *slider = effects_slider_.get()) {
 		slider->set_value_no_signal(settings_.effects_volume);
+	}
+	if (HSlider *slider = narration_slider_.get()) {
+		slider->set_value_no_signal(settings_.narration_volume);
+	}
+	if (Button *button = subtitles_button_.get()) {
+		button->set_text(settings_.subtitles ? "Subtitles: On" : "Subtitles: Off");
+	}
+	if (Button *button = vibration_button_.get()) {
+		button->set_text(settings_.vibration ? "Controller vibration: On" : "Controller vibration: Off");
 	}
 	for (std::size_t i = 0; i < key_buttons_.size(); i++) {
 		if (Button *button = key_buttons_[i].get()) {
