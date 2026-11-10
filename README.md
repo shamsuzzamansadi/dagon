@@ -4,12 +4,12 @@ A short 2D cinematic horror game for [GitHub Game Off 2026](https://itch.io/jam/
 (theme: SHIFT). A shipwrecked sailor wakes on a stretch of seabed that should be
 under the ocean. Godot 4.7 with gameplay in C++20 through GDExtension.
 
-**Status: M1 and M2 are accepted by the owner, with documented deferrals. M3 is implemented and awaiting independent follow-up review. It is not accepted by the owner,** who has played it and found it functional but too brief, too passive and not atmospheric enough ([record](docs/evidence/m3/owner-playtest-2026-11-09.md)). A revision answering that is on the M3 branch. The game opens on a main menu, with New Game, Continue
+**Status: M1, M2 and M3 are accepted by the owner, with documented deferrals** ([M3's record](docs/evidence/m3/owner-acceptance-2026-11-10.md)). M3's acceptance is of the milestone, not of a finished game, and no release has been made. M4 is next. The game opens on a main menu, with New Game, Continue
 from one checkpoint save, Settings with key rebinding, Controls and Credits. New Game begins with a short, skippable prologue. Play starts on the Shore, in its accepted art direction: a
 sailor you can walk and jump with, on exposed seabed beside a stranded boat, with the sea far off. You can examine things, pause, and
 use a controller, with buttons named for the device in use.
 
-On the M3 branch, the whole route can be played: the prologue, Shore, Exposed Abyss, Monolith, Witness, the escape and the ending. There are clue tablets, side routes, a stone to push onto a raised slab to bring it down across a gap, a distant ritual, a three-stone puzzle, placeholder cinematics,
+The whole route can be played: the prologue, Shore, Exposed Abyss, Monolith, Witness, the escape and the ending. There are clue tablets, side routes, a stone to push onto a raised slab to bring it down across a gap, a distant ritual, a three-stone puzzle, placeholder cinematics,
 the sea coming back after you in the escape, a save at each checkpoint, and optional controller vibration. **The Shore and the stretch from the cave entrance to the first tablet are finished art, and so are the monolith, the creature and the epilogue's pictures. The rest past x = 1440 is unfinished greybox,** a stated boundary. The cinematics are a first pass. **There is a first sound pass across the route: ambience, footsteps, effects, breathing and music in five places. It is synthesized, not final, and has not been listened to by the developer.** Six lines are narrated in an AI voice the owner chose: the talisman, the carving and the whole epilogue; the rest of the
 narration is captions. It is shorter than the finished game is meant to be. See
 [docs/roadmap.md](docs/roadmap.md), [docs/reviews/m3-review-package.md](docs/reviews/m3-review-package.md) and [docs/shore-preview.md](docs/shore-preview.md).

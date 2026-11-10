@@ -67,7 +67,7 @@ checkpoint.
 There is one ending (MVP). The epilogue text is original and written in the
 first-person, after-the-fact voice of the source.
 
-**Status (M3): the route is built in greybox, implemented, awaiting independent review, and not accepted by the owner.** Target times are for the finished game. The greybox is
+**Status (M3, accepted 2026-11-10): the route is built, partly greybox.** Target times are for the finished game. The greybox is
 far shorter, because timing is set later by adding content, not walking (risk R11). Where each thing stands: [roadmap](roadmap.md), [M3 package](reviews/m3-review-package.md).
 
 **Connections through the route (owner, 2026-11-04).** One mark, an eye above a line of waves, runs through the whole game, and nothing needs it to be noticed:
@@ -301,7 +301,7 @@ levels, custom physics or rendering, multiplayer.
 ## 11. Menus, settings and saving
 
 **Status: all of this is implemented. M2 is accepted by the owner for the beats that existed then, and M3 extends saving to every savable beat,
-implemented, awaiting independent review, and not accepted by the owner.** Added by
+implemented, and accepted with M3 on 2026-11-10.** Added by
 the owner on 2026-11-02 and brought forward on 2026-11-03 ([D24, D25, D36](decisions.md)). Saving is an intentional scope change:
 this document excluded it before.
 

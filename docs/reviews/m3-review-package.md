@@ -1,7 +1,7 @@
 # M3 Review Package
 
 **To:** ChatGPT (independent reviewer), and the owner for the manual check. **Date:** 2026-11-04, revised 2026-11-09.
-**Status: implemented, expanded, refined and given a focused completion pass by the owner on 2026-11-09. The owner chose voice A on 2026-11-10, and the epilogue is now fully voiced. Awaiting ChatGPT's follow-up review and the owner's playtest. Not accepted.** M3 is not merged, and no tag or release has been made. **[§0](#0-the-owners-revision-of-2026-11-09-read-this-first) is the revision and the build to play; sections 1 to 12 are the record of `5fe820b`.** Any reviewer, please state which checks you rerun and which rely on the supplied CI evidence.
+**Status: accepted by the owner on 2026-11-10 at `3980bc3`, as the completed, agreed milestone, with the documented M4/M5 and hardware and playtesting deferrals ([record](../evidence/m3/owner-acceptance-2026-11-10.md)). Milestone acceptance, not approval of a finished release. ChatGPT completed a limited follow-up review at `3980bc3` ([record](../evidence/m3/review-chatgpt-at-3980bc3.md)). No tag or release has been made.** [§0](#0-the-owners-revision-of-2026-11-09-read-this-first) is the revision; sections 1 to 12 are the record of `5fe820b`.
 
 | | |
 |---|---|
@@ -35,7 +35,7 @@ The owner played `5fe820b` and found the game functional but **too brief, too pa
 
 This section is the revision as it now stands. **Sections 1 to 12 below are the record of `5fe820b`,** kept as they were.
 
-**M3 is not accepted.** The owner chose voice A on 2026-11-10 ([D94](../decisions.md)): a choice of voice, not an approval of the finished narration or the mix. Green CI is technical evidence only. It says nothing about whether the game is engaging or sounds good.
+**M3 was accepted by the owner on 2026-11-10 at `3980bc3`** ([record](../evidence/m3/owner-acceptance-2026-11-10.md)); what follows is the state at that commit. The owner chose voice A on 2026-11-10 ([D94](../decisions.md)): a choice of voice, not an approval of the finished narration or the mix. Green CI is technical evidence only. It says nothing about whether the game is engaging or sounds good.
 
 | | |
 |---|---|
