@@ -124,7 +124,7 @@ rebinding and save support are never removed silently (risk R20).
 - [x] **M2: accepted by the owner on 2026-11-03, with documented deferrals** ([record](evidence/m2/owner-acceptance-2026-11-03.md),
   [package](reviews/m2-review-package.md)). The main menu and save moved here from M3 (D36). Audio is volume controls and buses
   prepared, and nothing more (D42). M3–M7 not started.
-- [x] **M3 Complete gameplay, accepted by the owner on 2026-11-10 at `3980bc3`, as the agreed milestone, with the M4/M5, hardware and playtesting deferrals** ([record](evidence/m3/owner-acceptance-2026-11-10.md)). Package: [m3-review-package.md](reviews/m3-review-package.md). Milestone acceptance, not approval of a finished game. No release has been made. M4–M7 not started.
+- [x] **M3 Complete gameplay, accepted by the owner on 2026-11-10 at `3980bc3`, as the agreed milestone, with the M4/M5, hardware and playtesting deferrals** ([record](evidence/m3/owner-acceptance-2026-11-10.md)). Package: [m3-review-package.md](reviews/m3-review-package.md). Milestone acceptance, not approval of a finished game. No release has been made. M4 started on 2026-11-10, on `m4/atmosphere`, with [its plan](m4-plan.md) proposed for the owner. M5–M7 not started.
 - **Every later playtest identifies the exact artifact or run it tested.**
 
 ## M3 implementation sequence (recorded 2026-11-04, as the owner asked)

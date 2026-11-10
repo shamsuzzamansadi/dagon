@@ -2,7 +2,7 @@
 
 Changing task state only. The lasting rules are in [AGENTS.md](../AGENTS.md). **Check this against `git log`, the pull request and CI before relying on it.**
 
-**Last updated:** 2026-11-10, at M3's acceptance and merge.
+**Last updated:** 2026-11-10, at the start of M4.
 
 ## Where things are
 
@@ -12,7 +12,8 @@ Changing task state only. The lasting rules are in [AGENTS.md](../AGENTS.md). **
 | **Review** | ChatGPT's limited follow-up review at `3980bc3`: native tests, breakage-tool, release-tool and art checks passed independently; no new blocking code defect in the areas reviewed; integration, exported-route and listening not rerun or judged ([record](evidence/m3/review-chatgpt-at-3980bc3.md)) |
 | **Acceptance fingerprint** | `sha256:892b1072136b806ee25340c4cc3f8cefaa36880ae5d7399bd70e6e42f744e453` |
 | **Releases** | **None.** `release/v0.1.0-pre-alpha.1.json` stays `planned`. Do not tag or publish without the owner asking |
-| **Next** | M4, on a new branch from `main`. Its plan, the squash commit and `main`'s CI are recorded there |
+| **Merged** | Squash commit `ad6df8c` on `main`, through [#3](https://github.com/shamsuzzamansadi/dagon/pull/3). `main`'s CI, run [42817688574](https://github.com/shamsuzzamansadi/dagon/actions/runs/42817688574), passed: GCC, Clang, MSVC, the release tools, and the release gate, which found the record `planned` and published nothing. The M3 branch is deleted, locally and remotely |
+| **Now** | **M4, Atmosphere, on `m4/atmosphere`,** from `ad6df8c`. **[The plan](m4-plan.md) is proposed, for the owner.** Nothing is implemented yet |
 
 ## M3 requirements: done and accepted
 
@@ -66,4 +67,4 @@ These may be gone. Everything finished is pushed.
 
 ## Next concrete action
 
-Start M4 on its own branch from the updated `main`, following its plan.
+The owner's word on [the M4 plan](m4-plan.md). Then its first item: the prologue spoken in voice A.
