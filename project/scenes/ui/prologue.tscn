@@ -19,6 +19,7 @@
 [ext_resource type="AudioStream" path="res://assets/audio/effects/oars.ogg" id="a_oars"]
 [ext_resource type="AudioStream" path="res://assets/audio/ambience/lapping.ogg" id="a_lapping"]
 [ext_resource type="AudioStream" path="res://assets/audio/ambience/wind.ogg" id="a_wind"]
+[ext_resource type="AudioStream" path="res://assets/audio/ambience/shore_sea.ogg" id="a_shore_sea"]
 
 [sub_resource type="Animation" id="raider_show"]
 resource_name = "show"
@@ -331,26 +332,31 @@ stretch_mode = 5
 
 [node name="Lying" type="TextureRect" parent="Panels/Dry"]
 layout_mode = 0
-offset_left = 226.0
-offset_top = 172.0
-offset_right = 246.0
-offset_bottom = 186.0
+offset_left = 126.0
+offset_top = 182.0
+offset_right = 174.0
+offset_bottom = 222.0
 mouse_filter = 2
 texture = ExtResource("p4_lying")
 
 [node name="Sitting" type="TextureRect" parent="Panels/Dry"]
 modulate = Color(1, 1, 1, 0)
 layout_mode = 0
-offset_left = 226.0
-offset_top = 172.0
-offset_right = 246.0
-offset_bottom = 186.0
+offset_left = 126.0
+offset_top = 182.0
+offset_right = 174.0
+offset_bottom = 222.0
 mouse_filter = 2
 texture = ExtResource("p4_sitting")
 
+[node name="Sea" type="AudioStreamPlayer" parent="Panels/Dry"]
+stream = ExtResource("a_shore_sea")
+volume_db = -1.0
+bus = &"Effects"
+
 [node name="Wind" type="AudioStreamPlayer" parent="Panels/Dry"]
 stream = ExtResource("a_wind")
-volume_db = -14.0
+volume_db = -6.0
 bus = &"Effects"
 
 [node name="Motion" type="AnimationPlayer" parent="Panels/Dry"]

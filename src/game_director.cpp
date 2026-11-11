@@ -22,6 +22,8 @@ namespace dagon {
 
 namespace {
 
+const char *const CLIP_WAKE = "shore_wake";
+const char *const POSE_WAKE = "wake";
 const char *const CLIP_AWAKEN = "monolith_awaken";
 const char *const CLIP_REVEAL = "dagon_reveal";
 const char *const CLIP_COLLAPSE = "collapse";
@@ -66,6 +68,7 @@ void GameDirector::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_start_beat", "beat"), &GameDirector::set_start_beat);
 	ClassDB::bind_method(D_METHOD("get_start_beat"), &GameDirector::get_start_beat);
 	ClassDB::bind_method(D_METHOD("fade_in"), &GameDirector::fade_in);
+	ClassDB::bind_method(D_METHOD("wake"), &GameDirector::wake);
 	ClassDB::bind_method(D_METHOD("show_notice", "text"), &GameDirector::show_notice);
 	ClassDB::bind_method(D_METHOD("on_puzzle_solved"), &GameDirector::on_puzzle_solved);
 	ClassDB::bind_method(D_METHOD("start_cinematic", "clip"), &GameDirector::start_cinematic);
@@ -923,6 +926,19 @@ void GameDirector::restart_checkpoint() {
 	}
 	fade_in();
 	emit_signal("player_respawned");
+}
+
+void GameDirector::wake() {
+	if (progress_.beat() != core::Beat::Shore || active_.has_value()) {
+		return;
+	}
+	start_cinematic(CLIP_WAKE);
+	// Only if the clip is really running. With none, control is already back, and he simply stands.
+	if (active_.has_value()) {
+		if (PlayerController *player = player_.get()) {
+			player->show_pose(POSE_WAKE);
+		}
+	}
 }
 
 void GameDirector::fade_in() {

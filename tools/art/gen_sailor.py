@@ -206,6 +206,93 @@ def air_frame(near, far, sway):
     return f.image
 
 
+def turned(rows):
+    """A sprite turned a quarter anticlockwise: what faced right now faces up, as for a man on his back."""
+    width = max(len(r) for r in rows)
+    rows = [r.ljust(width, ".") for r in rows]
+    return ["".join(rows[y][x] for y in range(len(rows))) for x in range(width - 1, -1, -1)]
+
+
+LANTERN_X = 12  # Where the lantern stands on the seabed while he sleeps, and where his hand finds it.
+
+
+def ground_lantern(f):
+    draw_lantern(f, LANTERN_X, -7)
+
+
+def flat_legs(f, knee_lift):
+    """Legs out along the ground to the right, the near one a little bent."""
+    f.line(1, -3, 8, -2, "C2", ((0, 0), (0, -1)))
+    f.line(1, -4, 5, -4 - knee_lift, "C7", ((0, 0), (0, 1)))
+    f.line(5, -4 - knee_lift, 8, -3, "C7", ((0, 0), (0, 1)))
+    f.line(2, -2, 7, -1, "C6")
+    draw_boot(f, 8, -3, 1, "E0", "E1", "E3")
+
+
+def lying_frame():
+    """Asleep on his back beside the boat, head toward it, the lantern set down by his feet."""
+    f = Frame()
+    flat_legs(f, 1)
+    f.sprite(turned(COAT), -8, -10, COAT_COLORS)
+    f.sprite(turned(HEAD), -15, -10, COLORS)
+    f.line(-4, -4, 1, -3, "C4")
+    f.px(2, -3, "S1")
+    ground_lantern(f)
+    return f.image
+
+
+def sitting_frame(reach=False):
+    f = Frame()
+    flat_legs(f, 4)
+    f.sprite(COAT, -7, -11, COAT_COLORS)
+    f.sprite(HEAD, -7, -18, COLORS)
+    if reach:
+        # Leaning for the lantern.
+        f.line(-2, -9, 4, -9, "C2", ((0, 0), (0, 1)))
+        f.line(4, -9, LANTERN_X - 2, -7, "C4", ((0, 0), (0, 1)))
+        f.px(LANTERN_X - 1, -7, "S1")
+    else:
+        # A hand on the ground, holding himself up.
+        f.line(-2, -9, -1, -5, "C2", ((0, 0), (1, 0)))
+        f.line(-1, -5, 2, -2, "C4", ((0, 0), (1, 0)))
+        f.px(3, -2, "S1")
+    ground_lantern(f)
+    return f.image
+
+
+def kneeling_frame():
+    """One knee down, the lantern in his hand and just off the ground."""
+    f = Frame()
+    f.line(-1, -7, -5, -2, "C2", ((0, 0), (1, 0)))
+    f.line(-5, -2, -9, -1, "C2", ((0, 0), (0, -1)))
+    f.line(0, -8, 4, -8, "C7", ((0, 0), (0, 1), (0, -1)))
+    f.line(4, -8, 4, -2, "C7", ((0, 0), (1, 0)))
+    f.line(0, -6, 3, -6, "C6")
+    draw_boot(f, 4, -2, 0, "E0", "E1", "E3")
+    f.sprite(COAT, -6, -17, COAT_COLORS)
+    f.sprite(HEAD, -6, -24, COLORS)
+    f.line(-1, -15, 4, -12, "C2", ((0, 0), (0, 1)))
+    f.line(4, -12, LANTERN_X - 2, -9, "C4", ((0, 0), (0, 1)))
+    f.px(LANTERN_X - 1, -9, "S1")
+    draw_lantern(f, LANTERN_X, -9)
+    return f.image
+
+
+def rising_frame():
+    """Nearly up: knees still bent, head down, the lantern coming in to his side."""
+    f = Frame()
+    hip_y = -10
+    draw_leg(f, (1, hip_y), (4, 0, 0), "C2", "C1", "C0", "C0", "C1")
+    draw_leg(f, (0, hip_y), (-3, 0, 0), "C7", "C6", "E0", "E1", "E3")
+    draw_body(f, 2, far_hand=None, sway=0, near_hand=(9, -12), head_nod=1)
+    return f.image
+
+
+def wake_frames():
+    """Getting up beside the boat, from where the prologue's last picture leaves him: sitting."""
+    return [sitting_frame(), sitting_frame(reach=True), kneeling_frame(), rising_frame(), idle_frame(0, 0)]
+
+
 def all_frames():
     """Returns {animation: [frames]} in the order the sheet is laid out."""
     return {
@@ -216,4 +303,6 @@ def all_frames():
         "walk": [walk_frame(e) for e in WALK],
         "jump": [air_frame((3, 5, 0), (-4, 3, -1), 1)],
         "fall": [air_frame((-2, 3, -1), (4, 5, 0), -1)],
+        "wake": wake_frames(),
+        "sleep": [lying_frame()],
     }

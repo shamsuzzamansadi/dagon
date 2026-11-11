@@ -27,7 +27,9 @@ REVEAL_ARTWORK = ["monolith", "dagon_body", "dagon_head", "dagon_crest", "dagon_
 CAVE_OUT = ROOT / "project" / "assets" / "cave"
 CAVE_ARTWORK = ["cave_front", "cave_wall", "abyss_far", "ritual_far", "foreground_cave"]
 PROLOGUE_OUT = ROOT / "project" / "assets" / "prologue"
-PROLOGUE_ARTWORK = ["prologue_1_raider", "prologue_2_escape", "prologue_3_drift", "prologue_4_dry", "prologue_1_lamp", "prologue_2_lamp", "prologue_2_boat", "prologue_2_oars_0", "prologue_2_oars_1", "prologue_3_boat", "prologue_4_lying", "prologue_4_sitting", "ending_1_found", "ending_2_listen", "ending_3_shop", "ending_4_rising"]
+# Not prologue_4_*: those are photographs of the Shore as the game lights it (project/tests/capture_opening.gd, D97),
+# so their colours are the palette's under the game's tint and lantern, and are not the palette's own.
+PROLOGUE_ARTWORK = ["prologue_1_raider", "prologue_2_escape", "prologue_3_drift", "prologue_1_lamp", "prologue_2_lamp", "prologue_2_boat", "prologue_2_oars_0", "prologue_2_oars_1", "prologue_3_boat", "ending_1_found", "ending_2_listen", "ending_3_shop", "ending_4_rising"]
 CAVE_X0 = 600
 CAVE_OPEN_GROUND = range(640, 1440)
 IDLE_FRAMES = 8

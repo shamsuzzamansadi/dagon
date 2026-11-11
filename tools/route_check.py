@@ -415,23 +415,26 @@ def run_new_game_to_the_ending(game, read):
         time.sleep(0.3)
         game.tap("menu_right")
     game.tap("enter")
-    # New Game shows the prologue. The reading run lets it play through at its own pace; the direct run skips it.
+    # New Game shows How to Play on the main menu, and Begin starts the prologue.
+    game.wait_for("dagon: introduction shown")
+    time.sleep(0.5)
+    game.shot(name("02-introduction"))
+    game.tap("enter")
+    # The reading run lets the prologue play through at its own pace; the direct run skips it.
     shown = time.monotonic()
     game.wait_for("dagon: prologue shown")
     time.sleep(0.5)
-    game.shot(name("02-prologue"))
+    game.shot(name("03-prologue"))
     if read:
         game.wait_for("dagon: prologue finished skipped=false", 120)
     else:
         game.tap("escape")
         game.wait_for("dagon: prologue finished skipped=true", 10)
     prologue_seconds = time.monotonic() - shown
-    game.wait_for("dagon: introduction shown")
-    time.sleep(0.5)
-    game.shot(name("03-introduction"))
-    game.tap("enter")
     begun = time.monotonic()
 
+    # Nothing stands between the prologue and the game. He gets up, and the prompt comes when the game is the player's.
+    game.wait_for("dagon: cinematic finalized clip=shore_wake", 15)
     game.wait_for("dagon: prompt: [E] Examine")
     time.sleep(0.3)
     if read:

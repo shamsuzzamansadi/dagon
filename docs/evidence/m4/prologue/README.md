@@ -1,8 +1,8 @@
 # The prologue, spoken
 
-**[prologue-voiced.mp4](prologue-voiced.mp4)**, 44 s, picture and sound together: New Game from the main menu, then the whole prologue at its own pace with nothing pressed, each of its four lines in voice A over its own picture, then the game's first moments. Recorded from the game by Godot's Movie Maker (`project/tests/record_prologue.gd`), software-rendered at the game's own 480 × 270, shown at twice that size. **It is the game playing, with its real mix. It is not a person playing.** [stages.txt](stages.txt) gives the frame each stage begins at, 30 to the second.
+**[prologue-voiced.mp4](prologue-voiced.mp4)**, 44 s, picture and sound together: New Game from the main menu, then the whole prologue at its own pace with nothing pressed, each of its four lines in voice A over its own picture, then the game's first moments. Recorded from the game by Godot's Movie Maker (`project/tests/record_prologue.gd`), software-rendered at the game's own 480 × 270, shown at twice that size. The file was first committed at 480 × 270; this double-size copy was made from that file, not from the raw recording, with its sound stream copied unchanged. **It is the game playing, with its real mix. It is not a person playing.** [stages.txt](stages.txt) gives the frame each stage begins at, 30 to the second.
 
-**This recording is of the build before the prologue was joined to the Shore.** The How to Play card still comes between the last picture and the game, and the game is silent under it. That is the next piece of M4's work, and it gets its own recording.
+**This recording is of `2ccde53`, before the prologue was joined to the Shore.** The How to Play card still comes between the last picture and the game, and the game is silent under it. [The recording of the joined opening](../opening/README.md) replaces it for listening; this one is kept as the record of the first measurement.
 
 **The developer cannot hear.** What follows is measured. Whether the voice sounds right over these pictures, and whether the music and the sea sit well under it, are for the owner's ear.
 

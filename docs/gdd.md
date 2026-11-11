@@ -55,7 +55,7 @@ checkpoint.
 
 ## 4. Structure and pacing (one continuous level)
 
-**A short prologue comes first, on New Game only (D71):** four pictures, one line each, skippable. A raider takes his ship in the war, he escapes in a small boat, drifts, and wakes with the sea gone, beside that same boat.
+**A short prologue comes first, on New Game only (D71):** four pictures, one line each, spoken (D95), skippable. A raider takes his ship in the war, he escapes in a small boat, drifts, and wakes with the sea gone, beside that same boat. **How to Play is shown before it, on the main menu, and the last picture is the Shore itself as the game opens on it:** he sits up in the picture, and the game begins on him getting up from there, with nothing between (D97).
 
 | Act | Name             | Target time | Beats |
 |-----|------------------|-------------|-------|

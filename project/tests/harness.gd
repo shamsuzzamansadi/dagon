@@ -20,6 +20,8 @@ var _expected_errors := {}
 
 ## How many prologues wait_for_scene skipped on the way to a game, since the last fixture.
 var prologues_skipped := 0
+## How many times it pressed Begin on the main menu's How to Play, on the way to a game.
+var introductions_begun := 0
 
 func _init(p_tree: SceneTree) -> void:
 	tree = p_tree
@@ -85,17 +87,43 @@ func load_with(node: Node, as_main := false) -> Node:
 
 ## Waits for a scene change to finish, and returns the new scene.
 func wait_for_scene(type_name: String, max_steps := 60) -> Node:
-	# New Game shows the prologue before the game. A test waiting for the game skips it, as a player can, and the
-	# tests of the prologue itself say so. Continue never shows it, which they check too.
+	# New Game shows How to Play on the main menu, then the prologue, then the game. A test waiting for the game
+	# presses Begin and skips the prologue, as a player can, and the tests of each say so themselves. Continue shows
+	# neither, which they check too.
 	if type_name == "GameSession":
-		await wait_until(func() -> bool: return is_instance_valid(tree.current_scene) and tree.current_scene.is_node_ready() and (tree.current_scene.is_class(type_name) or tree.current_scene.has_method("skip_prologue")), max_steps, "the scene to change to %s" % type_name)
-		if is_instance_valid(tree.current_scene) and tree.current_scene.has_method("skip_prologue") and not tree.current_scene.is_class(type_name):
-			prologues_skipped += 1
-			tree.current_scene.skip_prologue()
+		for i in max_steps:
+			var scene := tree.current_scene
+			if is_instance_valid(scene) and scene.is_node_ready():
+				if scene.is_class(type_name):
+					break
+				if is_introduction(scene):
+					introductions_begun += 1
+					scene.back()
+				elif is_prologue(scene) and not scene.is_prologue_finished():
+					prologues_skipped += 1
+					scene.skip_prologue()
+			await steps(1)
 	await wait_until(func() -> bool: return is_instance_valid(tree.current_scene) and tree.current_scene.is_class(type_name) and tree.current_scene.is_node_ready(), max_steps, "the scene to change to %s" % type_name)
 	fixture = tree.current_scene
 	await steps(1)
 	return fixture
+
+
+## The main menu showing How to Play, as it does once New Game is accepted.
+func is_introduction(scene: Node) -> bool:
+	if not is_instance_valid(scene) or not scene.has_method("get_mode") or scene.get_mode() != 1:
+		return false
+	var panel: Control = scene.get_node_or_null("Center/Controls")
+	return panel != null and panel.visible and panel.get_node("Items/Back").text == "Begin"
+
+
+func is_prologue(scene: Node) -> bool:
+	return is_instance_valid(scene) and scene.has_method("get_mode") and scene.get_mode() == 3 and scene.is_node_ready()
+
+
+## A new game opens on him getting up, with control locked for about two seconds.
+func wait_for_control(player: Node, max_steps := 400) -> bool:
+	return await wait_until(func() -> bool: return player.is_control_enabled(), max_steps, "control")
 
 
 ## For a test that sets out to cause an engine error. The runner fails a test on any error it logs, except one whose

@@ -25,6 +25,7 @@ const SUITES: Array[Script] = [
 	preload("res://tests/test_route.gd"),
 	preload("res://tests/test_narration.gd"),
 	preload("res://tests/test_narrative.gd"),
+	preload("res://tests/test_opening.gd"),
 ]
 const REQUIRED_CLASSES: Array[String] = ["PlayerController", "CameraRig", "Interactable", "Interactor", "StoryTrigger", "Hud", "PuzzleController", "GameDirector", "GameSession", "MenuController", "SettingsMenu"]
 const STORAGE_VARIABLE := "DAGON_STORAGE_DIR"

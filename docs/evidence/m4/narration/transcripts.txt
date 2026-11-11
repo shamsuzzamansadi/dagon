@@ -43,9 +43,19 @@ prologue.raider: word for word
    script: The war was two years old when a raider took our ship. They kept us below, and fed us when they remembered.
    heard:  The war was two years old when a raider took our ship. They kept us below and fed us when they remembered.
    words:  The@0.00 war@0.18 was@0.46 two@0.72 years@0.98 old@1.22 when@1.56 a@1.78 raider@1.94 took@2.22 our@2.48 ship.@2.74 They@3.86 kept@4.14 us@4.42 below@4.74 and@5.12 fed@5.58 us@5.90 when@6.12 they@6.30 remembered.@6.44
+shore.boat: word for word
+   5.82 s, 12.7 chars/s, -24.0 dB RMS, peak -2.9 dBFS
+   script: My boat lies on bare seabed. The sea has drawn back farther than any tide.
+   heard:  My boat lies on bare seabed. The sea has drawn back farther than any tide.
+   words:  My@0.00 boat@0.28 lies@0.60 on@1.04 bare@1.38 seabed.@1.64 The@2.62 sea@2.82 has@3.06 drawn@3.32 back@3.60 farther@3.96 than@4.32 any@4.70 tide.@5.08
+shore.fish: word for word
+   5.46 s, 14.3 chars/s, -24.0 dB RMS, peak -5.5 dBFS
+   script: Dead fish, rotting where the water left them. They have not been dry for long.
+   heard:  Dead fish, rotting where the water left them, they have not been dry for long.
+   words:  Dead@0.00 fish,@0.30 rotting@1.40 where@1.40 the@1.76 water@1.90 left@2.16 them,@2.44 they@3.26 have@3.42 not@3.56 been@3.78 dry@4.04 for@4.38 long.@4.64
 shore.talisman: word for word
    9.76 s, 13.7 chars/s, -24.0 dB RMS, peak -3.1 dBFS
    script: Something small, half sunk in the mud. An eye, cut above a line of waves. It is heavier than it should be, and someone wore it smooth.
    heard:  Something small, half sunk in the mud, an eye cut above a line of waves. It is heavier than it should be, and someone wore it smooth.
    words:  Something@0.00 small,@0.48 half@1.64 sunk@1.72 in@2.06 the@2.30 mud,@2.42 an@3.16 eye@3.28 cut@3.62 above@4.10 a@4.38 line@4.58 of@4.80 waves.@4.98 It@5.86 is@6.08 heavier@6.28 than@6.56 it@6.90 should@7.06 be,@7.26 and@7.84 someone@8.06 wore@8.52 it@8.88 smooth.@9.06
-10 lines, 0 differing
+12 lines, 0 differing

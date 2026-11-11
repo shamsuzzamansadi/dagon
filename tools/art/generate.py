@@ -59,7 +59,9 @@ def sprite_frames(texture, animations):
 
 def write_sailor():
     frames = gen_sailor.all_frames()
-    order = [("idle", 4.0, True), ("walk", 10.0, True), ("jump", 1.0, False), ("fall", 1.0, False)]
+    # After the four the controller needs, so their places in the sheet stay where check_art.py reads them. "wake" is
+    # the new game's first two seconds; "sleep" is only ever photographed, for the prologue's last picture.
+    order = [("idle", 4.0, True), ("walk", 10.0, True), ("jump", 1.0, False), ("fall", 1.0, False), ("wake", 2.5, False), ("sleep", 1.0, False)]
     count = sum(len(frames[name]) for name, _, _ in order)
     sheet = Image.new("RGBA", (count * gen_sailor.FRAME_W, gen_sailor.FRAME_H), (0, 0, 0, 0))
     animations = []

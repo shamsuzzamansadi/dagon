@@ -14,6 +14,8 @@ const VOICED := {
 	"prologue.escape": "I took a boat",
 	"prologue.drift": "I stopped counting the days",
 	"prologue.dry": "the sea had gone",
+	"shore.boat": "My boat lies on bare seabed",
+	"shore.fish": "Dead fish",
 	"shore.talisman": "Something small",
 	"cave.carving": "The same eye",
 	"ending.found": "A steamer found me",
@@ -23,8 +25,9 @@ const VOICED := {
 }
 const PROLOGUE := "res://scenes/ui/prologue.tscn"
 const VOICED_LINE := &"shore.talisman"
-const TEXT_LINE := &"shore.fish"
-const OTHER_TEXT_LINE := &"shore.boat"
+## Two lines that are captions only. What he examines in the Abyss stays text in M4.
+const TEXT_LINE := &"abyss.fossil_a"
+const OTHER_TEXT_LINE := &"abyss.footprint"
 const STORY_LINE := &"abyss.ritual"
 const TALISMAN_X := 349.0
 const FISH_X := 189.0
@@ -272,9 +275,11 @@ func test_a_press_at_something_else_examines_it_at_once_and_replaces_the_line(h)
 	await h.stand_at(_player(h), Vector2(TALISMAN_X, -2))
 	await h.tap_key(KEY_E)
 	h.check(_voice(h).playing, "no audio")
+	var talisman: AudioStream = _voice(h).stream
 	await h.stand_at(_player(h), Vector2(FISH_X, -2))
 	await h.tap_key(KEY_E)
-	h.check(not _voice(h).playing, "the old audio went on")
+	h.check(_voice(h).stream != talisman, "the old audio went on")
+	h.check(_voice(h).playing and _voice(h).stream == load("res://assets/narration/shore.fish.ogg"), "the fish's line is not the one being spoken")
 	h.check(_caption(h).text == world.get_node("Props/FishNearRock").caption, "the caption reads '%s'" % _caption(h).text)
 
 

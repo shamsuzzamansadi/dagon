@@ -33,6 +33,11 @@ public:
 	void teleport(const godot::Vector2 &p_position);
 
 	int get_facing() const { return facing_; }
+
+	// A picture of him for a clip, such as getting up: an animation of his sprite, shown instead of standing. It shows
+	// only while control is locked and is forgotten when control returns, so a clip that sticks cannot leave him in it.
+	void show_pose(const godot::StringName &p_animation);
+	godot::StringName get_shown_pose() const { return shown_pose_; }
 	// Turns the sailor without moving him, as walking that way would. -1 is left, and 1 is right.
 	void face(int p_direction);
 
@@ -131,6 +136,7 @@ private:
 	float walk_distance_ = 0.0f;
 	float airborne_time_ = 0.0f;
 	bool was_walking_ = false;
+	godot::StringName shown_pose_;
 };
 
 } // namespace dagon

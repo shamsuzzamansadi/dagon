@@ -5,12 +5,12 @@ A short 2D cinematic horror game for [GitHub Game Off 2026](https://itch.io/jam/
 under the ocean. Godot 4.7 with gameplay in C++20 through GDExtension.
 
 **Status: M1, M2 and M3 are accepted by the owner, with documented deferrals** ([M3's record](docs/evidence/m3/owner-acceptance-2026-11-10.md)). M3's acceptance is of the milestone, not of a finished game, and no release has been made. M4 is next. The game opens on a main menu, with New Game, Continue
-from one checkpoint save, Settings with key rebinding, Controls and Credits. New Game begins with a short, skippable prologue. Play starts on the Shore, in its accepted art direction: a
+from one checkpoint save, Settings with key rebinding, Controls and Credits. New Game shows How to Play, then a short, spoken, skippable prologue whose last picture is the Shore itself. Play starts there, as he gets up beside his boat, on the Shore, in its accepted art direction: a
 sailor you can walk and jump with, on exposed seabed beside a stranded boat, with the sea far off. You can examine things, pause, and
 use a controller, with buttons named for the device in use.
 
 The whole route can be played: the prologue, Shore, Exposed Abyss, Monolith, Witness, the escape and the ending. There are clue tablets, side routes, a stone to push onto a raised slab to bring it down across a gap, a distant ritual, a three-stone puzzle, placeholder cinematics,
-the sea coming back after you in the escape, a save at each checkpoint, and optional controller vibration. **The Shore and the stretch from the cave entrance to the first tablet are finished art, and so are the monolith, the creature and the epilogue's pictures. The rest past x = 1440 is unfinished greybox,** a stated boundary. The cinematics are a first pass. **There is a first sound pass across the route: ambience, footsteps, effects, breathing and music in five places. It is synthesized, not final, and has not been listened to by the developer.** Ten lines are narrated in an AI voice the owner chose: the prologue, the talisman, the carving and the whole epilogue; the rest of the
+the sea coming back after you in the escape, a save at each checkpoint, and optional controller vibration. **The Shore and the stretch from the cave entrance to the first tablet are finished art, and so are the monolith, the creature and the epilogue's pictures. The rest past x = 1440 is unfinished greybox,** a stated boundary. The cinematics are a first pass. **There is a first sound pass across the route: ambience, footsteps, effects, breathing and music in five places. It is synthesized, not final, and has not been listened to by the developer.** Twelve lines are narrated in an AI voice the owner chose: the prologue, the boat, the fish, the talisman, the carving and the whole epilogue; the rest of the
 narration is captions, and [the record](docs/evidence/m4/narration/README.md) lists which is which. It is shorter than the finished game is meant to be. See
 [docs/roadmap.md](docs/roadmap.md), [docs/reviews/m3-review-package.md](docs/reviews/m3-review-package.md) and [docs/shore-preview.md](docs/shore-preview.md).
 
@@ -45,7 +45,7 @@ device you are using, and an unrecognized controller is described by position.
 
 In Settings you can change the keyboard keys for walking, jumping and examining. The Left and Right arrows always move
 and Esc always pauses. Controller buttons are fixed. Narration has its own volume, and subtitles and controller vibration can each be switched off. They are on by default. The Music and Effects sliders are saved and set on their own buses, ready
-for the audio planned in M4 and M5. The sound so far is a first pass, synthesized, and the narration covers ten lines.
+for the audio planned in M4 and M5. The sound so far is a first pass, synthesized, and the narration covers twelve lines.
 
 All of this is checked by automated tests with simulated input for each layout. In human tests, A, D, the Left and Right arrows and
 Space have worked, and the owner reports that the Xbox controller controls they tried worked, without listing them. Individual Xbox

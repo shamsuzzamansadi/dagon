@@ -78,6 +78,9 @@ public:
 	bool is_crossing_moving() const { return crossing_moving_; }
 
 	void fade_in();
+	// A new game opens on him getting up beside the boat: a locking cinematic like any other, so control returns when
+	// its clip ends, is missing or sticks. Only at the Shore, and never from a restore, which plays no clip.
+	void wake();
 	void show_notice(const godot::String &p_text);
 	void set_input_device(int p_device);
 	// From a clip's method track, at the moment it belongs to. A paused or stopped clip cannot ask.

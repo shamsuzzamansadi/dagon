@@ -1,6 +1,7 @@
 extends SceneTree
-## Plays New Game from the main menu: the whole prologue at its own pace, nothing pressed, then the game's first
-## moments and his first steps on the Shore, for Godot's Movie Maker to record with its sound. Evidence, not a test.
+## Plays New Game from the main menu: How to Play, the whole prologue at its own pace with nothing pressed, then
+## straight into the game as he gets up, looks at his boat and the fish, and walks on, for Godot's Movie Maker to
+## record with its sound. Evidence, not a test.
 ## On a private display:
 ## DISPLAY=:77 DAGON_STORAGE_DIR=<dagon-test-dir> godot --path project --resolution 960x540 --write-movie <out.avi> \
 ##     --fixed-fps 30 --script res://tests/record_prologue.gd
@@ -29,7 +30,10 @@ func _run() -> void:
 	_mark("title")
 	await h.steps(60)
 	await h.tap_key(KEY_ENTER)
-	await h.wait_until(func() -> bool: return is_instance_valid(current_scene) and current_scene.has_method("skip_prologue"), 120, "the prologue")
+	_mark("how-to-play")
+	await h.steps(60 * 3)
+	await h.tap_key(KEY_ENTER)
+	await h.wait_until(func() -> bool: return h.is_prologue(current_scene), 120, "the prologue")
 	var prologue: Node = current_scene
 	var only := OS.get_environment("DAGON_RECORD_ONLY")
 	if only == "voice":
@@ -44,16 +48,16 @@ func _run() -> void:
 	h.fixture = current_scene
 	_mark("game")
 	var route = RoutePlayer.new(h)
-	# Whatever the game shows first is left on screen long enough to be seen and heard, then answered as a player would.
-	await h.steps(60 * 4)
-	if route.pause_menu().is_open():
-		_mark("introduction-answered")
-		await h.tap_key(KEY_ENTER)
-	await h.wait_until(func() -> bool: return route.player().is_control_enabled(), 60 * 30, "control")
+	if only == "bed":
+		route.world().get_node("Hud/Voice").volume_db = -80.0
+	await h.wait_for_control(route.player())
 	_mark("control")
-	await h.steps(60 * 2)
+	# As a player does: he looks at the boat he is standing by, then walks on and looks at the fish. Each line is
+	# let run to its end.
+	await h.steps(60)
+	route.read_through = true
 	_mark("first-steps")
-	await route.walk(KEY_D, func() -> bool: return route.player().global_position.x > 240.0, 60 * 20)
+	await route.walk(KEY_D, func() -> bool: return route.player().global_position.x > 250.0, 60 * 60, true)
 	await h.steps(60 * 2)
 	_mark("end")
 	for type in ["AudioStreamPlayer", "AudioStreamPlayer2D"]:

@@ -1155,8 +1155,13 @@ _data = {
 &"beat_fleeing": SubResource("beat_fleeing")
 }
 
+[sub_resource type="Animation" id="clip_shore_wake"]
+resource_name = "shore_wake"
+length = 2.2
+
 [sub_resource type="AnimationLibrary" id="cinematics_library"]
 _data = {
+&"shore_wake": SubResource("clip_shore_wake"),
 &"monolith_awaken": SubResource("clip_monolith_awaken"),
 &"dagon_reveal": SubResource("clip_dagon_reveal"),
 &"collapse": SubResource("clip_collapse")

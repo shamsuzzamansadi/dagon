@@ -31,16 +31,20 @@ func _run() -> void:
 	_mark("title")
 	await h.steps(90)
 	await h.tap_key(KEY_ENTER)
+	# How to Play, read, then Begin.
+	_mark("how-to-play")
+	await h.steps(120)
+	await h.tap_key(KEY_ENTER)
 	# The whole prologue, unskipped, at its own pace.
-	await h.wait_until(func() -> bool: return is_instance_valid(current_scene) and current_scene.has_method("skip_prologue"), 120, "the prologue")
+	await h.wait_until(func() -> bool: return h.is_prologue(current_scene), 120, "the prologue")
 	_mark("prologue")
 	await _game()
 	var route = RoutePlayer.new(h)
 	route.read_through = true
-	await h.steps(90)
-	await h.tap_key(KEY_ENTER)
-	await h.landed_on_floor(route.player())
 	_mark("shore")
+	# He gets up, and then the game is the player's.
+	await h.landed_on_floor(route.player())
+	await h.wait_for_control(route.player())
 	await route.walk(KEY_D, func() -> bool: return route.player().global_position.x > 330.0, 900, true)
 	# A pause on the Shore: every sound should stop, and come back.
 	_mark("pause")

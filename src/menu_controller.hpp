@@ -150,12 +150,13 @@ private:
 	void ask_confirm(ConfirmAction p_action, const godot::String &p_message, const godot::String &p_ok_text);
 	godot::String quit_message(ConfirmAction p_action);
 	void write_new_game();
-	void start_session(core::Beat p_beat, bool p_show_intro);
+	void start_session(core::Beat p_beat, bool p_show_intro, bool p_waking = false);
+	void begin_prologue();
 	void show_next_ending_line();
 	bool is_sequence() const { return mode_ == MODE_ENDING || mode_ == MODE_PROLOGUE; }
 	void show_panel(int p_index);
 	static void start_panel(godot::Node *p_panel);
-	void fade_sounds(double p_seconds);
+	void fade_sounds(double p_seconds, const godot::Node *p_keep_under = nullptr);
 	static void stop_panel(godot::Node *p_panel);
 	void finish_prologue(bool p_skipped);
 	godot::Control *panel(const NodeRef<godot::Control> &p_panel) const { return p_panel.get(); }

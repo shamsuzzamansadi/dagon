@@ -14,6 +14,8 @@ This table is the list. A line not in it is a caption only. The integration suit
 | `prologue.escape` | M4 | 7.9 s | 15.1 chars/s | seed 8 | Word for word; "rowed" heard as "rode", which sound the same |
 | `prologue.drift` | M4 | 8.0 s | 13.2 chars/s | seed 10 | Word for word |
 | `prologue.dry` | M4 | 3.7 s | 12.7 chars/s | seed 7 | Word for word |
+| `shore.boat` | M4 | 5.8 s | 12.7 chars/s | seed 7 | Word for word |
+| `shore.fish` | M4 | 5.5 s | 14.3 chars/s | seed 7 | Word for word |
 | `shore.talisman` | M3 | 9.8 s | 13.7 chars/s | the audition's | Word for word |
 | `cave.carving` | M3 | 12.2 s | 12.5 chars/s | the audition's | Word for word |
 | `ending.found` | M3 | 15.3 s | 12.7 chars/s | seed 9 | Word for word |
@@ -21,7 +23,7 @@ This table is the list. A line not in it is a caption only. The integration suit
 | `ending.innsmouth` | M3 | 16.1 s | 13.8 chars/s | the audition's | Word for word except the name, heard as "Insemouth": the exception recorded in M3, **for the owner's ear** |
 | `ending.rising` | M3 | 8.0 s | 15.2 chars/s | seed 7 | Word for word |
 
-Every file is at −24.0 dB RMS, with peaks between −2.9 and −5.9 dBFS. The full transcripts, with the time each word is said, are in [transcripts.txt](transcripts.txt), made by `python tools/audio/check_narration.py --words`.
+Twelve lines. Every file is at −24.0 dB RMS, with peaks between −2.9 and −5.9 dBFS. The full transcripts, with the time each word is said, are in [transcripts.txt](transcripts.txt), made by `python tools/audio/check_narration.py --words`.
 
 ## How the prologue's takes were chosen
 
@@ -38,6 +40,10 @@ Characters a second. All thirteen takes were heard word for word, "rowed" as "ro
 
 **For the owner's ear:** the escape line is still the quickest of the four, at 15.1, about the pace of the epilogue's last line (15.2). If it sounds hurried, more takes are cheap.
 
+## The Shore's first lines
+
+The boat and the fish, the first two things he can look at. Three takes of each, seeds 7, 8 and 9, all six heard word for word. The slowest of each was kept, both seed 7: the boat at 12.7 characters a second (13.9 and 12.7 for the others), the fish at 14.3 (14.5 and 14.6).
+
 ## Still captions
 
-Everything else in `project/narration/script.txt`. The M4 plan speaks the Shore's first lines next, then, as the schedule allows, the story lines. What is left at the end of M4 is listed in the handoff and the review package, for M5.
+Everything else in `project/narration/script.txt`. The M4 plan speaks the story lines next, as the schedule allows; what he examines past the Shore stays text unless the owner asks. What is left at the end of M4 is listed in the handoff and the review package, for M5.
