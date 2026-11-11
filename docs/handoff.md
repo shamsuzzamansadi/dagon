@@ -2,7 +2,7 @@
 
 Changing task state only. The lasting rules are in [AGENTS.md](../AGENTS.md). **Check this against `git log`, the pull request and CI before relying on it.**
 
-**Last updated:** 2026-11-10, during M4, after its first item.
+**Last updated:** 2026-11-11, during M4, after its second item and a recovery from a lost working folder.
 
 ## Where things are
 
@@ -59,36 +59,34 @@ Changing task state only. The lasting rules are in [AGENTS.md](../AGENTS.md). **
 
 | # | Item of [the plan](m4-plan.md) | State | Commit |
 |---|---|---|---|
-| 1 | The prologue spoken in voice A | **Done.** Four lines, each transcribed word for word; tests; a recording with sound; the voice measured at 8.9 to 18.9 dB above the music and sea beneath it ([narration record](evidence/m4/narration/README.md), [recording and measurements](evidence/m4/prologue/README.md), D95, D96). **Not listened to by anyone yet** | `2ccde53` |
-| 2 | Continuity from the prologue into the Shore; the Shore's first lines voiced | **Next.** Design settled, nothing committed: see below | |
-| 3 | Environment art past x = 1440, in route order | Not started | |
+| 1 | The prologue spoken in voice A | **Done.** Four lines, each transcribed word for word; tests; a recording with sound; the voice measured against the music and sea beneath it ([narration record](evidence/m4/narration/README.md), [recording and measurements](evidence/m4/prologue/README.md), D95, D96). **Not listened to by anyone yet** | `2ccde53` |
+| 2 | Continuity from the prologue into the Shore; the Shore's first lines voiced | **Done.** New Game, How to Play, Begin, prologue, then straight into the game with nothing between: the last picture is the Shore's own opening view, the sailor gets up beside his boat under the cinematic contract (`shore_wake`), and the last picture carries the Shore's sea and wind so the sound does not drop at the cut. `shore.boat` and `shore.fish` in voice A, word for word; twelve lines voiced in all ([recording and measurements](evidence/m4/opening/README.md), D97–D99). Continue and Restart never show the prologue or the waking. **Not listened to by anyone yet** | `6e4a4ab` |
+| 3 | Environment art past x = 1440, in route order | **Started, nothing committed.** `tools/art/gen_abyss.py` draws the Abyss's ground from the scene's own collision, and `project/tests/capture_m4.gd` captures the route by stretch; neither is wired into `generate.py`, the scene or `check_art.py` yet. Both sit uncommitted in the native clone | |
 | 4 | Audio polish | Not started | |
-| 5 | Further narration | Not started | |
-| 6 | Validation, review package, identified build | Not started. **No draft pull request yet** | |
+| 5 | Further narration | Not started beyond the two Shore lines of item 2 | |
+| 6 | Validation, review package, identified build | Not started. **No draft pull request yet:** it is opened with this push | |
 
-**Results on `2ccde53`:** `tools/run_godot_checks.sh` on the native Linux clone, GCC debug build of the unchanged C++: import, classes, integration **424 passed, 0 failed**, three smoke runs, all ok. CI has not run on it yet. No C++ changed, so the library is M3's.
+**Results on `6e4a4ab`,** all run on the native Linux clone after the tree was recovered (see below), GCC: `scons unit_tests` 127 test cases passed; `tools/run_godot_checks.sh` (debug build): import, classes, integration **434 passed, 0 failed**, three smoke runs, all ok; release build; `tools/export_check.sh linux` ok; the exported route by `tools/route_check.py` on a private display: `ROUTE_RESULT runs=4 failed=0`. CI on this commit: check the pull request.
 
-**The design for item 2, decided but not built:**
-- The How to Play card moves to the main menu, before the prologue: New Game, How to Play, Begin, prologue, Shore. Nothing then sits between the last picture and the game. Continue is unchanged.
-- The last picture becomes the Shore's own opening view, with the man lying, then sitting, where the sailor starts.
-- In the game, a new game opens on a short cinematic under the existing contract (`shore_wake`): he rises from sitting. `PlayerController` gets a pose that only shows while control is locked, and is cleared when control returns, so a stuck clip cannot leave him on the ground. Continue and Restart never play it.
-- `shore.boat` and `shore.fish` spoken in voice A.
-- Tests, the route player, `record_play.gd`, `session_probe.gd` and `tools/route_check.py` expect the card after the prologue, and change with it.
+**Measured on the opening's recording, not heard:** each prologue line 9.1 to 13.9 dB above the music and sea under it; the bed ducks 4.4 to 5.3 dB for the voice; the mix peaks at −2.8 dBFS; no sudden change in level at the cut into the game. Whether it sounds right is the owner's to judge.
 
-**Risks, as of this update:** art is the largest item and has not started; the window is four days. The voice tools run only from the temporary folder below, which a reboot would remove; rebuilding it takes about half an hour.
+**An interruption on 2026-11-11, and what it cost.** The machine restarted and emptied `/tmp`, where the native clone, the voice tools and item 2's uncommitted work and validation logs were. Nothing pushed was lost. Item 2 was rebuilt by replaying the session's own recorded edit commands onto a fresh clone of `ecad573`, each checked against its recorded output; the two voice lines were regenerated with the same seed and settings (same durations, pace and peaks, transcribed again); the recording was made again and its measurements came out the same. **The earlier validation results were not carried over: every result above is from a fresh run on the recovered tree.** The step 1 video's double-size copy was made from its committed file, since its raw recording was gone. The clone and tools now live under the home folder, not `/tmp`.
 
-## Temporary resources
+**Risks, as of this update:** art is the largest item and has barely begun; about an hour of the 11–14 November window went to the recovery. If art runs late, the plan's own fallback applies: the stretches nearest the reveal first, the Abyss's middle keeping the finished far view over simpler ground, identified as unfinished.
 
-These may be gone. Everything finished is pushed.
+## Working resources
+
+Outside the repository, but no longer in `/tmp`. Everything finished is pushed.
 
 | What | Where |
 |---|---|
-| Native clone, where M4 is being built and tested | `/tmp/claude-1000/-mnt-c-Users-sadi-projects-dagon/621ac8dc-276d-4bbd-8143-03866a5a9d1a/scratchpad/work` (call its parent `$S`) |
-| Voice environment and models, for `tools/audio/make_audition.py --speak` and `check_narration.py` | `$S/tts/`, `$S/voice-models/`, `$S/hf/` (set `HF_HOME=$S/hf HF_HUB_OFFLINE=1`); speech data linked from `~/.cache/dagon-voice-short/data` (set `ESPEAK_DATA_PATH` to it) |
-| Encoder for recordings | the `ffmpeg` inside `$S/venv`'s `imageio_ffmpeg` |
-| The prologue's rejected takes | the M4 session's scratch folder, `takes/seed-7` to `seed-10`; not kept in the repository |
-| Private X display | `$S/xns.sh`, run with `unshare -rm` (docs/toolchain.md §6a). One at a time |
+| Native clone, where M4 is built and tested | `~/.cache/dagon-m4/S/work` (call its parent `$S`). Session scratch: `~/.cache/dagon-m4/N` (`$N`) |
+| Build | `$S/venv/bin/scons`, with `SCONS_CACHE=~/.cache/dagon-scons`. The same environment has Pillow, NumPy, SciPy and soundfile for `tools/art` and `tools/audio/listening.py`, and `imageio_ffmpeg`'s `ffmpeg` for encoding |
+| Voice environment and models, for `tools/audio/make_audition.py --speak` and `check_narration.py` | `$S/tts/` (conda, Python 3.11: torch 2.6.0 CPU, chatterbox-tts 0.1.2, kokoro-onnx 0.4.9, numpy 1.26.4, setuptools < 81, soundfile, scipy), `$S/voice-models/` (Kokoro v1.0 model and voices), `$S/hf/` (set `HF_HOME=$S/hf`); speech data linked from `~/.cache/dagon-voice-short/data` (set `ESPEAK_DATA_PATH` to it) |
+| Private X display | `$S/xns.sh`, run with `unshare -rm` (docs/toolchain.md §6a), from packages unpacked into `$S/xroot`. One at a time |
+| Helpers | `$N/focus.sh <text>` (focused integration run; empty text runs everything), `$N/record.sh <script> <dir>` (Movie Maker on the private display), `$N/cap.sh <dir> [filter]` (route captures and contact sheets) |
+| The session's recorded commands, used for the recovery | `~/.cache/dagon-m4/replay/` |
 
 ## Next concrete action
 
-Item 2 of [the plan](m4-plan.md): build the continuity into the Shore as designed above, starting with the pose in `PlayerController` and the `shore_wake` clip, then the card's move and the tests that follow it. Open the draft pull request once it holds together.
+Item 3 of [the plan](m4-plan.md), first stretch: wire `gen_abyss.ground_tiles()` into `tools/art/generate.py` and the scene (sprites under `Terrain`, the greybox ground hidden, collision untouched), add the Abyss surface to `check_art.py`, then the canyon walls and far view in place of `GreyboxBackdrop`, `CanyonRim` and `FarRidges/Silhouette`, keeping the watcher and the distant shape reading. Capture with `$N/cap.sh`, look, commit and push; then the rib arch.
