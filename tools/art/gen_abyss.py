@@ -99,6 +99,7 @@ def ground():
     paste(img, crossing_pillar(), None)
     noise = Noise(301)  # The reference section's own, so the mud carries on across x = 1440.
     stone = Noise(331)
+    draw_props_behind(img, noise)
     for col in range(width):
         x = X0 + col
         top = round(GROUND_ROW + surface_y(x + 0.5))
@@ -144,6 +145,9 @@ def ground():
     draw_rock_feet(img, stone)
     draw_hollow(img, noise)
     draw_dressing(img, noise)
+    draw_props(img, noise)
+    draw_footprint(img, noise)
+    draw_prints(img)
     for x in range(END_WALL_X, X1):
         pass  # The ground runs on under the last wall, which is not drawn.
     return img
@@ -418,14 +422,16 @@ def prop_position(name):
 
 
 def prop_shape(prop, part):
-    """A part of a prop, in world space: the prop's place, the part's own offset, and its shape."""
+    """A part of a prop, in world space: the prop's place, the part's own offset and scale, and its shape."""
     text = scene_text()
     block = re.search(r'\[node name="%s" type="Polygon2D" parent="Props/%s"\]\n(.*?)\n\n' % (part, prop), text, re.S).group(1)
     offset = re.search(r"position = Vector2\(([-0-9.]+), ([-0-9.]+)\)", block)
     ox, oy = (float(offset.group(1)), float(offset.group(2))) if offset else (0.0, 0.0)
+    scale = re.search(r"scale = Vector2\(([-0-9.]+), ([-0-9.]+)\)", block)
+    sx, sy = (float(scale.group(1)), float(scale.group(2))) if scale else (1.0, 1.0)
     px, py = prop_position(prop)
     numbers = [float(n) for n in re.search(r"polygon = PackedVector2Array\(([^)]*)\)", block).group(1).split(",")]
-    return [(x + px + ox, y + py + oy) for x, y in zip(numbers[0::2], numbers[1::2])]
+    return [(x * sx + px + ox, y * sy + py + oy) for x, y in zip(numbers[0::2], numbers[1::2])]
 
 
 def carve(img, shapes, cut="E0", fill="T3", lip="T4"):
@@ -449,19 +455,26 @@ def carve(img, shapes, cut="E0", fill="T3", lip="T4"):
             put(img, x - X0, GROUND_ROW + y, color)
 
 
-def draw_tablet(img, noise, cx, base):
-    """A standing slab like the first, outside the cave (gen_cave.draw_tablet), on the ground or on a shelf."""
-    foot = GROUND_ROW + base
-    for y in range(foot - 33, foot):
-        row = y - (foot - 33)
-        half = 11 if row > 6 else 7 + round(row * 0.7)
-        for x in range(cx - half, cx + half + 1):
+def draw_tablet(img, noise, shape):
+    """A standing slab like the first, outside the cave (gen_cave.draw_tablet), lit and edged as it is, filling its
+    own shape in the scene: the one in the recess is smaller, to stand under the shelf."""
+    left, right = math.floor(min(x for x, _ in shape)), math.ceil(max(x for x, _ in shape))
+    top, bottom = math.floor(min(y for _, y in shape)), math.ceil(max(y for _, y in shape))
+    cx = (left + right) / 2
+    for y in range(top, bottom):
+        for x in range(left, right + 1):
+            if not _covers(shape, x, y):
+                continue
             facet = noise(x / 6.0, y / 7.0)
-            value = 3.0 + (facet - 0.5) * 1.0 + (0.6 if x < cx else 0.0) - row * 0.02
-            put(img, x - X0, y, ramp(MUD, value, x, y, 0.2))
-        put(img, cx - half - X0, y, "C5")
-        put(img, cx + half - X0, y, "E1")
-    hline(img, cx - 7 - X0, cx + 7 - X0, foot - 33, "C6")
+            value = 3.0 + (facet - 0.5) * 1.0 + (0.6 if x < cx else 0.0) - (y - top) * 0.02
+            color = ramp(MUD, value, x, y, 0.2)
+            if not _covers(shape, x, y - 1):
+                color = "C6"
+            elif not _covers(shape, x - 1, y):
+                color = "C5"
+            elif not _covers(shape, x + 1, y):
+                color = "E1"
+            put(img, x - X0, GROUND_ROW + y, color)
 
 
 def draw_props_behind(img, noise):
@@ -469,7 +482,7 @@ def draw_props_behind(img, noise):
     # Under the first shelf: a hollowed face of the rock, and the procession cut into it.
     paste(img, stone_from([scene_shape("Alcove", "ActArt")], 381, ROCK, 0.9, 1.2), None)
     paste(img, stone_from([prop_shape("Relief", "Panel")], 382, ROCK, 2.1, 0.9), None)
-    carve(img, [prop_shape("Relief", f"Walker{i}") for i in range(1, 6)], cut="E5", fill="E4", lip="E3")
+    draw_walkers(img)
     carve(img, [prop_shape("Relief", "Sea"), prop_shape("Relief", "Arm")])
     # What holds the second shelf up: two leaning props of rock, behind the way under it.
     for x, lean in ((3440, 5), (3548, -4)):
@@ -479,14 +492,31 @@ def draw_props_behind(img, noise):
         paste(img, stone_from([scene_shape(name, "Ledges")], seed, STONE, 2.5, 1.0), None)
 
 
+# A robed figure walking toward the sea, its head bowed: too small for the scene's shapes to say, so drawn by hand.
+WALKER = ["..##.", "..##.", "...#.", ".###.", ".####", ".###.", ".###.", ".###.", ".####", ".####", "#####"]
+STRIDES = [".#.#.", "#...#"]
+
+
+def draw_walkers(img):
+    """The procession, one figure on each walker's shape and standing on its foot, cut as the rest of the relief."""
+    for i in range(1, 6):
+        shape = prop_shape("Relief", f"Walker{i}")
+        left = round((min(x for x, _ in shape) + max(x for x, _ in shape)) / 2) - 2
+        rows = WALKER + [STRIDES[i % 2]]
+        top = round(max(y for _, y in shape)) - len(rows)
+        lit = {(left + c, top + r) for r, line_ in enumerate(rows) for c, mark in enumerate(line_) if mark == "#"}
+        for x, y in lit:
+            color = "E3" if (x, y + 1) not in lit else "E5" if (x, y - 1) not in lit else "E4"
+            put(img, x - X0, GROUND_ROW + y, color)
+
+
 def draw_props(img, noise):
     """What he can stop and look at."""
     # The second fossil: a skull as long as a man, one socket, lying where the ribs stand.
     paste(img, stone_from([prop_shape("FossilB", "Art")], 391, BONE_OLD, 3.0, 1.2), None)
     carve(img, [prop_shape("FossilB", "Socket")], cut="E0", fill="E0", lip="E1")
     for prop in ("TabletKneel", "TabletEye"):
-        shape = prop_shape(prop, "Art")
-        draw_tablet(img, noise, round(prop_position(prop)[0]), round(max(y for _, y in shape)))
+        draw_tablet(img, noise, prop_shape(prop, "Art"))
     carve(img, [prop_shape("TabletKneel", "Mark")])
     carve(img, [prop_shape("TabletEye", "Mark")])
     carve(img, [prop_shape("TabletEye", "Pupil")], cut="E0", fill="E0", lip="E0")
@@ -505,6 +535,29 @@ def draw_footprint(img, noise):
     for x in range(round(min(x for x, _ in shape)) + 6, round(max(x for x, _ in shape)) - 6):
         if _covers(flipped, x, 4) and noise(x / 2.0, 91.0) > 0.45:
             put(img, x - X0, GROUND_ROW + 4, "T2" if noise(x / 3.0, 92.0) > 0.5 else "T1")
+    # What shows over the prompt when he stands at it: the dent along the edge of the ground, and the mud its three
+    # toes pushed up, lit on top.
+    left, right = round(min(x for x, _ in shape)), round(max(x for x, _ in shape))
+    for x in range(left + 3, right - 2):
+        put(img, x - X0, GROUND_ROW + round(surface_y(x)), "E1")
+    for (tx, ty), height in zip(sorted((p for p in shape if p[1] < -9), key=lambda p: p[0]), (2, 3, 2)):
+        row = GROUND_ROW + round(surface_y(tx))
+        for dx in range(-2, 3):
+            h = height - (1 if abs(dx) == 2 else 0)
+            for k in range(1, h + 1):
+                put(img, round(tx) + dx - X0, row - k, "E4" if k == h else "E2" if dx < 0 else "E3")
+
+
+def draw_prints(img):
+    """Three small prints, a man's, pressed into the crust on the way to the ledges: dark in the dent, its far rim lit."""
+    for i in range(3):
+        shape = scene_shape(f"PrintDown{i}", "ActArt")
+        left, right = round(min(x for x, _ in shape)), round(max(x for x, _ in shape))
+        row = GROUND_ROW + round(surface_y(left))
+        hline(img, left - X0, right - X0, row, "E1")
+        put(img, left + 1 - X0, row + 1, "E0")
+        put(img, right - 1 - X0, row + 1, "E0")
+        put(img, right - X0, row - 1, "E4")
 
 
 # ---------------------------------------------------------------- the canyon
@@ -626,8 +679,9 @@ def _along(points, x, y):
 
 def rib_arch():
     """Five ribs of something far larger than a whale, standing out of the mud and leaning over the way on. Each fills
-    its own shape in the scene, short of the tip, where it snapped from the spine. Bleached along the back where the moon reaches, dark beneath, stained green
-    where it stands in the mud, split across in places by its own weight. Returns the image and its world origin."""
+    its own shape in the scene, short of the tip, where it snapped from the spine. Bleached along the back where the
+    moon reaches, dark beneath, stained green where it stands in the mud, split across in places by its own weight.
+    Returns the image and its world origin."""
     shapes = [gen_reveal.scene_polygon(name, "ActArt") for name in RIBS]
     x0 = math.floor(min(x for shape in shapes for x, _ in shape)) - 1
     y0 = math.floor(min(y for shape in shapes for _, y in shape)) - 1

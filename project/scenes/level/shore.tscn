@@ -1596,18 +1596,22 @@ color = Color(0.14, 0.165, 0.2, 1)
 polygon = PackedVector2Array(640, -220, 1040, -220, 1040, -150, 1010, -120, 965, -96, 920, -106, 870, -88, 810, -102, 750, -92, 700, -112, 660, -104, 640, -128)
 
 [node name="Alcove" type="Polygon2D" parent="ActArt"]
+visible = false
 color = Color(0.05, 0.065, 0.09, 1)
 polygon = PackedVector2Array(2826, 0, 2826, -28, 2990, -28, 2990, 0)
 
 [node name="PrintDown0" type="Polygon2D" parent="ActArt"]
+visible = false
 color = Color(0.3, 0.36, 0.38, 1)
 polygon = PackedVector2Array(2008, -1, 2010, -2, 2012, -1, 2011, 0, 2009, 0)
 
 [node name="PrintDown1" type="Polygon2D" parent="ActArt"]
+visible = false
 color = Color(0.3, 0.36, 0.38, 1)
 polygon = PackedVector2Array(2018, -1, 2020, -2, 2022, -1, 2021, 0, 2019, 0)
 
 [node name="PrintDown2" type="Polygon2D" parent="ActArt"]
+visible = false
 color = Color(0.3, 0.36, 0.38, 1)
 polygon = PackedVector2Array(2028, -1, 2030, -2, 2032, -1, 2031, 0, 2029, 0)
 
@@ -1927,11 +1931,13 @@ line_id = &"abyss.fossil_b"
 shape = SubResource("prop_shape")
 
 [node name="Art" type="Polygon2D" parent="Props/FossilB"]
+visible = false
 position = Vector2(0, 14)
 color = Color(0.47, 0.48, 0.45, 1)
 polygon = PackedVector2Array(-34, 0, -30, -16, -12, -26, 10, -22, 28, -10, 40, 0, 22, 0, 18, -7, 8, -9, 4, 0)
 
 [node name="Socket" type="Polygon2D" parent="Props/FossilB"]
+visible = false
 position = Vector2(0, 14)
 color = Color(0.26, 0.28, 0.29, 1)
 polygon = PackedVector2Array(-16, -16, -9, -19, -6, -14, -13, -11)
@@ -1949,12 +1955,14 @@ position = Vector2(0, 6)
 shape = SubResource("low_tablet_shape")
 
 [node name="Art" type="Polygon2D" parent="Props/TabletKneel"]
+visible = false
 position = Vector2(0, 14)
 scale = Vector2(0.78, 0.78)
 color = Color(0.3, 0.34, 0.38, 1)
 polygon = PackedVector2Array(-11, 0, -12, -27, -7, -33, 7, -33, 12, -27, 11, 0)
 
 [node name="Mark" type="Polygon2D" parent="Props/TabletKneel"]
+visible = false
 position = Vector2(0, 14)
 scale = Vector2(0.78, 0.78)
 color = Color(0.62, 0.72, 0.72, 1)
@@ -1972,6 +1980,7 @@ line_id = &"abyss.footprint"
 shape = SubResource("prop_shape")
 
 [node name="Art" type="Polygon2D" parent="Props/Footprint"]
+visible = false
 position = Vector2(0, 14)
 color = Color(0.26, 0.28, 0.29, 1)
 polygon = PackedVector2Array(-16, 0, -19, -3, -10, -5, -7, -11, -4, -5, 0, -12, 4, -5, 8, -10, 10, -5, 18, -3, 15, 0)
@@ -1988,16 +1997,19 @@ line_id = &"abyss.tablet_eye"
 shape = SubResource("prop_shape")
 
 [node name="Art" type="Polygon2D" parent="Props/TabletEye"]
+visible = false
 position = Vector2(0, 20)
 color = Color(0.3, 0.34, 0.38, 1)
 polygon = PackedVector2Array(-11, 0, -12, -27, -7, -33, 7, -33, 12, -27, 11, 0)
 
 [node name="Mark" type="Polygon2D" parent="Props/TabletEye"]
+visible = false
 position = Vector2(0, 20)
 color = Color(0.62, 0.72, 0.72, 1)
 polygon = PackedVector2Array(-9, -18, -4, -23, 4, -23, 9, -18, 4, -13, -4, -13)
 
 [node name="Pupil" type="Polygon2D" parent="Props/TabletEye"]
+visible = false
 position = Vector2(0, 20)
 color = Color(0.3, 0.34, 0.38, 1)
 polygon = PackedVector2Array(-2, -20, 2, -20, 2, -16, -2, -16)
@@ -2095,34 +2107,42 @@ position = Vector2(0, 6)
 shape = SubResource("relief_shape")
 
 [node name="Panel" type="Polygon2D" parent="Props/Relief"]
+visible = false
 color = Color(0.13, 0.155, 0.19, 1)
 polygon = PackedVector2Array(-40, -10, -40, 12, 40, 12, 40, -10)
 
 [node name="Walker1" type="Polygon2D" parent="Props/Relief"]
+visible = false
 color = Color(0.36, 0.42, 0.45, 1)
 polygon = PackedVector2Array(-32.2, 10, -32.2, 1, -33, -1.2, -31.5, -4.2, -28.5, -4.2, -27, -1.2, -27.8, 1, -27.8, 10)
 
 [node name="Walker2" type="Polygon2D" parent="Props/Relief"]
+visible = false
 color = Color(0.36, 0.42, 0.45, 1)
 polygon = PackedVector2Array(-17.2, 10, -17.2, 1, -18, -1.2, -16.5, -4.2, -13.5, -4.2, -12, -1.2, -12.8, 1, -12.8, 10)
 
 [node name="Walker3" type="Polygon2D" parent="Props/Relief"]
+visible = false
 color = Color(0.36, 0.42, 0.45, 1)
 polygon = PackedVector2Array(-2.2, 10, -2.2, 1, -3, -1.2, -1.5, -4.2, 1.5, -4.2, 3, -1.2, 2.2, 1, 2.2, 10)
 
 [node name="Walker4" type="Polygon2D" parent="Props/Relief"]
+visible = false
 color = Color(0.36, 0.42, 0.45, 1)
 polygon = PackedVector2Array(12.8, 10, 12.8, 1, 12, -1.2, 13.5, -4.2, 16.5, -4.2, 18, -1.2, 17.2, 1, 17.2, 10)
 
 [node name="Walker5" type="Polygon2D" parent="Props/Relief"]
+visible = false
 color = Color(0.36, 0.42, 0.45, 1)
 polygon = PackedVector2Array(27.8, 10, 27.8, 1, 27, -1.2, 28.5, -4.2, 31.5, -4.2, 33, -1.2, 32.2, 1, 32.2, 10)
 
 [node name="Sea" type="Polygon2D" parent="Props/Relief"]
+visible = false
 color = Color(0.62, 0.72, 0.72, 1)
 polygon = PackedVector2Array(26, 12, 26, 8, 40, 6, 40, 12)
 
 [node name="Arm" type="Polygon2D" parent="Props/Relief"]
+visible = false
 color = Color(0.62, 0.72, 0.72, 1)
 polygon = PackedVector2Array(34, 7, 35, 2, 33, -3, 35, -7, 38, -8, 37, -5, 36, -2, 38, 2, 37, 7)
 
@@ -2138,10 +2158,12 @@ line_id = &"abyss.cairn"
 shape = SubResource("prop_shape")
 
 [node name="Stack" type="Polygon2D" parent="Props/Cairn"]
+visible = false
 color = Color(0.3, 0.34, 0.38, 1)
 polygon = PackedVector2Array(-9, 20, -7, 13, -8, 12, -5, 6, -6, 5, -3, 0, 3, 0, 6, 5, 5, 6, 8, 12, 7, 13, 9, 20)
 
 [node name="Mark" type="Polygon2D" parent="Props/Cairn"]
+visible = false
 color = Color(0.62, 0.72, 0.72, 1)
 polygon = PackedVector2Array(-4, 17.9, -1.8, 15.7, 1.8, 15.7, 4, 17.9, 1.8, 20.1, -1.8, 20.1)
 
@@ -2157,10 +2179,12 @@ line_id = &"canyon.statue"
 shape = SubResource("prop_shape")
 
 [node name="Figure" type="Polygon2D" parent="Props/Statue"]
+visible = false
 color = Color(0.3, 0.34, 0.38, 1)
 polygon = PackedVector2Array(-12, 20, -12, 12, -7, 10, -5, 2, -3, -8, -1, -16, 1, -20, 8, -24, 14, -22, 16, -16, 12, -13, 6, -13, 5, -6, 13, -18, 15, -17, 8, 0, 5, 6, 8, 12, 10, 20)
 
 [node name="Mark" type="Polygon2D" parent="Props/Statue"]
+visible = false
 color = Color(0.62, 0.72, 0.72, 1)
 polygon = PackedVector2Array(-3.6, 22.8, -1.6, 20.8, 1.6, 20.8, 3.6, 22.8, 1.6, 24.8, -1.6, 24.8)
 
@@ -2425,6 +2449,7 @@ collision_mask = 0
 polygon = PackedVector2Array(2826, -36, 2990, -36, 2990, -28, 2826, -28)
 
 [node name="ShelfA" type="Polygon2D" parent="Ledges"]
+visible = false
 color = Color(0.2, 0.24, 0.28, 1)
 polygon = PackedVector2Array(2826, -36, 2990, -36, 2988, -28, 2828, -28)
 
@@ -2432,6 +2457,7 @@ polygon = PackedVector2Array(2826, -36, 2990, -36, 2988, -28, 2828, -28)
 polygon = PackedVector2Array(3424, -36, 3570, -36, 3570, -28, 3424, -28)
 
 [node name="ShelfB" type="Polygon2D" parent="Ledges"]
+visible = false
 color = Color(0.2, 0.24, 0.28, 1)
 polygon = PackedVector2Array(3424, -36, 3570, -36, 3568, -28, 3426, -28)
 
