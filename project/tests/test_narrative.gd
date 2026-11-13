@@ -684,3 +684,25 @@ func test_the_water_covers_the_whole_screen_at_its_height(h) -> void:
 		box = box.expand(point)
 	box.position += top
 	h.check(box.has_point(Vector2(0, 0)) and box.has_point(Vector2(479, 269)), "the water reaches %s at its height" % box)
+
+
+## Examining is heard, under the line; pressing a stone is heard only as the stone, with no examining sound on it.
+func test_examining_has_a_sound_and_pressing_a_stone_does_not(h) -> void:
+	var world := await _world(h, MONOLITH)
+	var sound: AudioStreamPlayer = world.get_node("Hud/SoundExamine")
+	h.check(sound.stream != null and sound.stream.resource_path.ends_with("examine.ogg"), "examining plays %s" % sound.stream)
+	var wav := AudioStreamWAV.new()
+	var bytes := PackedByteArray()
+	bytes.resize(44100 * 10)
+	wav.data = bytes
+	sound.stream = wav
+	var player := _player(h)
+	await h.stand_at(player, Vector2(world.get_node("Monolith/Mural").global_position.x, -2))
+	await h.tap_key(KEY_E)
+	h.check(sound.playing, "examining the mural is not heard")
+	sound.stop()
+	await h.stand_at(player, Vector2(world.get_node("Monolith/GlyphKneel").global_position.x, -2))
+	await h.tap_key(KEY_E)
+	h.check(not sound.playing, "pressing a stone was heard as examining it")
+	for path in ["Monolith/StoneAccept", "Monolith/StoneReject", "Hud/Voice"]:
+		world.get_node(path).stop()

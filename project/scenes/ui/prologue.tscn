@@ -1,6 +1,9 @@
 [gd_scene format=3]
 
 [ext_resource type="Theme" path="res://assets/ui/theme.tres" id="theme"]
+[ext_resource type="AudioStream" path="res://assets/audio/effects/ui_move.ogg" id="a_ui_move"]
+[ext_resource type="AudioStream" path="res://assets/audio/effects/ui_accept.ogg" id="a_ui_accept"]
+[ext_resource type="AudioStream" path="res://assets/audio/effects/ui_back.ogg" id="a_ui_back"]
 [ext_resource type="PackedScene" path="res://scenes/level/game.tscn" id="game"]
 [ext_resource type="Texture2D" path="res://assets/prologue/prologue_1_raider.png" id="p1"]
 [ext_resource type="Texture2D" path="res://assets/prologue/prologue_2_escape.png" id="p2"]
@@ -156,6 +159,9 @@ _data = {
 
 
 [node name="Prologue" type="MenuController"]
+move_sound_path = NodePath("SoundMove")
+accept_sound_path = NodePath("SoundAccept")
+back_sound_path = NodePath("SoundBack")
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -398,6 +404,18 @@ layout_mode = 2
 focus_neighbor_left = NodePath("../Continue")
 focus_neighbor_right = NodePath("../Continue")
 text = "Skip"
+
+[node name="SoundMove" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("a_ui_move")
+bus = &"Effects"
+
+[node name="SoundAccept" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("a_ui_accept")
+bus = &"Effects"
+
+[node name="SoundBack" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("a_ui_back")
+bus = &"Effects"
 
 [connection signal="pressed" from="Card/Items/Buttons/Continue" to="." method="advance_ending"]
 [connection signal="pressed" from="Card/Items/Buttons/Skip" to="." method="skip_prologue"]

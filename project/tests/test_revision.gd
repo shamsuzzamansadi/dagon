@@ -731,3 +731,15 @@ func test_the_epilogue_shows_every_line_with_subtitles_off(h) -> void:
 		h.check(lines.get_child(0).text == narration_text(ending.ending_lines[line]), "line %d does not match the script" % line)
 		if line + 1 < ending.ending_lines.size():
 			ending.advance_ending()
+
+
+## The Abyss is not one sound throughout: open mud, then the deeper mud, then the canyon, in the order he walks them.
+func test_the_abyss_sounds_deeper_as_he_goes_on(h) -> void:
+	var world := await _world(h, 1)
+	var names := ["Sound/AbyssNear", "Sound/AbyssMid", "Sound/AbyssFar"]
+	var files := ["abyss.ogg", "abyss_deep.ogg", "canyon.ogg"]
+	for i in names.size():
+		var sound: AudioStreamPlayer2D = world.get_node(names[i])
+		h.check(sound.stream.resource_path.ends_with("/" + files[i]), "%s plays %s" % [names[i], sound.stream.resource_path])
+		if i > 0:
+			h.check(sound.global_position.x > world.get_node(names[i - 1]).global_position.x, "%s is not further on than %s" % [names[i], names[i - 1]])

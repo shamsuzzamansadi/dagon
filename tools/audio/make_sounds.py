@@ -255,6 +255,85 @@ def amb_abyss(rng):
     return level(make_loop(stereo(*out), 3.0), rms=-28)
 
 
+def amb_abyss_deep(rng):
+    """Further out, where the mud goes black and wet: the wind lower and heavier, the groans deeper and nearer, and
+    under everything a slow swell, slower than breathing, as if the ground were lifted from beneath."""
+    n = seconds(34)
+    t = t_axis(n)
+    groans = np.zeros(n)
+    for start in (2.0, 9.5, 18.0, 27.5):
+        g = groan(rng, rng.uniform(4.5, 7.0))
+        place(groans, filt(g, "low", 180) * rng.uniform(0.35, 0.55), start)
+    groans = reverb(groans, 3.5, 900, 0.65, rng)[:n]
+    # 7.75 s divides the loop's 31 s (34 s less the crossfade), so the swell runs on across the seam.
+    swell = filt(brown(n, rng), "low", 45) * (0.55 + 0.45 * np.sin(2 * np.pi * t / 7.75) ** 2) * 0.9
+    out = []
+    for side in range(2):
+        wind = filt(pink(n, rng), "band", (70, 340)) * (0.3 + smooth_random(n, rng, 7.0, 0.0, 0.7))
+        out.append(wind + swell + groans)
+    return level(make_loop(stereo(*out), 3.0), rms=-28)
+
+
+def amb_canyon(rng):
+    """Where the canyon closes in toward the Monolith: still, enclosed air, wind thin and high across the rim far
+    above, stone ticking as it cools, and water seeping somewhere down the walls, its echo long."""
+    n = seconds(26)
+    room = filt(brown(n, rng), "low", 120) * 0.45
+    ticks = np.zeros(n)
+    time = 0.5
+    while time < 25:
+        m = seconds(0.03)
+        place(ticks, filt(white(m, rng), "band", (1500, 4500)) * env_exp(m, 0.004) * rng.uniform(0.1, 0.35), time)
+        time += rng.uniform(0.8, 4.0)
+    seep = np.zeros(n)
+    time = 1.3
+    while time < 24:
+        place(seep, drip(rng) * 0.35, time)
+        time += rng.uniform(2.0, 5.5)
+    mono = room + reverb(ticks + seep, 4.0, 2500, 0.8, rng)[:n]
+    out = [mono + filt(pink(n, rng), "band", (500, 1400)) * 0.07 * smooth_random(n, rng, 4.0, 0.1, 1.0) for _ in range(2)]
+    return level(make_loop(stereo(*out), 2.0), rms=-30)
+
+
+# ---------------------------------------------------------------- the interface and examining
+
+def tap(rng, freq, length, body=0.5):
+    """A soft knock on stone: low, short, a little air on it. Quiet, so it sits under narration."""
+    n = seconds(length)
+    tone = sine_sweep(n, freq * 1.15, freq, 0.4) * env_exp(n, length / 5)
+    air = filt(white(n, rng), "band", (600, 2400)) * env_exp(n, 0.01) * 0.25
+    return tone * body + air
+
+
+def ui_move(rng):
+    return fade(level(tap(rng, 330, 0.07, 0.6), peak=-20), fade_out=0.01)
+
+
+def ui_accept(rng):
+    n = seconds(0.32)
+    x = np.zeros(n)
+    place(x, tap(rng, 220, 0.25, 0.8), 0.0)
+    place(x, tap(rng, 330, 0.2, 0.4), 0.05)
+    return fade(level(reverb(x, 0.5, 2500, 0.2, rng)[:n], peak=-16), fade_out=0.05)
+
+
+def ui_back(rng):
+    n = seconds(0.22)
+    x = np.zeros(n)
+    place(x, tap(rng, 300, 0.12, 0.6), 0.0)
+    place(x, tap(rng, 200, 0.15, 0.6), 0.06)
+    return fade(level(x, peak=-19), fade_out=0.04)
+
+
+def examine(rng):
+    """He stops and looks: a breath of air drawn in and a palm laid on stone. Under the voice, not over it."""
+    n = seconds(0.45)
+    t = t_axis(n)
+    x = filt(pink(n, rng), "band", (300, 1600)) * np.sin(np.pi * np.clip(t / 0.3, 0, 1)) ** 2 * 0.3
+    place(x, tap(rng, 140, 0.2, 0.9), 0.22)
+    return fade(level(x, peak=-22), fade_out=0.06)
+
+
 def amb_monolith(rng):
     """A drone the stone seems to hold: slow beating fifths under a breath of air."""
     n = seconds(24)
@@ -406,21 +485,31 @@ def hand_impact(rng):
 
 
 def rock_fall(rng):
-    n = seconds(1.6)
+    """A block off the canyon's rim: the ground takes it first, deep, then the crack and scatter, then the rumble of
+    the wall settling after it. Weight in the low end, where the first version had little."""
+    n = seconds(2.6)
     x = np.zeros(n)
-    place(x, impact(rng, rng.uniform(65, 85), 0.18, 0.8), 0.0)
-    place(x, debris(rng, 1.2, 25) * 0.45, 0.04)
-    return fade(level(reverb(x, 1.0, 3000, 0.25, rng)[:n], peak=-4), fade_out=0.2)
+    place(x, impact(rng, rng.uniform(40, 50), 0.32, 0.2) * 1.1, 0.0)
+    place(x, impact(rng, rng.uniform(65, 85), 0.18, 0.8) * 0.8, 0.01)
+    place(x, debris(rng, 1.4, 25) * 0.4, 0.05)
+    rumble = filt(brown(seconds(2.2), rng), "low", 90) * np.exp(-t_axis(seconds(2.2)) / 0.7) * 0.7
+    place(x, rumble, 0.08)
+    return fade(level(reverb(x, 1.2, 2500, 0.3, rng)[:n], peak=-4), fade_out=0.3)
 
 
 def tide_roar(rng):
+    """The sea coming back out of the trench: churn on top, and under it a deep, slow heave, each surge pressing
+    forward, so it is heard as a weight coming on and not only as noise."""
     n = seconds(14)
+    t = t_axis(n)
     out = []
     churn = smooth_random(n, rng, 1.2, 0.55, 1.0)
+    # 4 s divides the loop's 12 s (14 s less the crossfade), so the heave runs on across the seam.
+    deep = filt(brown(n, rng), "low", 55) * (0.55 + 0.45 * np.sin(2 * np.pi * t / 4.0) ** 2) * 1.1
     for side in range(2):
         rush = filt(pink(n, rng), "band", (90, 4200)) * churn
         low = filt(brown(n, rng), "low", 110) * 0.8
-        out.append(rush + low)
+        out.append(rush + low + deep)
     return level(make_loop(stereo(*out), 2.0), rms=-20)
 
 
@@ -434,12 +523,15 @@ def body_fall(rng):
 
 
 def sea_rush(rng):
-    n = seconds(4.0)
-    rise = np.linspace(0, 1, n) ** 1.8
+    """The sea closing over him: it rises, and then it lands, a deep blow and the water heavy over it."""
+    n = seconds(4.5)
+    rise = np.minimum(1.0, np.linspace(0, 1.12, n)) ** 1.8
     out = []
     for side in range(2):
-        out.append(filt(pink(n, rng), "band", (100, 3000)) * rise + filt(brown(n, rng), "low", 80) * rise)
-    return fade(level(stereo(*out), peak=-3), fade_out=0.1)
+        out.append(filt(pink(n, rng), "band", (100, 3000)) * rise + filt(brown(n, rng), "low", 70) * rise * 1.3)
+    landed = np.zeros(n)
+    place(landed, impact(rng, 42, 0.45, 0.15), 3.4)
+    return fade(level(stereo(*out) + landed, peak=-3), fade_out=0.1)
 
 
 # ---------------------------------------------------------------- the sailor's breathing
@@ -694,6 +786,12 @@ SOUNDS = {
     "ambience/wind.ogg": (amb_wind, True, "The Shore and the open abyss: wind"),
     "ambience/cave.ogg": (amb_cave, True, "The cave: still air, a low resonance, drips"),
     "ambience/abyss.ogg": (amb_abyss, True, "The Exposed Abyss: wind on mud, far groans, settling mud"),
+    "ambience/abyss_deep.ogg": (amb_abyss_deep, True, "The Abyss, deeper: heavier wind, nearer groans, a slow swell beneath"),
+    "ambience/canyon.ogg": (amb_canyon, True, "The canyon to the Monolith: enclosed air, high wind on the rim, seeping water"),
+    "effects/ui_move.ogg": (ui_move, False, "Menus: moving between choices"),
+    "effects/ui_accept.ogg": (ui_accept, False, "Menus: choosing"),
+    "effects/ui_back.ogg": (ui_back, False, "Menus: going back"),
+    "effects/examine.ogg": (examine, False, "Examining: a breath and a palm on stone, under the voice"),
     "ambience/monolith.ogg": (amb_monolith, True, "The monolith: a held drone"),
     "ambience/tide_roar.ogg": (tide_roar, True, "The escape: the returning sea, following him"),
     "footsteps/sand_1.ogg": (lambda r: step_sand(r), False, "Footstep, wet sand and mud"),

@@ -118,6 +118,9 @@ public:
 	DAGON_PATH_PROPERTY(ending_box_path)
 	DAGON_PATH_PROPERTY(voice_path)
 	DAGON_PATH_PROPERTY(panels_path)
+	DAGON_PATH_PROPERTY(move_sound_path)
+	DAGON_PATH_PROPERTY(accept_sound_path)
+	DAGON_PATH_PROPERTY(back_sound_path)
 
 #undef DAGON_PATH_PROPERTY
 
@@ -144,6 +147,9 @@ private:
 	void focus_path(const godot::NodePath &p_path);
 	void focus_default();
 	void on_settings_closed();
+	void on_gui_focus_changed(godot::Control *p_control);
+	void on_button_pressed();
+	static void play(const NodeRef<godot::AudioStreamPlayer> &p_sound);
 	void on_joy_connection_changed(int p_device, bool p_connected);
 	void refresh_controls_text();
 	void autostart();
@@ -192,6 +198,9 @@ private:
 	godot::NodePath save_status_label_path_;
 	godot::NodePath ending_box_path_;
 	godot::NodePath panels_path_;
+	godot::NodePath move_sound_path_;
+	godot::NodePath accept_sound_path_;
+	godot::NodePath back_sound_path_;
 	godot::NodePath voice_path_;
 	godot::PackedStringArray ending_lines_;
 
@@ -205,6 +214,11 @@ private:
 	NodeRef<godot::Label> save_status_label_;
 	NodeRef<godot::Button> continue_button_;
 	NodeRef<godot::AudioStreamPlayer> voice_;
+	NodeRef<godot::AudioStreamPlayer> move_sound_;
+	NodeRef<godot::AudioStreamPlayer> accept_sound_;
+	NodeRef<godot::AudioStreamPlayer> back_sound_;
+	// Set while the menu moves focus itself, on the way into a screen: only the player's own moves are heard.
+	bool quiet_focus_ = false;
 	int ending_line_ = -1;
 	double ending_line_left_ = 0.0;
 	Screen screen_ = Screen::Closed;

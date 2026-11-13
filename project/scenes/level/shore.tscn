@@ -63,6 +63,8 @@
 [ext_resource type="AudioStream" path="res://assets/audio/ambience/wind.ogg" id="a_wind"]
 [ext_resource type="AudioStream" path="res://assets/audio/ambience/cave.ogg" id="a_cave"]
 [ext_resource type="AudioStream" path="res://assets/audio/ambience/abyss.ogg" id="a_abyss"]
+[ext_resource type="AudioStream" path="res://assets/audio/ambience/abyss_deep.ogg" id="a_abyss_deep"]
+[ext_resource type="AudioStream" path="res://assets/audio/ambience/canyon.ogg" id="a_canyon"]
 [ext_resource type="AudioStream" path="res://assets/audio/ambience/monolith.ogg" id="a_monolith"]
 [ext_resource type="AudioStream" path="res://assets/audio/ambience/tide_roar.ogg" id="a_tide"]
 [ext_resource type="AudioStream" path="res://assets/audio/effects/stone_accept.ogg" id="a_accept"]
@@ -3061,7 +3063,7 @@ bus = &"Effects"
 
 [node name="AbyssMid" type="AudioStreamPlayer2D" parent="Sound"]
 position = Vector2(2700, -50)
-stream = ExtResource("a_abyss")
+stream = ExtResource("a_abyss_deep")
 volume_db = 0.0
 autoplay = true
 max_distance = 900.0
@@ -3070,7 +3072,7 @@ bus = &"Effects"
 
 [node name="AbyssFar" type="AudioStreamPlayer2D" parent="Sound"]
 position = Vector2(3400, -50)
-stream = ExtResource("a_abyss")
+stream = ExtResource("a_canyon")
 volume_db = -2.0
 autoplay = true
 max_distance = 700.0

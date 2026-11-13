@@ -130,6 +130,9 @@ void MenuController::_bind_methods() {
 	DAGON_BIND_PATH(ending_box_path);
 	DAGON_BIND_PATH(voice_path);
 	DAGON_BIND_PATH(panels_path);
+	DAGON_BIND_PATH(move_sound_path);
+	DAGON_BIND_PATH(accept_sound_path);
+	DAGON_BIND_PATH(back_sound_path);
 
 #undef DAGON_BIND_PATH
 }
@@ -167,6 +170,14 @@ void MenuController::_ready() {
 	}
 	if (SettingsMenu *settings = settings_menu_.get()) {
 		settings->connect("closed", callable_mp(this, &MenuController::on_settings_closed));
+	}
+	move_sound_.set(move_sound_path_.is_empty() ? nullptr : get_node<AudioStreamPlayer>(move_sound_path_));
+	accept_sound_.set(accept_sound_path_.is_empty() ? nullptr : get_node<AudioStreamPlayer>(accept_sound_path_));
+	back_sound_.set(back_sound_path_.is_empty() ? nullptr : get_node<AudioStreamPlayer>(back_sound_path_));
+	get_viewport()->connect("gui_focus_changed", callable_mp(this, &MenuController::on_gui_focus_changed));
+	const TypedArray<Node> buttons = find_children("*", "BaseButton", true, false);
+	for (int64_t i = 0; i < buttons.size(); i++) {
+		Object::cast_to<Node>(buttons[i])->connect("pressed", callable_mp(this, &MenuController::on_button_pressed));
 	}
 
 	Input *input = Input::get_singleton();
@@ -443,8 +454,10 @@ void MenuController::_unhandled_input(const Ref<InputEvent> &p_event) {
 		// Taken first: skipping the prologue changes the scene, which takes this node out of the tree at once.
 		Viewport *viewport = get_viewport();
 		if (is_open()) {
+			play(back_sound_);
 			back();
 		} else {
+			play(accept_sound_);
 			open();
 		}
 		viewport->set_input_as_handled();
@@ -485,12 +498,29 @@ void MenuController::focus_path(const NodePath &p_path) {
 }
 
 void MenuController::focus_default() {
+	quiet_focus_ = true;
 	if (screen_ == Screen::Settings) {
 		settings_menu_.get()->focus_current();
-		return;
-	}
-	if (Control *control = get_node<Control>(default_focus_path_)) {
+	} else if (Control *control = get_node<Control>(default_focus_path_)) {
 		control->grab_focus();
+	}
+	quiet_focus_ = false;
+}
+
+void MenuController::on_gui_focus_changed(Control *p_control) {
+	if (!quiet_focus_ && is_open() && p_control != nullptr && is_ancestor_of(p_control)) {
+		play(move_sound_);
+	}
+}
+
+void MenuController::on_button_pressed() {
+	play(accept_sound_);
+}
+
+void MenuController::play(const NodeRef<AudioStreamPlayer> &p_sound) {
+	// A press that changes the scene has already taken the menu out of the tree by the time it is heard here.
+	if (AudioStreamPlayer *sound = p_sound.get(); sound != nullptr && sound->is_inside_tree()) {
+		sound->play();
 	}
 }
 
@@ -565,7 +595,9 @@ void MenuController::refresh_controls_text() {
 
 void MenuController::open_settings() {
 	show_screen(Screen::Settings);
+	quiet_focus_ = true;
 	settings_menu_.get()->open();
+	quiet_focus_ = false;
 }
 
 void MenuController::on_settings_closed() {
