@@ -41,6 +41,14 @@
 [ext_resource type="Texture2D" path="res://assets/abyss/abyss_trench.png" id="r_abyss_trench"]
 [ext_resource type="Texture2D" path="res://assets/abyss/abyss_mural_lit.png" id="r_abyss_mural_lit"]
 [ext_resource type="Texture2D" path="res://assets/abyss/abyss_mural_fragments.png" id="r_abyss_mural_fragments"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_rock_near.png" id="r_abyss_rock_near"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_rock_mid.png" id="r_abyss_rock_mid"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_rock_far.png" id="r_abyss_rock_far"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_dust_near.png" id="r_abyss_dust_near"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_dust_mid.png" id="r_abyss_dust_mid"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_dust_far.png" id="r_abyss_dust_far"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_tide.png" id="r_abyss_tide"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_returning_sea.png" id="r_abyss_returning_sea"]
 [ext_resource type="Texture2D" path="res://assets/abyss/abyss_glyphkneel.png" id="r_abyss_glyphkneel"]
 [ext_resource type="Texture2D" path="res://assets/abyss/abyss_glyphkneel_lit.png" id="r_abyss_glyphkneel_lit"]
 [ext_resource type="Texture2D" path="res://assets/abyss/abyss_glypheye.png" id="r_abyss_glypheye"]
@@ -2695,43 +2703,79 @@ collision_mask = 0
 polygon = PackedVector2Array(4196, 0, 4198, -8, 4206, -15, 4217, -14, 4225, -9, 4228, 0)
 
 [node name="RockNear" type="Polygon2D" parent="Rockfall"]
+self_modulate = Color(1, 1, 1, 0)
 position = Vector2(4212, 0)
 color = Color(0.3, 0.34, 0.38, 1)
 polygon = PackedVector2Array(-16, 0, -14, -8, -6, -15, 5, -14, 13, -9, 16, 0)
 
+[node name="Drawn" type="Sprite2D" parent="Rockfall/RockNear"]
+position = Vector2(-16, -15)
+texture = ExtResource("r_abyss_rock_near")
+centered = false
+
 [node name="DustNear" type="Polygon2D" parent="Rockfall"]
+self_modulate = Color(1, 1, 1, 0)
 modulate = Color(1, 1, 1, 0)
 position = Vector2(4212, 0)
 color = Color(0.55, 0.58, 0.58, 1)
 polygon = PackedVector2Array(-30, 0, -24, -9, -10, -14, 10, -14, 24, -9, 30, 0)
+
+[node name="Drawn" type="Sprite2D" parent="Rockfall/DustNear"]
+position = Vector2(-30, -14)
+texture = ExtResource("r_abyss_dust_near")
+centered = false
 
 [node name="ShapeMid" type="CollisionPolygon2D" parent="Rockfall"]
 polygon = PackedVector2Array(4017, 0, 4020, -10, 4028, -16, 4039, -13, 4046, -15, 4051, -7, 4053, 0)
 
 [node name="RockMid" type="Polygon2D" parent="Rockfall"]
+self_modulate = Color(1, 1, 1, 0)
 position = Vector2(4035, 0)
 color = Color(0.3, 0.34, 0.38, 1)
 polygon = PackedVector2Array(-18, 0, -15, -10, -7, -16, 4, -13, 11, -15, 16, -7, 18, 0)
 
+[node name="Drawn" type="Sprite2D" parent="Rockfall/RockMid"]
+position = Vector2(-18, -16)
+texture = ExtResource("r_abyss_rock_mid")
+centered = false
+
 [node name="DustMid" type="Polygon2D" parent="Rockfall"]
+self_modulate = Color(1, 1, 1, 0)
 modulate = Color(1, 1, 1, 0)
 position = Vector2(4035, 0)
 color = Color(0.55, 0.58, 0.58, 1)
 polygon = PackedVector2Array(-30, 0, -24, -9, -10, -14, 10, -14, 24, -9, 30, 0)
+
+[node name="Drawn" type="Sprite2D" parent="Rockfall/DustMid"]
+position = Vector2(-30, -14)
+texture = ExtResource("r_abyss_dust_mid")
+centered = false
 
 [node name="ShapeFar" type="CollisionPolygon2D" parent="Rockfall"]
 polygon = PackedVector2Array(3821, 0, 3822, -7, 3830, -14, 3840, -16, 3850, -11, 3855, 0)
 
 [node name="RockFar" type="Polygon2D" parent="Rockfall"]
+self_modulate = Color(1, 1, 1, 0)
 position = Vector2(3838, 0)
 color = Color(0.3, 0.34, 0.38, 1)
 polygon = PackedVector2Array(-17, 0, -16, -7, -8, -14, 2, -16, 12, -11, 17, 0)
 
+[node name="Drawn" type="Sprite2D" parent="Rockfall/RockFar"]
+position = Vector2(-17, -16)
+texture = ExtResource("r_abyss_rock_far")
+centered = false
+
 [node name="DustFar" type="Polygon2D" parent="Rockfall"]
+self_modulate = Color(1, 1, 1, 0)
 modulate = Color(1, 1, 1, 0)
 position = Vector2(3838, 0)
 color = Color(0.55, 0.58, 0.58, 1)
 polygon = PackedVector2Array(-30, 0, -24, -9, -10, -14, 10, -14, 24, -9, 30, 0)
+
+[node name="Drawn" type="Sprite2D" parent="Rockfall/DustFar"]
+position = Vector2(-30, -14)
+texture = ExtResource("r_abyss_dust_far")
+centered = false
 
 [node name="Ribs" type="Sprite2D" parent="."]
 light_mask = 2
@@ -2799,7 +2843,8 @@ target_path = NodePath("../Player")
 
 [node name="Bank" type="Polygon2D" parent="Fog"]
 color = Color(0.2, 0.26, 0.3, 0.3)
-polygon = PackedVector2Array(4300, -560, 5400, -560, 5400, 60, 4300, 60)
+polygon = PackedVector2Array(4300, -560, 4460, -560, 5400, -560, 5400, 60, 4460, 60, 4300, 60)
+vertex_colors = PackedColorArray(0.2, 0.26, 0.3, 0, 0.2, 0.26, 0.3, 0.3, 0.2, 0.26, 0.3, 0.3, 0.2, 0.26, 0.3, 0.3, 0.2, 0.26, 0.3, 0.3, 0.2, 0.26, 0.3, 0)
 
 [node name="Foreground" type="Parallax2D" parent="."]
 scroll_scale = Vector2(1.3, 1)
@@ -2928,10 +2973,17 @@ visible = false
 position = Vector2(4540, 0)
 
 [node name="Water" type="Polygon2D" parent="Tide"]
+self_modulate = Color(1, 1, 1, 0)
 color = Color(0.03, 0.08, 0.1, 0.94)
 polygon = PackedVector2Array(0, -30, 8, -38, 18, -33, 30, -41, 44, -34, 60, -39, 80, -34, 120, -37, 900, -36, 900, 60, 0, 60)
 
+[node name="Drawn" type="Sprite2D" parent="Tide/Water"]
+position = Vector2(-4, -45)
+texture = ExtResource("r_abyss_tide")
+centered = false
+
 [node name="Foam" type="Polygon2D" parent="Tide/Water"]
+visible = false
 color = Color(0.5, 0.62, 0.62, 0.9)
 polygon = PackedVector2Array(-4, -28, 8, -40, 18, -35, 30, -43, 44, -36, 60, -41, 80, -36, 120, -39, 120, -35, 80, -32, 60, -37, 44, -32, 30, -39, 18, -31, 8, -36, 2, -26)
 
@@ -2945,11 +2997,18 @@ layer = 4
 visible = false
 
 [node name="Water" type="Polygon2D" parent="ReturningSea"]
+self_modulate = Color(1, 1, 1, 0)
 position = Vector2(40, 300)
 color = Color(0.02, 0.05, 0.07, 0.96)
 polygon = PackedVector2Array(-40, 0, 40, -7, 120, -1, 200, -8, 280, -2, 360, -7, 440, -1, 520, -6, 520, 340, -40, 340)
 
+[node name="Drawn" type="Sprite2D" parent="ReturningSea/Water"]
+position = Vector2(-44, -12)
+texture = ExtResource("r_abyss_returning_sea")
+centered = false
+
 [node name="Foam" type="Polygon2D" parent="ReturningSea/Water"]
+visible = false
 color = Color(0.4, 0.54, 0.54, 0.85)
 polygon = PackedVector2Array(-40, 0, 40, -7, 120, -1, 200, -8, 280, -2, 360, -7, 440, -1, 520, -6, 520, -2, 440, 4, 360, -2, 280, 3, 200, -3, 120, 4, 40, -2, -40, 4)
 

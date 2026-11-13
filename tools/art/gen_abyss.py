@@ -838,6 +838,103 @@ def trench():
     return img
 
 
+# ---------------------------------------------------------------- the flight: rock, dust and the sea coming back
+
+ROCKFALL = ["Near", "Mid", "Far"]
+
+
+def fallen_rock(name):
+    """A block come down from the canyon's rim: fresh-broken, so paler on its new faces than the weathered stone
+    round it. In the rock's own space, as the clip drops it."""
+    return stone_from([gen_reveal.scene_polygon(f"Rock{name}", "Rockfall")], 441 + len(name), STONE, 2.7, 1.6)
+
+
+def dust(name):
+    """The dust a rock throws up where it lands: thick at its foot, thinning to loose grains at its edge. Opaque
+    grains, so the palette holds; the clip fades the whole of it."""
+    shape = gen_reveal.scene_polygon(f"Dust{name}", "Rockfall")
+    img, origin = _canvas([shape], 0)
+    noise = Noise(451 + len(name))
+    rng = random.Random(452 + len(name))
+    for row in range(img.height):
+        for col in range(img.width):
+            x, y = col + origin[0], row + origin[1]
+            if not _covers(shape, x, y):
+                continue
+            edge = min(1.0, gen_reveal_edge(shape, x + 0.5, y + 0.5) / 6.0)
+            thick = edge * (0.55 + 0.45 * noise.fractal(x / 7.0, y / 5.0, 2)) + 0.25 * (y - origin[1]) / img.height
+            if rng.random() < thick:
+                put(img, col, row, "C7" if rng.random() > 0.6 else "E5" if y < -6 else "E4")
+    return img, origin
+
+
+def gen_reveal_edge(points, x, y):
+    """Distance from a point inside a polygon to its outline."""
+    return _distance(points + points[:1], x, y)
+
+
+def sea_front(points, seed):
+    """Water coming back: black and heavy, streaked where it runs, foam thick along its top and broken into spray
+    where it leads. Fills the scene's shape, and throws its spray a little ahead of it."""
+    img, origin = _canvas([points], 4)
+    noise = Noise(seed)
+    rng = random.Random(seed + 1)
+
+    def inside(x, y):
+        return _covers(points, x, y)
+    for row in range(img.height):
+        for col in range(img.width):
+            x, y = col + origin[0], row + origin[1]
+            if not inside(x, y):
+                continue
+            below = 0
+            while below < 6 and inside(x, y - 1 - below):
+                below += 1
+            streak = noise(x / 23.0, y / 2.0)
+            value = 1.2 + (streak - 0.5) * 1.0 - min(1.0, below / 30.0) * 0.4
+            color = ramp(WATER, value, x, y, 0.0)
+            if below == 0:
+                color = "C8" if noise(x / 3.0, 7.0) > 0.45 else "C7"
+            elif not inside(x - 1, y) or (not inside(x - 3, y) and noise(x / 2.0, y / 3.0) > 0.35):
+                # The face it leads with, breaking.
+                color = "C7" if noise(x, y / 2.0) > 0.5 else "T4"
+            elif below < 3:
+                color = "T4" if noise(x / 4.0, y + 9.0) > 0.4 else "C6"
+            elif below < 6 and noise(x / 2.0, y / 2.0) > 0.7:
+                color = "T3"
+            put(img, col, row, color)
+    # The face it leads with is not a wall: foam spills ragged ahead of it. Only a picture: where the sea has him is
+    # decided from the front's position, not from these pixels.
+    lead = min(x for x, _ in points)
+    for row in range(img.height):
+        y = origin[1] + row
+        if not inside(math.floor(lead), y):
+            continue
+        reach = round(4 * noise(y / 5.0, 13.0))
+        for k in range(1, reach + 1):
+            if rng.random() < 1.0 - k / (reach + 1.5):
+                put(img, math.floor(lead) - k - origin[0], row, "C7" if rng.random() > 0.5 else "T4")
+    # Spray thrown up off the top, thickest where the front leads.
+    for _ in range(int(img.width * 0.6)):
+        x = rng.uniform(lead, lead + min(140, img.width))
+        tops = [y for y in range(origin[1], origin[1] + img.height) if inside(math.floor(x), y)]
+        if not tops:
+            continue
+        y = tops[0] - rng.randint(1, 4)
+        put(img, math.floor(x) - origin[0], y - origin[1], rng.choice(("C7", "C8", "T4")))
+    return img, origin
+
+
+def tide():
+    """The sea as it comes back over the Abyss after him, from the trench: in the tide's own space."""
+    return sea_front(gen_reveal.scene_polygon("Water", "Tide"), 461)
+
+
+def returning_sea():
+    """The sea as it closes over him at the end, across the whole screen: in its own screen space."""
+    return sea_front(gen_reveal.scene_polygon("Water", "ReturningSea"), 471)
+
+
 def ground_tiles():
     strip = ground()
     return [strip.crop((i * TILE_W, 0, (i + 1) * TILE_W, HEIGHT)) for i in range(TILES)]

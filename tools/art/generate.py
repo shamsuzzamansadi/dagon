@@ -149,6 +149,11 @@ def main():
     gen_abyss.trench().save(ABYSS_OUT / "abyss_trench.png")
     gen_abyss.mural_lit()[0].save(ABYSS_OUT / "abyss_mural_lit.png")
     gen_abyss.mural_fragments()[0].save(ABYSS_OUT / "abyss_mural_fragments.png")
+    for name in gen_abyss.ROCKFALL:
+        gen_abyss.fallen_rock(name)[0].save(ABYSS_OUT / f"abyss_rock_{name.lower()}.png")
+        gen_abyss.dust(name)[0].save(ABYSS_OUT / f"abyss_dust_{name.lower()}.png")
+    gen_abyss.tide()[0].save(ABYSS_OUT / "abyss_tide.png")
+    gen_abyss.returning_sea()[0].save(ABYSS_OUT / "abyss_returning_sea.png")
     PROLOGUE_OUT.mkdir(parents=True, exist_ok=True)
     for name, draw in gen_prologue.PANELS.items():
         draw().save(PROLOGUE_OUT / name)
