@@ -93,6 +93,8 @@ def ground():
     worn stone underfoot where the canyon closes round the Monolith."""
     width = X1 - X0
     img = blank(width, HEIGHT)
+    # Behind the mud, which then lies against their feet.
+    paste(img, rib_arch(), None)
     noise = Noise(301)  # The reference section's own, so the mud carries on across x = 1440.
     stone = Noise(331)
     for col in range(width):
@@ -607,9 +609,22 @@ def _distance(points, x, y):
     return best
 
 
+def _along(points, x, y):
+    """How far along a line drawn through points its nearest point to (x, y) lies, in pixels."""
+    best, at, run = 1e9, 0.0, 0.0
+    for (x0, y0), (x1, y1) in zip(points, points[1:]):
+        dx, dy = x1 - x0, y1 - y0
+        t = max(0.0, min(1.0, ((x - x0) * dx + (y - y0) * dy) / (dx * dx + dy * dy)))
+        distance = math.hypot(x - x0 - t * dx, y - y0 - t * dy)
+        if distance < best:
+            best, at = distance, run + t * math.hypot(dx, dy)
+        run += math.hypot(dx, dy)
+    return at
+
+
 def rib_arch():
     """Five ribs of something far larger than a whale, standing out of the mud and leaning over the way on. Each fills
-    its own shape in the scene exactly. Bleached along the back where the moon reaches, dark beneath, stained green
+    its own shape in the scene, short of the tip, where it snapped from the spine. Bleached along the back where the moon reaches, dark beneath, stained green
     where it stands in the mud, split across in places by its own weight. Returns the image and its world origin."""
     shapes = [gen_reveal.scene_polygon(name, "ActArt") for name in RIBS]
     x0 = math.floor(min(x for shape in shapes for x, _ in shape)) - 1
@@ -623,7 +638,8 @@ def rib_arch():
         half = len(shape) // 2
         back, belly = shape[:half], shape[half:]
         length = sum(math.hypot(bx - ax, by - ay) for (ax, ay), (bx, by) in zip(back, back[1:]))
-        breaks = sorted(rng.uniform(0.18, 0.9) for _ in range(3))
+        # Cracks run in from the belly, where the weight pulls, each stopping part of the way across.
+        cracks = sorted((rng.uniform(0.18, 0.85) * length, rng.uniform(0.15, 0.55)) for _ in range(3))
         left = math.floor(min(x for x, _ in shape)) - x0
         right = math.ceil(max(x for x, _ in shape)) - x0
         for col in range(left, right + 1):
@@ -633,13 +649,22 @@ def rib_arch():
                 x, y = col + x0 + 0.5, row + y0 + 0.5
                 to_back, to_belly = _distance(back, x, y), _distance(belly, x, y)
                 across = to_back / max(0.01, to_back + to_belly)
-                # How far along the rib, from the mud to the tip, near enough: by height, then by reach.
-                along = min(1.0, (math.hypot(x - shape[0][0], y) / length) * 1.25)
+                along = _along(back, x, y)
+                # Snapped off where it once met the spine: a splintered end, not a cut one.
+                end = length - along
+                splinter = 1.5 + 10.0 * noise(across * 9.0, index * 5.0 + 0.5)
+                if end < splinter or abs(across - 0.45) > 0.2 + 0.35 * end / 14.0:
+                    continue
                 pit = noise(x / 3.0, y / 3.0 + index * 9.0)
                 grain = noise((x + y) / 14.0, (x - y) / 3.0 + index)
-                value = 6.3 - 4.6 * across + (grain - 0.5) * 1.4 - (1.2 if pit > 0.8 else 0.0) - 1.6 * max(0.0, 1.0 - along * 5.0)
-                if any(abs(along - b) < 0.006 + 0.004 * across for b in breaks):
-                    value -= 2.6
+                value = 6.0 - 4.4 * across + (grain - 0.5) * 1.2 - (1.0 if pit > 0.84 else 0.0) - 1.6 * max(0.0, 1.0 - along / length * 5.0)
+                if end < splinter + 1.5:
+                    value -= 1.2
+                for at, reach in cracks:
+                    if across > reach and abs(along - at) < 0.6:
+                        value -= 2.4
+                    elif across > reach + 0.1 and 0.6 <= along - at < 1.8:
+                        value += 0.7
                 color = ramp(BONE, value, col + x0, row, 0.3)
                 # Weed and stain where it stands in the mud, and a little in the cracks' lee.
                 if -y < 26 * noise(x / 6.0, 7.0 + index) and noise(x / 2.0, y / 4.0) > 0.52:
