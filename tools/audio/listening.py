@@ -37,15 +37,15 @@ TARGET_LUFS = -23.0
 
 # Which stretch of a recording each excerpt covers, by its RECORD stages, and what it is for.
 EXCERPTS = [
-    ("01-opening-prologue", "prologue", "shore", "The whole prologue, unskipped: its music, the sea, the oars, the calm, the wind"),
-    ("02-shore", "shore", "pause", "The Shore: sea, wind, wet sand underfoot, his tired breathing, the talisman's voice"),
-    ("03-pause-and-resume", "pause", "resume", "Pausing on the Shore and resuming, with 4 s either side: everything should stop, then come back"),
+    ("01-opening-prologue", "prologue", "shore", "The whole prologue, unskipped: its four lines, its music, the sea, the oars, the calm, the wind, into the game"),
+    ("02-shore", "shore", "pause", "The Shore: sea, wind, wet sand underfoot, his tired breathing, the boat, the fish and the talisman spoken, the examine sound"),
+    ("03-pause-and-resume", "pause", "resume", "Pausing on the Shore and resuming, with 4 s either side: everything should stop, then come back; the menu's sounds"),
     ("04-cave", "cave", "seabed", "The cave: its air and drips, the restrained music, rock underfoot, the carving's voice"),
-    ("05-seabed-and-crossing", "seabed", "crossed", "Out on the seabed, the ritual far off, the climb, the stone pushed and the slab down"),
-    ("06-stones-and-gate", "crossed", "gate-open", "The Abyss to the Monolith, a wrong stone, the right ones, the stones answering, the gate"),
-    ("07-reveal", "gate-open", "escape-running", "The reveal: the water, the cascade, its call, the hand on the stone, his gasp, the music"),
-    ("08-escape-running", "escape-running", "ending", "Running from the sea: the roar behind, the rock, his breathing, the fall, the sea over him"),
-    ("09-ending", "ending", "main-menu", "The ending: music and the sea under the four lines, one of them voiced, and the credits"),
+    ("05-seabed-and-crossing", "seabed", "crossed", "Out on the seabed, the ritual far off and its line, the climb, the stone pushed, the slab down and its line"),
+    ("06-stones-and-gate", "crossed", "gate-open", "The Abyss deepening to the canyon, the Monolith's line, a wrong stone, the right ones, the stones answering and their line, the gate"),
+    ("07-reveal", "gate-open", "escape-running", "The reveal: the water, the cascade, its call, the hand on the stone, his gasp, the music, its three lines"),
+    ("08-escape-running", "escape-running", "ending", "Running from the sea: the roar behind, the rock, his breathing, the two lines, the fall, the sea over him"),
+    ("09-ending", "ending", "main-menu", "The ending: music and the sea under its four spoken lines, and the credits"),
     ("10-escape-standing-still", "escape-standing-still", "ending-again", "The other outcome: standing still at the ledge until the sea comes"),
 ]
 

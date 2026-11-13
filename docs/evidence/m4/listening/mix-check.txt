@@ -1,0 +1,40 @@
+recording: 339.3 s, 2 channels, 48000 Hz
+peak -1.0 dBFS, true peak -1.0 dBTP
+
+loudness by stage (integrated LUFS, and the loudest 3 s)
+  title                        0.0-    1.5 s   -120.0 LUFS  max short-term -120.0
+  how-to-play                  1.5-    3.6 s    -29.9 LUFS  max short-term  -34.5
+  prologue                     3.6-   36.6 s    -21.5 LUFS  max short-term  -19.2
+  shore                       36.6-   66.7 s    -21.3 LUFS  max short-term  -20.0
+  pause                       66.7-   68.7 s    -29.9 LUFS  max short-term  -34.0
+  resume                      68.7-   83.8 s    -35.7 LUFS  max short-term  -33.2
+  cave                        83.8-  120.7 s    -23.3 LUFS  max short-term  -19.4
+  seabed                     120.7-  147.4 s    -26.8 LUFS  max short-term  -22.4
+  crossed                    147.4-  208.6 s    -25.8 LUFS  max short-term  -21.3
+  stones-solved              208.6-  215.7 s    -19.9 LUFS  max short-term  -19.1
+  gate-open                  215.7-  220.9 s    -27.3 LUFS  max short-term  -25.4
+  reveal                     220.9-  235.0 s    -17.4 LUFS  max short-term  -15.6
+  escape-running             235.0-  250.9 s    -18.3 LUFS  max short-term  -14.6
+  ending                     250.9-  300.5 s    -21.1 LUFS  max short-term  -18.4
+  credits                    300.5-  304.5 s    -36.9 LUFS  max short-term  -35.9
+  main-menu                  304.5-  305.6 s   -120.0 LUFS  max short-term  -54.1
+  continue                   305.6-  322.0 s    -17.5 LUFS  max short-term  -15.6
+  escape-standing-still      322.0-  332.4 s    -17.4 LUFS  max short-term  -14.6
+  ending-again               332.4-  338.4 s    -21.2 LUFS  max short-term  -20.3
+
+sudden changes over 30 dB within 20 ms: 8
+  at    1.50 s (title): -180.0 ->  -55.8 dB
+  at    1.52 s (title):  -55.8 ->  -23.0 dB
+  at    3.54 s (how-to-play): -180.0 ->  -59.8 dB
+  at   36.60 s (prologue):  -36.3 ->  -88.3 dB
+  at   36.62 s (prologue):  -88.3 ->  -39.8 dB
+  at   68.68 s (pause): -180.0 ->  -28.2 dB
+  at  305.50 s (main-menu): -180.0 ->  -50.5 dB
+  at  338.40 s (end):  -36.0 -> -180.0 dB
+
+isolated sample steps (possible clicks): 0
+
+while paused: peak -120.0 dBFS
+main menu after the ending: peak -120.0 dBFS, -120.0 LUFS
+
+MIX_CHECK problems=0
