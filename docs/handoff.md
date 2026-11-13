@@ -2,7 +2,7 @@
 
 Changing task state only. The lasting rules are in [AGENTS.md](../AGENTS.md). **Check this against `git log`, the pull request and CI before relying on it.**
 
-**Last updated:** 2026-11-13, during M4's sixth item: items 1 to 5 done, breakage and the recording done; the final integration point, review package and Windows build remain. **The M4 window ends on 14 November.**
+**Last updated:** 2026-11-13, **M4 complete for review:** items 1 to 6 done. Stopped for the independent review and the owner's listening and playtest. No merge, tag or release; M5 not started.
 
 ## Where things are
 
@@ -64,7 +64,7 @@ Changing task state only. The lasting rules are in [AGENTS.md](../AGENTS.md). **
 | 3 | Environment art past x = 1440, in route order | **Done: seven stretches, no greybox shape left on the route** ([captures](evidence/m4/art/README.md), D100). A ground and far view; B the rib arch; C the crossing; D the shelves, tablets and props; E the canyon, the puzzle stones, the gate and the trench behind the reveal; F the mural, faint and lit; G the flight's rock, dust, the two seas and the fog's edge (M3 deferred these with the art past 1440). What still shows as a flat shape is M5's: the creature and the ritual's far figures. **Known:** a seam beside the creature's arm at the reveal, from the Shore's screen-fixed sky; the greybox had it; the reveal's composition is M5's. **Looked at by the developer only** | `622ca0e` A, `cdb1ba6` B, `a9bbd3c` C, `b5bd3b2` D, `5ed5c01` E, `c8cb324` F, `27d918f` G |
 | 4 | Audio polish | **Made and measured; not heard by anyone** ([record](evidence/m4/audio/README.md), D101). Interface sounds, an examine sound, three Abyss beds, weight for the rockfall and both seas. The game's mix recorded and measured, and cut into a [listening package](evidence/m4/listening/README.md) for the owner. **Waiting on:** the owner's listening, to set the reveal's level and the mix | `6eea116`; package `5d83ea6` |
 | 5 | Further narration | **Done: every story line spoken,** 22 lines in all, each word-checked; the reveal's lines respaced so each is heard out, and a test holds every clip to it ([record](evidence/m4/narration/README.md), D102). Examine lines stay text. **Not listened to by anyone** | `8589ebd` |
-| 6 | Validation, review package, identified build | **Under way.** Done: focused breakage of M4's new logic ([result](evidence/m4/breakage.txt)); the whole game recorded with sound. Left: the integration point on the final code, the review package, the Windows build named with its checksum, the pull request's text. **Draft pull request: [#4](https://github.com/shamsuzzamansadi/dagon/pull/4),** open, not for merging | `e24d726`, `5d83ea6`, `d0d0606` |
+| 6 | Validation, review package, identified build | **Done.** [Review package](reviews/m4-review-package.md). Breakage ([result](evidence/m4/breakage.txt)), the whole game recorded with sound ([listening package](evidence/m4/listening/README.md)), the integration point and CI on `4fcdd6b` (below). **The build for the owner:** `dagon-windows` from push run [43503636921](https://github.com/shamsuzzamansadi/dagon/actions/runs/43503636921), zip SHA-256 `1ec506451d71dd0072473f8fe6cd15d691b9e2aa9487ed19e67f8e9883aded8a`. Draft pull request [#4](https://github.com/shamsuzzamansadi/dagon/pull/4), not for merging | `4fcdd6b`; package after it |
 
 **Results on `6e4a4ab`,** all run on the native Linux clone after the tree was recovered (see below), GCC: `scons unit_tests` 127 test cases passed; `tools/run_godot_checks.sh` (debug build): import, classes, integration **434 passed, 0 failed**, three smoke runs, all ok; release build; `tools/export_check.sh linux` ok; the exported route by `tools/route_check.py` on a private display: `ROUTE_RESULT runs=4 failed=0`. CI on this commit: check the pull request.
 
@@ -92,7 +92,9 @@ Changing task state only. The lasting rules are in [AGENTS.md](../AGENTS.md). **
 
 **The recording, at `e24d726`** (`record_play.gd`, 5 min 39 s): `MIX_CHECK problems=0`; no clipping, true peak −1.0 dBTP; the reveal −17.4 LUFS. **One unexpected change: a 20 ms drop at the cut into the game,** absent from a second recording of the same build with `record_prologue.gd`; cause not established; recorded as such.
 
-**Risks and forecast, as of this update (13 November, evening):** items 1 to 5 are done; item 6 needs the integration point on the final code (checks, export, exported route: about 25 minutes), the review package and the Windows artifact from CI, all within 14 November. **No blocker on the developer's side.** What then waits is the owner's listening (the mix), the independent review and the owner's decision. Nothing has been dropped or reduced.
+**The integration point, on `4fcdd6b`** (clean tree; logs in `$W/notes/int-4fcdd6b`): debug and release builds; `tools/run_godot_checks.sh`: clean import, classes, integration **439 passed, 0 failed**, three smoke runs, all ok; `tools/export_check.sh linux` ok; the exported route **`ROUTE_RESULT runs=4 failed=0`**. **CI on `4fcdd6b`**, push run [43503636921](https://github.com/shamsuzzamansadi/dagon/actions/runs/43503636921): passed; integration 439/0 on GCC, Clang and MSVC, the exported route 4/0 on Linux and Windows, native tests 127/127. Acceptance fingerprint `sha256:024a966bb1515d5708a7490af2b15765f12e92a351781ce412a2af913e631c5c`, the same for `e24d726` to `4fcdd6b`.
+
+**Risks and forecast, as of this update (13 November):** M4's approved work is complete within the window. **No blocker on the developer's side.** What waits: the owner's listening, which sets the reveal's level and the mix (item 4's last step); the independent review; the owner's playtest and decision. Open and recorded: a 20 ms drop at the cut into the game in one of two recordings, cause not established; the reveal's seam beside the arm, M5's with the reveal.
 
 ## Working resources
 
@@ -107,4 +109,4 @@ Outside the repository, outside `/tmp` and outside caches. Everything finished i
 
 ## Next concrete action
 
-Item 6: run `$W/bin/integration_point.sh int-<commit>` on the final code commit (release build first: C++ changed in `6eea116`); then CI on it; download its push run's `dagon-windows` and take its SHA-256; finish `docs/reviews/m4-review-package.md` from the draft in `$W/notes/m4-review-package.draft.md`; update the pull request's text. Stop there for review and the owner.
+**Stopped for review.** Send the [review package](reviews/m4-review-package.md) for independent review, and the owner the Windows build named above, with its checksum, and the listening package. Act on what comes back on this branch. Merge only on the owner's acceptance, by the order in AGENTS.md; M5 only after that.
