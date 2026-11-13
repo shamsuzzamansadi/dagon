@@ -47,6 +47,7 @@ func test_a_new_game_opens_on_him_getting_up_and_then_the_game_is_his(h) -> void
 	var sprite := _sprite(session)
 	h.check(director.get_beat() == SHORE, "the new game is at beat %d" % director.get_beat())
 	h.check(director.is_cinematic_active(), "no cinematic as the game opens")
+	h.check(not session.is_waking(), "the waking is still asked for after it has begun")
 	h.check(session.get_world().get_node("Cinematics").current_animation == WAKE, "the clip playing is '%s'" % session.get_world().get_node("Cinematics").current_animation)
 	h.check(not player.is_control_enabled(), "he can be walked before he is up")
 	h.check(sprite.animation == &"wake" and sprite.frame == 0, "he is shown as %s, frame %d, as the game opens" % [sprite.animation, sprite.frame])

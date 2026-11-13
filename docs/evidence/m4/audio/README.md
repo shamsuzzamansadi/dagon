@@ -33,7 +33,7 @@ From `make_sounds.py`'s own report ([measurements.txt](measurements.txt)), on th
 
 All 46 files: `SOUNDS files=46 problems=0` (nothing near clipping, no loop seam, no DC offset). The slow swell and heave are timed to divide their loops exactly, so neither jumps at the seam. The Master bus's limiter at −1 dB ([D91](../../../decisions.md)) is unchanged.
 
-**Still to come, and not done:** the game's real mix with these in it, measured from a recording of play (`listening.py check`), and the listening package cut from that recording (`listening.py excerpts`) for the owner. One recording is made after item 5, as new voice lines change the mix too.
+**The game's real mix with these in it** was recorded after item 5, as its new lines change the mix too, and measured: no clipping, no clicks, the reveal −17.4 LUFS and running −18.3 ([listening package](../listening/README.md)). That is where to listen to them.
 
 ## Tested
 
