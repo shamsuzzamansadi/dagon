@@ -345,8 +345,10 @@ def draw_carving(img, noise, cx):
 # ---------------------------------------------------------------- beyond the mouth
 
 
-def abyss_far():
-    """The seabed going on for ever: a pale band where it meets the sky, black ridges, a sheen on the mud."""
+def abyss_far(x0=FAR_X0, width=FAR_W, spires=(120, 260, 470, 560)):
+    """The seabed going on for ever: a pale band where it meets the sky, black ridges, a sheen on the mud.
+    Any stretch of it can be drawn, from x0 in the layer's own space, and joins the stretch beside it without a seam."""
+    FAR_X0, FAR_W = x0, width
     img = blank(FAR_W, HEIGHT)
     noise = Noise(321)
     rng = random.Random(322)
@@ -378,7 +380,7 @@ def abyss_far():
             if density > 0.45 and (x + y) % 2 == 0:
                 put(img, c, y, "C4" if density > 0.6 else "C3")
     # A few far spires of rock, as thin as needles.
-    for sx in (120, 260, 470, 560):
+    for sx in spires:
         h = rng.randrange(14, 30)
         base = horizon + 2
         for k in range(h):

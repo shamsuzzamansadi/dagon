@@ -2,7 +2,7 @@
 
 Changing task state only. The lasting rules are in [AGENTS.md](../AGENTS.md). **Check this against `git log`, the pull request and CI before relying on it.**
 
-**Last updated:** 2026-11-10, at M3's acceptance and merge.
+**Last updated:** 2026-11-13, **M4 complete for review:** items 1 to 6 done. Stopped for the independent review and the owner's listening and playtest. No merge, tag or release; M5 not started.
 
 ## Where things are
 
@@ -12,7 +12,8 @@ Changing task state only. The lasting rules are in [AGENTS.md](../AGENTS.md). **
 | **Review** | ChatGPT's limited follow-up review at `3980bc3`: native tests, breakage-tool, release-tool and art checks passed independently; no new blocking code defect in the areas reviewed; integration, exported-route and listening not rerun or judged ([record](evidence/m3/review-chatgpt-at-3980bc3.md)) |
 | **Acceptance fingerprint** | `sha256:892b1072136b806ee25340c4cc3f8cefaa36880ae5d7399bd70e6e42f744e453` |
 | **Releases** | **None.** `release/v0.1.0-pre-alpha.1.json` stays `planned`. Do not tag or publish without the owner asking |
-| **Next** | M4, on a new branch from `main`. Its plan, the squash commit and `main`'s CI are recorded there |
+| **Merged** | Squash commit `ad6df8c` on `main`, through [#3](https://github.com/shamsuzzamansadi/dagon/pull/3). `main`'s CI, run [42817688574](https://github.com/shamsuzzamansadi/dagon/actions/runs/42817688574), passed: GCC, Clang, MSVC, the release tools, and the release gate, which found the record `planned` and published nothing. The M3 branch is deleted, locally and remotely |
+| **Now** | **M4, Atmosphere, on `m4/atmosphere`,** from `ad6df8c`. **The owner approved [the plan](m4-plan.md) on 2026-11-10** and authorized its implementation in order, stopping at independent review and owner acceptance: no merge, tag, release or itch.io submission. **Window: 11–14 November. The owner's target is still completion before 20 November** |
 
 ## M3 requirements: done and accepted
 
@@ -54,16 +55,58 @@ Changing task state only. The lasting rules are in [AGENTS.md](../AGENTS.md). **
 - **2026-11-09, on a build of `53e8d23`:** improved substantially; four concerns, answered by D87–D93.
 - **2026-11-10:** chose voice A; then accepted M3 at `3980bc3`.
 
-## Temporary resources
+## M4 progress
 
-These may be gone. Everything finished is pushed.
+| # | Item of [the plan](m4-plan.md) | State | Commit |
+|---|---|---|---|
+| 1 | The prologue spoken in voice A | **Done.** Four lines, each transcribed word for word; tests; a recording with sound; the voice measured against the music and sea beneath it ([narration record](evidence/m4/narration/README.md), [recording and measurements](evidence/m4/prologue/README.md), D95, D96). **Not listened to by anyone yet** | `2ccde53` |
+| 2 | Continuity from the prologue into the Shore; the Shore's first lines voiced | **Done.** New Game, How to Play, Begin, prologue, then straight into the game with nothing between: the last picture is the Shore's own opening view, the sailor gets up beside his boat under the cinematic contract (`shore_wake`), and the last picture carries the Shore's sea and wind so the sound does not drop at the cut. `shore.boat` and `shore.fish` in voice A, word for word; twelve lines voiced in all ([recording and measurements](evidence/m4/opening/README.md), D97–D99). Continue and Restart never show the prologue or the waking. **Not listened to by anyone yet** | `6e4a4ab` |
+| 3 | Environment art past x = 1440, in route order | **Done: seven stretches, no greybox shape left on the route** ([captures](evidence/m4/art/README.md), D100). A ground and far view; B the rib arch; C the crossing; D the shelves, tablets and props; E the canyon, the puzzle stones, the gate and the trench behind the reveal; F the mural, faint and lit; G the flight's rock, dust, the two seas and the fog's edge (M3 deferred these with the art past 1440). What still shows as a flat shape is M5's: the creature and the ritual's far figures. **Known:** a seam beside the creature's arm at the reveal, from the Shore's screen-fixed sky; the greybox had it; the reveal's composition is M5's. **Looked at by the developer only** | `622ca0e` A, `cdb1ba6` B, `a9bbd3c` C, `b5bd3b2` D, `5ed5c01` E, `c8cb324` F, `27d918f` G |
+| 4 | Audio polish | **Made and measured; not heard by anyone** ([record](evidence/m4/audio/README.md), D101). Interface sounds, an examine sound, three Abyss beds, weight for the rockfall and both seas. The game's mix recorded and measured, and cut into a [listening package](evidence/m4/listening/README.md) for the owner. **Waiting on:** the owner's listening, to set the reveal's level and the mix | `6eea116`; package `5d83ea6` |
+| 5 | Further narration | **Done: every story line spoken,** 22 lines in all, each word-checked; the reveal's lines respaced so each is heard out, and a test holds every clip to it ([record](evidence/m4/narration/README.md), D102). Examine lines stay text. **Not listened to by anyone** | `8589ebd` |
+| 6 | Validation, review package, identified build | **Done.** [Review package](reviews/m4-review-package.md). Breakage ([result](evidence/m4/breakage.txt)), the whole game recorded with sound ([listening package](evidence/m4/listening/README.md)), the integration point and CI on `4fcdd6b` (below). **The build for the owner:** `dagon-windows` from push run [43503636921](https://github.com/shamsuzzamansadi/dagon/actions/runs/43503636921), zip SHA-256 `1ec506451d71dd0072473f8fe6cd15d691b9e2aa9487ed19e67f8e9883aded8a`. Draft pull request [#4](https://github.com/shamsuzzamansadi/dagon/pull/4), not for merging | `4fcdd6b`; package after it |
+
+**Results on `6e4a4ab`,** all run on the native Linux clone after the tree was recovered (see below), GCC: `scons unit_tests` 127 test cases passed; `tools/run_godot_checks.sh` (debug build): import, classes, integration **434 passed, 0 failed**, three smoke runs, all ok; release build; `tools/export_check.sh linux` ok; the exported route by `tools/route_check.py` on a private display: `ROUTE_RESULT runs=4 failed=0`. CI on this commit: check the pull request.
+
+**CI on `3c3e550`** (item 2 and its handoff): runs [42976363793](https://github.com/shamsuzzamansadi/dagon/actions/runs/42976363793) and [42976444602](https://github.com/shamsuzzamansadi/dagon/actions/runs/42976444602), both passed: GCC, Clang, MSVC and the release tools.
+
+**Results on `622ca0e`** (stretch A), native Linux clone, GCC debug: `tools/art/check_art.py` problems=0, including the new comparison of the Abyss's ground with the collision (3080 columns) and of the far cliff with the watcher and the distant shape; integration **435 passed, 0 failed**.
+
+**CI on `7781ea4`** (stretch A and its handoff; the code is `622ca0e`'s): pull-request run [43441243947](https://github.com/shamsuzzamansadi/dagon/actions/runs/43441243947) **passed**: GCC, Clang, MSVC and the release tools. Push run [43441235507](https://github.com/shamsuzzamansadi/dagon/actions/runs/43441235507): GCC, Clang and the release tools passed; its Windows job was still running when this was written.
+
+**Results on `cdb1ba6` to `27d918f`** (art B to G), native Linux clone, GCC debug, each on its own commit: `check_art.py` problems=0; integration **435 passed, 0 failed**. Captures, and frames of the reveal and the flight as they play, looked at by the developer only. CI on each of `cdb1ba6` to `c8cb324` passed (GCC, Clang, MSVC, release tools).
+
+**The integration point, on `27d918f`** (all of item 3; [logs](#working-resources) in `$W/notes/int-27d918f`): debug and release builds up to date; `tools/run_godot_checks.sh`: clean import, classes, integration **435 passed, 0 failed**, three smoke runs, all ok; `tools/export_check.sh linux` ok (release extension loaded, new game and continue ran); the exported route by `tools/route_check.py` on a private display: **`ROUTE_RESULT runs=4 failed=0`**. No C++ changed between `6e4a4ab` and `27d918f`, so `6e4a4ab`'s unit tests (127 passed) stand for it.
+
+**Results on `6eea116`** (item 4), GCC debug: integration **438 passed, 0 failed**, three new tests among them. A first run found the scene-changing presses playing a sound outside the tree (fixed: such a press is not played) and the two new beds not looping (fixed in their import settings); both were caught by the suite.
+
+**How the art goes in.** Static pieces are baked into the ground strip in `gen_abyss.ground()`, painted before the mud so it lies against their feet; their greybox polygons are hidden, not deleted. Moving pieces get a `Drawn` sprite on their own body (the slab on `Crossing`, the boulder on `CrossingStone`), so the puzzle moves the drawing. Still to come that way: the gate and the three puzzle stones with their lit signs. The recorded wiring scripts are in `$W/notes/drafts/` (below).
+
+**Measured on the opening's recording, not heard:** each prologue line 9.1 to 13.9 dB above the music and sea under it; the bed ducks 4.4 to 5.3 dB for the voice; the mix peaks at −2.8 dBFS; no sudden change in level at the cut into the game. Whether it sounds right is the owner's to judge.
+
+**An interruption on 2026-11-11, and what it cost.** The machine restarted and emptied `/tmp`, where the native clone, the voice tools and item 2's uncommitted work and validation logs were. Nothing pushed was lost. Item 2 was rebuilt by replaying the session's own recorded edit commands onto a fresh clone of `ecad573`, each checked against its recorded output; the two voice lines were regenerated with the same seed and settings (same durations, pace and peaks, transcribed again); the recording was made again and its measurements came out the same. **The earlier validation results were not carried over: every result above is from a fresh run on the recovered tree.** The step 1 video's double-size copy was made from its committed file, since its raw recording was gone. The clone and tools now live under the home folder, not `/tmp`.
+
+**Results on `8589ebd`** (item 5), GCC debug: narration tests 46 passed; integration **439 passed, 0 failed**, after a clean import (an incremental import once crashed Godot at shutdown, signal 11, leaving one recording without its import file; a clean import did not). 22 recordings transcribed word for word, Innsmouth's recorded exception aside. CI passed on `0212a95`, `8589ebd`, `e24d726` and `5d83ea6`: GCC, Clang, MSVC, release tools.
+
+**Breakage, at `e24d726`** (`tools/breakage_m4.py`, 17 entries, 3 workers, controls held): **16 caught, 1 not caught.** The survivor, dropping `waking_ = false`, had no effect but `is_waking()` reporting a spent waking as pending; `d0d0606` adds that check, and the breakage alone, re-run with its controls on `d0d0606`: **caught; the clean controls passed, the one after it 439 passed, 0 failed**.
+
+**The recording, at `e24d726`** (`record_play.gd`, 5 min 39 s): `MIX_CHECK problems=0`; no clipping, true peak −1.0 dBTP; the reveal −17.4 LUFS. **One unexpected change: a 20 ms drop at the cut into the game,** absent from a second recording of the same build with `record_prologue.gd`; cause not established; recorded as such.
+
+**The integration point, on `4fcdd6b`** (clean tree; logs in `$W/notes/int-4fcdd6b`): debug and release builds; `tools/run_godot_checks.sh`: clean import, classes, integration **439 passed, 0 failed**, three smoke runs, all ok; `tools/export_check.sh linux` ok; the exported route **`ROUTE_RESULT runs=4 failed=0`**. **CI on `4fcdd6b`**, push run [43503636921](https://github.com/shamsuzzamansadi/dagon/actions/runs/43503636921): passed; integration 439/0 on GCC, Clang and MSVC, the exported route 4/0 on Linux and Windows, native tests 127/127. Acceptance fingerprint `sha256:024a966bb1515d5708a7490af2b15765f12e92a351781ce412a2af913e631c5c`, the same for `e24d726` to `4fcdd6b`.
+
+**Risks and forecast, as of this update (13 November):** M4's approved work is complete within the window. **No blocker on the developer's side.** What waits: the owner's listening, which sets the reveal's level and the mix (item 4's last step); the independent review; the owner's playtest and decision. Open and recorded: a 20 ms drop at the cut into the game in one of two recordings, cause not established; the reveal's seam beside the arm, M5's with the reveal.
+
+## Working resources
+
+Outside the repository, outside `/tmp` and outside caches. Everything finished is pushed.
 
 | What | Where |
 |---|---|
-| Native clone | `/tmp/claude-1000/-mnt-c-Users-sadi-projects-dagon/621ac8dc-276d-4bbd-8143-03866a5a9d1a/scratchpad/work` (call its parent `$S`) |
-| Voice environment and models, for `tools/audio/make_audition.py --speak` | `$S/tts/`, `$S/voice-models/`, `$S/hf/`; speech data linked from `~/.cache/dagon-voice-short/data` |
-| Private X display | `$S/xns.sh`, run with `unshare -rm` (docs/toolchain.md §6a). One at a time |
+| Durable work, `$W` = `~/work/dagon-m4` | `$W/clone`: the native clone, where M4 is built and tested. `$W/notes`: logs, captures by stretch (`cap-b`, `cap-c`, ...), commit messages, `drafts/` (the recorded wiring scripts `wire_a.py`, `wire_b.py`, `wire_c.py`, and handoff edits), `proto/` (offline previews), `setup-logs/`. `$W/replay`: the session commands used in the 11 November recovery |
+| Helpers, `$W/bin` | `env.sh` (source it: sets `W`, `S`, `CLONE`, `NOTES`, `SCONS_CACHE`, `GODOT`, `FF`), `xns.sh` (private X display in `unshare -rm`, docs/toolchain.md §6a; one at a time), `cap.sh <dir> [filter]` (route captures and sheets), `focus.sh <text>` (integration run; empty text runs everything), `record.sh <script> <dir>` (Movie Maker on the private display) |
+| Rebuildable environments, `$S` = `~/.cache/dagon-m4/S` | `$S/venv` (scons, Pillow, NumPy, SciPy, soundfile, `imageio_ffmpeg`); `SCONS_CACHE=~/.cache/dagon-scons`; voice: `$S/tts/` (conda, Python 3.11: torch 2.6.0 CPU, chatterbox-tts 0.1.2, kokoro-onnx 0.4.9, numpy 1.26.4, setuptools < 81, soundfile, scipy), `$S/voice-models/`, `$S/hf/` (`HF_HOME`), speech data in `~/.cache/dagon-voice-short/data` (`ESPEAK_DATA_PATH`); X: `$S/xroot`, `$S/xdeb`, `$S/ovl`. `~/.cache/dagon-m4/voice-src/tree` is a clean checkout of `ecad573` |
+| Pushing from the clone | `git -c credential.helper= -c credential.helper='!gh auth git-credential' push origin m4/atmosphere` |
 
 ## Next concrete action
 
-Start M4 on its own branch from the updated `main`, following its plan.
+**Stopped for review.** Send the [review package](reviews/m4-review-package.md) for independent review, and the owner the Windows build named above, with its checksum, and the listening package. Act on what comes back on this branch. Merge only on the owner's acceptance, by the order in AGENTS.md; M5 only after that.

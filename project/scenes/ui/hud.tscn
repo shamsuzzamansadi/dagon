@@ -1,8 +1,10 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Theme" path="res://assets/ui/theme.tres" id="theme"]
+[ext_resource type="AudioStream" path="res://assets/audio/effects/examine.ogg" id="a_examine"]
 
 [node name="Hud" type="Hud"]
+examine_sound_path = NodePath("SoundExamine")
 layer = 5
 notice_label_path = NodePath("Notice")
 prompt_label_path = NodePath("Prompt")
@@ -59,3 +61,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 color = Color(0.0392, 0.0549, 0.0941, 1)
+
+[node name="SoundExamine" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("a_examine")
+bus = &"Effects"

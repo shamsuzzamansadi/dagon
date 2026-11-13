@@ -1,15 +1,18 @@
-"""Draws the prologue's four pictures, 480x270, in the Shore's palette. Original staging: silhouettes and light,
+"""Draws the prologue's first three pictures, 480x270, in the Shore's palette. Original staging: silhouettes and light,
 nothing taken from any adaptation of the story. The card with the line covers the bottom of the screen, about from
 y = 190 down, so what matters in each picture stands above that.
 
     prologue_1_raider.png   captivity: the raider's side close, a porthole lit and barred, a guard above, our ship held
     prologue_2_escape.png   the same side from outside; the boat pulls away from it
     prologue_3_drift.png    the sea under a white sun; the boat drifts on it
-    prologue_4_dry.png      the boat on its side on bare seabed, the sea a thin line far off; the man beside it
+
+The fourth, prologue_4_dry.png with its lying and sitting pieces, is not drawn here. It is the Shore itself as a new
+game opens on it, photographed from the game by project/tests/capture_opening.gd, so that the last picture and the
+game's first frame are one view (D97).
 
 Each background leaves out what moves. The moving parts are saved beside it, as prologue_<n>_<part>.png, and the
-prologue scene animates them a little: the lamp flickering and going out, the boat rowing away, drifting, the man
-sitting up. The positions are in PROLOGUE_LAYERS, and the scene uses the same ones.
+prologue scene animates them a little: the lamp flickering and going out, the boat rowing away, drifting. The
+positions are in PROLOGUE_LAYERS, and the scene uses the same ones.
 """
 
 import math
@@ -212,51 +215,6 @@ def panel_drift_layers():
     return img, {"boat": (boat, (185, 164))}
 
 
-def man(lying):
-    img = blank(20, 14)
-    if lying:
-        fill(img, [(1, 12), (3, 9), (14, 9), (17, 10), (18, 12), (15, 13), (2, 13)], "C1")
-        for k in range(4):
-            put(img, 16 + k % 2, 9 + k // 2, "S0")
-    else:
-        fill(img, [(6, 13), (6, 6), (8, 3), (11, 3), (12, 6), (13, 13)], "C1")
-        fill(img, [(12, 13), (17, 11), (18, 13)], "C1")
-        for k in range(4):
-            put(img, 9 + k % 2, 1 + k // 2, "S0")
-    return img
-
-
-def panel_dry_layers():
-    img = gen_shore.sky()
-    noise = Noise(404)
-    # The sea, gone to a thin pale line at the very edge of sight.
-    for x in range(W):
-        put(img, x, HORIZON + 4, "T2" if noise(x / 9.0, 1) > 0.4 else "C4")
-        put(img, x, HORIZON + 5, "C3")
-    # Everything else is seabed: black, wet, and shining where the moon is.
-    for y in range(HORIZON + 6, H):
-        d = (y - HORIZON) / (H - HORIZON)
-        for x in range(W):
-            value = 2.6 - d * 1.9 + (noise(x / 20.0, y / 3.0) - 0.5) * 0.8
-            sheen = 1.0 * math.exp(-(((x - 318) / 40.0) ** 2)) * (1 - d)
-            put(img, x, y, ramp(["E0", "E1", "E2", "E3", "C5"], value + sheen, x, y, 0.35))
-    rng = random.Random(405)
-    for _ in range(40):
-        x, y = rng.randrange(W), rng.randrange(HORIZON + 12, H)
-        put(img, x, y, rng.choice(("E4", "T1", "C6")))
-    # The boat, on its side, stranded: the same boat the Shore begins with.
-    bx, by = 150, 180
-    fill(img, [(bx, by - 2), (bx + 70, by - 10), (bx + 74, by + 2), (bx + 4, by + 6)], "W1")
-    hline(img, bx + 4, bx + 70, by - 9, "W3")
-    fill(img, [(bx + 6, by - 3), (bx + 68, by - 9), (bx + 66, by - 4), (bx + 8, by + 1)], "W0")
-    # Dead fish near it, as on the Shore.
-    for fx, fy in ((250, 186), (128, 190), (276, 194)):
-        hline(img, fx, fx + 5, fy, "C6")
-        put(img, fx + 6, fy - 1, "C5")
-        put(img, fx + 6, fy + 1, "C5")
-    return img, {"lying": (man(True), (226, 172)), "sitting": (man(False), (226, 172))}
-
-
 def panel_raider():
     return flatten(panel_raider_layers())
 
@@ -267,10 +225,6 @@ def panel_escape():
 
 def panel_drift():
     return flatten(panel_drift_layers())
-
-
-def panel_dry():
-    return flatten(panel_dry_layers(), skip=("sitting",))
 
 
 def flatten(layers, skip=()):
@@ -291,7 +245,6 @@ PROLOGUE_LAYERS = {
     "prologue_1": panel_raider_layers,
     "prologue_2": panel_escape_layers,
     "prologue_3": panel_drift_layers,
-    "prologue_4": panel_dry_layers,
 }
 
 
@@ -299,7 +252,6 @@ PANELS = {
     "prologue_1_raider.png": lambda: panel_raider_layers()[0],
     "prologue_2_escape.png": lambda: panel_escape_layers()[0],
     "prologue_3_drift.png": lambda: panel_drift_layers()[0],
-    "prologue_4_dry.png": lambda: panel_dry_layers()[0],
 }
 
 

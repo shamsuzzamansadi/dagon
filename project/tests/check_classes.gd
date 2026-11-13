@@ -6,7 +6,7 @@ const EXPECTED := {
 	"PlayerController": {
 		"base": "CharacterBody2D",
 		"properties": ["walk_speed", "acceleration", "deceleration", "air_control", "gravity_scale", "max_fall_speed", "jump_velocity", "jump_cut", "coyote_time", "jump_buffer_time", "action_move_left", "action_move_right", "action_jump", "visual_path", "sprite_path", "walk_pixels_per_frame"],
-		"methods": ["set_control_enabled", "is_control_enabled", "teleport", "get_facing", "face"],
+		"methods": ["set_control_enabled", "is_control_enabled", "teleport", "get_facing", "face", "show_pose", "get_shown_pose"],
 		"signals": ["jumped", "landed"],
 	},
 	"CameraRig": {
@@ -48,13 +48,13 @@ const EXPECTED := {
 	"GameDirector": {
 		"base": "Node",
 		"properties": ["player_path", "hud_path", "kill_plane_path", "camera_rig_path", "atmosphere_path", "cinematics_path", "monolith_gate_path", "puzzle_path", "mural_path", "mural_solved_line", "background_path", "background_triggers", "awakened_visuals", "checkpoints", "story_triggers", "ending_scene", "flee_timeout"],
-		"methods": ["restart_checkpoint", "get_active_checkpoint", "get_beat", "is_safe_to_save", "is_in_final_sequence", "set_start_beat", "get_start_beat", "fade_in", "show_notice", "on_puzzle_solved", "start_cinematic", "finalize_cinematic", "is_cinematic_active", "get_generation", "get_active_clip", "has_pending_event", "is_recovery_pending", "get_flee_elapsed", "haptic_cue"],
+		"methods": ["wake", "restart_checkpoint", "get_active_checkpoint", "get_beat", "is_safe_to_save", "is_in_final_sequence", "set_start_beat", "get_start_beat", "fade_in", "show_notice", "on_puzzle_solved", "start_cinematic", "finalize_cinematic", "is_cinematic_active", "get_generation", "get_active_clip", "has_pending_event", "is_recovery_pending", "get_flee_elapsed", "haptic_cue"],
 		"signals": ["checkpoint_reached", "player_respawned", "beat_changed", "cinematic_started", "cinematic_finalized", "overlap_rechecked", "contract_error", "background_event_started"],
 	},
 	"GameSession": {
 		"base": "Node",
 		"properties": ["world_scene", "director_path", "menu_path"],
-		"methods": ["set_start", "set_active_device", "get_active_device", "restart_checkpoint", "retry_save", "is_checkpoint_saved", "has_any_save", "is_in_final_sequence", "get_session_beat", "get_persisted_beat", "get_world", "get_director"],
+		"methods": ["set_start", "set_waking", "is_waking", "set_active_device", "get_active_device", "restart_checkpoint", "retry_save", "is_checkpoint_saved", "has_any_save", "is_in_final_sequence", "get_session_beat", "get_persisted_beat", "get_world", "get_director"],
 		"signals": [],
 	},
 	"MenuController": {

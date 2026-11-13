@@ -75,7 +75,9 @@ func _title(h) -> Control:
 func test_new_game_writes_the_save_first_then_shows_the_prologue(h) -> void:
 	await _title(h)
 	await h.tap_key(KEY_ENTER)
-	await h.wait_until(func() -> bool: return is_instance_valid(h.tree.current_scene) and h.tree.current_scene.has_method("skip_prologue"), 60, "the prologue")
+	h.check(h.read_storage_file(SAVE_FILE) == SHORE_SAVE, "the save before How to Play holds: %s" % h.read_storage_file(SAVE_FILE))
+	await h.tap_key(KEY_ENTER)
+	await h.wait_until(func() -> bool: return h.is_prologue(h.tree.current_scene), 60, "the prologue")
 	var prologue: Node = h.tree.current_scene
 	h.check(prologue.get_mode() == 3, "the prologue is in mode %d" % prologue.get_mode())
 	h.check(h.read_storage_file(SAVE_FILE) == SHORE_SAVE, "the save before the prologue holds: %s" % h.read_storage_file(SAVE_FILE))
@@ -94,7 +96,7 @@ func test_continue_never_shows_the_prologue(h) -> void:
 	var seen := [false]
 	for i in 60:
 		await h.steps(1)
-		if is_instance_valid(h.tree.current_scene) and h.tree.current_scene.has_method("skip_prologue"):
+		if h.is_prologue(h.tree.current_scene) or h.is_introduction(h.tree.current_scene):
 			seen[0] = true
 		if is_instance_valid(h.tree.current_scene) and h.tree.current_scene.is_class("GameSession"):
 			break
@@ -110,7 +112,8 @@ func test_finishing_pressing_through_and_skipping_the_prologue_reach_the_same_st
 		DirAccess.remove_absolute(h.storage_dir.path_join(SAVE_FILE))
 		await _title(h)
 		await h.tap_key(KEY_ENTER)
-		await h.wait_until(func() -> bool: return is_instance_valid(h.tree.current_scene) and h.tree.current_scene.has_method("skip_prologue"), 60, "the prologue")
+		await h.tap_key(KEY_ENTER)
+		await h.wait_until(func() -> bool: return h.is_prologue(h.tree.current_scene), 60, "the prologue")
 		await h.steps(3)
 		match how:
 			"skip":
@@ -125,10 +128,14 @@ func test_finishing_pressing_through_and_skipping_the_prologue_reach_the_same_st
 		var session: Node = h.tree.current_scene
 		h.fixture = session
 		await h.steps(5)
-		states.append([session.get_session_beat(), session.get_node("PauseLayer/PauseMenu").is_open(), h.read_storage_file(SAVE_FILE)])
+		# Each opens on him getting up, with nothing over the game, and hands him the same game when he is up.
+		var waking: bool = session.get_director().is_cinematic_active() and session.get_node("World/Player").get_shown_pose() == &"wake"
+		var covered: bool = session.get_node("PauseLayer/PauseMenu").is_open() or h.tree.paused
+		await h.wait_for_control(session.get_node("World/Player"))
+		states.append([session.get_session_beat(), waking, covered, session.get_node("World/Player").global_position.round(), h.read_storage_file(SAVE_FILE)])
 		await h.unload_fixture()
 	h.check(states[0] == states[1] and states[1] == states[2], "the three ways in differ: %s" % str(states))
-	h.check(states[0][0] == 0 and states[0][1] and states[0][2] == SHORE_SAVE, "the game did not start at the Shore with its introduction: %s" % str(states[0]))
+	h.check(states[0][0] == 0 and states[0][1] and not states[0][2] and states[0][4] == SHORE_SAVE, "the game did not start at the Shore, on him getting up, with nothing over it: %s" % str(states[0]))
 
 
 func test_the_prologue_is_short_and_one_line_at_a_time(h) -> void:
@@ -643,7 +650,8 @@ func test_each_prologue_picture_moves_and_sounds_while_it_shows_and_nothing_carr
 func test_skipping_the_prologue_leaves_none_of_its_sound_in_the_game(h) -> void:
 	await _title(h)
 	await h.tap_key(KEY_ENTER)
-	await h.wait_until(func() -> bool: return is_instance_valid(h.tree.current_scene) and h.tree.current_scene.has_method("skip_prologue"), 60, "the prologue")
+	await h.tap_key(KEY_ENTER)
+	await h.wait_until(func() -> bool: return h.is_prologue(h.tree.current_scene), 60, "the prologue")
 	await h.steps(10)
 	h.tree.current_scene.skip_prologue()
 	await h.wait_until(func() -> bool: return is_instance_valid(h.tree.current_scene) and h.tree.current_scene.is_class("GameSession"), 60, "the game")
@@ -691,7 +699,16 @@ func test_the_prologue_fades_over_its_last_line_and_the_ending_under_the_credits
 		prologue.advance_ending()
 	await h.steps(150)
 	h.check(music.playing and music.volume_db < start - 12.0, "the prologue's music is at %.1f dB on its last line" % music.volume_db)
-	h.check(prologue.get_node("Panels/Dry/Wind").volume_db < -14.0 - 12.0, "the wind does not fade with it")
+	# The last picture is the Shore, and its sea and wind are the Shore's: they hold their level into the game (D97).
+	var untouched: Node = (load("res://scenes/ui/prologue.tscn") as PackedScene).instantiate()
+	for sound_name in ["Sea", "Wind"]:
+		var sound: AudioStreamPlayer = prologue.get_node("Panels/Dry/" + sound_name)
+		var as_placed: float = untouched.get_node("Panels/Dry/" + sound_name).volume_db
+		h.check(sound.playing and is_equal_approx(sound.volume_db, as_placed), "the last picture's %s is at %.1f dB, placed at %.1f" % [sound_name, sound.volume_db, as_placed])
+	untouched.free()
+	var world: Node = (load("res://scenes/level/shore.tscn") as PackedScene).instantiate()
+	h.check(prologue.get_node("Panels/Dry/Sea").stream == world.get_node("Sound/ShoreSea").stream and prologue.get_node("Panels/Dry/Wind").stream == world.get_node("Sound/ShoreWind").stream, "the last picture does not sound like the Shore")
+	world.free()
 	await h.unload_fixture()
 	var ending: Node = await h.load_main_fixture("res://scenes/ui/ending.tscn")
 	var sea: AudioStreamPlayer = ending.get_node("Sea")
@@ -714,3 +731,15 @@ func test_the_epilogue_shows_every_line_with_subtitles_off(h) -> void:
 		h.check(lines.get_child(0).text == narration_text(ending.ending_lines[line]), "line %d does not match the script" % line)
 		if line + 1 < ending.ending_lines.size():
 			ending.advance_ending()
+
+
+## The Abyss is not one sound throughout: open mud, then the deeper mud, then the canyon, in the order he walks them.
+func test_the_abyss_sounds_deeper_as_he_goes_on(h) -> void:
+	var world := await _world(h, 1)
+	var names := ["Sound/AbyssNear", "Sound/AbyssMid", "Sound/AbyssFar"]
+	var files := ["abyss.ogg", "abyss_deep.ogg", "canyon.ogg"]
+	for i in names.size():
+		var sound: AudioStreamPlayer2D = world.get_node(names[i])
+		h.check(sound.stream.resource_path.ends_with("/" + files[i]), "%s plays %s" % [names[i], sound.stream.resource_path])
+		if i > 0:
+			h.check(sound.global_position.x > world.get_node(names[i - 1]).global_position.x, "%s is not further on than %s" % [names[i], names[i - 1]])

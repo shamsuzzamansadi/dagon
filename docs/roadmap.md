@@ -74,7 +74,7 @@ starts only after M6 is green, and is time-boxed.
 | Narrative | Props, captions, and background-event logic | Final ritual imagery |
 | Reveal | Readable reveal, timing and collapse. **Since 2026-11-09:** the monolith carved, and the creature drawn over the reveal's shapes, with water and sound | Final Dagon animation, lighting and effects |
 | Controller | Vibration behaviour and settings | Tuning by feel, with the owner |
-| Narration | Playback and subtitle integration. **Voice A, the owner's choice of 2026-11-10, speaks the talisman, the carving and the whole epilogue** | The remaining spoken lines in voice A, and the owner's judgment of it by ear |
+| Narration | Playback and subtitle integration. **Voice A, the owner's choice of 2026-11-10, speaks the talisman, the carving and the whole epilogue** | The remaining spoken lines in voice A, and the owner's judgment of it by ear. **M4 began with the prologue's four lines** ([record](evidence/m4/narration/README.md)) |
 | Audio | **Since 2026-11-09:** an initial sound pass across the route, music in five places, a voice audition, and a listening package | The final mix, by ear, and anything the pass misses |
 | Art | **Since 2026-11-09:** one finished reference section, from the cave entrance to the first tablet; its boundary into the canyon; the monolith, the creature, the carving at the crossing, and the prologue's and epilogue's pictures | The rest of the route: listed below |
 | Persistence | Save and restore correctness, with focused regression coverage | Kept green |
@@ -124,7 +124,7 @@ rebinding and save support are never removed silently (risk R20).
 - [x] **M2: accepted by the owner on 2026-11-03, with documented deferrals** ([record](evidence/m2/owner-acceptance-2026-11-03.md),
   [package](reviews/m2-review-package.md)). The main menu and save moved here from M3 (D36). Audio is volume controls and buses
   prepared, and nothing more (D42). M3–M7 not started.
-- [x] **M3 Complete gameplay, accepted by the owner on 2026-11-10 at `3980bc3`, as the agreed milestone, with the M4/M5, hardware and playtesting deferrals** ([record](evidence/m3/owner-acceptance-2026-11-10.md)). Package: [m3-review-package.md](reviews/m3-review-package.md). Milestone acceptance, not approval of a finished game. No release has been made. M4–M7 not started.
+- [x] **M3 Complete gameplay, accepted by the owner on 2026-11-10 at `3980bc3`, as the agreed milestone, with the M4/M5, hardware and playtesting deferrals** ([record](evidence/m3/owner-acceptance-2026-11-10.md)). Package: [m3-review-package.md](reviews/m3-review-package.md). Milestone acceptance, not approval of a finished game. No release has been made. M4 started on 2026-11-10, on `m4/atmosphere`; the owner approved [its plan](m4-plan.md) the same day. M5–M7 not started.
 - **Every later playtest identifies the exact artifact or run it tested.**
 
 ## M3 implementation sequence (recorded 2026-11-04, as the owner asked)

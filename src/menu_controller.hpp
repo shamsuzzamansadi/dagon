@@ -118,6 +118,9 @@ public:
 	DAGON_PATH_PROPERTY(ending_box_path)
 	DAGON_PATH_PROPERTY(voice_path)
 	DAGON_PATH_PROPERTY(panels_path)
+	DAGON_PATH_PROPERTY(move_sound_path)
+	DAGON_PATH_PROPERTY(accept_sound_path)
+	DAGON_PATH_PROPERTY(back_sound_path)
 
 #undef DAGON_PATH_PROPERTY
 
@@ -144,18 +147,22 @@ private:
 	void focus_path(const godot::NodePath &p_path);
 	void focus_default();
 	void on_settings_closed();
+	void on_gui_focus_changed(godot::Control *p_control);
+	void on_button_pressed();
+	static void play(const NodeRef<godot::AudioStreamPlayer> &p_sound);
 	void on_joy_connection_changed(int p_device, bool p_connected);
 	void refresh_controls_text();
 	void autostart();
 	void ask_confirm(ConfirmAction p_action, const godot::String &p_message, const godot::String &p_ok_text);
 	godot::String quit_message(ConfirmAction p_action);
 	void write_new_game();
-	void start_session(core::Beat p_beat, bool p_show_intro);
+	void start_session(core::Beat p_beat, bool p_show_intro, bool p_waking = false);
+	void begin_prologue();
 	void show_next_ending_line();
 	bool is_sequence() const { return mode_ == MODE_ENDING || mode_ == MODE_PROLOGUE; }
 	void show_panel(int p_index);
 	static void start_panel(godot::Node *p_panel);
-	void fade_sounds(double p_seconds);
+	void fade_sounds(double p_seconds, const godot::Node *p_keep_under = nullptr);
 	static void stop_panel(godot::Node *p_panel);
 	void finish_prologue(bool p_skipped);
 	godot::Control *panel(const NodeRef<godot::Control> &p_panel) const { return p_panel.get(); }
@@ -191,6 +198,9 @@ private:
 	godot::NodePath save_status_label_path_;
 	godot::NodePath ending_box_path_;
 	godot::NodePath panels_path_;
+	godot::NodePath move_sound_path_;
+	godot::NodePath accept_sound_path_;
+	godot::NodePath back_sound_path_;
 	godot::NodePath voice_path_;
 	godot::PackedStringArray ending_lines_;
 
@@ -204,6 +214,11 @@ private:
 	NodeRef<godot::Label> save_status_label_;
 	NodeRef<godot::Button> continue_button_;
 	NodeRef<godot::AudioStreamPlayer> voice_;
+	NodeRef<godot::AudioStreamPlayer> move_sound_;
+	NodeRef<godot::AudioStreamPlayer> accept_sound_;
+	NodeRef<godot::AudioStreamPlayer> back_sound_;
+	// Set while the menu moves focus itself, on the way into a screen: only the player's own moves are heard.
+	bool quiet_focus_ = false;
 	int ending_line_ = -1;
 	double ending_line_left_ = 0.0;
 	Screen screen_ = Screen::Closed;

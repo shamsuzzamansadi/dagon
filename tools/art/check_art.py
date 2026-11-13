@@ -5,6 +5,7 @@ Usage: python tools/art/check_art.py
 Exits non-zero on any failure.
 """
 
+import math
 import pathlib
 import re
 import sys
@@ -26,8 +27,18 @@ REVEAL_ARTWORK = ["monolith", "dagon_body", "dagon_head", "dagon_crest", "dagon_
 # The finished reference section, and the prologue. shaft.png is a light mask, like light.png.
 CAVE_OUT = ROOT / "project" / "assets" / "cave"
 CAVE_ARTWORK = ["cave_front", "cave_wall", "abyss_far", "ritual_far", "foreground_cave"]
+ABYSS_OUT = ROOT / "project" / "assets" / "abyss"
+ABYSS_TILES = 4
+ABYSS_ARTWORK = [f"abyss_ground_{i}" for i in range(ABYSS_TILES)] + ["abyss_far_plain", "abyss_escarpment", "abyss_slab", "abyss_stone", "abyss_canyon", "abyss_statues",
+    "abyss_gate", "abyss_trench", "abyss_mural_lit", "abyss_mural_fragments",
+    "abyss_tide", "abyss_returning_sea"] + [f"abyss_{kind}_{n}" for kind in ("rock", "dust") for n in ("near", "mid", "far")] + [f"abyss_glyph{n}{lit}" for n in ("kneel", "eye", "wave") for lit in ("", "_lit")]
+ABYSS_X0 = 1440
+ABYSS_GROUND = range(1440, 4520)
+ESCARPMENT_X0 = 700
 PROLOGUE_OUT = ROOT / "project" / "assets" / "prologue"
-PROLOGUE_ARTWORK = ["prologue_1_raider", "prologue_2_escape", "prologue_3_drift", "prologue_4_dry", "prologue_1_lamp", "prologue_2_lamp", "prologue_2_boat", "prologue_2_oars_0", "prologue_2_oars_1", "prologue_3_boat", "prologue_4_lying", "prologue_4_sitting", "ending_1_found", "ending_2_listen", "ending_3_shop", "ending_4_rising"]
+# Not prologue_4_*: those are photographs of the Shore as the game lights it (project/tests/capture_opening.gd, D97),
+# so their colours are the palette's under the game's tint and lantern, and are not the palette's own.
+PROLOGUE_ARTWORK = ["prologue_1_raider", "prologue_2_escape", "prologue_3_drift", "prologue_1_lamp", "prologue_2_lamp", "prologue_2_boat", "prologue_2_oars_0", "prologue_2_oars_1", "prologue_3_boat", "ending_1_found", "ending_2_listen", "ending_3_shop", "ending_4_rising"]
 CAVE_X0 = 600
 CAVE_OPEN_GROUND = range(640, 1440)
 IDLE_FRAMES = 8
@@ -114,6 +125,61 @@ def check_cave_surface(problems):
     print(f"cave surface: compared {checked} columns with the collision")
 
 
+def check_abyss_surface(problems):
+    """The Abyss's drawn ground against the collision, column by column: solid from the collision's top down, and
+    nothing of the ground itself above it. Things that stand on the ground are drawn above it, and are counted."""
+    tiles = [Image.open(ABYSS_OUT / f"abyss_ground_{i}.png").convert("RGBA") for i in range(ABYSS_TILES)]
+    width = tiles[0].width
+    polygon = collision_polygon()
+    standing = 0
+    for x in ABYSS_GROUND:
+        surface = round(collision_top(polygon, x + 0.5)) + GROUND_ROW
+        tile, column = tiles[(x - ABYSS_X0) // width], (x - ABYSS_X0) % width
+        gaps = [y for y in range(surface, tile.height) if tile.getpixel((column, y))[3] == 0]
+        if gaps:
+            problems.append(f"abyss column {x} has no ground at row {gaps[0]}, below its collision top at row {surface}")
+        if any(tile.getpixel((column, y))[3] != 0 for y in range(surface - DRESSING_ROWS - 1, surface - DRESSING_ROWS + 1)):
+            standing += 1
+    if standing > len(ABYSS_GROUND) // 3:
+        problems.append(f"{standing} abyss columns are drawn above their collision top: more than what stands on the ground can explain")
+    print(f"abyss surface: compared {len(ABYSS_GROUND)} columns with the collision, {standing} of them under something standing")
+
+
+def scene_node(name, parent):
+    text = SCENE.read_text()
+    block = re.search(r'\[node name="%s" type="Polygon2D" parent="%s"\]\n(.*?)\n\n' % (name, parent), text, re.S).group(1)
+    numbers = [float(n) for n in re.search(r"polygon = PackedVector2Array\(([^)]*)\)", block).group(1).split(",")]
+    offset = re.search(r"position = Vector2\(([-0-9.]+), ([-0-9.]+)\)", block)
+    ox, oy = (float(offset.group(1)), float(offset.group(2))) if offset else (0.0, 0.0)
+    return [(x + ox, y + oy) for x, y in zip(numbers[0::2], numbers[1::2])]
+
+
+def check_far_cliff(problems):
+    """The far cliff carries two silhouettes that later milestones draw: the watcher must have its top to stand on
+    and to drop behind, and the distant shape's foot must stay behind it, before it moves and after."""
+    cliff = Image.open(ABYSS_OUT / "abyss_escarpment.png").convert("RGBA")
+
+    def top(x):
+        column = round(x) - ESCARPMENT_X0
+        return next((y for y in range(cliff.height) if cliff.getpixel((column, y))[3] != 0), cliff.height) - GROUND_ROW
+
+    watcher = scene_node("WatcherFar", "FarRidges")
+    feet = max(y for _, y in watcher)
+    for x in range(math.floor(min(x for x, _ in watcher)), math.ceil(max(x for x, _ in watcher)) + 1):
+        if top(x) != feet:
+            problems.append(f"the far cliff's top is at {top(x)} under the watcher at {x}, whose feet are at {feet:.0f}")
+    shape = scene_node("DistantShape", "FarRidges")
+    moved = re.search(r'NodePath\("FarRidges/DistantShape:position"\).*?"values": \[.*?Vector2\(([-0-9.]+), ([-0-9.]+)\)\]', SCENE.read_text(), re.S)
+    moves = [(0.0, 0.0), (float(moved.group(1)) - (min(x for x, _ in shape)), float(moved.group(2)))]
+    for dx, dy in moves:
+        foot = max(y for _, y in shape) + dy
+        for x in range(math.ceil(min(x for x, _ in shape) + dx), math.floor(max(x for x, _ in shape) + dx)):
+            if top(x) > foot - 1:
+                problems.append(f"the distant shape's foot shows above the far cliff at {x}")
+                break
+    print("far cliff: the watcher's footing and the distant shape's foot compared with the scene")
+
+
 def main():
     problems = []
     for name in ARTWORK:
@@ -126,12 +192,12 @@ def main():
         image = Image.open(UI_OUT / f"{name}.png").convert("RGBA")
         if {c for _, c in image.getcolors(1 << 24) if c[3] != 0} - ALLOWED:
             problems.append(f"{name}.png has colours outside the palette")
-    for folder, names in ((CAVE_OUT, CAVE_ARTWORK), (PROLOGUE_OUT, PROLOGUE_ARTWORK), (REVEAL_OUT, REVEAL_ARTWORK)):
+    for folder, names in ((CAVE_OUT, CAVE_ARTWORK), (ABYSS_OUT, ABYSS_ARTWORK), (PROLOGUE_OUT, PROLOGUE_ARTWORK), (REVEAL_OUT, REVEAL_ARTWORK)):
         for name in names:
             image = Image.open(folder / f"{name}.png").convert("RGBA")
             if {c for _, c in image.getcolors(1 << 24) if c[3] != 0} - ALLOWED:
                 problems.append(f"{name}.png has colours outside the palette")
-    print(f"palette: checked {len(ARTWORK) + len(CAVE_ARTWORK) + len(PROLOGUE_ARTWORK) + len(REVEAL_ARTWORK) + 2} images against {len(ALLOWED)} colours")
+    print(f"palette: checked {len(ARTWORK) + len(CAVE_ARTWORK) + len(ABYSS_ARTWORK) + len(PROLOGUE_ARTWORK) + len(REVEAL_ARTWORK) + 2} images against {len(ALLOWED)} colours")
 
     # Each foot's sole has its own colour, so its position can be read from the shipped pixels.
     sheet = Image.open(OUT / "sailor.png").convert("RGBA")
@@ -154,6 +220,8 @@ def main():
 
     check_surface(problems)
     check_cave_surface(problems)
+    check_abyss_surface(problems)
+    check_far_cliff(problems)
 
     for problem in problems:
         print(f"PROBLEM {problem}")

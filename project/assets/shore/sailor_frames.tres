@@ -1,4 +1,4 @@
-[gd_resource type="SpriteFrames" load_steps=20 format=3]
+[gd_resource type="SpriteFrames" load_steps=26 format=3]
 
 [ext_resource type="Texture2D" path="res://assets/shore/sailor.png" id="1"]
 
@@ -73,6 +73,30 @@ region = Rect2(512, 0, 32, 32)
 [sub_resource type="AtlasTexture" id="a17"]
 atlas = ExtResource("1")
 region = Rect2(544, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="a18"]
+atlas = ExtResource("1")
+region = Rect2(576, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="a19"]
+atlas = ExtResource("1")
+region = Rect2(608, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="a20"]
+atlas = ExtResource("1")
+region = Rect2(640, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="a21"]
+atlas = ExtResource("1")
+region = Rect2(672, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="a22"]
+atlas = ExtResource("1")
+region = Rect2(704, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="a23"]
+atlas = ExtResource("1")
+region = Rect2(736, 0, 32, 32)
 
 [resource]
 animations = [
@@ -149,6 +173,34 @@ animations = [
 }],
 "loop": false,
 "name": &"fall",
+"speed": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("a18")
+}, {
+"duration": 1.0,
+"texture": SubResource("a19")
+}, {
+"duration": 1.0,
+"texture": SubResource("a20")
+}, {
+"duration": 1.0,
+"texture": SubResource("a21")
+}, {
+"duration": 1.0,
+"texture": SubResource("a22")
+}],
+"loop": false,
+"name": &"wake",
+"speed": 2.5
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("a23")
+}],
+"loop": false,
+"name": &"sleep",
 "speed": 1.0
 }
 ]

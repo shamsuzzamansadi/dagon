@@ -1,0 +1,33 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+OpenGL API 4.5 (Core Profile) Mesa 25.2.8-0ubuntu0.24.04.4 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 20.1.2, 256 bits)
+
+Movie Maker mode enabled, recording movie in 480×270 @ 30 FPS...
+RECORD title frame=0
+RECORD how-to-play frame=46
+RECORD prologue frame=108
+RECORD shore frame=1099
+RECORD pause frame=2000
+RECORD resume frame=2062
+RECORD cave frame=2513
+RECORD seabed frame=3621
+RECORD crossed frame=4422
+RECORD stones-solved frame=6259
+RECORD gate-open frame=6471
+RECORD reveal frame=6627
+RECORD escape-running frame=7049
+RECORD ending frame=7527
+RECORD credits frame=9014
+RECORD main-menu frame=9135
+RECORD continue frame=9167
+RECORD escape-standing-still frame=9661
+RECORD ending-again frame=9972
+RECORD end frame=10152
+--------------------------------------------------------------------------------
+Done recording movie at path: /home/sadi/work/dagon-m4/notes/rec-full/record_play.avi
+10179 frames at 30 FPS (movie length: 00:05:39:09), recorded in 00:01:57 (289% of real-time speed).
+CPU render time: 43.27 seconds (average: 4.25 ms/frame)
+GPU render time: 48.62 seconds (average: 4.78 ms/frame)
+Encoding time: 18.14 seconds (average: 1.78 ms/frame)
+--------------------------------------------------------------------------------

@@ -9,6 +9,7 @@ import pathlib
 
 from PIL import Image
 
+import gen_abyss
 import gen_boat
 import gen_sailor
 import gen_cave
@@ -20,6 +21,7 @@ import gen_ui
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 OUT = ROOT / "project" / "assets" / "shore"
 CAVE_OUT = OUT.parent / "cave"
+ABYSS_OUT = OUT.parent / "abyss"
 PROLOGUE_OUT = OUT.parent / "prologue"
 REVEAL_OUT = OUT.parent / "reveal"
 UI_OUT = ROOT / "project" / "assets" / "ui"
@@ -59,7 +61,9 @@ def sprite_frames(texture, animations):
 
 def write_sailor():
     frames = gen_sailor.all_frames()
-    order = [("idle", 4.0, True), ("walk", 10.0, True), ("jump", 1.0, False), ("fall", 1.0, False)]
+    # After the four the controller needs, so their places in the sheet stay where check_art.py reads them. "wake" is
+    # the new game's first two seconds; "sleep" is only ever photographed, for the prologue's last picture.
+    order = [("idle", 4.0, True), ("walk", 10.0, True), ("jump", 1.0, False), ("fall", 1.0, False), ("wake", 2.5, False), ("sleep", 1.0, False)]
     count = sum(len(frames[name]) for name, _, _ in order)
     sheet = Image.new("RGBA", (count * gen_sailor.FRAME_W, gen_sailor.FRAME_H), (0, 0, 0, 0))
     animations = []
@@ -129,6 +133,27 @@ def main():
     gen_cave.ritual_far().save(CAVE_OUT / "ritual_far.png")
     gen_cave.foreground_cave().save(CAVE_OUT / "foreground_cave.png")
     gen_cave.shaft().save(CAVE_OUT / "shaft.png")
+    ABYSS_OUT.mkdir(parents=True, exist_ok=True)
+    for index, tile in enumerate(gen_abyss.ground_tiles()):
+        tile.save(ABYSS_OUT / f"abyss_ground_{index}.png")
+    gen_abyss.far_plain().save(ABYSS_OUT / "abyss_far_plain.png")
+    gen_abyss.escarpment().save(ABYSS_OUT / "abyss_escarpment.png")
+    gen_abyss.crossing_slab()[0].save(ABYSS_OUT / "abyss_slab.png")
+    gen_abyss.crossing_stone()[0].save(ABYSS_OUT / "abyss_stone.png")
+    gen_abyss.canyon_wall()[0].save(ABYSS_OUT / "abyss_canyon.png")
+    gen_abyss.statues()[0].save(ABYSS_OUT / "abyss_statues.png")
+    gen_abyss.gate()[0].save(ABYSS_OUT / "abyss_gate.png")
+    for name in gen_abyss.GLYPH_STONES:
+        gen_abyss.glyph_stone(name)[0].save(ABYSS_OUT / f"abyss_{name.lower()}.png")
+        gen_abyss.glyph_stone(name, lit=True)[0].save(ABYSS_OUT / f"abyss_{name.lower()}_lit.png")
+    gen_abyss.trench().save(ABYSS_OUT / "abyss_trench.png")
+    gen_abyss.mural_lit()[0].save(ABYSS_OUT / "abyss_mural_lit.png")
+    gen_abyss.mural_fragments()[0].save(ABYSS_OUT / "abyss_mural_fragments.png")
+    for name in gen_abyss.ROCKFALL:
+        gen_abyss.fallen_rock(name)[0].save(ABYSS_OUT / f"abyss_rock_{name.lower()}.png")
+        gen_abyss.dust(name)[0].save(ABYSS_OUT / f"abyss_dust_{name.lower()}.png")
+    gen_abyss.tide()[0].save(ABYSS_OUT / "abyss_tide.png")
+    gen_abyss.returning_sea()[0].save(ABYSS_OUT / "abyss_returning_sea.png")
     PROLOGUE_OUT.mkdir(parents=True, exist_ok=True)
     for name, draw in gen_prologue.PANELS.items():
         draw().save(PROLOGUE_OUT / name)

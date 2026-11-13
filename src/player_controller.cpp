@@ -23,6 +23,8 @@ void PlayerController::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("teleport", "position"), &PlayerController::teleport);
 	ClassDB::bind_method(D_METHOD("get_facing"), &PlayerController::get_facing);
 	ClassDB::bind_method(D_METHOD("face", "direction"), &PlayerController::face);
+	ClassDB::bind_method(D_METHOD("show_pose", "animation"), &PlayerController::show_pose);
+	ClassDB::bind_method(D_METHOD("get_shown_pose"), &PlayerController::get_shown_pose);
 
 #define DAGON_BIND_FLOAT(m_name)                                                               \
 	ClassDB::bind_method(D_METHOD("set_" #m_name, "value"), &PlayerController::set_##m_name);  \
@@ -189,10 +191,21 @@ void PlayerController::set_control_enabled(bool p_enabled) {
 		core::clear_jump_intent(state_);
 		return;
 	}
-	// A cinematic may have moved or tilted him, and a clip stopped early may not have put him back.
+	// A cinematic may have moved, tilted or posed him, and a clip stopped early may not have put him back.
+	shown_pose_ = StringName();
 	if (Node2D *visual = visual_.get()) {
 		visual->set_position(Vector2());
 		visual->set_rotation(0.0f);
+	}
+}
+
+void PlayerController::show_pose(const StringName &p_animation) {
+	shown_pose_ = p_animation;
+	// At once, so that not one frame shows him standing first.
+	AnimatedSprite2D *sprite = sprite_.get();
+	if (sprite != nullptr && !control_enabled_ && p_animation != StringName() && sprite->get_sprite_frames()->has_animation(p_animation)) {
+		sprite->set_speed_scale(1.0f);
+		sprite->play(p_animation);
 	}
 }
 
@@ -211,6 +224,14 @@ void PlayerController::update_sprite(float p_moved_pixels, float p_delta) {
 
 	const bool grounded = is_on_floor();
 	airborne_time_ = grounded ? 0.0f : airborne_time_ + p_delta;
+	if (!control_enabled_ && shown_pose_ != StringName() && sprite->get_sprite_frames()->has_animation(shown_pose_)) {
+		if (sprite->get_animation() != shown_pose_) {
+			sprite->set_speed_scale(1.0f);
+			sprite->play(shown_pose_);
+		}
+		was_walking_ = false;
+		return;
+	}
 	const core::BodyPose pose = core::select_body_pose(grounded, p_moved_pixels, get_velocity().y, airborne_time_);
 
 	switch (pose) {

@@ -27,6 +27,34 @@
 [ext_resource type="Texture2D" path="res://assets/cave/cave_front.png" id="r_cave_front"]
 [ext_resource type="Texture2D" path="res://assets/cave/cave_wall.png" id="r_cave_wall"]
 [ext_resource type="Texture2D" path="res://assets/cave/abyss_far.png" id="r_abyss_far"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_ground_0.png" id="r_abyss_ground_0"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_ground_1.png" id="r_abyss_ground_1"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_ground_2.png" id="r_abyss_ground_2"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_ground_3.png" id="r_abyss_ground_3"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_far_plain.png" id="r_abyss_far_plain"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_escarpment.png" id="r_abyss_escarpment"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_slab.png" id="r_abyss_slab"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_stone.png" id="r_abyss_stone"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_canyon.png" id="r_abyss_canyon"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_statues.png" id="r_abyss_statues"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_gate.png" id="r_abyss_gate"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_trench.png" id="r_abyss_trench"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_mural_lit.png" id="r_abyss_mural_lit"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_mural_fragments.png" id="r_abyss_mural_fragments"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_rock_near.png" id="r_abyss_rock_near"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_rock_mid.png" id="r_abyss_rock_mid"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_rock_far.png" id="r_abyss_rock_far"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_dust_near.png" id="r_abyss_dust_near"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_dust_mid.png" id="r_abyss_dust_mid"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_dust_far.png" id="r_abyss_dust_far"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_tide.png" id="r_abyss_tide"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_returning_sea.png" id="r_abyss_returning_sea"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_glyphkneel.png" id="r_abyss_glyphkneel"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_glyphkneel_lit.png" id="r_abyss_glyphkneel_lit"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_glypheye.png" id="r_abyss_glypheye"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_glypheye_lit.png" id="r_abyss_glypheye_lit"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_glyphwave.png" id="r_abyss_glyphwave"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_glyphwave_lit.png" id="r_abyss_glyphwave_lit"]
 [ext_resource type="Texture2D" path="res://assets/cave/ritual_far.png" id="r_ritual_far"]
 [ext_resource type="Texture2D" path="res://assets/cave/foreground_cave.png" id="r_fg_cave"]
 [ext_resource type="Texture2D" path="res://assets/cave/shaft.png" id="r_shaft"]
@@ -35,6 +63,8 @@
 [ext_resource type="AudioStream" path="res://assets/audio/ambience/wind.ogg" id="a_wind"]
 [ext_resource type="AudioStream" path="res://assets/audio/ambience/cave.ogg" id="a_cave"]
 [ext_resource type="AudioStream" path="res://assets/audio/ambience/abyss.ogg" id="a_abyss"]
+[ext_resource type="AudioStream" path="res://assets/audio/ambience/abyss_deep.ogg" id="a_abyss_deep"]
+[ext_resource type="AudioStream" path="res://assets/audio/ambience/canyon.ogg" id="a_canyon"]
 [ext_resource type="AudioStream" path="res://assets/audio/ambience/monolith.ogg" id="a_monolith"]
 [ext_resource type="AudioStream" path="res://assets/audio/ambience/tide_roar.ogg" id="a_tide"]
 [ext_resource type="AudioStream" path="res://assets/audio/effects/stone_accept.ogg" id="a_accept"]
@@ -587,7 +617,7 @@ tracks/1/path = NodePath("Hud")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(4.6, 12.2),
+"times": PackedFloat32Array(4.3, 12.2),
 "transitions": PackedFloat32Array(1, 1),
 "values": [{
 "args": [&"story.reveal"],
@@ -906,7 +936,7 @@ tracks/26/path = NodePath("Hud")
 tracks/26/interp = 1
 tracks/26/loop_wrap = true
 tracks/26/keys = {
-"times": PackedFloat32Array(9.6),
+"times": PackedFloat32Array(8.2),
 "transitions": PackedFloat32Array(1),
 "values": [{
 "args": [&"story.recoil"],
@@ -1155,8 +1185,13 @@ _data = {
 &"beat_fleeing": SubResource("beat_fleeing")
 }
 
+[sub_resource type="Animation" id="clip_shore_wake"]
+resource_name = "shore_wake"
+length = 2.2
+
 [sub_resource type="AnimationLibrary" id="cinematics_library"]
 _data = {
+&"shore_wake": SubResource("clip_shore_wake"),
 &"monolith_awaken": SubResource("clip_monolith_awaken"),
 &"dagon_reveal": SubResource("clip_dagon_reveal"),
 &"collapse": SubResource("clip_collapse")
@@ -1392,7 +1427,7 @@ centered = false
 
 [node name="AbyssView" type="Polygon2D" parent="."]
 clip_children = 1
-polygon = PackedVector2Array(600, -700, 1440, -700, 1440, 60, 600, 60)
+polygon = PackedVector2Array(600, -700, 4544, -700, 4544, 60, 600, 60)
 
 [node name="Far" type="Parallax2D" parent="AbyssView"]
 scroll_scale = Vector2(0.35, 1)
@@ -1403,12 +1438,20 @@ position = Vector2(40, -220)
 texture = ExtResource("r_abyss_far")
 centered = false
 
+[node name="Plain" type="Sprite2D" parent="AbyssView/Far"]
+light_mask = 2
+position = Vector2(680, -220)
+texture = ExtResource("r_abyss_far_plain")
+centered = false
+
 [node name="GreyboxBackdrop" type="Polygon2D" parent="."]
+visible = false
 light_mask = 2
 color = Color(0.0392157, 0.054902, 0.0941176, 1)
 polygon = PackedVector2Array(1440, 60, 1440, -2, 1452, -10, 1466, -12, 1478, -28, 1494, -34, 1508, -58, 1520, -62, 1534, -96, 1548, -104, 1562, -140, 1578, -150, 1592, -190, 1604, -200, 1616, -240, 1630, -700, 4544, -700, 4544, 60)
 
 [node name="CanyonRim" type="Polygon2D" parent="."]
+visible = false
 light_mask = 2
 color = Color(0.1, 0.12, 0.17, 1)
 polygon = PackedVector2Array(1440, -2, 1452, -10, 1466, -12, 1478, -28, 1494, -34, 1508, -58, 1520, -62, 1534, -96, 1548, -104, 1562, -140, 1578, -150, 1592, -190, 1604, -200, 1616, -240, 1621, -237, 1609, -197, 1597, -187, 1583, -147, 1567, -137, 1553, -101, 1539, -93, 1525, -59, 1513, -55, 1499, -31, 1483, -25, 1471, -9, 1457, -7, 1445, 1)
@@ -1424,6 +1467,7 @@ color = Color(0.03, 0.04, 0.07, 1)
 polygon = PackedVector2Array(1276.1, -140, 1276.1, -155.6, 1274.8, -159.5, 1277.4, -164.7, 1282.6, -164.7, 1285.2, -159.5, 1283.9, -155.6, 1283.9, -140)
 
 [node name="Silhouette" type="Polygon2D" parent="FarRidges"]
+visible = false
 color = Color(0.07, 0.09, 0.14, 1)
 polygon = PackedVector2Array(680, 60, 680, -44, 730, -50, 730, -70, 820, -68, 820, -55, 910, -41, 910, -95, 1000, -105, 1000, -60, 1090, -58, 1090, -120, 1180, -106, 1180, -80, 1270, -90, 1270, -140, 1360, -138, 1360, -90, 1450, -76, 1450, -110, 1540, -120, 1540, -70, 1630, -68, 1630, -150, 1720, -136, 1720, -100, 1810, -110, 1810, -165, 1900, -163, 1900, -120, 1990, -106, 1990, -180, 2080, -190, 2080, 60)
 
@@ -1431,6 +1475,12 @@ polygon = PackedVector2Array(680, 60, 680, -44, 730, -50, 730, -70, 820, -68, 82
 position = Vector2(1000, 0)
 color = Color(0.025, 0.035, 0.06, 1)
 polygon = PackedVector2Array(0, -150, 26, -196, 50, -214, 80, -205, 104, -170, 118, -150)
+
+[node name="Escarpment" type="Sprite2D" parent="FarRidges"]
+light_mask = 2
+position = Vector2(700, -220)
+texture = ExtResource("r_abyss_escarpment")
+centered = false
 
 [node name="RitualLayer" type="Parallax2D" parent="."]
 scroll_scale = Vector2(0.5, 1)
@@ -1519,38 +1569,51 @@ centered = false
 [node name="Trench" type="Node2D" parent="."]
 
 [node name="Sky" type="Polygon2D" parent="Trench"]
+visible = false
 color = Color(0.17, 0.23, 0.27, 1)
 polygon = PackedVector2Array(4544, -700, 5400, -700, 5400, 60, 4544, 60)
 
 [node name="Water" type="Polygon2D" parent="Trench"]
+visible = false
 color = Color(0.05, 0.11, 0.13, 1)
 polygon = PackedVector2Array(4544, 20, 5400, 20, 5400, 60, 4544, 60)
 
 [node name="ActArt" type="Node2D" parent="."]
 
 [node name="Rib1" type="Polygon2D" parent="ActArt"]
+visible = false
 color = Color(0.26, 0.28, 0.29, 1)
 polygon = PackedVector2Array(1700, -0, 1702.3, -24.7, 1709.3, -48.6, 1720.5, -70.7, 1735.8, -90.4, 1754.4, -106.8, 1775.8, -119.4, 1799.2, -127.9, 1823.7, -131.7, 1848.5, -131, 1872.8, -125.5, 1895.6, -115.7, 1916.1, -101.7, 1910.4, -94.8, 1891.3, -107.8, 1870, -117, 1847.4, -122, 1824.3, -122.8, 1801.4, -119.1, 1779.6, -111.3, 1759.7, -99.5, 1742.3, -84.2, 1728.1, -65.9, 1717.6, -45.3, 1711.2, -23, 1709, -0)
 
 [node name="Rib2" type="Polygon2D" parent="ActArt"]
+visible = false
 color = Color(0.26, 0.28, 0.29, 1)
 polygon = PackedVector2Array(1766, -0, 1768.7, -28.1, 1776.5, -55.2, 1789.4, -80.4, 1806.7, -102.7, 1827.8, -121.4, 1852.1, -135.7, 1878.7, -145.3, 1906.6, -149.7, 1934.8, -148.8, 1962.4, -142.7, 1988.3, -131.4, 2011.6, -115.6, 2005.9, -108.6, 1983.9, -123.6, 1959.6, -134.1, 1933.7, -139.9, 1907.1, -140.7, 1880.9, -136.6, 1856, -127.6, 1833.1, -114.1, 1813.2, -96.5, 1796.9, -75.6, 1784.9, -51.9, 1777.5, -26.4, 1775, -0)
 
 [node name="Rib3" type="Polygon2D" parent="ActArt"]
+visible = false
 color = Color(0.26, 0.28, 0.29, 1)
 polygon = PackedVector2Array(1832, -0, 1834.9, -30.4, 1843.4, -59.6, 1857.2, -86.8, 1875.9, -110.9, 1898.8, -131.1, 1925, -146.6, 1953.7, -156.9, 1983.8, -161.7, 2014.3, -160.7, 2044.1, -154.1, 2072, -142, 2097.3, -124.8, 2091.5, -117.9, 2067.7, -134.1, 2041.3, -145.5, 2013.2, -151.8, 1984.4, -152.7, 1956, -148.2, 1928.9, -138.4, 1904.1, -123.8, 1882.5, -104.7, 1864.8, -82, 1851.7, -56.3, 1843.7, -28.7, 1841, -0)
 
 [node name="Rib4" type="Polygon2D" parent="ActArt"]
+visible = false
 color = Color(0.26, 0.28, 0.29, 1)
 polygon = PackedVector2Array(1898, -0, 1900.7, -28.1, 1908.5, -55.2, 1921.4, -80.4, 1938.7, -102.7, 1959.8, -121.4, 1984.1, -135.7, 2010.7, -145.3, 2038.6, -149.7, 2066.8, -148.8, 2094.4, -142.7, 2120.3, -131.4, 2143.6, -115.6, 2137.9, -108.6, 2115.9, -123.6, 2091.6, -134.1, 2065.7, -139.9, 2039.1, -140.7, 2012.9, -136.6, 1988, -127.6, 1965.1, -114.1, 1945.2, -96.5, 1928.9, -75.6, 1916.9, -51.9, 1909.5, -26.4, 1907, -0)
 
 [node name="Rib5" type="Polygon2D" parent="ActArt"]
+visible = false
 color = Color(0.26, 0.28, 0.29, 1)
 polygon = PackedVector2Array(1964, -0, 1966.3, -24.7, 1973.3, -48.6, 1984.5, -70.7, 1999.8, -90.4, 2018.4, -106.8, 2039.8, -119.4, 2063.2, -127.9, 2087.7, -131.7, 2112.5, -131, 2136.8, -125.5, 2159.6, -115.7, 2180.1, -101.7, 2174.4, -94.8, 2155.3, -107.8, 2134, -117, 2111.4, -122, 2088.3, -122.8, 2065.4, -119.1, 2043.6, -111.3, 2023.7, -99.5, 2006.3, -84.2, 1992.1, -65.9, 1981.6, -45.3, 1975.2, -23, 1973, -0)
 
 [node name="CanyonBack" type="Polygon2D" parent="ActArt"]
+visible = false
 color = Color(0.085, 0.105, 0.145, 1)
 polygon = PackedVector2Array(3540, 0, 3540, -120, 3600, -190, 3680, -210, 3780, -330, 3820, -520, 4310, -520, 4400, -260, 4470, -170, 4544, -120, 4544, 0)
+
+[node name="CanyonWall" type="Sprite2D" parent="ActArt"]
+position = Vector2(3540, -520)
+texture = ExtResource("r_abyss_canyon")
+centered = false
 
 [node name="CaveBack" type="Polygon2D" parent="ActArt"]
 visible = false
@@ -1563,18 +1626,22 @@ color = Color(0.14, 0.165, 0.2, 1)
 polygon = PackedVector2Array(640, -220, 1040, -220, 1040, -150, 1010, -120, 965, -96, 920, -106, 870, -88, 810, -102, 750, -92, 700, -112, 660, -104, 640, -128)
 
 [node name="Alcove" type="Polygon2D" parent="ActArt"]
+visible = false
 color = Color(0.05, 0.065, 0.09, 1)
 polygon = PackedVector2Array(2826, 0, 2826, -28, 2990, -28, 2990, 0)
 
 [node name="PrintDown0" type="Polygon2D" parent="ActArt"]
+visible = false
 color = Color(0.3, 0.36, 0.38, 1)
 polygon = PackedVector2Array(2008, -1, 2010, -2, 2012, -1, 2011, 0, 2009, 0)
 
 [node name="PrintDown1" type="Polygon2D" parent="ActArt"]
+visible = false
 color = Color(0.3, 0.36, 0.38, 1)
 polygon = PackedVector2Array(2018, -1, 2020, -2, 2022, -1, 2021, 0, 2019, 0)
 
 [node name="PrintDown2" type="Polygon2D" parent="ActArt"]
+visible = false
 color = Color(0.3, 0.36, 0.38, 1)
 polygon = PackedVector2Array(2028, -1, 2030, -2, 2032, -1, 2031, 0, 2029, 0)
 
@@ -1583,6 +1650,11 @@ visible = false
 position = Vector2(3690, 0)
 color = Color(0.03, 0.04, 0.07, 1)
 polygon = PackedVector2Array(-3.6, 0, -3.6, -14.4, -4.8, -18, -2.4, -22.8, 2.4, -22.8, 4.8, -18, 3.6, -14.4, 3.6, 0)
+
+[node name="Drawn" type="Sprite2D" parent="Trench"]
+position = Vector2(4544, -700)
+texture = ExtResource("r_abyss_trench")
+centered = false
 
 [node name="Splash" type="CPUParticles2D" parent="Trench"]
 z_index = 2
@@ -1717,12 +1789,36 @@ texture = ExtResource("7_terrain")
 centered = false
 
 [node name="GreyboxGround" type="Polygon2D" parent="Terrain"]
+visible = false
 color = Color(0.2, 0.24, 0.28, 1)
 polygon = PackedVector2Array(1440, -3.33, 1480, -10, 1540, -10, 1600, 0, 2150, 0, 2150, 16, 2160, 16, 2160, 32, 2170, 32, 2170, 48, 2290, 48, 2290, 0, 2780, 0, 2780, -14, 2812, -14, 2812, 0, 3004, 0, 3004, -14, 3036, -14, 3036, 0, 3584, 0, 3584, -14, 3612, -14, 3612, 0, 4544, 0, 4544, 60, 1440, 60)
 
 [node name="GroundBlend" type="Polygon2D" parent="Terrain"]
+visible = false
 polygon = PackedVector2Array(1440, -3.33, 1480, -10, 1540, -10, 1600, 0, 1640, 0, 1640, 60, 1440, 60)
 vertex_colors = PackedColorArray(0.36, 0.32, 0.33, 1.00, 0.36, 0.32, 0.33, 0.80, 0.36, 0.32, 0.33, 0.50, 0.36, 0.32, 0.33, 0.20, 0.36, 0.32, 0.33, 0.00, 0.15, 0.15, 0.2, 0, 0.15, 0.15, 0.2, 1)
+
+[node name="AbyssGround" type="Node2D" parent="."]
+
+[node name="Tile0" type="Sprite2D" parent="AbyssGround"]
+position = Vector2(1440, -220)
+texture = ExtResource("r_abyss_ground_0")
+centered = false
+
+[node name="Tile1" type="Sprite2D" parent="AbyssGround"]
+position = Vector2(2216, -220)
+texture = ExtResource("r_abyss_ground_1")
+centered = false
+
+[node name="Tile2" type="Sprite2D" parent="AbyssGround"]
+position = Vector2(2992, -220)
+texture = ExtResource("r_abyss_ground_2")
+centered = false
+
+[node name="Tile3" type="Sprite2D" parent="AbyssGround"]
+position = Vector2(3768, -220)
+texture = ExtResource("r_abyss_ground_3")
+centered = false
 
 [node name="ReferenceSection" type="Node2D" parent="."]
 
@@ -1870,11 +1966,13 @@ line_id = &"abyss.fossil_b"
 shape = SubResource("prop_shape")
 
 [node name="Art" type="Polygon2D" parent="Props/FossilB"]
+visible = false
 position = Vector2(0, 14)
 color = Color(0.47, 0.48, 0.45, 1)
 polygon = PackedVector2Array(-34, 0, -30, -16, -12, -26, 10, -22, 28, -10, 40, 0, 22, 0, 18, -7, 8, -9, 4, 0)
 
 [node name="Socket" type="Polygon2D" parent="Props/FossilB"]
+visible = false
 position = Vector2(0, 14)
 color = Color(0.26, 0.28, 0.29, 1)
 polygon = PackedVector2Array(-16, -16, -9, -19, -6, -14, -13, -11)
@@ -1892,12 +1990,14 @@ position = Vector2(0, 6)
 shape = SubResource("low_tablet_shape")
 
 [node name="Art" type="Polygon2D" parent="Props/TabletKneel"]
+visible = false
 position = Vector2(0, 14)
 scale = Vector2(0.78, 0.78)
 color = Color(0.3, 0.34, 0.38, 1)
 polygon = PackedVector2Array(-11, 0, -12, -27, -7, -33, 7, -33, 12, -27, 11, 0)
 
 [node name="Mark" type="Polygon2D" parent="Props/TabletKneel"]
+visible = false
 position = Vector2(0, 14)
 scale = Vector2(0.78, 0.78)
 color = Color(0.62, 0.72, 0.72, 1)
@@ -1915,6 +2015,7 @@ line_id = &"abyss.footprint"
 shape = SubResource("prop_shape")
 
 [node name="Art" type="Polygon2D" parent="Props/Footprint"]
+visible = false
 position = Vector2(0, 14)
 color = Color(0.26, 0.28, 0.29, 1)
 polygon = PackedVector2Array(-16, 0, -19, -3, -10, -5, -7, -11, -4, -5, 0, -12, 4, -5, 8, -10, 10, -5, 18, -3, 15, 0)
@@ -1931,16 +2032,19 @@ line_id = &"abyss.tablet_eye"
 shape = SubResource("prop_shape")
 
 [node name="Art" type="Polygon2D" parent="Props/TabletEye"]
+visible = false
 position = Vector2(0, 20)
 color = Color(0.3, 0.34, 0.38, 1)
 polygon = PackedVector2Array(-11, 0, -12, -27, -7, -33, 7, -33, 12, -27, 11, 0)
 
 [node name="Mark" type="Polygon2D" parent="Props/TabletEye"]
+visible = false
 position = Vector2(0, 20)
 color = Color(0.62, 0.72, 0.72, 1)
 polygon = PackedVector2Array(-9, -18, -4, -23, 4, -23, 9, -18, 4, -13, -4, -13)
 
 [node name="Pupil" type="Polygon2D" parent="Props/TabletEye"]
+visible = false
 position = Vector2(0, 20)
 color = Color(0.3, 0.34, 0.38, 1)
 polygon = PackedVector2Array(-2, -20, 2, -20, 2, -16, -2, -16)
@@ -2038,34 +2142,42 @@ position = Vector2(0, 6)
 shape = SubResource("relief_shape")
 
 [node name="Panel" type="Polygon2D" parent="Props/Relief"]
+visible = false
 color = Color(0.13, 0.155, 0.19, 1)
 polygon = PackedVector2Array(-40, -10, -40, 12, 40, 12, 40, -10)
 
 [node name="Walker1" type="Polygon2D" parent="Props/Relief"]
+visible = false
 color = Color(0.36, 0.42, 0.45, 1)
 polygon = PackedVector2Array(-32.2, 10, -32.2, 1, -33, -1.2, -31.5, -4.2, -28.5, -4.2, -27, -1.2, -27.8, 1, -27.8, 10)
 
 [node name="Walker2" type="Polygon2D" parent="Props/Relief"]
+visible = false
 color = Color(0.36, 0.42, 0.45, 1)
 polygon = PackedVector2Array(-17.2, 10, -17.2, 1, -18, -1.2, -16.5, -4.2, -13.5, -4.2, -12, -1.2, -12.8, 1, -12.8, 10)
 
 [node name="Walker3" type="Polygon2D" parent="Props/Relief"]
+visible = false
 color = Color(0.36, 0.42, 0.45, 1)
 polygon = PackedVector2Array(-2.2, 10, -2.2, 1, -3, -1.2, -1.5, -4.2, 1.5, -4.2, 3, -1.2, 2.2, 1, 2.2, 10)
 
 [node name="Walker4" type="Polygon2D" parent="Props/Relief"]
+visible = false
 color = Color(0.36, 0.42, 0.45, 1)
 polygon = PackedVector2Array(12.8, 10, 12.8, 1, 12, -1.2, 13.5, -4.2, 16.5, -4.2, 18, -1.2, 17.2, 1, 17.2, 10)
 
 [node name="Walker5" type="Polygon2D" parent="Props/Relief"]
+visible = false
 color = Color(0.36, 0.42, 0.45, 1)
 polygon = PackedVector2Array(27.8, 10, 27.8, 1, 27, -1.2, 28.5, -4.2, 31.5, -4.2, 33, -1.2, 32.2, 1, 32.2, 10)
 
 [node name="Sea" type="Polygon2D" parent="Props/Relief"]
+visible = false
 color = Color(0.62, 0.72, 0.72, 1)
 polygon = PackedVector2Array(26, 12, 26, 8, 40, 6, 40, 12)
 
 [node name="Arm" type="Polygon2D" parent="Props/Relief"]
+visible = false
 color = Color(0.62, 0.72, 0.72, 1)
 polygon = PackedVector2Array(34, 7, 35, 2, 33, -3, 35, -7, 38, -8, 37, -5, 36, -2, 38, 2, 37, 7)
 
@@ -2081,10 +2193,12 @@ line_id = &"abyss.cairn"
 shape = SubResource("prop_shape")
 
 [node name="Stack" type="Polygon2D" parent="Props/Cairn"]
+visible = false
 color = Color(0.3, 0.34, 0.38, 1)
 polygon = PackedVector2Array(-9, 20, -7, 13, -8, 12, -5, 6, -6, 5, -3, 0, 3, 0, 6, 5, 5, 6, 8, 12, 7, 13, 9, 20)
 
 [node name="Mark" type="Polygon2D" parent="Props/Cairn"]
+visible = false
 color = Color(0.62, 0.72, 0.72, 1)
 polygon = PackedVector2Array(-4, 17.9, -1.8, 15.7, 1.8, 15.7, 4, 17.9, 1.8, 20.1, -1.8, 20.1)
 
@@ -2100,10 +2214,12 @@ line_id = &"canyon.statue"
 shape = SubResource("prop_shape")
 
 [node name="Figure" type="Polygon2D" parent="Props/Statue"]
+visible = false
 color = Color(0.3, 0.34, 0.38, 1)
 polygon = PackedVector2Array(-12, 20, -12, 12, -7, 10, -5, 2, -3, -8, -1, -16, 1, -20, 8, -24, 14, -22, 16, -16, 12, -13, 6, -13, 5, -6, 13, -18, 15, -17, 8, 0, 5, 6, 8, 12, 10, 20)
 
 [node name="Mark" type="Polygon2D" parent="Props/Statue"]
+visible = false
 color = Color(0.62, 0.72, 0.72, 1)
 polygon = PackedVector2Array(-3.6, 22.8, -1.6, 20.8, 1.6, 20.8, 3.6, 22.8, 1.6, 24.8, -1.6, 24.8)
 
@@ -2138,86 +2254,121 @@ visible = false
 color = Color(0.3, 0.34, 0.38, 1)
 polygon = PackedVector2Array(3852, -6, 3852, -92, 3944, -92, 3944, -6)
 
+[node name="Fragments" type="Sprite2D" parent="Monolith"]
+position = Vector2(3863, -62)
+texture = ExtResource("r_abyss_mural_fragments")
+centered = false
+
 [node name="FragmentWave" type="Polygon2D" parent="Monolith"]
+visible = false
 color = Color(0.36, 0.42, 0.45, 1)
 polygon = PackedVector2Array(3864, -57, 3868, -61, 3872, -57, 3876, -61, 3880, -57, 3880, -54, 3876, -58, 3872, -54, 3868, -58, 3864, -54)
 
 [node name="FragmentKneel" type="Polygon2D" parent="Monolith"]
+visible = false
 color = Color(0.36, 0.42, 0.45, 1)
 polygon = PackedVector2Array(3891, -39, 3891, -42, 3895, -42, 3898, -48, 3901, -51, 3905, -52, 3906, -48, 3903, -45, 3900, -43, 3898, -39)
 
 [node name="FragmentEye" type="Polygon2D" parent="Monolith"]
+visible = false
 color = Color(0.36, 0.42, 0.45, 1)
 polygon = PackedVector2Array(3915, -54, 3920, -59, 3928, -59, 3933, -54, 3928, -49, 3920, -49)
 
 [node name="StatueA" type="Polygon2D" parent="Monolith"]
+visible = false
 color = Color(0.2, 0.235, 0.27, 1)
 polygon = PackedVector2Array(3949, 0, 3949, -7, 3954, -9, 3956, -17, 3958, -26, 3960, -33, 3962, -37, 3969, -41, 3975, -39, 3977, -33, 3973, -30, 3967, -30, 3966, -23, 3974, -35, 3976, -34, 3969, -17, 3966, -11, 3969, -7, 3971, 0)
 
 [node name="StatueB" type="Polygon2D" parent="Monolith"]
+visible = false
 color = Color(0.2, 0.235, 0.27, 1)
 polygon = PackedVector2Array(4225, 0, 4225, -7, 4230, -9, 4232, -17, 4234, -26, 4236, -33, 4238, -37, 4245, -41, 4251, -39, 4253, -33, 4249, -30, 4243, -30, 4242, -23, 4250, -35, 4252, -34, 4245, -17, 4242, -11, 4245, -7, 4247, 0)
+
+[node name="Statues" type="Sprite2D" parent="Monolith"]
+position = Vector2(3949, -41)
+texture = ExtResource("r_abyss_statues")
+centered = false
 
 [node name="MuralLit" type="Node2D" parent="Monolith"]
 visible = false
 
+[node name="Drawn" type="Sprite2D" parent="Monolith/MuralLit"]
+position = Vector2(3857, -94)
+texture = ExtResource("r_abyss_mural_lit")
+centered = false
+
 [node name="WaveTop" type="Polygon2D" parent="Monolith/MuralLit"]
+visible = false
 color = Color(0.5, 0.92, 0.78, 1)
 polygon = PackedVector2Array(3864, -57, 3868, -61, 3872, -57, 3876, -61, 3880, -57, 3880, -54, 3876, -58, 3872, -54, 3868, -58, 3864, -54)
 
 [node name="WaveLow" type="Polygon2D" parent="Monolith/MuralLit"]
+visible = false
 color = Color(0.5, 0.92, 0.78, 1)
 polygon = PackedVector2Array(3864, -50, 3868, -54, 3872, -50, 3876, -54, 3880, -50, 3880, -47, 3876, -51, 3872, -47, 3868, -51, 3864, -47)
 
 [node name="Kneel" type="Polygon2D" parent="Monolith/MuralLit"]
+visible = false
 color = Color(0.5, 0.92, 0.78, 1)
 polygon = PackedVector2Array(3891, -39, 3891, -42, 3895, -42, 3898, -48, 3901, -51, 3905, -52, 3906, -48, 3903, -45, 3900, -43, 3898, -39)
 
 [node name="Eye" type="Polygon2D" parent="Monolith/MuralLit"]
+visible = false
 color = Color(0.5, 0.92, 0.78, 1)
 polygon = PackedVector2Array(3915, -54, 3920, -59, 3928, -59, 3933, -54, 3928, -49, 3920, -49)
 
 [node name="Bowing1" type="Polygon2D" parent="Monolith/MuralLit"]
+visible = false
 color = Color(0.5, 0.92, 0.78, 1)
 polygon = PackedVector2Array(3859.8, -15.4, 3859.8, -17.2, 3862.2, -17.2, 3864, -20.8, 3865.8, -22.6, 3868.2, -23.2, 3868.8, -20.8, 3867, -19, 3865.2, -17.8, 3864, -15.4)
 
 [node name="Bowing2" type="Polygon2D" parent="Monolith/MuralLit"]
+visible = false
 color = Color(0.5, 0.92, 0.78, 1)
 polygon = PackedVector2Array(3875.8, -15.4, 3875.8, -17.2, 3878.2, -17.2, 3880, -20.8, 3881.8, -22.6, 3884.2, -23.2, 3884.8, -20.8, 3883, -19, 3881.2, -17.8, 3880, -15.4)
 
 [node name="Bowing3" type="Polygon2D" parent="Monolith/MuralLit"]
+visible = false
 color = Color(0.5, 0.92, 0.78, 1)
 polygon = PackedVector2Array(3891.8, -15.4, 3891.8, -17.2, 3894.2, -17.2, 3896, -20.8, 3897.8, -22.6, 3900.2, -23.2, 3900.8, -20.8, 3899, -19, 3897.2, -17.8, 3896, -15.4)
 
 [node name="Bowing4" type="Polygon2D" parent="Monolith/MuralLit"]
+visible = false
 color = Color(0.5, 0.92, 0.78, 1)
 polygon = PackedVector2Array(3907.8, -15.4, 3907.8, -17.2, 3910.2, -17.2, 3912, -20.8, 3913.8, -22.6, 3916.2, -23.2, 3916.8, -20.8, 3915, -19, 3913.2, -17.8, 3912, -15.4)
 
 [node name="Bowing5" type="Polygon2D" parent="Monolith/MuralLit"]
+visible = false
 color = Color(0.5, 0.92, 0.78, 1)
 polygon = PackedVector2Array(3923.8, -15.4, 3923.8, -17.2, 3926.2, -17.2, 3928, -20.8, 3929.8, -22.6, 3932.2, -23.2, 3932.8, -20.8, 3931, -19, 3929.2, -17.8, 3928, -15.4)
 
 [node name="Swimmer" type="Polygon2D" parent="Monolith/MuralLit"]
+visible = false
 color = Color(0.5, 0.92, 0.78, 1)
 polygon = PackedVector2Array(3922, -79, 3921, -85, 3916, -86, 3914, -92, 3911, -86, 3907, -87, 3905, -93, 3902, -87, 3898, -88, 3896, -93, 3893, -87, 3886, -87, 3878, -84, 3884, -82, 3876, -80, 3884, -79, 3896, -78, 3910, -77)
 
 [node name="ArmLeft" type="Polygon2D" parent="Monolith/MuralLit"]
+visible = false
 color = Color(0.5, 0.92, 0.78, 1)
 polygon = PackedVector2Array(3910, -76, 3896, -71, 3880, -70, 3872, -72, 3862, -74, 3858, -70, 3862, -66, 3870, -65, 3871, -68, 3880, -67, 3896, -67, 3910, -72)
 
 [node name="ArmRight" type="Polygon2D" parent="Monolith/MuralLit"]
+visible = false
 color = Color(0.5, 0.92, 0.78, 1)
 polygon = PackedVector2Array(3864, -90, 3870, -90, 3871, -62, 3863, -62)
 
 [node name="Symbol" type="Polygon2D" parent="Monolith/MuralLit"]
+visible = false
 color = Color(0.5, 0.92, 0.78, 1)
 polygon = PackedVector2Array(3890.8, -63.4, 3894.8, -67.4, 3901.2, -67.4, 3905.2, -63.4, 3901.2, -59.4, 3894.8, -59.4)
 
 [node name="EyesA" type="Polygon2D" parent="Monolith/MuralLit"]
+visible = false
 color = Color(0.5, 0.92, 0.78, 1)
 polygon = PackedVector2Array(3971, -28, 3972.1, -29.1, 3973.9, -29.1, 3975, -28, 3973.9, -26.9, 3972.1, -26.9)
 
 [node name="EyesB" type="Polygon2D" parent="Monolith/MuralLit"]
+visible = false
 color = Color(0.5, 0.92, 0.78, 1)
 polygon = PackedVector2Array(4247, -28, 4248.1, -29.1, 4249.9, -29.1, 4251, -28, 4249.9, -26.9, 4248.1, -26.9)
 
@@ -2264,20 +2415,33 @@ prompt = "Press the kneeling stone"
 shape = SubResource("stone_shape")
 
 [node name="Art" type="Polygon2D" parent="Monolith/GlyphKneel"]
+visible = false
 position = Vector2(0, 16)
 color = Color(0.3, 0.34, 0.38, 1)
 polygon = PackedVector2Array(-13, 0, -14, -24, -9, -31, 8, -32, 14, -25, 13, 0)
 
 [node name="Mark" type="Polygon2D" parent="Monolith/GlyphKneel"]
+visible = false
 position = Vector2(0, 16)
 color = Color(0.36, 0.42, 0.45, 1)
 polygon = PackedVector2Array(-7, -9, -7, -12, -3, -12, 0, -18, 3, -21, 7, -22, 8, -18, 5, -15, 2, -13, 0, -9)
+
+[node name="Drawn" type="Sprite2D" parent="Monolith/GlyphKneel"]
+position = Vector2(-14, -16)
+texture = ExtResource("r_abyss_glyphkneel")
+centered = false
 
 [node name="Lit" type="Node2D" parent="Monolith/GlyphKneel"]
 visible = false
 position = Vector2(0, 16)
 
+[node name="Drawn" type="Sprite2D" parent="Monolith/GlyphKneel/Lit"]
+position = Vector2(-14, -32)
+texture = ExtResource("r_abyss_glyphkneel_lit")
+centered = false
+
 [node name="Mark" type="Polygon2D" parent="Monolith/GlyphKneel/Lit"]
+visible = false
 color = Color(0.5, 0.92, 0.78, 1)
 polygon = PackedVector2Array(-7, -9, -7, -12, -3, -12, 0, -18, 3, -21, 7, -22, 8, -18, 5, -15, 2, -13, 0, -9)
 
@@ -2293,20 +2457,33 @@ prompt = "Press the eye stone"
 shape = SubResource("stone_shape")
 
 [node name="Art" type="Polygon2D" parent="Monolith/GlyphEye"]
+visible = false
 position = Vector2(0, 16)
 color = Color(0.3, 0.34, 0.38, 1)
 polygon = PackedVector2Array(-13, 0, -14, -24, -9, -31, 8, -32, 14, -25, 13, 0)
 
 [node name="Mark" type="Polygon2D" parent="Monolith/GlyphEye"]
+visible = false
 position = Vector2(0, 16)
 color = Color(0.36, 0.42, 0.45, 1)
 polygon = PackedVector2Array(-9, -18, -4, -23, 4, -23, 9, -18, 4, -13, -4, -13)
+
+[node name="Drawn" type="Sprite2D" parent="Monolith/GlyphEye"]
+position = Vector2(-14, -16)
+texture = ExtResource("r_abyss_glypheye")
+centered = false
 
 [node name="Lit" type="Node2D" parent="Monolith/GlyphEye"]
 visible = false
 position = Vector2(0, 16)
 
+[node name="Drawn" type="Sprite2D" parent="Monolith/GlyphEye/Lit"]
+position = Vector2(-14, -32)
+texture = ExtResource("r_abyss_glypheye_lit")
+centered = false
+
 [node name="Mark" type="Polygon2D" parent="Monolith/GlyphEye/Lit"]
+visible = false
 color = Color(0.5, 0.92, 0.78, 1)
 polygon = PackedVector2Array(-9, -18, -4, -23, 4, -23, 9, -18, 4, -13, -4, -13)
 
@@ -2322,29 +2499,44 @@ prompt = "Press the wave stone"
 shape = SubResource("stone_shape")
 
 [node name="Art" type="Polygon2D" parent="Monolith/GlyphWave"]
+visible = false
 position = Vector2(0, 16)
 color = Color(0.3, 0.34, 0.38, 1)
 polygon = PackedVector2Array(-13, 0, -14, -24, -9, -31, 8, -32, 14, -25, 13, 0)
 
 [node name="MarkA" type="Polygon2D" parent="Monolith/GlyphWave"]
+visible = false
 position = Vector2(0, 16)
 color = Color(0.36, 0.42, 0.45, 1)
 polygon = PackedVector2Array(-8, -21, -4, -25, 0, -21, 4, -25, 8, -21, 8, -18, 4, -22, 0, -18, -4, -22, -8, -18)
 
 [node name="MarkB" type="Polygon2D" parent="Monolith/GlyphWave"]
+visible = false
 position = Vector2(0, 16)
 color = Color(0.36, 0.42, 0.45, 1)
 polygon = PackedVector2Array(-8, -14, -4, -18, 0, -14, 4, -18, 8, -14, 8, -11, 4, -15, 0, -11, -4, -15, -8, -11)
+
+[node name="Drawn" type="Sprite2D" parent="Monolith/GlyphWave"]
+position = Vector2(-14, -16)
+texture = ExtResource("r_abyss_glyphwave")
+centered = false
 
 [node name="Lit" type="Node2D" parent="Monolith/GlyphWave"]
 visible = false
 position = Vector2(0, 16)
 
+[node name="Drawn" type="Sprite2D" parent="Monolith/GlyphWave/Lit"]
+position = Vector2(-14, -32)
+texture = ExtResource("r_abyss_glyphwave_lit")
+centered = false
+
 [node name="MarkA" type="Polygon2D" parent="Monolith/GlyphWave/Lit"]
+visible = false
 color = Color(0.5, 0.92, 0.78, 1)
 polygon = PackedVector2Array(-8, -21, -4, -25, 0, -21, 4, -25, 8, -21, 8, -18, 4, -22, 0, -18, -4, -22, -8, -18)
 
 [node name="MarkB" type="Polygon2D" parent="Monolith/GlyphWave/Lit"]
+visible = false
 color = Color(0.5, 0.92, 0.78, 1)
 polygon = PackedVector2Array(-8, -14, -4, -18, 0, -14, 4, -18, 8, -14, 8, -11, 4, -15, 0, -11, -4, -15, -8, -11)
 
@@ -2353,10 +2545,16 @@ position = Vector2(4300, -150)
 collision_layer = 1
 collision_mask = 0
 
+[node name="Drawn" type="Sprite2D" parent="Monolith/Gate"]
+position = Vector2(-8, -150)
+texture = ExtResource("r_abyss_gate")
+centered = false
+
 [node name="Shape" type="CollisionShape2D" parent="Monolith/Gate"]
 shape = SubResource("gate_shape")
 
 [node name="Visual" type="Polygon2D" parent="Monolith/Gate"]
+visible = false
 color = Color(0.33, 0.37, 0.4, 1)
 polygon = PackedVector2Array(-8, 150, -8, -150, 8, -150, 8, 150)
 
@@ -2368,6 +2566,7 @@ collision_mask = 0
 polygon = PackedVector2Array(2826, -36, 2990, -36, 2990, -28, 2826, -28)
 
 [node name="ShelfA" type="Polygon2D" parent="Ledges"]
+visible = false
 color = Color(0.2, 0.24, 0.28, 1)
 polygon = PackedVector2Array(2826, -36, 2990, -36, 2988, -28, 2828, -28)
 
@@ -2375,6 +2574,7 @@ polygon = PackedVector2Array(2826, -36, 2990, -36, 2988, -28, 2828, -28)
 polygon = PackedVector2Array(3424, -36, 3570, -36, 3570, -28, 3424, -28)
 
 [node name="ShelfB" type="Polygon2D" parent="Ledges"]
+visible = false
 color = Color(0.2, 0.24, 0.28, 1)
 polygon = PackedVector2Array(3424, -36, 3570, -36, 3568, -28, 3426, -28)
 
@@ -2388,16 +2588,24 @@ collision_mask = 0
 polygon = PackedVector2Array(-80, -4, 80, -4, 80, 4, -80, 4)
 
 [node name="Slab" type="Polygon2D" parent="Crossing"]
+visible = false
 color = Color(0.3, 0.34, 0.38, 1)
 polygon = PackedVector2Array(-80, -4, 80, -4, 80, 4, -80, 4)
 
 [node name="Seam" type="Polygon2D" parent="Crossing"]
+visible = false
 color = Color(0.2, 0.24, 0.28, 1)
 polygon = PackedVector2Array(-24, -4, -22, -4, -22, 4, -24, 4)
 
 [node name="Mark" type="Polygon2D" parent="Crossing"]
+visible = false
 color = Color(0.62, 0.72, 0.72, 1)
 polygon = PackedVector2Array(36, -2, 40, -3, 44, -2, 48, -3, 52, -2, 52, -1, 48, -2, 44, -1, 40, -2, 36, -1)
+
+[node name="Drawn" type="Sprite2D" parent="Crossing"]
+position = Vector2(-80, -4)
+texture = ExtResource("r_abyss_slab")
+centered = false
 
 [node name="Sound" type="AudioStreamPlayer2D" parent="Crossing"]
 stream = ExtResource("a_slab")
@@ -2406,14 +2614,17 @@ bus = &"Effects"
 [node name="CrossingLedges" type="StaticBody2D" parent="."]
 
 [node name="SupportLow" type="Polygon2D" parent="CrossingLedges"]
+visible = false
 color = Color(0.13, 0.16, 0.2, 1)
 polygon = PackedVector2Array(2038, 0, 2040, -14, 2048, -16, 2060, -15, 2066, -12, 2068, 0)
 
 [node name="SupportMid" type="Polygon2D" parent="CrossingLedges"]
+visible = false
 color = Color(0.12, 0.15, 0.19, 1)
 polygon = PackedVector2Array(2066, 0, 2068, -30, 2078, -35, 2092, -34, 2098, -28, 2100, 0)
 
 [node name="SupportHigh" type="Polygon2D" parent="CrossingLedges"]
+visible = false
 color = Color(0.11, 0.14, 0.18, 1)
 polygon = PackedVector2Array(2096, 0, 2098, -48, 2108, -55, 2124, -55, 2132, -50, 2134, 0)
 
@@ -2423,6 +2634,7 @@ shape = SubResource("ledge_shape")
 one_way_collision = true
 
 [node name="Low" type="Polygon2D" parent="CrossingLedges"]
+visible = false
 color = Color(0.26, 0.3, 0.34, 1)
 polygon = PackedVector2Array(2034, -18, 2078, -18, 2076, -13, 2060, -11, 2036, -13)
 
@@ -2432,6 +2644,7 @@ shape = SubResource("ledge_wide_shape")
 one_way_collision = true
 
 [node name="Mid" type="Polygon2D" parent="CrossingLedges"]
+visible = false
 color = Color(0.25, 0.29, 0.33, 1)
 polygon = PackedVector2Array(2054, -38, 2110, -38, 2108, -33, 2086, -31, 2056, -33)
 
@@ -2441,6 +2654,7 @@ shape = SubResource("shelf_shape")
 one_way_collision = true
 
 [node name="Shelf" type="Polygon2D" parent="CrossingLedges"]
+visible = false
 color = Color(0.24, 0.28, 0.32, 1)
 polygon = PackedVector2Array(2078, -58, 2142, -58, 2140, -53, 2112, -50, 2080, -53)
 
@@ -2451,12 +2665,19 @@ position = Vector2(2133, -66)
 shape = SubResource("stone_shape")
 
 [node name="Art" type="Polygon2D" parent="CrossingStone"]
+visible = false
 color = Color(0.34, 0.37, 0.4, 1)
 polygon = PackedVector2Array(-8, 2, -7, -4, -3, -8, 3, -8, 7, -5, 8, 1, 6, 6, 1, 8, -5, 7)
 
 [node name="Lit" type="Polygon2D" parent="CrossingStone"]
+visible = false
 color = Color(0.5, 0.55, 0.57, 1)
 polygon = PackedVector2Array(-6, -4, -3, -7, 2, -7, 0, -5, -4, -2)
+
+[node name="Drawn" type="Sprite2D" parent="CrossingStone"]
+position = Vector2(-8, -8)
+texture = ExtResource("r_abyss_stone")
+centered = false
 
 [node name="Push" type="Interactable" parent="CrossingStone"]
 position = Vector2(-19, -15)
@@ -2471,6 +2692,7 @@ one_shot = true
 shape = SubResource("push_shape")
 
 [node name="Pillar" type="Polygon2D" parent="."]
+visible = false
 color = Color(0.16, 0.19, 0.23, 1)
 polygon = PackedVector2Array(2213, 48, 2213, 10, 2216, 7, 2224, 7, 2227, 10, 2227, 48)
 
@@ -2483,43 +2705,79 @@ collision_mask = 0
 polygon = PackedVector2Array(4196, 0, 4198, -8, 4206, -15, 4217, -14, 4225, -9, 4228, 0)
 
 [node name="RockNear" type="Polygon2D" parent="Rockfall"]
+self_modulate = Color(1, 1, 1, 0)
 position = Vector2(4212, 0)
 color = Color(0.3, 0.34, 0.38, 1)
 polygon = PackedVector2Array(-16, 0, -14, -8, -6, -15, 5, -14, 13, -9, 16, 0)
 
+[node name="Drawn" type="Sprite2D" parent="Rockfall/RockNear"]
+position = Vector2(-16, -15)
+texture = ExtResource("r_abyss_rock_near")
+centered = false
+
 [node name="DustNear" type="Polygon2D" parent="Rockfall"]
+self_modulate = Color(1, 1, 1, 0)
 modulate = Color(1, 1, 1, 0)
 position = Vector2(4212, 0)
 color = Color(0.55, 0.58, 0.58, 1)
 polygon = PackedVector2Array(-30, 0, -24, -9, -10, -14, 10, -14, 24, -9, 30, 0)
+
+[node name="Drawn" type="Sprite2D" parent="Rockfall/DustNear"]
+position = Vector2(-30, -14)
+texture = ExtResource("r_abyss_dust_near")
+centered = false
 
 [node name="ShapeMid" type="CollisionPolygon2D" parent="Rockfall"]
 polygon = PackedVector2Array(4017, 0, 4020, -10, 4028, -16, 4039, -13, 4046, -15, 4051, -7, 4053, 0)
 
 [node name="RockMid" type="Polygon2D" parent="Rockfall"]
+self_modulate = Color(1, 1, 1, 0)
 position = Vector2(4035, 0)
 color = Color(0.3, 0.34, 0.38, 1)
 polygon = PackedVector2Array(-18, 0, -15, -10, -7, -16, 4, -13, 11, -15, 16, -7, 18, 0)
 
+[node name="Drawn" type="Sprite2D" parent="Rockfall/RockMid"]
+position = Vector2(-18, -16)
+texture = ExtResource("r_abyss_rock_mid")
+centered = false
+
 [node name="DustMid" type="Polygon2D" parent="Rockfall"]
+self_modulate = Color(1, 1, 1, 0)
 modulate = Color(1, 1, 1, 0)
 position = Vector2(4035, 0)
 color = Color(0.55, 0.58, 0.58, 1)
 polygon = PackedVector2Array(-30, 0, -24, -9, -10, -14, 10, -14, 24, -9, 30, 0)
+
+[node name="Drawn" type="Sprite2D" parent="Rockfall/DustMid"]
+position = Vector2(-30, -14)
+texture = ExtResource("r_abyss_dust_mid")
+centered = false
 
 [node name="ShapeFar" type="CollisionPolygon2D" parent="Rockfall"]
 polygon = PackedVector2Array(3821, 0, 3822, -7, 3830, -14, 3840, -16, 3850, -11, 3855, 0)
 
 [node name="RockFar" type="Polygon2D" parent="Rockfall"]
+self_modulate = Color(1, 1, 1, 0)
 position = Vector2(3838, 0)
 color = Color(0.3, 0.34, 0.38, 1)
 polygon = PackedVector2Array(-17, 0, -16, -7, -8, -14, 2, -16, 12, -11, 17, 0)
 
+[node name="Drawn" type="Sprite2D" parent="Rockfall/RockFar"]
+position = Vector2(-17, -16)
+texture = ExtResource("r_abyss_rock_far")
+centered = false
+
 [node name="DustFar" type="Polygon2D" parent="Rockfall"]
+self_modulate = Color(1, 1, 1, 0)
 modulate = Color(1, 1, 1, 0)
 position = Vector2(3838, 0)
 color = Color(0.55, 0.58, 0.58, 1)
 polygon = PackedVector2Array(-30, 0, -24, -9, -10, -14, 10, -14, 24, -9, 30, 0)
+
+[node name="Drawn" type="Sprite2D" parent="Rockfall/DustFar"]
+position = Vector2(-30, -14)
+texture = ExtResource("r_abyss_dust_far")
+centered = false
 
 [node name="Ribs" type="Sprite2D" parent="."]
 light_mask = 2
@@ -2587,7 +2845,8 @@ target_path = NodePath("../Player")
 
 [node name="Bank" type="Polygon2D" parent="Fog"]
 color = Color(0.2, 0.26, 0.3, 0.3)
-polygon = PackedVector2Array(4300, -560, 5400, -560, 5400, 60, 4300, 60)
+polygon = PackedVector2Array(4300, -560, 4460, -560, 5400, -560, 5400, 60, 4460, 60, 4300, 60)
+vertex_colors = PackedColorArray(0.2, 0.26, 0.3, 0, 0.2, 0.26, 0.3, 0.3, 0.2, 0.26, 0.3, 0.3, 0.2, 0.26, 0.3, 0.3, 0.2, 0.26, 0.3, 0.3, 0.2, 0.26, 0.3, 0)
 
 [node name="Foreground" type="Parallax2D" parent="."]
 scroll_scale = Vector2(1.3, 1)
@@ -2716,10 +2975,17 @@ visible = false
 position = Vector2(4540, 0)
 
 [node name="Water" type="Polygon2D" parent="Tide"]
+self_modulate = Color(1, 1, 1, 0)
 color = Color(0.03, 0.08, 0.1, 0.94)
 polygon = PackedVector2Array(0, -30, 8, -38, 18, -33, 30, -41, 44, -34, 60, -39, 80, -34, 120, -37, 900, -36, 900, 60, 0, 60)
 
+[node name="Drawn" type="Sprite2D" parent="Tide/Water"]
+position = Vector2(-4, -45)
+texture = ExtResource("r_abyss_tide")
+centered = false
+
 [node name="Foam" type="Polygon2D" parent="Tide/Water"]
+visible = false
 color = Color(0.5, 0.62, 0.62, 0.9)
 polygon = PackedVector2Array(-4, -28, 8, -40, 18, -35, 30, -43, 44, -36, 60, -41, 80, -36, 120, -39, 120, -35, 80, -32, 60, -37, 44, -32, 30, -39, 18, -31, 8, -36, 2, -26)
 
@@ -2733,11 +2999,18 @@ layer = 4
 visible = false
 
 [node name="Water" type="Polygon2D" parent="ReturningSea"]
+self_modulate = Color(1, 1, 1, 0)
 position = Vector2(40, 300)
 color = Color(0.02, 0.05, 0.07, 0.96)
 polygon = PackedVector2Array(-40, 0, 40, -7, 120, -1, 200, -8, 280, -2, 360, -7, 440, -1, 520, -6, 520, 340, -40, 340)
 
+[node name="Drawn" type="Sprite2D" parent="ReturningSea/Water"]
+position = Vector2(-44, -12)
+texture = ExtResource("r_abyss_returning_sea")
+centered = false
+
 [node name="Foam" type="Polygon2D" parent="ReturningSea/Water"]
+visible = false
 color = Color(0.4, 0.54, 0.54, 0.85)
 polygon = PackedVector2Array(-40, 0, 40, -7, 120, -1, 200, -8, 280, -2, 360, -7, 440, -1, 520, -6, 520, -2, 440, 4, 360, -2, 280, 3, 200, -3, 120, 4, 40, -2, -40, 4)
 
@@ -2790,7 +3063,7 @@ bus = &"Effects"
 
 [node name="AbyssMid" type="AudioStreamPlayer2D" parent="Sound"]
 position = Vector2(2700, -50)
-stream = ExtResource("a_abyss")
+stream = ExtResource("a_abyss_deep")
 volume_db = 0.0
 autoplay = true
 max_distance = 900.0
@@ -2799,7 +3072,7 @@ bus = &"Effects"
 
 [node name="AbyssFar" type="AudioStreamPlayer2D" parent="Sound"]
 position = Vector2(3400, -50)
-stream = ExtResource("a_abyss")
+stream = ExtResource("a_canyon")
 volume_db = -2.0
 autoplay = true
 max_distance = 700.0

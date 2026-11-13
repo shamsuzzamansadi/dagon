@@ -1,6 +1,9 @@
 [gd_scene format=3]
 
 [ext_resource type="Theme" path="res://assets/ui/theme.tres" id="theme"]
+[ext_resource type="AudioStream" path="res://assets/audio/effects/ui_move.ogg" id="a_ui_move"]
+[ext_resource type="AudioStream" path="res://assets/audio/effects/ui_accept.ogg" id="a_ui_accept"]
+[ext_resource type="AudioStream" path="res://assets/audio/effects/ui_back.ogg" id="a_ui_back"]
 [ext_resource type="AudioStream" path="res://assets/audio/music/ending.ogg" id="music"]
 [ext_resource type="AudioStream" path="res://assets/audio/ambience/night_sea.ogg" id="sea"]
 [ext_resource type="Texture2D" path="res://assets/prologue/ending_1_found.png" id="e1"]
@@ -9,6 +12,9 @@
 [ext_resource type="Texture2D" path="res://assets/prologue/ending_4_rising.png" id="e4"]
 
 [node name="Ending" type="MenuController"]
+move_sound_path = NodePath("SoundMove")
+accept_sound_path = NodePath("SoundAccept")
+back_sound_path = NodePath("SoundBack")
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -167,6 +173,18 @@ autowrap_mode = 2
 [node name="MainMenu" type="Button" parent="Center/Credits/Items"]
 layout_mode = 2
 text = "Main Menu"
+
+[node name="SoundMove" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("a_ui_move")
+bus = &"Effects"
+
+[node name="SoundAccept" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("a_ui_accept")
+bus = &"Effects"
+
+[node name="SoundBack" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("a_ui_back")
+bus = &"Effects"
 
 [connection signal="pressed" from="Center/Card/Items/Continue" to="." method="advance_ending"]
 [connection signal="pressed" from="Center/Credits/Items/MainMenu" to="." method="quit_to_main_menu"]

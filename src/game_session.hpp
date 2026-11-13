@@ -25,6 +25,9 @@ public:
 
 	// Set by the main menu before this node enters the tree. It never reads the save itself.
 	void set_start(int p_beat, bool p_persisted, bool p_show_intro);
+	// A new game, straight from the prologue: the first world opens on him getting up. Never a rebuilt world.
+	void set_waking(bool p_waking) { waking_ = p_waking; }
+	bool is_waking() const { return waking_; }
 
 	// The device in use. It has to outlive the world, like the session checkpoint.
 	void set_active_device(int p_device);
@@ -72,6 +75,7 @@ private:
 	int session_beat_ = 0;
 	int persisted_beat_ = -1; // None yet.
 	bool show_intro_ = false;
+	bool waking_ = false;
 	int active_device_ = -1;
 };
 

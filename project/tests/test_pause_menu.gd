@@ -285,3 +285,45 @@ func test_every_button_is_connected(h) -> void:
 	var buttons := "PauseLayer/PauseMenu/Center/Confirm/Items/Buttons/"
 	h.check(h.fixture.get_node(buttons + "Cancel").pressed.is_connected(menu.cancel_confirm), "Cancel is not connected")
 	h.check(h.fixture.get_node(buttons + "Ok").pressed.is_connected(menu.confirm), "Ok is not connected")
+
+
+## Moving between choices, choosing and going back are each heard; the menu putting focus somewhere itself, on the
+## way into a screen, is not. The streams are swapped for long silence, so a short sound cannot end before it is seen.
+func test_the_menu_is_heard_moving_choosing_and_going_back(h) -> void:
+	await _setup(h)
+	var sounds := {}
+	for which in ["Move", "Accept", "Back"]:
+		var sound: AudioStreamPlayer = _menu(h).get_node("Sound" + which)
+		h.check(sound.stream != null and sound.stream.resource_path.ends_with("ui_%s.ogg" % which.to_lower()), "Sound%s plays %s" % [which, sound.stream])
+		sound.stream = _silence()
+		sounds[which] = sound
+	await h.tap_action("pause")
+	h.check(sounds["Accept"].playing, "opening the menu is not heard")
+	h.check(not sounds["Move"].playing, "the menu putting focus on Resume was heard as a move")
+	_hush(sounds)
+	await h.tap_action("ui_down")
+	h.check(sounds["Move"].playing, "moving down is not heard")
+	_button(h, "Settings").grab_focus()
+	_hush(sounds)
+	await h.tap_action("ui_accept")
+	h.check(sounds["Accept"].playing, "choosing Settings is not heard")
+	h.check(not sounds["Move"].playing, "Settings putting focus on its first slider was heard as a move")
+	_hush(sounds)
+	await h.tap_key(KEY_ESCAPE)
+	h.check(sounds["Back"].playing, "going back is not heard")
+	h.check(not sounds["Move"].playing, "focus going back to Settings was heard as a move")
+	_hush(sounds)
+
+
+func _silence() -> AudioStreamWAV:
+	var wav := AudioStreamWAV.new()
+	wav.mix_rate = 8000
+	var bytes := PackedByteArray()
+	bytes.resize(8000 * 10)
+	wav.data = bytes
+	return wav
+
+
+func _hush(sounds: Dictionary) -> void:
+	for sound in sounds.values():
+		sound.stop()

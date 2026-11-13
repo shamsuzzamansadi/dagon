@@ -1,6 +1,9 @@
 [gd_scene format=3]
 
 [ext_resource type="Theme" path="res://assets/ui/theme.tres" id="theme"]
+[ext_resource type="AudioStream" path="res://assets/audio/effects/ui_move.ogg" id="a_ui_move"]
+[ext_resource type="AudioStream" path="res://assets/audio/effects/ui_accept.ogg" id="a_ui_accept"]
+[ext_resource type="AudioStream" path="res://assets/audio/effects/ui_back.ogg" id="a_ui_back"]
 [ext_resource type="PackedScene" path="res://scenes/level/game.tscn" id="game"]
 [ext_resource type="Texture2D" path="res://assets/prologue/prologue_1_raider.png" id="p1"]
 [ext_resource type="Texture2D" path="res://assets/prologue/prologue_2_escape.png" id="p2"]
@@ -19,6 +22,7 @@
 [ext_resource type="AudioStream" path="res://assets/audio/effects/oars.ogg" id="a_oars"]
 [ext_resource type="AudioStream" path="res://assets/audio/ambience/lapping.ogg" id="a_lapping"]
 [ext_resource type="AudioStream" path="res://assets/audio/ambience/wind.ogg" id="a_wind"]
+[ext_resource type="AudioStream" path="res://assets/audio/ambience/shore_sea.ogg" id="a_shore_sea"]
 
 [sub_resource type="Animation" id="raider_show"]
 resource_name = "show"
@@ -155,6 +159,9 @@ _data = {
 
 
 [node name="Prologue" type="MenuController"]
+move_sound_path = NodePath("SoundMove")
+accept_sound_path = NodePath("SoundAccept")
+back_sound_path = NodePath("SoundBack")
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -176,7 +183,7 @@ bus = &"Narration"
 
 [node name="Music" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("music")
-volume_db = -4.0
+volume_db = -7.5
 autoplay = true
 bus = &"Music"
 
@@ -331,26 +338,31 @@ stretch_mode = 5
 
 [node name="Lying" type="TextureRect" parent="Panels/Dry"]
 layout_mode = 0
-offset_left = 226.0
-offset_top = 172.0
-offset_right = 246.0
-offset_bottom = 186.0
+offset_left = 126.0
+offset_top = 182.0
+offset_right = 174.0
+offset_bottom = 222.0
 mouse_filter = 2
 texture = ExtResource("p4_lying")
 
 [node name="Sitting" type="TextureRect" parent="Panels/Dry"]
 modulate = Color(1, 1, 1, 0)
 layout_mode = 0
-offset_left = 226.0
-offset_top = 172.0
-offset_right = 246.0
-offset_bottom = 186.0
+offset_left = 126.0
+offset_top = 182.0
+offset_right = 174.0
+offset_bottom = 222.0
 mouse_filter = 2
 texture = ExtResource("p4_sitting")
 
+[node name="Sea" type="AudioStreamPlayer" parent="Panels/Dry"]
+stream = ExtResource("a_shore_sea")
+volume_db = -1.0
+bus = &"Effects"
+
 [node name="Wind" type="AudioStreamPlayer" parent="Panels/Dry"]
 stream = ExtResource("a_wind")
-volume_db = -14.0
+volume_db = -6.0
 bus = &"Effects"
 
 [node name="Motion" type="AnimationPlayer" parent="Panels/Dry"]
@@ -392,6 +404,18 @@ layout_mode = 2
 focus_neighbor_left = NodePath("../Continue")
 focus_neighbor_right = NodePath("../Continue")
 text = "Skip"
+
+[node name="SoundMove" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("a_ui_move")
+bus = &"Effects"
+
+[node name="SoundAccept" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("a_ui_accept")
+bus = &"Effects"
+
+[node name="SoundBack" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("a_ui_back")
+bus = &"Effects"
 
 [connection signal="pressed" from="Card/Items/Buttons/Continue" to="." method="advance_ending"]
 [connection signal="pressed" from="Card/Items/Buttons/Skip" to="." method="skip_prologue"]
