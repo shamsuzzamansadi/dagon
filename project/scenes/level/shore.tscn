@@ -27,6 +27,12 @@
 [ext_resource type="Texture2D" path="res://assets/cave/cave_front.png" id="r_cave_front"]
 [ext_resource type="Texture2D" path="res://assets/cave/cave_wall.png" id="r_cave_wall"]
 [ext_resource type="Texture2D" path="res://assets/cave/abyss_far.png" id="r_abyss_far"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_ground_0.png" id="r_abyss_ground_0"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_ground_1.png" id="r_abyss_ground_1"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_ground_2.png" id="r_abyss_ground_2"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_ground_3.png" id="r_abyss_ground_3"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_far_plain.png" id="r_abyss_far_plain"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_escarpment.png" id="r_abyss_escarpment"]
 [ext_resource type="Texture2D" path="res://assets/cave/ritual_far.png" id="r_ritual_far"]
 [ext_resource type="Texture2D" path="res://assets/cave/foreground_cave.png" id="r_fg_cave"]
 [ext_resource type="Texture2D" path="res://assets/cave/shaft.png" id="r_shaft"]
@@ -1397,7 +1403,7 @@ centered = false
 
 [node name="AbyssView" type="Polygon2D" parent="."]
 clip_children = 1
-polygon = PackedVector2Array(600, -700, 1440, -700, 1440, 60, 600, 60)
+polygon = PackedVector2Array(600, -700, 4544, -700, 4544, 60, 600, 60)
 
 [node name="Far" type="Parallax2D" parent="AbyssView"]
 scroll_scale = Vector2(0.35, 1)
@@ -1408,12 +1414,20 @@ position = Vector2(40, -220)
 texture = ExtResource("r_abyss_far")
 centered = false
 
+[node name="Plain" type="Sprite2D" parent="AbyssView/Far"]
+light_mask = 2
+position = Vector2(680, -220)
+texture = ExtResource("r_abyss_far_plain")
+centered = false
+
 [node name="GreyboxBackdrop" type="Polygon2D" parent="."]
+visible = false
 light_mask = 2
 color = Color(0.0392157, 0.054902, 0.0941176, 1)
 polygon = PackedVector2Array(1440, 60, 1440, -2, 1452, -10, 1466, -12, 1478, -28, 1494, -34, 1508, -58, 1520, -62, 1534, -96, 1548, -104, 1562, -140, 1578, -150, 1592, -190, 1604, -200, 1616, -240, 1630, -700, 4544, -700, 4544, 60)
 
 [node name="CanyonRim" type="Polygon2D" parent="."]
+visible = false
 light_mask = 2
 color = Color(0.1, 0.12, 0.17, 1)
 polygon = PackedVector2Array(1440, -2, 1452, -10, 1466, -12, 1478, -28, 1494, -34, 1508, -58, 1520, -62, 1534, -96, 1548, -104, 1562, -140, 1578, -150, 1592, -190, 1604, -200, 1616, -240, 1621, -237, 1609, -197, 1597, -187, 1583, -147, 1567, -137, 1553, -101, 1539, -93, 1525, -59, 1513, -55, 1499, -31, 1483, -25, 1471, -9, 1457, -7, 1445, 1)
@@ -1429,6 +1443,7 @@ color = Color(0.03, 0.04, 0.07, 1)
 polygon = PackedVector2Array(1276.1, -140, 1276.1, -155.6, 1274.8, -159.5, 1277.4, -164.7, 1282.6, -164.7, 1285.2, -159.5, 1283.9, -155.6, 1283.9, -140)
 
 [node name="Silhouette" type="Polygon2D" parent="FarRidges"]
+visible = false
 color = Color(0.07, 0.09, 0.14, 1)
 polygon = PackedVector2Array(680, 60, 680, -44, 730, -50, 730, -70, 820, -68, 820, -55, 910, -41, 910, -95, 1000, -105, 1000, -60, 1090, -58, 1090, -120, 1180, -106, 1180, -80, 1270, -90, 1270, -140, 1360, -138, 1360, -90, 1450, -76, 1450, -110, 1540, -120, 1540, -70, 1630, -68, 1630, -150, 1720, -136, 1720, -100, 1810, -110, 1810, -165, 1900, -163, 1900, -120, 1990, -106, 1990, -180, 2080, -190, 2080, 60)
 
@@ -1436,6 +1451,12 @@ polygon = PackedVector2Array(680, 60, 680, -44, 730, -50, 730, -70, 820, -68, 82
 position = Vector2(1000, 0)
 color = Color(0.025, 0.035, 0.06, 1)
 polygon = PackedVector2Array(0, -150, 26, -196, 50, -214, 80, -205, 104, -170, 118, -150)
+
+[node name="Escarpment" type="Sprite2D" parent="FarRidges"]
+light_mask = 2
+position = Vector2(700, -220)
+texture = ExtResource("r_abyss_escarpment")
+centered = false
 
 [node name="RitualLayer" type="Parallax2D" parent="."]
 scroll_scale = Vector2(0.5, 1)
@@ -1722,12 +1743,36 @@ texture = ExtResource("7_terrain")
 centered = false
 
 [node name="GreyboxGround" type="Polygon2D" parent="Terrain"]
+visible = false
 color = Color(0.2, 0.24, 0.28, 1)
 polygon = PackedVector2Array(1440, -3.33, 1480, -10, 1540, -10, 1600, 0, 2150, 0, 2150, 16, 2160, 16, 2160, 32, 2170, 32, 2170, 48, 2290, 48, 2290, 0, 2780, 0, 2780, -14, 2812, -14, 2812, 0, 3004, 0, 3004, -14, 3036, -14, 3036, 0, 3584, 0, 3584, -14, 3612, -14, 3612, 0, 4544, 0, 4544, 60, 1440, 60)
 
 [node name="GroundBlend" type="Polygon2D" parent="Terrain"]
+visible = false
 polygon = PackedVector2Array(1440, -3.33, 1480, -10, 1540, -10, 1600, 0, 1640, 0, 1640, 60, 1440, 60)
 vertex_colors = PackedColorArray(0.36, 0.32, 0.33, 1.00, 0.36, 0.32, 0.33, 0.80, 0.36, 0.32, 0.33, 0.50, 0.36, 0.32, 0.33, 0.20, 0.36, 0.32, 0.33, 0.00, 0.15, 0.15, 0.2, 0, 0.15, 0.15, 0.2, 1)
+
+[node name="AbyssGround" type="Node2D" parent="."]
+
+[node name="Tile0" type="Sprite2D" parent="AbyssGround"]
+position = Vector2(1440, -220)
+texture = ExtResource("r_abyss_ground_0")
+centered = false
+
+[node name="Tile1" type="Sprite2D" parent="AbyssGround"]
+position = Vector2(2216, -220)
+texture = ExtResource("r_abyss_ground_1")
+centered = false
+
+[node name="Tile2" type="Sprite2D" parent="AbyssGround"]
+position = Vector2(2992, -220)
+texture = ExtResource("r_abyss_ground_2")
+centered = false
+
+[node name="Tile3" type="Sprite2D" parent="AbyssGround"]
+position = Vector2(3768, -220)
+texture = ExtResource("r_abyss_ground_3")
+centered = false
 
 [node name="ReferenceSection" type="Node2D" parent="."]
 

@@ -80,9 +80,9 @@ func test_shore_keeps_the_greybox_level_up_to_where_the_acts_carry_on(h) -> void
 	level.free()
 
 
-## Past the art, the backdrop must hide every parallax layer running out, and no gap may show.
-## The Shore's art meets the finished reference section, which runs on to where the greybox begins.
-func test_art_ends_where_the_greybox_begins(h) -> void:
+## No gap may show along the route: the Shore's art meets the finished reference section, and that meets the Abyss's
+## ground, which runs on to the end. The far view runs on behind it, and the greybox that stood there is hidden.
+func test_the_art_runs_unbroken_to_the_end_of_the_route(h) -> void:
 	await _setup(h)
 	var art: Sprite2D = h.fixture.get_node("Terrain/Art")
 	h.check_near(art.position.x + art.texture.get_width(), ART_END_X, 0.0, "right edge of the terrain art")
@@ -90,13 +90,34 @@ func test_art_ends_where_the_greybox_begins(h) -> void:
 	h.check(section.position.x <= ART_END_X, "the reference section starts at %.0f, leaving a gap after the Shore" % section.position.x)
 	h.check_near(section.position.x + section.texture.get_width(), SECTION_END_X, 0.0, "right edge of the reference section")
 	var camera: Camera2D = h.fixture.get_node("CameraRig")
-	var ground: Rect2 = _bounds(h.fixture.get_node("Terrain/GreyboxGround").polygon)
-	h.check_near(ground.position.x, SECTION_END_X, 0.0, "left edge of the greybox ground")
-	h.check_near(ground.end.x, camera.limit_right, 0.0, "right edge of the greybox ground")
-	var backdrop: Rect2 = _bounds(h.fixture.get_node("GreyboxBackdrop").polygon)
-	h.check_near(backdrop.position.x, SECTION_END_X, 0.0, "left edge of the backdrop")
-	h.check_near(backdrop.end.x, camera.limit_right, 0.0, "right edge of the backdrop")
-	h.check(backdrop.position.y <= camera.limit_top and backdrop.end.y >= camera.limit_bottom, "the backdrop does not fill the view's height")
+	var edge := SECTION_END_X
+	for tile in h.fixture.get_node("AbyssGround").get_children():
+		h.check_near(tile.position.x, edge, 0.0, "left edge of %s" % tile.name)
+		h.check_near(tile.position.y, section.position.y, 0.0, "top of %s" % tile.name)
+		edge = tile.position.x + tile.texture.get_width()
+	h.check_near(edge, camera.limit_right, 0.0, "right edge of the Abyss's ground")
+	# The far view: one clip from the cave to the end, and the plain carried on where the reference section's stops.
+	var view: Rect2 = _bounds(h.fixture.get_node("AbyssView").polygon)
+	h.check_near(view.end.x, camera.limit_right, 0.0, "right edge of the far view's clip")
+	h.check(view.position.y <= camera.limit_top and view.end.y >= camera.limit_bottom, "the far view's clip does not fill the view's height")
+	var far: Sprite2D = h.fixture.get_node("AbyssView/Far/Art")
+	var plain: Sprite2D = h.fixture.get_node("AbyssView/Far/Plain")
+	h.check_near(plain.position.x, far.position.x + far.texture.get_width(), 0.0, "left edge of the far plain")
+	h.check_near(plain.position.y, far.position.y, 0.0, "top of the far plain")
+	var parallax: Parallax2D = h.fixture.get_node("AbyssView/Far")
+	h.check(plain.position.x + plain.texture.get_width() >= camera.limit_right * parallax.scroll_scale.x + 480.0, "the far plain ends before the route does, even with the camera pulled back")
+	for path in ["Terrain/GreyboxGround", "Terrain/GroundBlend", "GreyboxBackdrop", "CanyonRim", "FarRidges/Silhouette"]:
+		h.check(not h.fixture.get_node(path).visible, "the greybox %s still shows" % path)
+
+
+## The watcher drops behind the far cliff and the distant shape rises from behind it, so the cliff is drawn after both.
+func test_the_far_cliff_is_in_front_of_the_watcher_and_the_distant_shape(h) -> void:
+	await _setup(h)
+	var ridges: Node = h.fixture.get_node("FarRidges")
+	var cliff: Sprite2D = ridges.get_node("Escarpment")
+	h.check(cliff.get_index() > ridges.get_node("WatcherFar").get_index(), "the watcher is drawn over the far cliff")
+	h.check(cliff.get_index() > ridges.get_node("DistantShape").get_index(), "the distant shape is drawn over the far cliff")
+	h.check_near((ridges as Parallax2D).scroll_scale.x, (h.fixture.get_node("AbyssView/Far") as Parallax2D).scroll_scale.x, 0.0, "the far cliff does not move with the plain it stands on")
 
 
 func _bounds(polygon: PackedVector2Array) -> Rect2:

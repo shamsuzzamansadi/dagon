@@ -9,6 +9,7 @@ import pathlib
 
 from PIL import Image
 
+import gen_abyss
 import gen_boat
 import gen_sailor
 import gen_cave
@@ -20,6 +21,7 @@ import gen_ui
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 OUT = ROOT / "project" / "assets" / "shore"
 CAVE_OUT = OUT.parent / "cave"
+ABYSS_OUT = OUT.parent / "abyss"
 PROLOGUE_OUT = OUT.parent / "prologue"
 REVEAL_OUT = OUT.parent / "reveal"
 UI_OUT = ROOT / "project" / "assets" / "ui"
@@ -131,6 +133,11 @@ def main():
     gen_cave.ritual_far().save(CAVE_OUT / "ritual_far.png")
     gen_cave.foreground_cave().save(CAVE_OUT / "foreground_cave.png")
     gen_cave.shaft().save(CAVE_OUT / "shaft.png")
+    ABYSS_OUT.mkdir(parents=True, exist_ok=True)
+    for index, tile in enumerate(gen_abyss.ground_tiles()):
+        tile.save(ABYSS_OUT / f"abyss_ground_{index}.png")
+    gen_abyss.far_plain().save(ABYSS_OUT / "abyss_far_plain.png")
+    gen_abyss.escarpment().save(ABYSS_OUT / "abyss_escarpment.png")
     PROLOGUE_OUT.mkdir(parents=True, exist_ok=True)
     for name, draw in gen_prologue.PANELS.items():
         draw().save(PROLOGUE_OUT / name)
