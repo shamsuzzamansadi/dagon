@@ -1,3 +1,18 @@
+abyss.crossing: word for word
+   5.92 s, 14.7 chars/s, -24.0 dB RMS, peak -2.0 dBFS
+   script: It struck the raised end, and the slab came down level with a sound I felt in my teeth.
+   heard:  It struck the raised end, and the slab came down level with a sound I felt in my teeth.
+   words:  It@0.00 struck@0.22 the@0.52 raised@0.78 end,@1.18 and@1.90 the@2.08 slab@2.26 came@2.58 down@2.90 level@3.30 with@3.60 a@3.88 sound@4.08 I@4.38 felt@4.60 in@4.88 my@5.08 teeth.@5.28
+abyss.ritual: word for word
+   5.41 s, 12.9 chars/s, -24.0 dB RMS, peak -4.2 dBFS
+   script: Figures, far off among the stones. Kneeling, all of them. All but one.
+   heard:  figures, far off among the stones, kneeling, all of them, all but one.
+   words:  figures,@0.00 far@1.00 off@1.14 among@1.44 the@1.70 stones,@1.98 kneeling,@2.94 all@3.34 of@3.56 them,@3.74 all@4.28 but@4.44 one.@4.64
+abyss.watcher: word for word
+   5.52 s, 12.3 chars/s, -24.0 dB RMS, peak -2.6 dBFS
+   script: Upright, on the ridge. I looked again, and there was only the ridge.
+   heard:  upright on the ridge. I looked again and there was only the ridge.
+   words:  upright@0.00 on@0.54 the@1.10 ridge.@1.24 I@2.16 looked@2.52 again@2.78 and@3.26 there@3.68 was@3.86 only@4.06 the@4.50 ridge.@4.68
 cave.carving: word for word
    12.15 s, 12.5 chars/s, -24.0 dB RMS, peak -5.9 dBFS
    script: The same eye. The same waves, cut deep into the rock, and an arm coiled round them, each sucker cut with care. It isn't worn. Someone has kept it clean.
@@ -23,6 +38,21 @@ ending.rising: word for word
    script: Those figures bowed for a reason. Whatever rose that night did not rise for me, and I do not think it has finished rising.
    heard:  Those figures bowed for a reason. Whatever rose that night did not rise for me, and I do not think it has finished rising.
    words:  Those@0.00 figures@0.40 bowed@0.88 for@1.38 a@1.78 reason.@1.96 Whatever@2.84 rose@3.10 that@3.46 night@3.74 did@4.02 not@4.20 rise@4.46 for@4.78 me,@5.06 and@5.48 I@5.62 do@5.76 not@5.90 think@6.12 it@6.34 has@6.50 finished@6.72 rising.@7.16
+flee.back: word for word
+   2.19 s, 11.4 chars/s, -24.0 dB RMS, peak -7.0 dBFS
+   script: Don't look back. Don't...
+   heard:  Don't look back. Don't.
+   words:  Don't@0.00 look@0.32 back.@0.44 Don't.@1.56
+flee.sea: word for word
+   2.45 s, 13.1 chars/s, -24.0 dB RMS, peak -6.0 dBFS
+   script: The sea. The sea is coming back.
+   heard:  The sea. The sea is coming back.
+   words:  The@0.00 sea.@0.20 The@0.94 sea@1.18 is@1.40 coming@1.56 back.@1.78
+monolith.first: word for word
+   6.46 s, 13.3 chars/s, -24.0 dB RMS, peak -2.9 dBFS
+   script: The canyon opens, and then there is only that. I do not know who could have raised it.
+   heard:  The canyon opens, and then there is only that. I do not know who could have raised it.
+   words:  The@0.00 canyon@0.20 opens,@0.48 and@1.38 then@1.62 there@1.88 is@2.24 only@2.40 that.@2.68 I@3.60 do@3.88 not@4.10 know@4.40 who@4.72 could@5.12 have@5.36 raised@5.56 it.@5.86
 prologue.drift: word for word
    8.00 s, 13.2 chars/s, -24.0 dB RMS, peak -3.2 dBFS
    script: After that there was only the sea, and the sun, and no land in any direction. I stopped counting the days.
@@ -58,4 +88,24 @@ shore.talisman: word for word
    script: Something small, half sunk in the mud. An eye, cut above a line of waves. It is heavier than it should be, and someone wore it smooth.
    heard:  Something small, half sunk in the mud, an eye cut above a line of waves. It is heavier than it should be, and someone wore it smooth.
    words:  Something@0.00 small,@0.48 half@1.64 sunk@1.72 in@2.06 the@2.30 mud,@2.42 an@3.16 eye@3.28 cut@3.62 above@4.10 a@4.38 line@4.58 of@4.80 waves.@4.98 It@5.86 is@6.08 heavier@6.28 than@6.56 it@6.90 should@7.06 be,@7.26 and@7.84 someone@8.06 wore@8.52 it@8.88 smooth.@9.06
-12 lines, 0 differing
+story.awakened: word for word
+   4.73 s, 14.2 chars/s, -24.0 dB RMS, peak -4.5 dBFS
+   script: The stones answered. Somewhere behind the rock, something gave way.
+   heard:  the stones answered. Somewhere behind the rock, something gave way
+   words:  the@0.00 stones@0.16 answered.@0.52 Somewhere@1.52 behind@1.94 the@2.36 rock,@2.54 something@3.32 gave@3.58 way@3.94
+story.recoil: word for word
+   3.75 s, 12.8 chars/s, -24.0 dB RMS, peak -4.7 dBFS
+   script: The carving. The same arm, round the same stone.
+   heard:  The carving. The same arm round the same stone.
+   words:  The@0.00 carving.@0.20 The@1.12 same@1.34 arm@1.68 round@2.04 the@2.52 same@2.78 stone.@3.10
+story.reveal: word for word
+   3.63 s, 14.6 chars/s, -24.0 dB RMS, peak -5.3 dBFS
+   script: It was no ridge. It had been beside me the whole way.
+   heard:  It was no ridge. It had been beside me the whole way.
+   words:  It@0.00 was@0.20 no@0.38 ridge.@0.66 It@1.40 had@1.52 been@1.66 beside@1.82 me@2.30 the@2.60 whole@2.76 way.@2.96
+story.run: word for word
+   2.00 s, 11.5 chars/s, -24.0 dB RMS, peak -8.1 dBFS
+   script: Its head turned. I ran.
+   heard:  Its head turned. I ran.
+   words:  Its@0.00 head@0.24 turned.@0.46 I@1.32 ran.@1.38
+22 lines, 0 differing

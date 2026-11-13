@@ -617,7 +617,7 @@ tracks/1/path = NodePath("Hud")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(4.6, 12.2),
+"times": PackedFloat32Array(4.3, 12.2),
 "transitions": PackedFloat32Array(1, 1),
 "values": [{
 "args": [&"story.reveal"],
@@ -936,7 +936,7 @@ tracks/26/path = NodePath("Hud")
 tracks/26/interp = 1
 tracks/26/loop_wrap = true
 tracks/26/keys = {
-"times": PackedFloat32Array(9.6),
+"times": PackedFloat32Array(8.2),
 "transitions": PackedFloat32Array(1),
 "values": [{
 "args": [&"story.recoil"],

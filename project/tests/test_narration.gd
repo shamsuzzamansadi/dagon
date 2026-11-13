@@ -22,6 +22,16 @@ const VOICED := {
 	"ending.listen": "I have stopped arguing",
 	"ending.innsmouth": "called Innsmouth",
 	"ending.rising": "finished rising",
+	"abyss.ritual": "Kneeling, all of them",
+	"abyss.crossing": "felt in my teeth",
+	"abyss.watcher": "only the ridge",
+	"monolith.first": "who could have raised it",
+	"story.awakened": "The stones answered",
+	"story.reveal": "It was no ridge",
+	"story.recoil": "The same arm",
+	"story.run": "I ran",
+	"flee.back": "Don't look back",
+	"flee.sea": "The sea is coming back",
 }
 const PROLOGUE := "res://scenes/ui/prologue.tscn"
 const VOICED_LINE := &"shore.talisman"
@@ -219,7 +229,7 @@ func test_an_optional_line_cannot_touch_a_story_moment_and_is_not_queued(h) -> v
 		_hud(h).say(VOICED_LINE)
 	h.check(_hud(h).get_current_line() == STORY_LINE, "the line is %s" % _hud(h).get_current_line())
 	h.check(_caption(h).text == _script_text(STORY_LINE), "the caption reads '%s'" % _caption(h).text)
-	h.check(not _voice(h).playing, "an optional line's audio played over a story moment")
+	h.check(not (_voice(h).playing and _voice(h).stream == _audio(VOICED_LINE)), "an optional line's audio played over a story moment")
 	await h.wait_until(func() -> bool: return not _hud(h).is_speaking(), 500, "the story moment to end")
 	await h.steps(10)
 	h.check(not _caption(h).visible and not _voice(h).playing, "something queued played afterwards: '%s'" % _caption(h).text)
@@ -231,7 +241,7 @@ func test_a_story_moment_replaces_anything(h) -> void:
 	await h.steps(5)
 	_hud(h).say(STORY_LINE)
 	h.check(_hud(h).get_current_line() == STORY_LINE, "the line is %s" % _hud(h).get_current_line())
-	h.check(not _voice(h).playing, "the old audio went on")
+	h.check(not (_voice(h).playing and _voice(h).stream == _audio(VOICED_LINE)), "the old audio went on")
 
 
 func test_feedback_the_player_just_caused_replaces_what_is_being_said(h) -> void:
@@ -767,3 +777,35 @@ func test_the_settings_rows_save_and_come_back(h) -> void:
 	h.check_near(AudioServer.get_bus_volume_db(AudioServer.get_bus_index("Narration")), linear_to_db(0.3), 0.05, "the Narration bus")
 	session.get_node("PauseLayer/PauseMenu/Settings").restore_defaults()
 	h.check(subtitles.text == "Subtitles: On" and vibration.text == "Controller vibration: On", "the defaults came back as '%s' and '%s'" % [subtitles.text, vibration.text])
+
+
+func _audio(id: StringName) -> AudioStream:
+	var path := "res://assets/narration/%s.ogg" % id
+	return load(path) if ResourceLoader.exists(path) else null
+
+
+## A voiced line in a clip is heard out before the clip's next line replaces it: a story line replaces anything, so a
+## next line too soon would cut the voice off mid-sentence.
+func test_every_voiced_line_in_a_clip_is_heard_out_before_the_next(h) -> void:
+	var world := await _world(h)
+	var checked := 0
+	for player_name in ["Cinematics", "Atmosphere", "Background"]:
+		var player: AnimationPlayer = world.get_node(player_name)
+		for clip_name in player.get_animation_list():
+			var clip: Animation = player.get_animation(clip_name)
+			var said := []
+			for track in clip.get_track_count():
+				if clip.track_get_type(track) != Animation.TYPE_METHOD or not String(clip.track_get_path(track)).ends_with("Hud"):
+					continue
+				for key in clip.track_get_key_count(track):
+					if clip.method_track_get_name(track, key) == &"say":
+						said.append([clip.track_get_key_time(track, key), clip.method_track_get_params(track, key)[0]])
+			said.sort_custom(func(a, b) -> bool: return a[0] < b[0])
+			for i in range(said.size() - 1):
+				var voice := _audio(said[i][1])
+				if voice == null:
+					continue
+				checked += 1
+				var gap: float = said[i + 1][0] - said[i][0]
+				h.check(voice.get_length() + 0.2 <= gap, "in %s, %s lasts %.2f s but %s comes %.2f s after it" % [clip_name, said[i][1], voice.get_length(), said[i + 1][1], gap])
+	h.check(checked >= 2, "only %d voiced lines are followed by another in a clip" % checked)
