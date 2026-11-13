@@ -1,0 +1,36 @@
+M4: deliberate breakage of the new logic, by tools/breakage.py with tools/breakage_m4.py. Simulated input only.
+Each breakage is built, then the native unit tests and the integration suite are run; clean controls before and after on each worker.
+
+== At e24d726: all 17, three workers
+CAUGHT           3  The prologue is silent
+CAUGHT           7  A new game opens on him already standing
+NOT CAUGHT       0  Every world built shows the waking, Continue and Restart too
+CAUGHT           1  He wakes outside the Shore
+CAUGHT           2  The waking has no pose
+CAUGHT           7  Finishing the prologue starts on him standing
+CAUGHT           1  The last picture's sea and wind fade before the cut
+CAUGHT           2  The menu's own focus is heard as a move
+CAUGHT           1  Settings' own focus is heard as a move
+CAUGHT           1  Moving between choices is silent
+CAUGHT           1  Choosing is silent
+CAUGHT           1  Going back is silent
+CAUGHT          26  A press that changes the scene still tries to sound
+CAUGHT           1  Examining is silent
+CAUGHT           1  Pressing a stone is heard as examining
+CAUGHT           1  The Abyss is one sound again
+CAUGHT           1  The recognition is cut off by the run
+
+commit e24d726, 17 breakages, {'CAUGHT': 16, 'NOT CAUGHT': 1}, controls held, summary complete, 912 s
+BREAKAGE_RESULT valid=yes
+
+== The survivor closed: d0d0606 adds a check that a new game's waking is spent once it begins. The one breakage, re-run alone with its controls:
+CAUGHT           1  Every world built shows the waking, Continue and Restart too
+
+commit d0d0606, 1 breakages, {'CAUGHT': 1}, controls held, summary complete, 299 s
+BREAKAGE_RESULT valid=yes
+=== Every world built shows the waking, Continue and Restart too: CAUGHT (1 failing)
+    unit exit=0 unit failed=0, runner exit=1 passed=438 failed=1
+    FAIL test_opening.test_a_new_game_opens_on_him_getting_up_and_then_the_game_is_his
+control after: NOT CAUGHT passed=439 failed=0
+control before: NOT CAUGHT passed=439 failed=0 unit_failed=0
+control after: NOT CAUGHT passed=439 failed=0
