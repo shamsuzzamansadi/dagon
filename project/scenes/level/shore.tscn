@@ -35,6 +35,16 @@
 [ext_resource type="Texture2D" path="res://assets/abyss/abyss_escarpment.png" id="r_abyss_escarpment"]
 [ext_resource type="Texture2D" path="res://assets/abyss/abyss_slab.png" id="r_abyss_slab"]
 [ext_resource type="Texture2D" path="res://assets/abyss/abyss_stone.png" id="r_abyss_stone"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_canyon.png" id="r_abyss_canyon"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_statues.png" id="r_abyss_statues"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_gate.png" id="r_abyss_gate"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_trench.png" id="r_abyss_trench"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_glyphkneel.png" id="r_abyss_glyphkneel"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_glyphkneel_lit.png" id="r_abyss_glyphkneel_lit"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_glypheye.png" id="r_abyss_glypheye"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_glypheye_lit.png" id="r_abyss_glypheye_lit"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_glyphwave.png" id="r_abyss_glyphwave"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_glyphwave_lit.png" id="r_abyss_glyphwave_lit"]
 [ext_resource type="Texture2D" path="res://assets/cave/ritual_far.png" id="r_ritual_far"]
 [ext_resource type="Texture2D" path="res://assets/cave/foreground_cave.png" id="r_fg_cave"]
 [ext_resource type="Texture2D" path="res://assets/cave/shaft.png" id="r_shaft"]
@@ -1547,10 +1557,12 @@ centered = false
 [node name="Trench" type="Node2D" parent="."]
 
 [node name="Sky" type="Polygon2D" parent="Trench"]
+visible = false
 color = Color(0.17, 0.23, 0.27, 1)
 polygon = PackedVector2Array(4544, -700, 5400, -700, 5400, 60, 4544, 60)
 
 [node name="Water" type="Polygon2D" parent="Trench"]
+visible = false
 color = Color(0.05, 0.11, 0.13, 1)
 polygon = PackedVector2Array(4544, 20, 5400, 20, 5400, 60, 4544, 60)
 
@@ -1582,8 +1594,14 @@ color = Color(0.26, 0.28, 0.29, 1)
 polygon = PackedVector2Array(1964, -0, 1966.3, -24.7, 1973.3, -48.6, 1984.5, -70.7, 1999.8, -90.4, 2018.4, -106.8, 2039.8, -119.4, 2063.2, -127.9, 2087.7, -131.7, 2112.5, -131, 2136.8, -125.5, 2159.6, -115.7, 2180.1, -101.7, 2174.4, -94.8, 2155.3, -107.8, 2134, -117, 2111.4, -122, 2088.3, -122.8, 2065.4, -119.1, 2043.6, -111.3, 2023.7, -99.5, 2006.3, -84.2, 1992.1, -65.9, 1981.6, -45.3, 1975.2, -23, 1973, -0)
 
 [node name="CanyonBack" type="Polygon2D" parent="ActArt"]
+visible = false
 color = Color(0.085, 0.105, 0.145, 1)
 polygon = PackedVector2Array(3540, 0, 3540, -120, 3600, -190, 3680, -210, 3780, -330, 3820, -520, 4310, -520, 4400, -260, 4470, -170, 4544, -120, 4544, 0)
+
+[node name="CanyonWall" type="Sprite2D" parent="ActArt"]
+position = Vector2(3540, -520)
+texture = ExtResource("r_abyss_canyon")
+centered = false
 
 [node name="CaveBack" type="Polygon2D" parent="ActArt"]
 visible = false
@@ -1620,6 +1638,11 @@ visible = false
 position = Vector2(3690, 0)
 color = Color(0.03, 0.04, 0.07, 1)
 polygon = PackedVector2Array(-3.6, 0, -3.6, -14.4, -4.8, -18, -2.4, -22.8, 2.4, -22.8, 4.8, -18, 3.6, -14.4, 3.6, 0)
+
+[node name="Drawn" type="Sprite2D" parent="Trench"]
+position = Vector2(4544, -700)
+texture = ExtResource("r_abyss_trench")
+centered = false
 
 [node name="Splash" type="CPUParticles2D" parent="Trench"]
 z_index = 2
@@ -2232,12 +2255,19 @@ color = Color(0.36, 0.42, 0.45, 1)
 polygon = PackedVector2Array(3915, -54, 3920, -59, 3928, -59, 3933, -54, 3928, -49, 3920, -49)
 
 [node name="StatueA" type="Polygon2D" parent="Monolith"]
+visible = false
 color = Color(0.2, 0.235, 0.27, 1)
 polygon = PackedVector2Array(3949, 0, 3949, -7, 3954, -9, 3956, -17, 3958, -26, 3960, -33, 3962, -37, 3969, -41, 3975, -39, 3977, -33, 3973, -30, 3967, -30, 3966, -23, 3974, -35, 3976, -34, 3969, -17, 3966, -11, 3969, -7, 3971, 0)
 
 [node name="StatueB" type="Polygon2D" parent="Monolith"]
+visible = false
 color = Color(0.2, 0.235, 0.27, 1)
 polygon = PackedVector2Array(4225, 0, 4225, -7, 4230, -9, 4232, -17, 4234, -26, 4236, -33, 4238, -37, 4245, -41, 4251, -39, 4253, -33, 4249, -30, 4243, -30, 4242, -23, 4250, -35, 4252, -34, 4245, -17, 4242, -11, 4245, -7, 4247, 0)
+
+[node name="Statues" type="Sprite2D" parent="Monolith"]
+position = Vector2(3949, -41)
+texture = ExtResource("r_abyss_statues")
+centered = false
 
 [node name="MuralLit" type="Node2D" parent="Monolith"]
 visible = false
@@ -2345,20 +2375,33 @@ prompt = "Press the kneeling stone"
 shape = SubResource("stone_shape")
 
 [node name="Art" type="Polygon2D" parent="Monolith/GlyphKneel"]
+visible = false
 position = Vector2(0, 16)
 color = Color(0.3, 0.34, 0.38, 1)
 polygon = PackedVector2Array(-13, 0, -14, -24, -9, -31, 8, -32, 14, -25, 13, 0)
 
 [node name="Mark" type="Polygon2D" parent="Monolith/GlyphKneel"]
+visible = false
 position = Vector2(0, 16)
 color = Color(0.36, 0.42, 0.45, 1)
 polygon = PackedVector2Array(-7, -9, -7, -12, -3, -12, 0, -18, 3, -21, 7, -22, 8, -18, 5, -15, 2, -13, 0, -9)
+
+[node name="Drawn" type="Sprite2D" parent="Monolith/GlyphKneel"]
+position = Vector2(-14, -16)
+texture = ExtResource("r_abyss_glyphkneel")
+centered = false
 
 [node name="Lit" type="Node2D" parent="Monolith/GlyphKneel"]
 visible = false
 position = Vector2(0, 16)
 
+[node name="Drawn" type="Sprite2D" parent="Monolith/GlyphKneel/Lit"]
+position = Vector2(-14, -32)
+texture = ExtResource("r_abyss_glyphkneel_lit")
+centered = false
+
 [node name="Mark" type="Polygon2D" parent="Monolith/GlyphKneel/Lit"]
+visible = false
 color = Color(0.5, 0.92, 0.78, 1)
 polygon = PackedVector2Array(-7, -9, -7, -12, -3, -12, 0, -18, 3, -21, 7, -22, 8, -18, 5, -15, 2, -13, 0, -9)
 
@@ -2374,20 +2417,33 @@ prompt = "Press the eye stone"
 shape = SubResource("stone_shape")
 
 [node name="Art" type="Polygon2D" parent="Monolith/GlyphEye"]
+visible = false
 position = Vector2(0, 16)
 color = Color(0.3, 0.34, 0.38, 1)
 polygon = PackedVector2Array(-13, 0, -14, -24, -9, -31, 8, -32, 14, -25, 13, 0)
 
 [node name="Mark" type="Polygon2D" parent="Monolith/GlyphEye"]
+visible = false
 position = Vector2(0, 16)
 color = Color(0.36, 0.42, 0.45, 1)
 polygon = PackedVector2Array(-9, -18, -4, -23, 4, -23, 9, -18, 4, -13, -4, -13)
+
+[node name="Drawn" type="Sprite2D" parent="Monolith/GlyphEye"]
+position = Vector2(-14, -16)
+texture = ExtResource("r_abyss_glypheye")
+centered = false
 
 [node name="Lit" type="Node2D" parent="Monolith/GlyphEye"]
 visible = false
 position = Vector2(0, 16)
 
+[node name="Drawn" type="Sprite2D" parent="Monolith/GlyphEye/Lit"]
+position = Vector2(-14, -32)
+texture = ExtResource("r_abyss_glypheye_lit")
+centered = false
+
 [node name="Mark" type="Polygon2D" parent="Monolith/GlyphEye/Lit"]
+visible = false
 color = Color(0.5, 0.92, 0.78, 1)
 polygon = PackedVector2Array(-9, -18, -4, -23, 4, -23, 9, -18, 4, -13, -4, -13)
 
@@ -2403,29 +2459,44 @@ prompt = "Press the wave stone"
 shape = SubResource("stone_shape")
 
 [node name="Art" type="Polygon2D" parent="Monolith/GlyphWave"]
+visible = false
 position = Vector2(0, 16)
 color = Color(0.3, 0.34, 0.38, 1)
 polygon = PackedVector2Array(-13, 0, -14, -24, -9, -31, 8, -32, 14, -25, 13, 0)
 
 [node name="MarkA" type="Polygon2D" parent="Monolith/GlyphWave"]
+visible = false
 position = Vector2(0, 16)
 color = Color(0.36, 0.42, 0.45, 1)
 polygon = PackedVector2Array(-8, -21, -4, -25, 0, -21, 4, -25, 8, -21, 8, -18, 4, -22, 0, -18, -4, -22, -8, -18)
 
 [node name="MarkB" type="Polygon2D" parent="Monolith/GlyphWave"]
+visible = false
 position = Vector2(0, 16)
 color = Color(0.36, 0.42, 0.45, 1)
 polygon = PackedVector2Array(-8, -14, -4, -18, 0, -14, 4, -18, 8, -14, 8, -11, 4, -15, 0, -11, -4, -15, -8, -11)
+
+[node name="Drawn" type="Sprite2D" parent="Monolith/GlyphWave"]
+position = Vector2(-14, -16)
+texture = ExtResource("r_abyss_glyphwave")
+centered = false
 
 [node name="Lit" type="Node2D" parent="Monolith/GlyphWave"]
 visible = false
 position = Vector2(0, 16)
 
+[node name="Drawn" type="Sprite2D" parent="Monolith/GlyphWave/Lit"]
+position = Vector2(-14, -32)
+texture = ExtResource("r_abyss_glyphwave_lit")
+centered = false
+
 [node name="MarkA" type="Polygon2D" parent="Monolith/GlyphWave/Lit"]
+visible = false
 color = Color(0.5, 0.92, 0.78, 1)
 polygon = PackedVector2Array(-8, -21, -4, -25, 0, -21, 4, -25, 8, -21, 8, -18, 4, -22, 0, -18, -4, -22, -8, -18)
 
 [node name="MarkB" type="Polygon2D" parent="Monolith/GlyphWave/Lit"]
+visible = false
 color = Color(0.5, 0.92, 0.78, 1)
 polygon = PackedVector2Array(-8, -14, -4, -18, 0, -14, 4, -18, 8, -14, 8, -11, 4, -15, 0, -11, -4, -15, -8, -11)
 
@@ -2434,10 +2505,16 @@ position = Vector2(4300, -150)
 collision_layer = 1
 collision_mask = 0
 
+[node name="Drawn" type="Sprite2D" parent="Monolith/Gate"]
+position = Vector2(-8, -150)
+texture = ExtResource("r_abyss_gate")
+centered = false
+
 [node name="Shape" type="CollisionShape2D" parent="Monolith/Gate"]
 shape = SubResource("gate_shape")
 
 [node name="Visual" type="Polygon2D" parent="Monolith/Gate"]
+visible = false
 color = Color(0.33, 0.37, 0.4, 1)
 polygon = PackedVector2Array(-8, 150, -8, -150, 8, -150, 8, 150)
 

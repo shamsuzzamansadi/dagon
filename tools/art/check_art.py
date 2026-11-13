@@ -29,7 +29,8 @@ CAVE_OUT = ROOT / "project" / "assets" / "cave"
 CAVE_ARTWORK = ["cave_front", "cave_wall", "abyss_far", "ritual_far", "foreground_cave"]
 ABYSS_OUT = ROOT / "project" / "assets" / "abyss"
 ABYSS_TILES = 4
-ABYSS_ARTWORK = [f"abyss_ground_{i}" for i in range(ABYSS_TILES)] + ["abyss_far_plain", "abyss_escarpment", "abyss_slab", "abyss_stone"]
+ABYSS_ARTWORK = [f"abyss_ground_{i}" for i in range(ABYSS_TILES)] + ["abyss_far_plain", "abyss_escarpment", "abyss_slab", "abyss_stone", "abyss_canyon", "abyss_statues",
+    "abyss_gate", "abyss_trench"] + [f"abyss_glyph{n}{lit}" for n in ("kneel", "eye", "wave") for lit in ("", "_lit")]
 ABYSS_X0 = 1440
 ABYSS_GROUND = range(1440, 4520)
 ESCARPMENT_X0 = 700

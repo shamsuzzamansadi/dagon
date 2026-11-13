@@ -140,6 +140,13 @@ def main():
     gen_abyss.escarpment().save(ABYSS_OUT / "abyss_escarpment.png")
     gen_abyss.crossing_slab()[0].save(ABYSS_OUT / "abyss_slab.png")
     gen_abyss.crossing_stone()[0].save(ABYSS_OUT / "abyss_stone.png")
+    gen_abyss.canyon_wall()[0].save(ABYSS_OUT / "abyss_canyon.png")
+    gen_abyss.statues()[0].save(ABYSS_OUT / "abyss_statues.png")
+    gen_abyss.gate()[0].save(ABYSS_OUT / "abyss_gate.png")
+    for name in gen_abyss.GLYPH_STONES:
+        gen_abyss.glyph_stone(name)[0].save(ABYSS_OUT / f"abyss_{name.lower()}.png")
+        gen_abyss.glyph_stone(name, lit=True)[0].save(ABYSS_OUT / f"abyss_{name.lower()}_lit.png")
+    gen_abyss.trench().save(ABYSS_OUT / "abyss_trench.png")
     PROLOGUE_OUT.mkdir(parents=True, exist_ok=True)
     for name, draw in gen_prologue.PANELS.items():
         draw().save(PROLOGUE_OUT / name)

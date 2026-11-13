@@ -148,8 +148,15 @@ def ground():
     draw_props(img, noise)
     draw_footprint(img, noise)
     draw_prints(img)
-    for x in range(END_WALL_X, X1):
-        pass  # The ground runs on under the last wall, which is not drawn.
+    # The ground runs on under the last wall, which is not drawn, and past it breaks off into the trench, where nobody
+    # can stand: the crust falls away to the water, its broken edge lit.
+    for x in range(TRENCH_LIP, X1):
+        col = x - X0
+        drop = round((TRENCH_WATER + 2) * smooth(x, TRENCH_LIP, X1) + 3 * noise(x / 3.0, 61.0))
+        for row in range(GROUND_ROW - 40, GROUND_ROW + drop):
+            img.putpixel((col, row), (0, 0, 0, 0))
+        put(img, col, GROUND_ROW + drop, "E4" if noise(x / 2.0, 62.0) > 0.4 else "E3")
+        put(img, col, GROUND_ROW + drop + 1, "E2")
     return img
 
 
@@ -727,6 +734,65 @@ def rib_arch():
                     color = "T1" if across < 0.5 else "T0"
                 put(img, col, row, color)
     return img, (x0, y0)
+
+
+# ---------------------------------------------------------------- the statues and the trench
+
+
+def statues():
+    """The two figures either side of the stones, worn to the shape of the one on the second shelf: dark against the
+    Monolith's face, as the greybox had them, lit only along their tops. One image, in world space."""
+    return stone_from([scene_shape(name, "Monolith") for name in ("StatueA", "StatueB")], 395, ROCK, 1.6, 1.2)
+
+
+# Past the last wall, x 4544 to 5400: never on screen in play, only when the camera draws back for what rises.
+TRENCH_X1 = 5400
+TRENCH_TOP = -700
+TRENCH_BOTTOM = 60
+TRENCH_WATER = 20
+TRENCH_LIP = 4526
+SKY = ["C0", "C1", "C2", "C3", "C4", "C5"]
+FAR_SIDE = ["C0", "C1", "C2", "C3"]
+WATER = ["C0", "T0", "T1", "T2"]
+
+
+def trench():
+    """What stands behind the creature: the night as the Shore's sky has it, going down to a haze the moon lights over
+    the trench, kept lighter than the creature so its shape reads against it; the far side, a low black bank and its
+    wall down to the water; and the water, black, the moon on it in a broken line. Origin (X1, TRENCH_TOP)."""
+    width, height = TRENCH_X1 - X1, TRENCH_BOTTOM - TRENCH_TOP
+    img = blank(width, height)
+    noise = Noise(431)
+    rng = random.Random(432)
+    for col in range(width):
+        x = X1 + col
+        bank = -10 - round(7 * noise(x / 40.0, 3.0) + 3 * noise(x / 9.0, 4.0))
+        for row in range(height):
+            y = TRENCH_TOP + row
+            if y >= TRENCH_WATER:
+                depth = y - TRENCH_WATER
+                value = 1.5 - depth * 0.04 + (noise(x / 13.0, y / 2.0) - 0.5) * 0.6
+                color = ramp(WATER, value, x, y, 0.3)
+                if depth == 0:
+                    color = "T2" if noise(x / 6.0, 9.0) > 0.45 else "T1"
+                elif depth < 4 and noise(x / 3.0, 11.0 + depth) > 0.78:
+                    color = "C6"
+            elif y >= bank:
+                value = 1.3 + (noise(x / 25.0, y / 4.0) - 0.5) * 0.8 - (y - bank) * 0.02 + (1.0 if y == bank else 0.0)
+                color = ramp(FAR_SIDE, value, x, y, 0.3)
+            else:
+                # Lit by the moon behind the camera: C3 where the head rises, as light as the greybox had it, C4 at
+                # the horizon, darker only far above, where the stars are.
+                value = 1.6 + 2.4 * max(0.0, min(1.0, (y + 520) / 400.0)) - 0.4 * smooth(y, -520, -700)
+                value += 0.9 * smooth(y, -90, bank) * (0.6 + 0.4 * noise(x / 30.0, y / 10.0))
+                # No ordered dither: the camera draws back to half size and through every size between, and a fine
+                # pattern folds into shapes that are not there. The bands' edges drift with the haze instead.
+                value += 0.7 * (noise(x / 47.0, y / 13.0) - 0.5)
+                color = ramp(SKY, value, x, y, 0.0)
+                if value < 2.4 and rng.random() > 0.9985:
+                    color = rng.choice(("C6", "C7", "C8"))
+            put(img, col, row, color)
+    return img
 
 
 def ground_tiles():
