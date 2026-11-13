@@ -95,6 +95,8 @@ def ground():
     img = blank(width, HEIGHT)
     # Behind the mud, which then lies against their feet.
     paste(img, rib_arch(), None)
+    paste(img, crossing_ledges(), None)
+    paste(img, crossing_pillar(), None)
     noise = Noise(301)  # The reference section's own, so the mud carries on across x = 1440.
     stone = Noise(331)
     for col in range(width):

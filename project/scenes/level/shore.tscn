@@ -33,6 +33,8 @@
 [ext_resource type="Texture2D" path="res://assets/abyss/abyss_ground_3.png" id="r_abyss_ground_3"]
 [ext_resource type="Texture2D" path="res://assets/abyss/abyss_far_plain.png" id="r_abyss_far_plain"]
 [ext_resource type="Texture2D" path="res://assets/abyss/abyss_escarpment.png" id="r_abyss_escarpment"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_slab.png" id="r_abyss_slab"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_stone.png" id="r_abyss_stone"]
 [ext_resource type="Texture2D" path="res://assets/cave/ritual_far.png" id="r_ritual_far"]
 [ext_resource type="Texture2D" path="res://assets/cave/foreground_cave.png" id="r_fg_cave"]
 [ext_resource type="Texture2D" path="res://assets/cave/shaft.png" id="r_shaft"]
@@ -2443,16 +2445,24 @@ collision_mask = 0
 polygon = PackedVector2Array(-80, -4, 80, -4, 80, 4, -80, 4)
 
 [node name="Slab" type="Polygon2D" parent="Crossing"]
+visible = false
 color = Color(0.3, 0.34, 0.38, 1)
 polygon = PackedVector2Array(-80, -4, 80, -4, 80, 4, -80, 4)
 
 [node name="Seam" type="Polygon2D" parent="Crossing"]
+visible = false
 color = Color(0.2, 0.24, 0.28, 1)
 polygon = PackedVector2Array(-24, -4, -22, -4, -22, 4, -24, 4)
 
 [node name="Mark" type="Polygon2D" parent="Crossing"]
+visible = false
 color = Color(0.62, 0.72, 0.72, 1)
 polygon = PackedVector2Array(36, -2, 40, -3, 44, -2, 48, -3, 52, -2, 52, -1, 48, -2, 44, -1, 40, -2, 36, -1)
+
+[node name="Drawn" type="Sprite2D" parent="Crossing"]
+position = Vector2(-80, -4)
+texture = ExtResource("r_abyss_slab")
+centered = false
 
 [node name="Sound" type="AudioStreamPlayer2D" parent="Crossing"]
 stream = ExtResource("a_slab")
@@ -2461,14 +2471,17 @@ bus = &"Effects"
 [node name="CrossingLedges" type="StaticBody2D" parent="."]
 
 [node name="SupportLow" type="Polygon2D" parent="CrossingLedges"]
+visible = false
 color = Color(0.13, 0.16, 0.2, 1)
 polygon = PackedVector2Array(2038, 0, 2040, -14, 2048, -16, 2060, -15, 2066, -12, 2068, 0)
 
 [node name="SupportMid" type="Polygon2D" parent="CrossingLedges"]
+visible = false
 color = Color(0.12, 0.15, 0.19, 1)
 polygon = PackedVector2Array(2066, 0, 2068, -30, 2078, -35, 2092, -34, 2098, -28, 2100, 0)
 
 [node name="SupportHigh" type="Polygon2D" parent="CrossingLedges"]
+visible = false
 color = Color(0.11, 0.14, 0.18, 1)
 polygon = PackedVector2Array(2096, 0, 2098, -48, 2108, -55, 2124, -55, 2132, -50, 2134, 0)
 
@@ -2478,6 +2491,7 @@ shape = SubResource("ledge_shape")
 one_way_collision = true
 
 [node name="Low" type="Polygon2D" parent="CrossingLedges"]
+visible = false
 color = Color(0.26, 0.3, 0.34, 1)
 polygon = PackedVector2Array(2034, -18, 2078, -18, 2076, -13, 2060, -11, 2036, -13)
 
@@ -2487,6 +2501,7 @@ shape = SubResource("ledge_wide_shape")
 one_way_collision = true
 
 [node name="Mid" type="Polygon2D" parent="CrossingLedges"]
+visible = false
 color = Color(0.25, 0.29, 0.33, 1)
 polygon = PackedVector2Array(2054, -38, 2110, -38, 2108, -33, 2086, -31, 2056, -33)
 
@@ -2496,6 +2511,7 @@ shape = SubResource("shelf_shape")
 one_way_collision = true
 
 [node name="Shelf" type="Polygon2D" parent="CrossingLedges"]
+visible = false
 color = Color(0.24, 0.28, 0.32, 1)
 polygon = PackedVector2Array(2078, -58, 2142, -58, 2140, -53, 2112, -50, 2080, -53)
 
@@ -2506,12 +2522,19 @@ position = Vector2(2133, -66)
 shape = SubResource("stone_shape")
 
 [node name="Art" type="Polygon2D" parent="CrossingStone"]
+visible = false
 color = Color(0.34, 0.37, 0.4, 1)
 polygon = PackedVector2Array(-8, 2, -7, -4, -3, -8, 3, -8, 7, -5, 8, 1, 6, 6, 1, 8, -5, 7)
 
 [node name="Lit" type="Polygon2D" parent="CrossingStone"]
+visible = false
 color = Color(0.5, 0.55, 0.57, 1)
 polygon = PackedVector2Array(-6, -4, -3, -7, 2, -7, 0, -5, -4, -2)
+
+[node name="Drawn" type="Sprite2D" parent="CrossingStone"]
+position = Vector2(-8, -8)
+texture = ExtResource("r_abyss_stone")
+centered = false
 
 [node name="Push" type="Interactable" parent="CrossingStone"]
 position = Vector2(-19, -15)
@@ -2526,6 +2549,7 @@ one_shot = true
 shape = SubResource("push_shape")
 
 [node name="Pillar" type="Polygon2D" parent="."]
+visible = false
 color = Color(0.16, 0.19, 0.23, 1)
 polygon = PackedVector2Array(2213, 48, 2213, 10, 2216, 7, 2224, 7, 2227, 10, 2227, 48)
 

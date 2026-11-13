@@ -138,6 +138,8 @@ def main():
         tile.save(ABYSS_OUT / f"abyss_ground_{index}.png")
     gen_abyss.far_plain().save(ABYSS_OUT / "abyss_far_plain.png")
     gen_abyss.escarpment().save(ABYSS_OUT / "abyss_escarpment.png")
+    gen_abyss.crossing_slab()[0].save(ABYSS_OUT / "abyss_slab.png")
+    gen_abyss.crossing_stone()[0].save(ABYSS_OUT / "abyss_stone.png")
     PROLOGUE_OUT.mkdir(parents=True, exist_ok=True)
     for name, draw in gen_prologue.PANELS.items():
         draw().save(PROLOGUE_OUT / name)
