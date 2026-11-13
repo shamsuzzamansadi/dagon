@@ -736,6 +736,49 @@ def rib_arch():
     return img, (x0, y0)
 
 
+# ---------------------------------------------------------------- the mural
+
+MURAL = ["WaveTop", "WaveLow", "Kneel", "Eye", "Symbol", "Swimmer", "ArmLeft", "ArmRight"] + [f"Bowing{i}" for i in range(1, 6)]
+STATUE_EYES = ["EyesA", "EyesB"]
+FRAGMENTS = ["FragmentWave", "FragmentKneel", "FragmentEye"]
+
+
+def _canvas(shapes, pad=1):
+    left = math.floor(min(x for shape in shapes for x, _ in shape)) - pad
+    top = math.floor(min(y for shape in shapes for _, y in shape)) - pad
+    right = math.ceil(max(x for shape in shapes for x, _ in shape)) + pad
+    bottom = math.ceil(max(y for shape in shapes for _, y in shape)) + pad
+    return blank(right - left, bottom - top), (left, top)
+
+
+def mural_lit():
+    """The mural as the stones light it: every cut in the panel filled with the same light as their signs, bright
+    along its lower lip, and a groove's shadow round each figure where the light does not reach; the statues' eyes lit
+    with it. One image in world space, for the node the awakening shows and fades."""
+    panel = [scene_shape(name, "Monolith/MuralLit") for name in MURAL]
+    eyes = [scene_shape(name, "Monolith/MuralLit") for name in STATUE_EYES]
+    img, origin = _canvas(panel + eyes)
+
+    def covered(x, y):
+        return any(_covers(shape, x, y) for shape in panel)
+    for row in range(img.height):
+        for col in range(img.width):
+            x, y = col + origin[0], row + origin[1]
+            if not covered(x, y) and any(covered(x + dx, y + dy) for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+                put(img, col, row, "T1")
+    carve_into(img, origin, panel, cut="T3", fill="T4", lip="C9")
+    carve_into(img, origin, eyes, cut="C9", fill="C9", lip="T4")
+    return img, origin
+
+
+def mural_fragments():
+    """What can be made out on the panel before it is lit: three signs, worn faint, cut as the rest of the stone."""
+    shapes = [scene_shape(name, "Monolith") for name in FRAGMENTS]
+    img, origin = _canvas(shapes)
+    carve_into(img, origin, shapes, cut="E3", fill="E4", lip="C7")
+    return img, origin
+
+
 # ---------------------------------------------------------------- the statues and the trench
 
 

@@ -147,6 +147,8 @@ def main():
         gen_abyss.glyph_stone(name)[0].save(ABYSS_OUT / f"abyss_{name.lower()}.png")
         gen_abyss.glyph_stone(name, lit=True)[0].save(ABYSS_OUT / f"abyss_{name.lower()}_lit.png")
     gen_abyss.trench().save(ABYSS_OUT / "abyss_trench.png")
+    gen_abyss.mural_lit()[0].save(ABYSS_OUT / "abyss_mural_lit.png")
+    gen_abyss.mural_fragments()[0].save(ABYSS_OUT / "abyss_mural_fragments.png")
     PROLOGUE_OUT.mkdir(parents=True, exist_ok=True)
     for name, draw in gen_prologue.PANELS.items():
         draw().save(PROLOGUE_OUT / name)

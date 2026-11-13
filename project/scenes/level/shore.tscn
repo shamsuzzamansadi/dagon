@@ -39,6 +39,8 @@
 [ext_resource type="Texture2D" path="res://assets/abyss/abyss_statues.png" id="r_abyss_statues"]
 [ext_resource type="Texture2D" path="res://assets/abyss/abyss_gate.png" id="r_abyss_gate"]
 [ext_resource type="Texture2D" path="res://assets/abyss/abyss_trench.png" id="r_abyss_trench"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_mural_lit.png" id="r_abyss_mural_lit"]
+[ext_resource type="Texture2D" path="res://assets/abyss/abyss_mural_fragments.png" id="r_abyss_mural_fragments"]
 [ext_resource type="Texture2D" path="res://assets/abyss/abyss_glyphkneel.png" id="r_abyss_glyphkneel"]
 [ext_resource type="Texture2D" path="res://assets/abyss/abyss_glyphkneel_lit.png" id="r_abyss_glyphkneel_lit"]
 [ext_resource type="Texture2D" path="res://assets/abyss/abyss_glypheye.png" id="r_abyss_glypheye"]
@@ -2242,15 +2244,23 @@ visible = false
 color = Color(0.3, 0.34, 0.38, 1)
 polygon = PackedVector2Array(3852, -6, 3852, -92, 3944, -92, 3944, -6)
 
+[node name="Fragments" type="Sprite2D" parent="Monolith"]
+position = Vector2(3863, -62)
+texture = ExtResource("r_abyss_mural_fragments")
+centered = false
+
 [node name="FragmentWave" type="Polygon2D" parent="Monolith"]
+visible = false
 color = Color(0.36, 0.42, 0.45, 1)
 polygon = PackedVector2Array(3864, -57, 3868, -61, 3872, -57, 3876, -61, 3880, -57, 3880, -54, 3876, -58, 3872, -54, 3868, -58, 3864, -54)
 
 [node name="FragmentKneel" type="Polygon2D" parent="Monolith"]
+visible = false
 color = Color(0.36, 0.42, 0.45, 1)
 polygon = PackedVector2Array(3891, -39, 3891, -42, 3895, -42, 3898, -48, 3901, -51, 3905, -52, 3906, -48, 3903, -45, 3900, -43, 3898, -39)
 
 [node name="FragmentEye" type="Polygon2D" parent="Monolith"]
+visible = false
 color = Color(0.36, 0.42, 0.45, 1)
 polygon = PackedVector2Array(3915, -54, 3920, -59, 3928, -59, 3933, -54, 3928, -49, 3920, -49)
 
@@ -2272,63 +2282,83 @@ centered = false
 [node name="MuralLit" type="Node2D" parent="Monolith"]
 visible = false
 
+[node name="Drawn" type="Sprite2D" parent="Monolith/MuralLit"]
+position = Vector2(3857, -94)
+texture = ExtResource("r_abyss_mural_lit")
+centered = false
+
 [node name="WaveTop" type="Polygon2D" parent="Monolith/MuralLit"]
+visible = false
 color = Color(0.5, 0.92, 0.78, 1)
 polygon = PackedVector2Array(3864, -57, 3868, -61, 3872, -57, 3876, -61, 3880, -57, 3880, -54, 3876, -58, 3872, -54, 3868, -58, 3864, -54)
 
 [node name="WaveLow" type="Polygon2D" parent="Monolith/MuralLit"]
+visible = false
 color = Color(0.5, 0.92, 0.78, 1)
 polygon = PackedVector2Array(3864, -50, 3868, -54, 3872, -50, 3876, -54, 3880, -50, 3880, -47, 3876, -51, 3872, -47, 3868, -51, 3864, -47)
 
 [node name="Kneel" type="Polygon2D" parent="Monolith/MuralLit"]
+visible = false
 color = Color(0.5, 0.92, 0.78, 1)
 polygon = PackedVector2Array(3891, -39, 3891, -42, 3895, -42, 3898, -48, 3901, -51, 3905, -52, 3906, -48, 3903, -45, 3900, -43, 3898, -39)
 
 [node name="Eye" type="Polygon2D" parent="Monolith/MuralLit"]
+visible = false
 color = Color(0.5, 0.92, 0.78, 1)
 polygon = PackedVector2Array(3915, -54, 3920, -59, 3928, -59, 3933, -54, 3928, -49, 3920, -49)
 
 [node name="Bowing1" type="Polygon2D" parent="Monolith/MuralLit"]
+visible = false
 color = Color(0.5, 0.92, 0.78, 1)
 polygon = PackedVector2Array(3859.8, -15.4, 3859.8, -17.2, 3862.2, -17.2, 3864, -20.8, 3865.8, -22.6, 3868.2, -23.2, 3868.8, -20.8, 3867, -19, 3865.2, -17.8, 3864, -15.4)
 
 [node name="Bowing2" type="Polygon2D" parent="Monolith/MuralLit"]
+visible = false
 color = Color(0.5, 0.92, 0.78, 1)
 polygon = PackedVector2Array(3875.8, -15.4, 3875.8, -17.2, 3878.2, -17.2, 3880, -20.8, 3881.8, -22.6, 3884.2, -23.2, 3884.8, -20.8, 3883, -19, 3881.2, -17.8, 3880, -15.4)
 
 [node name="Bowing3" type="Polygon2D" parent="Monolith/MuralLit"]
+visible = false
 color = Color(0.5, 0.92, 0.78, 1)
 polygon = PackedVector2Array(3891.8, -15.4, 3891.8, -17.2, 3894.2, -17.2, 3896, -20.8, 3897.8, -22.6, 3900.2, -23.2, 3900.8, -20.8, 3899, -19, 3897.2, -17.8, 3896, -15.4)
 
 [node name="Bowing4" type="Polygon2D" parent="Monolith/MuralLit"]
+visible = false
 color = Color(0.5, 0.92, 0.78, 1)
 polygon = PackedVector2Array(3907.8, -15.4, 3907.8, -17.2, 3910.2, -17.2, 3912, -20.8, 3913.8, -22.6, 3916.2, -23.2, 3916.8, -20.8, 3915, -19, 3913.2, -17.8, 3912, -15.4)
 
 [node name="Bowing5" type="Polygon2D" parent="Monolith/MuralLit"]
+visible = false
 color = Color(0.5, 0.92, 0.78, 1)
 polygon = PackedVector2Array(3923.8, -15.4, 3923.8, -17.2, 3926.2, -17.2, 3928, -20.8, 3929.8, -22.6, 3932.2, -23.2, 3932.8, -20.8, 3931, -19, 3929.2, -17.8, 3928, -15.4)
 
 [node name="Swimmer" type="Polygon2D" parent="Monolith/MuralLit"]
+visible = false
 color = Color(0.5, 0.92, 0.78, 1)
 polygon = PackedVector2Array(3922, -79, 3921, -85, 3916, -86, 3914, -92, 3911, -86, 3907, -87, 3905, -93, 3902, -87, 3898, -88, 3896, -93, 3893, -87, 3886, -87, 3878, -84, 3884, -82, 3876, -80, 3884, -79, 3896, -78, 3910, -77)
 
 [node name="ArmLeft" type="Polygon2D" parent="Monolith/MuralLit"]
+visible = false
 color = Color(0.5, 0.92, 0.78, 1)
 polygon = PackedVector2Array(3910, -76, 3896, -71, 3880, -70, 3872, -72, 3862, -74, 3858, -70, 3862, -66, 3870, -65, 3871, -68, 3880, -67, 3896, -67, 3910, -72)
 
 [node name="ArmRight" type="Polygon2D" parent="Monolith/MuralLit"]
+visible = false
 color = Color(0.5, 0.92, 0.78, 1)
 polygon = PackedVector2Array(3864, -90, 3870, -90, 3871, -62, 3863, -62)
 
 [node name="Symbol" type="Polygon2D" parent="Monolith/MuralLit"]
+visible = false
 color = Color(0.5, 0.92, 0.78, 1)
 polygon = PackedVector2Array(3890.8, -63.4, 3894.8, -67.4, 3901.2, -67.4, 3905.2, -63.4, 3901.2, -59.4, 3894.8, -59.4)
 
 [node name="EyesA" type="Polygon2D" parent="Monolith/MuralLit"]
+visible = false
 color = Color(0.5, 0.92, 0.78, 1)
 polygon = PackedVector2Array(3971, -28, 3972.1, -29.1, 3973.9, -29.1, 3975, -28, 3973.9, -26.9, 3972.1, -26.9)
 
 [node name="EyesB" type="Polygon2D" parent="Monolith/MuralLit"]
+visible = false
 color = Color(0.5, 0.92, 0.78, 1)
 polygon = PackedVector2Array(4247, -28, 4248.1, -29.1, 4249.9, -29.1, 4251, -28, 4249.9, -26.9, 4248.1, -26.9)
 
