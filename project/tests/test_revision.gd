@@ -744,3 +744,31 @@ func test_the_abyss_sounds_deeper_as_he_goes_on(h) -> void:
 		h.check(sound.stream.resource_path.ends_with("/" + files[i]), "%s plays %s" % [names[i], sound.stream.resource_path])
 		if i > 0:
 			h.check(sound.global_position.x > world.get_node(names[i - 1]).global_position.x, "%s is not further on than %s" % [names[i], names[i - 1]])
+
+
+## A clip moves only what can be seen: no track animates a node that is hidden in the scene and that the clip itself
+## never shows. Art drawn over a greybox shape must be what the clip moves, or the motion is lost: the gate's rise and
+## the trench's water were, for a while in M4.
+func test_no_clip_animates_a_hidden_node_it_never_shows(h) -> void:
+	var world := await _world(h)
+	var checked := 0
+	for player_name in ["Cinematics", "Atmosphere", "Background"]:
+		var player: AnimationPlayer = world.get_node(player_name)
+		for clip_name in player.get_animation_list():
+			var clip := player.get_animation(clip_name)
+			var shown := {}
+			for track in clip.get_track_count():
+				var path := String(clip.track_get_path(track))
+				if path.ends_with(":visible"):
+					shown[path.get_slice(":", 0)] = true
+			for track in clip.get_track_count():
+				var path := String(clip.track_get_path(track))
+				var node_path := path.get_slice(":", 0)
+				if clip.track_get_type(track) != Animation.TYPE_VALUE or path.ends_with(":visible") or shown.has(node_path):
+					continue
+				var node := world.get_node_or_null(node_path)
+				h.check(node != null, "%s animates %s, which does not exist" % [clip_name, path])
+				if node is CanvasItem:
+					checked += 1
+					h.check(node.visible, "%s animates %s, which is hidden and never shown by it" % [clip_name, path])
+	h.check(checked > 10, "only %d tracks were checked" % checked)

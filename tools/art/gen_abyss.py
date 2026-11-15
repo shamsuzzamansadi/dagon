@@ -799,6 +799,33 @@ FAR_SIDE = ["C0", "C1", "C2", "C3"]
 WATER = ["C0", "T0", "T1", "T2"]
 
 
+def water_color(noise, x, y):
+    """The trench's water at a pixel: black, the moon on it in a broken line along the top."""
+    depth = y - TRENCH_WATER
+    value = 1.5 - depth * 0.04 + (noise(x / 13.0, y / 2.0) - 0.5) * 0.6
+    color = ramp(WATER, value, x, y, 0.3)
+    if depth == 0:
+        color = "T2" if noise(x / 6.0, 9.0) > 0.45 else "T1"
+    elif depth < 4 and noise(x / 3.0, 11.0 + depth) > 0.78:
+        color = "C6"
+    return color
+
+
+# The reveal raises the trench's water by this much as the creature rises, so its own picture is that much deeper.
+WATER_RISE = 14
+
+
+def trench_water():
+    """The trench's water alone, for the reveal to raise: the same pixels as in the backdrop beneath it, and deep
+    enough that nothing opens below it when it rises. Origin (X1, TRENCH_WATER)."""
+    noise = Noise(431)
+    img = blank(TRENCH_X1 - X1, TRENCH_BOTTOM + WATER_RISE - TRENCH_WATER)
+    for col in range(img.width):
+        for row in range(img.height):
+            put(img, col, row, water_color(noise, X1 + col, TRENCH_WATER + row))
+    return img
+
+
 def trench():
     """What stands behind the creature: the night as the Shore's sky has it, going down to a haze the moon lights over
     the trench, kept lighter than the creature so its shape reads against it; the far side, a low black bank and its
@@ -813,13 +840,7 @@ def trench():
         for row in range(height):
             y = TRENCH_TOP + row
             if y >= TRENCH_WATER:
-                depth = y - TRENCH_WATER
-                value = 1.5 - depth * 0.04 + (noise(x / 13.0, y / 2.0) - 0.5) * 0.6
-                color = ramp(WATER, value, x, y, 0.3)
-                if depth == 0:
-                    color = "T2" if noise(x / 6.0, 9.0) > 0.45 else "T1"
-                elif depth < 4 and noise(x / 3.0, 11.0 + depth) > 0.78:
-                    color = "C6"
+                color = water_color(noise, x, y)
             elif y >= bank:
                 value = 1.3 + (noise(x / 25.0, y / 4.0) - 0.5) * 0.8 - (y - bank) * 0.02 + (1.0 if y == bank else 0.0)
                 color = ramp(FAR_SIDE, value, x, y, 0.3)

@@ -316,3 +316,26 @@ func test_each_tablet_shows_its_own_line_in_the_story_order(h) -> void:
 		await h.stand_at(_player(h), Vector2(tablet.global_position.x, y))
 		await h.tap_key(KEY_E)
 		h.check(_caption(h).text == tablet.caption, "at %s the caption reads '%s'" % [tablet.name, _caption(h).text])
+
+
+## Solving raises the gate a player sees, not a hidden shape: the drawn slab climbs out of the way during the awakening
+## while it is still shown, the collision neither moves nor opens until the clip has finished, and then the way is open.
+func test_solving_raises_the_drawn_gate_and_then_opens_the_way(h) -> void:
+	var world := await _world(h)
+	var gate: CollisionObject2D = world.get_node("Monolith/Gate")
+	var slab: Sprite2D = world.get_node("Monolith/Gate/Drawn")
+	var start := slab.global_position
+	var body := gate.global_position
+	h.check(slab.is_visible_in_tree() and gate.collision_layer != 0, "the closed gate is not drawn and solid")
+	for x in [WAVE_X, KNEEL_X, EYE_X]:
+		await _press(h, x)
+	var director: Node = world.get_node("GameDirector")
+	await h.wait_until(func() -> bool: return director.is_cinematic_active(), 60, "the awakening to start")
+	var clip: AnimationPlayer = world.get_node("Cinematics")
+	await h.wait_until(func() -> bool: return clip.current_animation_position >= 2.5, 400, "the gate to be rising")
+	h.check(slab.is_visible_in_tree(), "the gate is hidden while it should be seen rising")
+	h.check(slab.global_position.y < start.y - 60.0, "the drawn gate has not risen: at %s, from %s" % [slab.global_position, start])
+	h.check(gate.collision_layer != 0 and gate.global_position == body, "the gate's body moved or opened before the clip finished")
+	await h.wait_until(func() -> bool: return not director.is_cinematic_active(), 600, "the awakening to finish")
+	await h.steps(3)
+	h.check(gate.collision_layer == 0 and not gate.visible, "the way is not open after the awakening")
