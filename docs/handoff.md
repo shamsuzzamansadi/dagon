@@ -2,7 +2,7 @@
 
 Changing task state only. The lasting rules are in [AGENTS.md](../AGENTS.md). **Check this against `git log`, the pull request and CI before relying on it.**
 
-**Last updated:** 2026-11-13, **M4 complete for review:** items 1 to 6 done. Stopped for the independent review and the owner's listening and playtest. No merge, tag or release; M5 not started.
+**Last updated:** 2026-11-15, **after the owner's follow-up:** the sailor in the prologue's boat made readable, the gap at the cut into the game found and closed in the game's output. **Stopped for the owner's playtest and explicit acceptance of the candidate below.** Then, by the owner's authorization of 2026-11-15, the merge and the first pre-alpha release (see Next).
 
 ## Where things are
 
@@ -96,6 +96,12 @@ Changing task state only. The lasting rules are in [AGENTS.md](../AGENTS.md). **
 
 **Risks and forecast, as of this update (13 November):** M4's approved work is complete within the window. **No blocker on the developer's side.** What waits: the owner's listening, which sets the reveal's level and the mix (item 4's last step); the independent review; the owner's playtest and decision. Open and recorded: a 20 ms drop at the cut into the game in one of two recordings, cause not established; the reveal's seam beside the arm, M5's with the reveal.
 
+**The owner's follow-up, 2026-11-15** ([feedback](evidence/m4/owner-playtest-2026-11-15.md)): the gameplay feels good and has improved substantially; the sailor is hard to tell apart in the prologue's boat; not yet acceptance. Done: the sailor redrawn, rowing and then slumped (`2c976de`, [record](evidence/m4/prologue-readability/README.md), D104); the cut's gap measured in the game's own output, editor and exported, narrowed to the scene's audio lifecycle, and closed with a 0.25 s handover (`ced2499`, [record](evidence/m4/transition/README.md), D103). **Measured, not heard.** The reveal's seam and the creature against its background stay **M5**, in the roadmap.
+
+**Results on `ced2499`:** locally, integration **440/0**, `run_godot_checks.sh` all ok, the Linux export check ok, the exported route **`runs=4 failed=0`**; the handover's breakage caught, controls held (at `50de077`, same code). CI push run [43731646562](https://github.com/shamsuzzamansadi/dagon/actions/runs/43731646562): integration 440/0 on GCC, Clang and MSVC, the exported route 4/0 on Linux and Windows, native tests 127/127. Fingerprint `sha256:9be07de66103f9683be95f918457b5ba8420d1c1a7f2093e4d05963223c1cab3`, unchanged by every later commit.
+
+**The candidate for the owner:** `dagon-windows` from run [43731646562](https://github.com/shamsuzzamansadi/dagon/actions/runs/43731646562) (artifact 14168993633), zip SHA-256 **`d57985364e28ef83dd61b6269c78369a113264960c78785123c0db2a37da8dc1`**. Linux: `dagon-linux`, zip `ceef058d642d05a68487f898b3dd1748b61c49289bd6311d5fe764e5c3e0b14c`.
+
 ## Working resources
 
 Outside the repository, outside `/tmp` and outside caches. Everything finished is pushed.
@@ -109,4 +115,6 @@ Outside the repository, outside `/tmp` and outside caches. Everything finished i
 
 ## Next concrete action
 
-**Stopped for review.** Send the [review package](reviews/m4-review-package.md) for independent review, and the owner the Windows build named above, with its checksum, and the listening package. Act on what comes back on this branch. Merge only on the owner's acceptance, by the order in AGENTS.md; M5 only after that.
+**Wait for the owner's playtest of the candidate above and an explicit acceptance of that build.** Nothing is merged, tagged or published before it.
+
+**Then, authorized by the owner on 2026-11-15** (this supersedes the earlier hold for this release): record the acceptance against fingerprint `sha256:9be07de6...` in an evidence record, limited to what the owner says; reconcile `release/v0.1.0-pre-alpha.1.json` (planned at M3, never published) with M4, its criteria and limitations, and set it to `publish` in this pull request; squash-merge #4 once its required checks pass; watch `main`'s CI and `release.yml` publish `v0.1.0-pre-alpha.1` (the first real publication: its write path is unproven, see `docs/release.md`); verify tag, commit, prerelease, assets, checksums, provenance and notes; on any partial failure, inspect the remote before anything else, and never replace a published version; delete the branch locally and remotely and prune; update the roadmap and this handoff. No M5.

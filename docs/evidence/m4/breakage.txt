@@ -34,3 +34,15 @@ BREAKAGE_RESULT valid=yes
 control after: NOT CAUGHT passed=439 failed=0
 control before: NOT CAUGHT passed=439 failed=0 unit_failed=0
 control after: NOT CAUGHT passed=439 failed=0
+
+== The owner's follow-up of 2026-11-15: the prologue's handover at the cut. One breakage, alone, with its controls, at 50de077 (code as ced2499):
+CAUGHT           1  The cut into the game is a plain change of scene again
+
+commit 50de077, 1 breakages, {'CAUGHT': 1}, controls held, summary complete, 269 s
+BREAKAGE_RESULT valid=yes
+=== The cut into the game is a plain change of scene again: CAUGHT (1 failing)
+    unit exit=0 unit failed=0, runner exit=1 passed=439 failed=1
+    FAIL test_narration.test_the_prologue_hands_its_sound_over_to_the_game_and_then_goes
+control after: NOT CAUGHT passed=440 failed=0
+control before: NOT CAUGHT passed=440 failed=0 unit_failed=0
+control after: NOT CAUGHT passed=440 failed=0

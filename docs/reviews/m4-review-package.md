@@ -1,6 +1,6 @@
 # M4 Review Package: Atmosphere
 
-**To:** ChatGPT (independent reviewer), and the owner for listening and the playtest. **Date:** 2026-11-13.
+**To:** ChatGPT (independent reviewer), and the owner for listening and the playtest. **Date:** 2026-11-13, revised 2026-11-15 for the owner's follow-up (§0).
 **Status: complete for review, not accepted.** The owner approved [the plan](../m4-plan.md) on 2026-11-10 and authorized its implementation, stopping here: no merge, tag, release or itch.io submission, and M5 not started.
 
 | | |
@@ -8,10 +8,10 @@
 | **Repository** | https://github.com/shamsuzzamansadi/dagon |
 | **Branch and pull request** | `m4/atmosphere`, draft [#4](https://github.com/shamsuzzamansadi/dagon/pull/4) |
 | **Base** | `main` at `ad6df8c` (M3, squash-merged), CI run [42817688574](https://github.com/shamsuzzamansadi/dagon/actions/runs/42817688574) |
-| **The tested code and the build for the owner** | **`4fcdd6be78033e17b01d1576c088a9465e32ca52`**, CI run **[43503636921](https://github.com/shamsuzzamansadi/dagon/actions/runs/43503636921)** (push) |
-| **Acceptance fingerprint of that commit** | `sha256:024a966bb1515d5708a7490af2b15765f12e92a351781ce412a2af913e631c5c` (`python tools/release_gate.py fingerprint --commit 4fcdd6b`) |
-| **Final HEAD** | A file cannot name its own commit; the pull request and the handoff name it. Every commit after `4fcdd6b` adds only documents and evidence |
-| **The Windows build for the owner** | `dagon-windows` from run 43503636921, zip SHA-256 **`1ec506451d71dd0072473f8fe6cd15d691b9e2aa9487ed19e67f8e9883aded8a`** (§8) |
+| **The tested code and the candidate for the owner** | **`ced2499`** (`ced24992`…, the follow-up's code), CI push run **[43731646562](https://github.com/shamsuzzamansadi/dagon/actions/runs/43731646562)**. Before it, `4fcdd6b` and run 43503636921, which the owner's feedback of 2026-11-15 followed |
+| **Acceptance fingerprint of that commit** | `sha256:9be07de66103f9683be95f918457b5ba8420d1c1a7f2093e4d05963223c1cab3` (`python tools/release_gate.py fingerprint --commit ced2499`). `4fcdd6b`'s was `sha256:024a966b…` |
+| **Final HEAD** | A file cannot name its own commit; the pull request and the handoff name it. Every commit after `ced2499` changes nothing the fingerprint covers |
+| **The Windows candidate for the owner** | `dagon-windows` from run 43731646562, zip SHA-256 **`d57985364e28ef83dd61b6269c78369a113264960c78785123c0db2a37da8dc1`** (§8) |
 
 **What has been verified, by whom.**
 
@@ -27,6 +27,18 @@
 | **The new art, played** | **Nobody yet** but the scripts |
 | A first-time player | Nobody, on any build (M6) |
 | Independent review | Not yet done |
+
+## 0. The owner's follow-up of 2026-11-15: read this first
+
+**The owner:** the gameplay feels good and has improved substantially; the main visible problem is that the sailor is hard to tell apart in the prologue's boat. **Not yet acceptance of the final M4 build.** ChatGPT analysed the audio signal and sampled frames of the owner's recording; it did not listen ([record](../evidence/m4/owner-playtest-2026-11-15.md)).
+
+| Asked | Done | Record |
+|---|---|---|
+| The sailor readable in the escape and the drift | Redrawn: head, cap, shoulders and arms, rim-lit; **rowing** in two poses timed with the existing oar frames, against a moon path on the water; **slumped**, head hanging, an arm over the side, in the drift. Story, lines, timing, Skip and Continue and the join into the Shore unchanged. Before and after recordings with sound | [prologue-readability](../evidence/m4/prologue-readability/README.md), D104, `2c976de` |
+| The gap at the cut into the game | **Found in the game's own output,** editor and exported: below −65 dB for 12 to 23 ms in most runs, a 10 to 14 dB dip in all. Narrowed by experiment to the scene's audio lifecycle: the game's sound comes up over its first frames after the prologue's stops. Fixed with a 0.25 s handover at that cut only; **0 of 12 runs** with a gap after it, exported included. The engine's reason is not established; **nothing has been heard** | [transition](../evidence/m4/transition/README.md), D103, `ced2499` |
+| The reveal's seam, and the creature against its background | **Open, M5,** explicit in the roadmap; not touched | [roadmap](../roadmap.md) |
+
+**Checked on `ced2499`:** integration 440/0, `run_godot_checks.sh`, the Linux export check, the exported route `runs=4 failed=0`, locally; CI run [43731646562]({R}): integration 440/0 on GCC, Clang and MSVC, the exported route 4/0 on Linux and Windows, native tests 127/127. **Breakage:** reverting the cut to a plain change of scene is caught by the new test, controls held ([result](../evidence/m4/breakage.txt)).
 
 ## 1. Delivered, item by item
 
@@ -114,7 +126,8 @@ Synthesized by `tools/audio/make_sounds.py`, as in M3. Only the new and changed 
 
 - **Nothing in M4 has been heard.** The voice lines, the new sounds and the mix are measured only.
 - **The art has been looked at by the developer only,** software-rendered.
-- **A 20 ms drop in the sound at the cut from the prologue into the game,** in one of two recordings of the same build; cause not established (§5, [record](../evidence/m4/listening/README.md)).
+- *Superseded on 2026-11-15:* the drop at the cut into the game is measured, narrowed to the scene's audio lifecycle and closed in the game's output (§0); not heard.
+- **The reveal's background seam and the creature's separation from its background,** visible in the owner's recording: open, M5.
 - The reveal's seam (§3). The creature, its animation, the reveal, collapse and ending clips, and the ritual and watcher beyond silhouettes are **M5's**, by the roadmap.
 - **Examine lines past the Shore and the cave are text,** by the plan, unless the owner asks.
 
@@ -129,21 +142,22 @@ Synthesized by `tools/audio/make_sounds.py`, as in M3. Only the new and changed 
 
 ## 8. The builds
 
-**Windows, for the owner:** [`dagon-windows`](https://github.com/shamsuzzamansadi/dagon/actions/runs/43503636921/artifacts/14075713434) from run [43503636921](https://github.com/shamsuzzamansadi/dagon/actions/runs/43503636921), the push run of `4fcdd6b`. Zip SHA-256 **`1ec506451d71dd0072473f8fe6cd15d691b9e2aa9487ed19e67f8e9883aded8a`**. The pull request's run builds the same source, and its zip's checksum will differ ([why](../evidence/m3/build-identity-53e8d23.md)).
+**Windows, the candidate for the owner:** [`dagon-windows`](https://github.com/shamsuzzamansadi/dagon/actions/runs/43731646562/artifacts/14168993633) from run [43731646562](https://github.com/shamsuzzamansadi/dagon/actions/runs/43731646562), the push run of `ced2499`. Zip SHA-256 **`d57985364e28ef83dd61b6269c78369a113264960c78785123c0db2a37da8dc1`**. *The previous build,* `4fcdd6b`'s, zip `1ec50645…aded8a`, is superseded. The pull request's run builds the same source, and its zip's checksum will differ ([why](../evidence/m3/build-identity-53e8d23.md)).
 
-**Linux:** [`dagon-linux`](https://github.com/shamsuzzamansadi/dagon/actions/runs/43503636921/artifacts/14076400232) from the same run, zip SHA-256 `61412ac01aefe247d4292f8c7b4a044f45d3cf63e04dbd67cf5b07cde6779f5e`.
+**Linux:** [`dagon-linux`](https://github.com/shamsuzzamansadi/dagon/actions/runs/43731646562/artifacts/14169003009) from the same run, zip SHA-256 `ceef058d642d05a68487f898b3dd1748b61c49289bd6311d5fe764e5c3e0b14c`.
 
 ## 9. The owner's checklist
 
 **Use exactly the Windows build named in §8, with its checksum.** Extract the whole zip into a new, empty folder and run `dagon.exe`. Please do not change your system's keyboard layout for this check.
 
+0. **The follow-up, first:** New Game, and let the prologue play. **In the escape and the drift, can you tell the sailor from the boat, and rowing from slumped? At the cut into the game, do you hear anything break?** Then a second New Game, and Skip on the last picture.
 1. **Listen first:** the [whole-game recording](../evidence/m4/listening/README.md) and its excerpts. **Does the reveal's loudness feel right? Is the voice too quick anywhere? Do the new menu and examine sounds, the deeper Abyss, the rock and the sea sit right?** Your notes set the mix; nothing else will.
 2. **New Game, and let the prologue play** into the Shore without pressing anything: is the join felt?
 3. **Walk the Abyss to the Monolith slowly.** Does each stretch read: the ribs, the crossing, the shelves and tablets, the canyon, the stones, the mural lit?
 4. **The reveal and the flight:** are all three of the reveal's lines heard out? Do the rock and the sea feel heavy?
 5. **Continue,** after quitting mid-game: no prologue, no waking.
 
-**Please report:** that you used this build; anything wrong; and your answers to 1, 3 and 4.
+**Please report:** that you used this build, by its checksum; anything wrong; your answers to 0, 1, 3 and 4; and, if you accept it, that you accept this build.
 
 ## 10. What happens next
 
