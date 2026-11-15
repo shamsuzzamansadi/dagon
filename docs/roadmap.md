@@ -262,6 +262,16 @@ Seen in the owner's recording of 2026-11-15 ([record](evidence/m4/owner-playtest
 
 Both belong to the reveal, which M5 redoes; M4 deliberately did not redesign the cinematic.
 
+**The ending's four pictures,** from the owner's third report of 2026-11-15 (same record). **Open, M5; not touched in M4:**
+
+1. **The rescue** (`Found`): the small boat looks empty. Make the sailor readable in it, and add a restrained visual sign of rescue.
+2. **The window** (`Listen`): make the sailor's head, shoulders and anxious posture clear; remove the ambiguous marks.
+3. **Innsmouth** (`Shop`): the line says bracelet, and the picture reads as a rectangular plaque or box. Draw a recognisable curved band, with its opening and its thickness, keeping the established eye-and-waves symbol.
+4. **The last sea** (`Rising`): make the crest recognisably the creature of the reveal, with convincing displaced water and scale.
+5. **Bring the four panels into one style, framing and level of detail.**
+
+**Limits, the owner's:** keep the story as it is, rescue, then lasting fear, then the Innsmouth connection, then the continuing threat. **The sailor's missing memory is intended;** no new playable sequence to explain it. **No change to the narration and no added story** merely to improve the pictures. The owner pressed through the later cards quickly in the recording: that is not a timing or cut-off narration defect unless one is reproduced.
+
 ### M6 verification
 
 Verify settings and save persistence, rebinding, menu focus, quit/relaunch/continue, and display usability.

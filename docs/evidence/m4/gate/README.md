@@ -30,7 +30,7 @@ Looked at by the developer only.
 | **3. Control and passage after the cinematic** | Control returns and he walks through the open gate into the reveal: the exported route, `runs=4 failed=0`, and `record_gate.gd` reaching x = 4382 at the Awakened beat | `8b30b33`, local and CI |
 | **4. Skip, missing clip, restart, save and Continue** | **The awakening cannot be skipped;** a press during it skips only its line (tested). A **missing, looping, ping-pong or stuck** awakening clip still opens the gate and returns control (`test_cinematics.gd`). **Restore and Continue at every savable beat** keep the gate open or closed, and now also hold a closed gate's drawn slab where its collision is, shown (`test_restore.gd`); the exported route Continues from the Awakened save and after the ending. **The prologue's Skip** starts a new game at the Shore with the gate closed, as restoring the Shore beat does | Integration 442/0 on `8b30b33`, GCC, Clang, MSVC |
 
-**Not tested by the owner:** the Skip case, and the try at passing the closed gate. Both above are scripted.
+**When this was written, not tested by the owner:** the Skip case, and the try at passing the closed gate; both above are scripted. **Since, the owner's third report of 2026-11-15** ([record](../owner-playtest-2026-11-15.md)): the owner personally tested the closed gate and the gate's opening, both satisfactory; and the owner's video shows the prologue's Skip reaching the Shore, confirmed from frames by ChatGPT, which did not listen.
 
 ## Regression checks
 
