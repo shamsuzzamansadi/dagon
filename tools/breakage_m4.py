@@ -29,6 +29,8 @@ BREAKAGES = [
     ("Examining is silent", H, "	if (AudioStreamPlayer *sound = examine_sound_.get(); sound != nullptr && examined) {\n		sound->play();", "	if (AudioStreamPlayer *sound = examine_sound_.get(); sound != nullptr && examined) {\n		(void)sound;"),
     ("Pressing a stone is heard as examining", H, "sound != nullptr && examined) {", "sound != nullptr) {\n		(void)examined;"),
     ("The Abyss is one sound again", W, 'stream = ExtResource("a_abyss_deep")', 'stream = ExtResource("a_abyss")'),
+    # The owner's follow-up of 2026-11-15: the prologue hands its sound over at the cut.
+    ("The cut into the game is a plain change of scene again", M, "	start_session(core::Beat::Shore, false, !unattended, true);", "	start_session(core::Beat::Shore, false, !unattended, false);"),
     # Item 5: the reveal's lines heard out.
     ("The recognition is cut off by the run", W, '"times": PackedFloat32Array(8.2),', '"times": PackedFloat32Array(9.6),'),
 ]
