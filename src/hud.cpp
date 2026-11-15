@@ -57,6 +57,9 @@ void Hud::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_voice_path", "path"), &Hud::set_voice_path);
 	ClassDB::bind_method(D_METHOD("get_voice_path"), &Hud::get_voice_path);
 	ADD_PROPERTY(PropertyInfo(Variant::NODE_PATH, "voice_path", PROPERTY_HINT_NODE_PATH_VALID_TYPES, "AudioStreamPlayer"), "set_voice_path", "get_voice_path");
+	ClassDB::bind_method(D_METHOD("set_examine_sound_path", "path"), &Hud::set_examine_sound_path);
+	ClassDB::bind_method(D_METHOD("get_examine_sound_path"), &Hud::get_examine_sound_path);
+	ADD_PROPERTY(PropertyInfo(Variant::NODE_PATH, "examine_sound_path", PROPERTY_HINT_NODE_PATH_VALID_TYPES, "AudioStreamPlayer"), "set_examine_sound_path", "get_examine_sound_path");
 	ClassDB::bind_method(D_METHOD("set_caption_hold_seconds", "value"), &Hud::set_caption_hold_seconds);
 	ClassDB::bind_method(D_METHOD("get_caption_hold_seconds"), &Hud::get_caption_hold_seconds);
 	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "caption_hold_seconds"), "set_caption_hold_seconds", "get_caption_hold_seconds");
@@ -76,6 +79,7 @@ void Hud::_ready() {
 		ERR_PRINT("Hud: a label or the fade rect path is not set; part of the HUD will not show.");
 	}
 	voice_.set(voice_path_.is_empty() ? nullptr : get_node<AudioStreamPlayer>(voice_path_));
+	examine_sound_.set(examine_sound_path_.is_empty() ? nullptr : get_node<AudioStreamPlayer>(examine_sound_path_));
 	script_ = narration::load_script().lines;
 
 	// In code, not in the scene: the interactor is inside an instanced scene, and a scene connection
@@ -155,6 +159,11 @@ void Hud::on_interacted(Object *p_target) {
 	const Interactable *target = Object::cast_to<Interactable>(p_target);
 	if (target == nullptr) {
 		return;
+	}
+	// Examining has a sound of its own; what is pushed or pressed has its own sound from what it does.
+	const bool examined = !target->get_line_id().is_empty() || !target->get_caption().is_empty();
+	if (AudioStreamPlayer *sound = examine_sound_.get(); sound != nullptr && examined) {
+		sound->play();
 	}
 	if (!target->get_line_id().is_empty()) {
 		say(target->get_line_id());

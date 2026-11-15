@@ -1,0 +1,66 @@
+Measurements of the cut from the prologue into the game, from the game's own mix written by Godot's Movie Maker.
+Measurement only. Nobody has listened.
+
+== Editor build, before the change (probe_cut.gd; each line one capture)
+cut-30-0: cut at 34.633 s; before -30.1 dB, after -34.4 dB; gaps below -65 dB: 23.0 ms at cut-0.018 s
+cut-30-1: cut at 34.633 s; before -30.1 dB, after -34.4 dB; gaps below -65 dB: 23.0 ms at cut-0.018 s
+cut-30-2: cut at 34.667 s; before -30.1 dB, after -34.5 dB; gaps below -65 dB: 23.0 ms at cut-0.020 s
+cut-30-3: cut at 34.667 s; before -30.1 dB, after -34.5 dB; gaps below -65 dB: 23.0 ms at cut-0.020 s
+cut-60-0: cut at 34.567 s; before -30.1 dB, after -34.8 dB; no gap below -65 dB
+cut-60-1: cut at 34.583 s; before -30.1 dB, after -34.5 dB; gaps below -65 dB: 12.3 ms at cut-0.000 s
+cut-60-2: cut at 34.600 s; before -30.1 dB, after -34.8 dB; no gap below -65 dB
+cut-60-3: cut at 34.617 s; before -30.1 dB, after -34.6 dB; gaps below -65 dB: 12.3 ms at cut-0.002 s
+
+== Experiment, not kept: the prologue left alive 0.5 s after the cut
+cut-30-0: cut at 34.633 s; before -30.1 dB, after -28.1 dB; no gap below -65 dB
+cut-60-1: cut at 34.583 s; before -30.1 dB, after -27.8 dB; no gap below -65 dB
+
+== Editor build, with the handover (ced2499's code)
+handover2/cut-30-0: cut at 34.633 s; before -30.1 dB, after -34.3 dB; no gap below -65 dB
+handover2/cut-30-2: cut at 34.667 s; before -30.1 dB, after -34.4 dB; no gap below -65 dB
+handover2/cut-60-0: cut at 34.567 s; before -30.1 dB, after -33.9 dB; no gap below -65 dB
+handover2/cut-60-1: cut at 34.583 s; before -30.1 dB, after -33.8 dB; no gap below -65 dB
+handover2/cut-60-2: cut at 34.600 s; before -30.1 dB, after -33.8 dB; no gap below -65 dB
+handover2/cut-60-3: cut at 34.617 s; before -30.1 dB, after -33.8 dB; no gap below -65 dB
+handover2-continue/cut-60-0: cut at 30.133 s; before -24.0 dB, after -36.3 dB; no gap below -65 dB
+handover2-continue/cut-60-1: cut at 30.150 s; before -23.6 dB, after -36.5 dB; no gap below -65 dB
+
+== Deepest and highest 20 ms windows after the cut, against the 0.3 s before it
+baseline           cut-30-0.wav   before  -30.0  lowest after  -70.3 (-40.3)  highest  -25.5 ( +4.5)
+baseline           cut-30-1.wav   before  -30.0  lowest after  -70.3 (-40.3)  highest  -25.5 ( +4.5)
+baseline           cut-30-2.wav   before  -29.9  lowest after  -81.4 (-51.6)  highest  -25.4 ( +4.5)
+baseline           cut-30-3.wav   before  -29.9  lowest after  -81.4 (-51.6)  highest  -25.4 ( +4.5)
+baseline           cut-60-0.wav   before  -29.9  lowest after  -40.5 (-10.6)  highest  -25.4 ( +4.5)
+baseline           cut-60-1.wav   before  -29.9  lowest after  -43.5 (-13.6)  highest  -25.5 ( +4.4)
+baseline           cut-60-2.wav   before  -29.9  lowest after  -40.3 (-10.4)  highest  -25.5 ( +4.4)
+baseline           cut-60-3.wav   before  -30.0  lowest after  -44.0 (-14.0)  highest  -25.6 ( +4.4)
+handover2          cut-30-0.wav   before  -30.0  lowest after  -36.9 ( -6.9)  highest  -23.3 ( +6.7)
+handover2          cut-30-2.wav   before  -29.9  lowest after  -37.1 ( -7.2)  highest  -23.5 ( +6.4)
+handover2          cut-60-0.wav   before  -29.9  lowest after  -37.2 ( -7.3)  highest  -23.1 ( +6.8)
+handover2          cut-60-1.wav   before  -29.9  lowest after  -37.3 ( -7.4)  highest  -24.2 ( +5.8)
+handover2          cut-60-2.wav   before  -29.9  lowest after  -37.0 ( -7.1)  highest  -25.0 ( +5.0)
+handover2          cut-60-3.wav   before  -30.0  lowest after  -37.0 ( -7.0)  highest  -23.5 ( +6.5)
+handover2-continue cut-60-0.wav   before  -26.5  lowest after  -39.1 (-12.6)  highest  -20.6 ( +5.9)
+handover2-continue cut-60-1.wav   before  -27.0  lowest after  -39.1 (-12.1)  highest  -21.0 ( +6.1)
+
+== The exported release build, driven by window-system keys on a private display, prologue left to end (export_cut.sh)
+export at 4fcdd6b, run 1: game started True, prologue finished True; below -65 dB: 12.3 ms at 32.94 s; deepest 20 ms dip within 32.3-33.6 s: 14.1 dB at 32.94 s
+export at 4fcdd6b, run 2: game started True, prologue finished True; below -65 dB: 12.3 ms at 32.94 s; deepest 20 ms dip within 32.3-33.6 s: 13.8 dB at 32.93 s
+export at 4fcdd6b, run 3: game started True, prologue finished True; below -65 dB: 12.3 ms at 32.95 s; deepest 20 ms dip within 32.3-33.6 s: 13.8 dB at 32.95 s
+export at 4fcdd6b, run 4: game started True, prologue finished True; nothing below -65 dB; deepest 20 ms dip within 32.3-33.6 s: 10.0 dB at 32.95 s
+export at ced2499, run 1: game started True, prologue finished True; nothing below -65 dB; deepest 20 ms dip within 32.3-33.6 s: 5.9 dB at 33.18 s
+export at ced2499, run 2: game started True, prologue finished True; nothing below -65 dB; deepest 20 ms dip within 32.3-33.6 s: 5.5 dB at 33.07 s
+export at ced2499, run 3: game started True, prologue finished True; nothing below -65 dB; deepest 20 ms dip within 32.3-33.6 s: 6.0 dB at 33.17 s
+export at ced2499, run 4: game started True, prologue finished True; nothing below -65 dB; deepest 20 ms dip within 32.3-33.6 s: 6.3 dB at 33.08 s
+
+== First attempt, not kept: the game made current in the same frame, the prologue freed at once. No effect
+fixed/cut-30-0: cut at 34.633 s; before -30.1 dB, after -34.4 dB; gaps below -65 dB: 23.0 ms at cut-0.018 s
+fixed/cut-30-1: cut at 34.633 s; before -30.1 dB, after -34.4 dB; gaps below -65 dB: 23.0 ms at cut-0.018 s
+fixed/cut-30-2: cut at 34.667 s; before -30.1 dB, after -34.5 dB; gaps below -65 dB: 23.0 ms at cut-0.020 s
+fixed/cut-30-3: cut at 34.667 s; before -30.1 dB, after -34.5 dB; gaps below -65 dB: 23.0 ms at cut-0.020 s
+fixed/cut-60-0: cut at 34.567 s; before -30.1 dB, after -34.8 dB; no gap below -65 dB
+fixed/cut-60-1: cut at 34.583 s; before -30.1 dB, after -34.5 dB; gaps below -65 dB: 12.3 ms at cut-0.000 s
+fixed/cut-60-2: cut at 34.600 s; before -30.1 dB, after -34.8 dB; no gap below -65 dB
+fixed/cut-60-3: cut at 34.617 s; before -30.1 dB, after -34.6 dB; gaps below -65 dB: 12.3 ms at cut-0.002 s
+fixed-continue/cut-60-0: cut at 30.133 s; before -24.0 dB, after -37.3 dB; no gap below -65 dB
+fixed-continue/cut-60-1: cut at 30.150 s; before -23.6 dB, after -37.4 dB; gaps below -65 dB: 12.1 ms at cut-0.004 s

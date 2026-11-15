@@ -55,7 +55,7 @@ checkpoint.
 
 ## 4. Structure and pacing (one continuous level)
 
-**A short prologue comes first, on New Game only (D71):** four pictures, one line each, skippable. A raider takes his ship in the war, he escapes in a small boat, drifts, and wakes with the sea gone, beside that same boat.
+**A short prologue comes first, on New Game only (D71):** four pictures, one line each, spoken (D95), skippable. A raider takes his ship in the war, he escapes in a small boat, drifts, and wakes with the sea gone, beside that same boat. **How to Play is shown before it, on the main menu, and the last picture is the Shore itself as the game opens on it:** he sits up in the picture, and the game begins on him getting up from there, with nothing between (D97).
 
 | Act | Name             | Target time | Beats |
 |-----|------------------|-------------|-------|
@@ -201,7 +201,7 @@ One English narrator, as the sailor, in the first person: **intimate, restrained
 
 **Rules, all implemented in M3 ([architecture §5](architecture.md)):** one script, with line IDs, for both voice and caption, so spoken words match the text. A caption stays through its line and a brief margin. **No queue.** A story moment replaces anything, and something optional replaces something optional, but cannot touch a story moment, and is simply dropped. Pressing Examine again skips, and does nothing else. Everything pauses with the game, and stops with the world. A line with no audio is a text line, so nothing depends on a file. Subtitles are on by default, and can be switched off, which only ever hides what can be heard.
 
-**The owner chose voice A (D94).** It speaks the talisman, the carving and the whole epilogue. The rest of the script is captions until M5, which speaks the remaining lines in the same voice; the final mix by ear belongs to M4 and M5.
+**The owner chose voice A (D94).** It speaks the prologue (M4, D95), the talisman, the carving and the whole epilogue. [The narration record](evidence/m4/narration/README.md) lists every spoken line. The rest of the script is captions until it is spoken in the same voice, in M4 as its plan allows and otherwise in M5; the final mix by ear belongs to M4 and M5.
 
 ### Controller vibration (owner, 2026-11-04)
 

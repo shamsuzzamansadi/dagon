@@ -1,0 +1,20 @@
+recording: 44.3 s, 2 channels, 48000 Hz
+peak -2.9 dBFS, true peak -2.9 dBTP
+
+loudness by stage (integrated LUFS, and the loudest 3 s)
+  title                        0.0-    1.1 s   -120.0 LUFS  max short-term  -69.8
+  line-1-prologue.raider       1.1-   10.0 s    -21.7 LUFS  max short-term  -19.7
+  line-2-prologue.escape      10.0-   19.3 s    -21.4 LUFS  max short-term  -19.1
+  line-3-prologue.drift       19.3-   28.9 s    -21.8 LUFS  max short-term  -19.9
+  line-4-prologue.dry         28.9-   34.1 s    -20.8 LUFS  max short-term  -21.1
+  game                        34.1-   38.1 s   -120.0 LUFS  max short-term -120.0
+  control                     38.1-   40.1 s    -33.5 LUFS  max short-term  -33.6
+  first-steps                 40.1-   43.7 s    -36.1 LUFS  max short-term  -35.7
+
+sudden changes over 30 dB within 20 ms: 2
+  at   38.10 s (introduction-answered): -180.0 ->  -44.7 dB
+  at   43.66 s (first-steps):  -37.5 ->  -72.9 dB
+
+isolated sample steps (possible clicks): 0
+
+MIX_CHECK problems=0

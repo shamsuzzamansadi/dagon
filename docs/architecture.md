@@ -145,6 +145,7 @@ so designers tune them in the inspector. Each class implements
 `_get_configuration_warnings()` for missing references.
 
 ### PlayerController : CharacterBody2D
+- **`show_pose(animation)` ([D98](decisions.md)):** a picture of him for a clip, such as getting up: an animation of his own sprite, shown in place of standing. **It shows only while control is locked, and `set_control_enabled(true)` forgets it,** as it also puts his visual node back, so a clip that sticks or is cut short cannot leave him in it, and an old pose cannot return with a later lock.
 - **Owns:** horizontal movement, gravity, jumping (coyote time, jump buffer,
   variable height), facing, animation state, footstep cadence.
 - **Exports:** `walk_speed`, `acceleration`, `deceleration`, `air_control`,
@@ -267,6 +268,8 @@ so designers tune them in the inspector. Each class implements
     these itself in `_ready`, because it already holds the list.
   - `on_puzzle_solved()` from PuzzleController.
   - Two internal events: `RevealDone` and `FleeTimeout`.
+
+**The waking ([D98](decisions.md)):** `wake()`, called once by `GameSession` for a new game that came through the prologue, starts the locking cinematic `shore_wake` at the Shore and then shows the pose `wake`. It is under the contract below like any other: a missing, looping or stuck clip ends in the finalizer, which returns control and so clears the pose. It has no outcome of its own, emits no checkpoint, and a world that is restored, rebuilt or past the Shore never plays it.
 
 **Gameplay outcomes are separate from presentation (review finding 1).** Every
 gameplay consequence of a beat is applied in C++. Clips are visual and audio
@@ -403,7 +406,8 @@ This is a guard plus one deferred step, not an event framework.
   clips (stretch).
 
 ### MenuController : Control
-- `mode` = Title | Pause | Ending.
+- `mode` = Title | Pause | Ending | Prologue.
+- **New Game ([D97](decisions.md)):** the save is written, then How to Play shows on the main menu (`show_intro`, which pauses the tree only in Pause mode), and Begin (`back`) starts the prologue. Finishing or skipping the prologue starts the session with `set_waking(true)` and no introduction. With no prologue scene set, the session starts at once and shows How to Play itself, paused, as it did before M4. With `DAGON_AUTOSTART` set, for the export check, nothing waits and he is not woken.
 - **Owns the active input device ([D40](decisions.md)),** in `_input`, because it keeps running while paused. It passes the device
   on to `GameSession`, and from there to the Hud. A disconnection of that device hands back to the keyboard, and a reconnection
   changes nothing until the controller is used. Going between scenes, it sets the device on the new scene before that scene enters the tree.
@@ -428,7 +432,7 @@ This is a guard plus one deferred step, not an event framework.
   `dagon::reset_global_state()` (review finding 4). See §7 rule 8.
 
 ### Narration (`src/narration.*`, `src/core/narration.*`, in `Hud` and `MenuController`)
-**One script, `project/narration/script.txt`:** each line is `id|optional or story|words`. The game shows those words and `tools/audio/make_narration.py` speaks them, so they cannot drift apart. An `Interactable` names a `line_id`, and takes its caption from the script. A line's audio, if it has any, is `res://assets/narration/<id>.ogg`. A line with no file is a text line, so nothing depends on audio being there.
+**One script, `project/narration/script.txt`:** each line is `id|optional or story|words`. The game shows those words, and the voice tool (`tools/audio/make_audition.py --speak`, since the owner's choice of voice) speaks them, so they cannot drift apart; `tools/audio/check_narration.py` transcribes each recording and compares it with the script. An `Interactable` names a `line_id`, and takes its caption from the script. A line's audio, if it has any, is `res://assets/narration/<id>.ogg`. A line with no file is a text line, so nothing depends on audio being there.
 
 **Rules, in plain C++ and unit-tested:**
 - `decide_line`: there is no queue. Nothing speaking: start. The same line: ignored, never restarted. A story line replaces anything. An optional line replaces an optional one, and is dropped during a story line.
@@ -442,7 +446,7 @@ This is a guard plus one deferred step, not an event framework.
 
 **Who starts a line:** the player, by examining. A clip's method track at its moment (`Hud.say`), which cannot happen on restore, as no clip plays then. And `GameDirector` on the way into the Monolith beat only, which a restored world does not pass through. **So restoring speaks nothing.**
 
-**The epilogue:** `MenuController` in Ending mode shows `ending_lines` one at a time on the card, each with its audio if any and over its own picture (`panels_path`), as the prologue does, moving on by itself after `line_seconds`. Continue moves on at once, and goes to the credits after the last, so nobody is made to wait.
+**The epilogue:** `MenuController` in Ending mode shows `ending_lines` one at a time on the card, each with its audio if any and over its own picture (`panels_path`), as the prologue does, moving on by itself after `line_seconds`. **The prologue's last picture is the Shore (D97):** `project/tests/capture_opening.gd` photographs the game's opening view and the sailor asleep and sitting, and the picture's own sea and wind are the Shore's streams, kept at their level while the music fades over the last line (`fade_sounds` leaves the shown picture's players alone there). Both sequences are fully spoken, the prologue since M4: the card waits for each recording, and Continue, Skip and the credits each stop the one playing. Continue moves on at once, and goes to the credits after the last, so nobody is made to wait.
 
 ### Controller vibration (`src/haptics.*`)
 Stateless, with three named cues, each under a second. `GameDirector::haptic_cue(name)` plays one on the device in use, if it is a controller and the setting is on, and clips call it through a method track at their moment. **It alone stops them,** on `NOTIFICATION_PAUSED`, on a change of device, and on leaving the tree, and a cue is never resumed. A new cue replaces the last, as `Input` holds one per device. A paused or stopped clip cannot reach its key, so a stale cue cannot fire. Tests read `Input.get_joy_vibration_strength`, which proves requests only, and says nothing about feel or hardware.

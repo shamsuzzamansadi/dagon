@@ -144,10 +144,13 @@ func test_the_whole_game_can_be_played_from_new_game_to_the_ending_and_back_to_a
 	h.check(menu.get_node("Center/Confirm").visible, "no confirmation before replacing the save")
 	await h.tap_key(KEY_RIGHT)
 	await h.tap_key(KEY_ENTER)
+	# How to Play again, Begin, and the prologue again, skipped here.
+	h.check(h.is_introduction(h.tree.current_scene), "the second New Game showed no introduction")
+	await h.tap_key(KEY_ENTER)
 	var again = RoutePlayer.new(h)
 	await h.wait_for_scene("GameSession")
-	await h.tap_key(KEY_ENTER)
 	await h.landed_on_floor(again.player())
+	await h.wait_for_control(again.player())
 	_check_clean_start(h, again, "after the ending")
 	h.check(h.read_storage_file(SAVE_FILE) == SHORE_SAVE, "the new game saved: %s" % h.read_storage_file(SAVE_FILE))
 	# It really plays: the first trigger still fires, once.
@@ -258,10 +261,12 @@ func test_pause_during_a_cinematic_then_quit_to_the_main_menu_then_new_game_star
 	await h.tap_key(KEY_ENTER)
 	await h.tap_key(KEY_RIGHT)
 	await h.tap_key(KEY_ENTER)
-	await h.wait_for_scene("GameSession")
+	h.check(h.is_introduction(h.tree.current_scene), "the second New Game showed no introduction")
 	await h.tap_key(KEY_ENTER)
+	await h.wait_for_scene("GameSession")
 	var again = RoutePlayer.new(h)
 	await h.landed_on_floor(again.player())
+	await h.wait_for_control(again.player())
 	_check_clean_start(h, again, "after quitting the reveal")
 
 

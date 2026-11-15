@@ -41,14 +41,16 @@ func pause_menu() -> Control:
 	return session().get_node("PauseLayer/PauseMenu")
 
 
-## New Game from the main menu, through the introduction.
+## New Game from the main menu: How to Play, Begin, the prologue skipped, and the sailor on his feet.
 func start_new_game() -> void:
 	await h.tap_key(KEY_ENTER)
-	await h.wait_for_scene("GameSession")
-	h.check(pause_menu().is_open(), "New Game showed no introduction")
+	h.check(h.is_introduction(h.tree.current_scene), "New Game showed no introduction")
 	await h.tap_key(KEY_ENTER)
-	h.check(not h.tree.paused, "Begin left the game paused")
+	await h.wait_for_scene("GameSession")
+	h.check(h.introductions_begun == 0, "Begin did not leave the introduction")
+	h.check(not h.tree.paused and not pause_menu().is_open(), "the game began paused")
 	await h.landed_on_floor(player())
+	await h.wait_for_control(player())
 
 
 ## Holds a key until the condition holds, hopping when the sailor is blocked, as anyone would. With examine on, it

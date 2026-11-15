@@ -25,6 +25,8 @@ const char *const SAVE_FAILED_NOTICE = "Could not save this checkpoint";
 
 void GameSession::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_start", "beat", "persisted", "show_intro"), &GameSession::set_start);
+	ClassDB::bind_method(D_METHOD("set_waking", "waking"), &GameSession::set_waking);
+	ClassDB::bind_method(D_METHOD("is_waking"), &GameSession::is_waking);
 	ClassDB::bind_method(D_METHOD("set_active_device", "device"), &GameSession::set_active_device);
 	ClassDB::bind_method(D_METHOD("get_active_device"), &GameSession::get_active_device);
 	ClassDB::bind_method(D_METHOD("restart_checkpoint"), &GameSession::restart_checkpoint);
@@ -98,6 +100,13 @@ void GameSession::_ready() {
 		menu->set_active_device(active_device_);
 		if (show_intro_) {
 			menu->show_intro();
+		}
+	}
+	// Once, in the world a new game begins in. Restart and Continue build theirs without it.
+	if (waking_) {
+		waking_ = false;
+		if (GameDirector *director = director_.get()) {
+			director->wake();
 		}
 	}
 }

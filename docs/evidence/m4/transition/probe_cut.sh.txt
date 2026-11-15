@@ -1,0 +1,14 @@
+#!/bin/sh
+# probe_cut.sh <out dir> <fps> <delays, comma-separated> [continue]: Movie Maker captures of the cut into the game,
+# one per delay, then a measurement of anything below -65 dB within half a second of the cut.
+. $HOME/work/dagon-m4/bin/env.sh
+out=$1; fps=$2; delays=$3; cont=${4:-0}; mkdir -p $out
+cp $NOTES/tools/probe_cut.gd $CLONE/project/tests/zz_probe_cut.gd
+for k in $(echo $delays | tr ',' ' '); do
+	d=$(mktemp -d $S/tmp/dagon-test-XXXXXX)
+	unshare -rm $W/bin/xns.sh sh -c "DAGON_PROBE_DELAY=$k DAGON_PROBE_CONTINUE=$cont DAGON_STORAGE_DIR=$d $GODOT --path $CLONE/project --resolution 480x270 --write-movie $out/cut-$fps-$k.avi --fixed-fps $fps --script res://tests/zz_probe_cut.gd > $out/cut-$fps-$k.log 2>&1"
+	rm -rf "$d"
+	$FF -v error -y -i $out/cut-$fps-$k.avi -vn -c:a pcm_s16le $out/cut-$fps-$k.wav && rm -f $out/cut-$fps-$k.avi
+	$S/venv/bin/python $NOTES/tools/gap.py $out/cut-$fps-$k.wav $out/cut-$fps-$k.log $fps "fps=$fps delay=$k continue=$cont"
+done
+rm -f $CLONE/project/tests/zz_probe_cut.gd $CLONE/project/tests/zz_probe_cut.gd.uid

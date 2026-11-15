@@ -1,6 +1,9 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=14 format=3]
 
 [ext_resource type="Theme" path="res://assets/ui/theme.tres" id="theme"]
+[ext_resource type="AudioStream" path="res://assets/audio/effects/ui_move.ogg" id="a_ui_move"]
+[ext_resource type="AudioStream" path="res://assets/audio/effects/ui_accept.ogg" id="a_ui_accept"]
+[ext_resource type="AudioStream" path="res://assets/audio/effects/ui_back.ogg" id="a_ui_back"]
 [ext_resource type="PackedScene" path="res://scenes/ui/settings_menu.tscn" id="1_settings"]
 [ext_resource type="PackedScene" path="res://scenes/level/game.tscn" id="2_game"]
 [ext_resource type="PackedScene" path="res://scenes/ui/prologue.tscn" id="3_prologue"]
@@ -13,6 +16,9 @@
 [ext_resource type="Texture2D" path="res://assets/shore/boat.png" id="9_boat"]
 
 [node name="Title" type="MenuController"]
+move_sound_path = NodePath("SoundMove")
+accept_sound_path = NodePath("SoundAccept")
+back_sound_path = NodePath("SoundBack")
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -237,6 +243,18 @@ text = "Back"
 [node name="Settings" parent="." instance=ExtResource("1_settings")]
 visible = false
 layout_mode = 1
+
+[node name="SoundMove" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("a_ui_move")
+bus = &"Effects"
+
+[node name="SoundAccept" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("a_ui_accept")
+bus = &"Effects"
+
+[node name="SoundBack" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("a_ui_back")
+bus = &"Effects"
 
 [connection signal="pressed" from="Center/Main/Panel/Items/NewGame" to="." method="new_game"]
 [connection signal="pressed" from="Center/Main/Panel/Items/Continue" to="." method="continue_game"]

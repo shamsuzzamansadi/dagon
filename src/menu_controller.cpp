@@ -17,9 +17,11 @@
 #include <godot_cpp/classes/resource_loader.hpp>
 #include <godot_cpp/classes/property_tweener.hpp>
 #include <godot_cpp/classes/scene_tree.hpp>
+#include <godot_cpp/classes/scene_tree_timer.hpp>
 #include <godot_cpp/classes/text_server.hpp>
 #include <godot_cpp/classes/tween.hpp>
 #include <godot_cpp/classes/viewport.hpp>
+#include <godot_cpp/classes/window.hpp>
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/core/error_macros.hpp>
 #include <godot_cpp/core/print_string.hpp>
@@ -46,6 +48,9 @@ constexpr double ENDING_LINE_MINIMUM_SECONDS = 3.0;
 constexpr double ENDING_LINE_PAUSE_SECONDS = 0.7;
 constexpr double CREDITS_FADE_SECONDS = 5.0;
 constexpr float FADE_OUT_DB = 36.0f;
+// After the cut the prologue's sound holds until the game's has come up, measured at under 0.1 s, then fades out.
+constexpr double HANDOVER_HOLD_SECONDS = 0.1;
+constexpr double HANDOVER_FADE_SECONDS = 0.15;
 constexpr float ENDING_LINE_FADE_SECONDS = 0.8f;
 constexpr float ENDING_LINE_WIDTH = 400.0f;
 
@@ -130,6 +135,9 @@ void MenuController::_bind_methods() {
 	DAGON_BIND_PATH(ending_box_path);
 	DAGON_BIND_PATH(voice_path);
 	DAGON_BIND_PATH(panels_path);
+	DAGON_BIND_PATH(move_sound_path);
+	DAGON_BIND_PATH(accept_sound_path);
+	DAGON_BIND_PATH(back_sound_path);
 
 #undef DAGON_BIND_PATH
 }
@@ -167,6 +175,14 @@ void MenuController::_ready() {
 	}
 	if (SettingsMenu *settings = settings_menu_.get()) {
 		settings->connect("closed", callable_mp(this, &MenuController::on_settings_closed));
+	}
+	move_sound_.set(move_sound_path_.is_empty() ? nullptr : get_node<AudioStreamPlayer>(move_sound_path_));
+	accept_sound_.set(accept_sound_path_.is_empty() ? nullptr : get_node<AudioStreamPlayer>(accept_sound_path_));
+	back_sound_.set(back_sound_path_.is_empty() ? nullptr : get_node<AudioStreamPlayer>(back_sound_path_));
+	get_viewport()->connect("gui_focus_changed", callable_mp(this, &MenuController::on_gui_focus_changed));
+	const TypedArray<Node> buttons = find_children("*", "BaseButton", true, false);
+	for (int64_t i = 0; i < buttons.size(); i++) {
+		Object::cast_to<Node>(buttons[i])->connect("pressed", callable_mp(this, &MenuController::on_button_pressed));
 	}
 
 	Input *input = Input::get_singleton();
@@ -268,16 +284,21 @@ void MenuController::show_panel(int p_index) {
 	}
 }
 
-// Every sound of this screen but the voice, down to nearly nothing, while it carries on playing.
-void MenuController::fade_sounds(double p_seconds) {
+// Every sound of this screen but the voice, down to nearly nothing, while it carries on playing. Those of one
+// picture can be kept as they are.
+void MenuController::fade_sounds(double p_seconds, const Node *p_keep_under, double p_delay) {
 	const AudioStreamPlayer *voice = voice_.get();
 	const TypedArray<Node> players = find_children("*", "AudioStreamPlayer", true, false);
 	for (int64_t i = 0; i < players.size(); i++) {
 		AudioStreamPlayer *sound = Object::cast_to<AudioStreamPlayer>(players[i]);
-		if (sound == nullptr || sound == voice || !sound->is_playing()) {
+		if (sound == nullptr || sound == voice || !sound->is_playing() || (p_keep_under != nullptr && sound->get_parent() == p_keep_under)) {
 			continue;
 		}
-		sound->create_tween()->tween_property(sound, "volume_db", sound->get_volume_db() - FADE_OUT_DB, p_seconds);
+		Ref<Tween> tween = sound->create_tween();
+		if (p_delay > 0.0) {
+			tween->tween_interval(p_delay);
+		}
+		tween->tween_property(sound, "volume_db", sound->get_volume_db() - FADE_OUT_DB, p_seconds);
 	}
 }
 
@@ -319,8 +340,11 @@ void MenuController::finish_prologue(bool p_skipped) {
 		voice->stop();
 	}
 	print_verbose("dagon: prologue finished skipped=", p_skipped);
-	// The new save was written before the prologue began, so finishing and skipping start the same game.
-	start_session(core::Beat::Shore, true);
+	// The new save was written before the prologue began, so finishing and skipping start the same game: at once,
+	// on him getting up beside the boat. How to Play was shown before the prologue. The export check counts frames,
+	// not seconds, and has nobody to watch him get up, so for it he is already standing.
+	const bool unattended = !OS::get_singleton()->get_environment(AUTOSTART_VARIABLE).is_empty();
+	start_session(core::Beat::Shore, false, !unattended, true);
 }
 
 // Each line of the epilogue takes the card when the one before has been said or could be read, whether it has a
@@ -360,9 +384,12 @@ void MenuController::show_next_ending_line() {
 	show_panel(ending_line_);
 	print_verbose(mode_ == MODE_PROLOGUE ? "dagon: prologue line: " : "dagon: ending line: ", id, " voiced=", voiced);
 	ending_line_left_ = core::line_seconds(static_cast<std::size_t>(text.length()), voiced ? stream->get_length() : 0.0, ENDING_LINE_MINIMUM_SECONDS) + ENDING_LINE_PAUSE_SECONDS;
-	// The prologue's music and sea fade out over its last line, so the game does not cut them off.
+	// The prologue's music fades out over its last line, so the game does not cut it off. The last picture is the
+	// Shore the game opens on, and its sound is the Shore's, at the Shore's level: it is kept, and the game carries on
+	// from it.
 	if (mode_ == MODE_PROLOGUE && ending_line_ + 1 >= ending_lines_.size()) {
-		fade_sounds(ending_line_left_);
+		const Control *panels = panels_path_.is_empty() ? nullptr : get_node<Control>(panels_path_);
+		fade_sounds(ending_line_left_, panels != nullptr && ending_line_ < panels->get_child_count() ? panels->get_child(ending_line_) : nullptr);
 	}
 }
 
@@ -436,8 +463,10 @@ void MenuController::_unhandled_input(const Ref<InputEvent> &p_event) {
 		// Taken first: skipping the prologue changes the scene, which takes this node out of the tree at once.
 		Viewport *viewport = get_viewport();
 		if (is_open()) {
+			play(back_sound_);
 			back();
 		} else {
+			play(accept_sound_);
 			open();
 		}
 		viewport->set_input_as_handled();
@@ -478,12 +507,29 @@ void MenuController::focus_path(const NodePath &p_path) {
 }
 
 void MenuController::focus_default() {
+	quiet_focus_ = true;
 	if (screen_ == Screen::Settings) {
 		settings_menu_.get()->focus_current();
-		return;
-	}
-	if (Control *control = get_node<Control>(default_focus_path_)) {
+	} else if (Control *control = get_node<Control>(default_focus_path_)) {
 		control->grab_focus();
+	}
+	quiet_focus_ = false;
+}
+
+void MenuController::on_gui_focus_changed(Control *p_control) {
+	if (!quiet_focus_ && is_open() && p_control != nullptr && is_ancestor_of(p_control)) {
+		play(move_sound_);
+	}
+}
+
+void MenuController::on_button_pressed() {
+	play(accept_sound_);
+}
+
+void MenuController::play(const NodeRef<AudioStreamPlayer> &p_sound) {
+	// A press that changes the scene has already taken the menu out of the tree by the time it is heard here.
+	if (AudioStreamPlayer *sound = p_sound.get(); sound != nullptr && sound->is_inside_tree()) {
+		sound->play();
 	}
 }
 
@@ -518,7 +564,10 @@ void MenuController::show_intro() {
 		return;
 	}
 	intro_ = true;
-	get_tree()->set_pause(true);
+	// In the game it holds the world still. On the main menu, before the prologue, there is no world to hold.
+	if (mode_ == MODE_PAUSE) {
+		get_tree()->set_pause(true);
+	}
 	refresh_controls_text();
 	if (Label *title = get_node<Label>(controls_title_label_path_)) {
 		title->set_text("How to Play");
@@ -531,7 +580,7 @@ void MenuController::show_intro() {
 	// The export check has nobody to press Begin, and needs play to start to see a prompt.
 	print_verbose("dagon: introduction shown");
 	if (!OS::get_singleton()->get_environment(AUTOSTART_VARIABLE).is_empty()) {
-		call_deferred("resume");
+		call_deferred("back");
 	}
 }
 
@@ -555,7 +604,9 @@ void MenuController::refresh_controls_text() {
 
 void MenuController::open_settings() {
 	show_screen(Screen::Settings);
+	quiet_focus_ = true;
 	settings_menu_.get()->open();
+	quiet_focus_ = false;
 }
 
 void MenuController::on_settings_closed() {
@@ -687,16 +738,24 @@ void MenuController::write_new_game() {
 		ask_confirm(ConfirmAction::NewGame, NEW_GAME_FAILED_MESSAGE, "Retry");
 		return;
 	}
-	// The save is written first, so leaving during the prologue already leaves a game to Continue, at the Shore.
+	// The save is written first, so leaving from here on already leaves a game to Continue, at the Shore.
+	// How to Play comes now, before the prologue, so that nothing stands between its last picture and the game.
 	if (prologue_scene_.is_valid()) {
 		reset_global_state();
-		MenuController *prologue = Object::cast_to<MenuController>(prologue_scene_->instantiate());
-		ERR_FAIL_NULL_MSG(prologue, "MenuController: prologue_scene's root is not a MenuController.");
-		prologue->set_active_device(active_device_);
-		get_tree()->change_scene_to_node(prologue);
+		show_intro();
 		return;
 	}
 	start_session(fresh.beat, true);
+}
+
+void MenuController::begin_prologue() {
+	intro_ = false;
+	ERR_FAIL_COND_MSG(prologue_scene_.is_null(), "MenuController: prologue_scene is not set.");
+	reset_global_state();
+	MenuController *prologue = Object::cast_to<MenuController>(prologue_scene_->instantiate());
+	ERR_FAIL_NULL_MSG(prologue, "MenuController: prologue_scene's root is not a MenuController.");
+	prologue->set_active_device(active_device_);
+	get_tree()->change_scene_to_node(prologue);
 }
 
 void MenuController::continue_game() {
@@ -706,14 +765,34 @@ void MenuController::continue_game() {
 	start_session(loaded_save_.beat, false);
 }
 
-void MenuController::start_session(core::Beat p_beat, bool p_show_intro) {
+void MenuController::start_session(core::Beat p_beat, bool p_show_intro, bool p_waking, bool p_seamless) {
 	ERR_FAIL_COND_MSG(game_scene_.is_null(), "MenuController: game_scene is not set; the game cannot start.");
 	reset_global_state();
 	GameSession *session = Object::cast_to<GameSession>(game_scene_->instantiate());
 	ERR_FAIL_NULL_MSG(session, "MenuController: game_scene's root is not a GameSession.");
 	session->set_start(static_cast<int>(p_beat), true, p_show_intro);
+	session->set_waking(p_waking);
 	session->set_active_device(active_device_);
-	get_tree()->change_scene_to_node(session);
+	// The prologue's last picture is the Shore, with the Shore's sea and wind, and the game carries on from it. The
+	// game's own sound is silent for part of its first frame and comes up over the next few, so a plain change of
+	// scene left a gap of 12 to 23 ms at the cut, and a dip after it, measured. Here the prologue stays a moment after
+	// the game goes in, hidden and deaf to input, its sound held while the game's comes up and then faded out under
+	// it, and then goes. The voice has already stopped.
+	SceneTree *tree = get_tree();
+	Node *previous = tree->get_current_scene();
+	if (p_seamless && previous == this) {
+		tree->get_root()->add_child(session);
+		tree->set_current_scene(session);
+		set_visible(false);
+		set_process(false);
+		set_physics_process(false);
+		set_process_input(false);
+		set_process_unhandled_input(false);
+		fade_sounds(HANDOVER_FADE_SECONDS, nullptr, HANDOVER_HOLD_SECONDS);
+		tree->create_timer(HANDOVER_HOLD_SECONDS + HANDOVER_FADE_SECONDS + 0.05)->connect("timeout", callable_mp(static_cast<Node *>(this), &Node::queue_free));
+		return;
+	}
+	tree->change_scene_to_node(session);
 }
 
 void MenuController::back() {
@@ -729,7 +808,9 @@ void MenuController::back() {
 			settings_menu_.get()->back();
 			break;
 		case Screen::Controls:
-			if (intro_) {
+			if (intro_ && mode_ == MODE_TITLE) {
+				begin_prologue();
+			} else if (intro_) {
 				resume();
 			} else {
 				show_screen(Screen::Main);

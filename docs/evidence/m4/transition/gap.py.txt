@@ -1,0 +1,19 @@
+"""gap.py WAV LOG FPS LABEL: anything below -65 dB, in either channel's peak, within 0.5 s of the cut frame."""
+import re, sys
+import numpy as np, soundfile as sf
+wav, log, fps, label = sys.argv[1], sys.argv[2], float(sys.argv[3]), sys.argv[4]
+x, sr = sf.read(wav, always_2d=True)
+marks = dict(re.findall(r"RECORD (\S+) frame=(\d+)", open(log).read()))
+first = int(re.search(r"RECORD prologue frame=(\d+)", open(log).read()).group(1)) if "prologue" in marks else 0
+cut = int(marks["cut"]) / fps
+m = np.abs(x).max(axis=1)
+a, b = max(0, int((cut - 0.5) * sr)), min(len(m), int((cut + 0.5) * sr))
+q = np.where(m[a:b] < 10 ** (-65 / 20))[0]
+gaps = []
+if len(q):
+    for r in np.split(q, np.where(np.diff(q) > 1)[0] + 1):
+        if len(r) >= sr * 0.005:
+            gaps.append(((a + r[0]) / sr - cut, len(r) / sr * 1000))
+level = lambda s0, s1: 20 * np.log10(np.sqrt(np.mean(x[int(s0 * sr):int(s1 * sr)] ** 2)) + 1e-12)
+print(f"{label}: cut at {cut:.3f} s; before {level(cut - 0.4, cut - 0.1):.1f} dB, after {level(cut + 0.1, cut + 0.4):.1f} dB; "
+      + ("gaps below -65 dB: " + ", ".join(f"{g[1]:.1f} ms at cut{g[0]:+.3f} s" for g in gaps) if gaps else "no gap below -65 dB"))

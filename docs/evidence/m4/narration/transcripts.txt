@@ -1,0 +1,111 @@
+abyss.crossing: word for word
+   5.92 s, 14.7 chars/s, -24.0 dB RMS, peak -2.0 dBFS
+   script: It struck the raised end, and the slab came down level with a sound I felt in my teeth.
+   heard:  It struck the raised end, and the slab came down level with a sound I felt in my teeth.
+   words:  It@0.00 struck@0.22 the@0.52 raised@0.78 end,@1.18 and@1.90 the@2.08 slab@2.26 came@2.58 down@2.90 level@3.30 with@3.60 a@3.88 sound@4.08 I@4.38 felt@4.60 in@4.88 my@5.08 teeth.@5.28
+abyss.ritual: word for word
+   5.41 s, 12.9 chars/s, -24.0 dB RMS, peak -4.2 dBFS
+   script: Figures, far off among the stones. Kneeling, all of them. All but one.
+   heard:  figures, far off among the stones, kneeling, all of them, all but one.
+   words:  figures,@0.00 far@1.00 off@1.14 among@1.44 the@1.70 stones,@1.98 kneeling,@2.94 all@3.34 of@3.56 them,@3.74 all@4.28 but@4.44 one.@4.64
+abyss.watcher: word for word
+   5.52 s, 12.3 chars/s, -24.0 dB RMS, peak -2.6 dBFS
+   script: Upright, on the ridge. I looked again, and there was only the ridge.
+   heard:  upright on the ridge. I looked again and there was only the ridge.
+   words:  upright@0.00 on@0.54 the@1.10 ridge.@1.24 I@2.16 looked@2.52 again@2.78 and@3.26 there@3.68 was@3.86 only@4.06 the@4.50 ridge.@4.68
+cave.carving: word for word
+   12.15 s, 12.5 chars/s, -24.0 dB RMS, peak -5.9 dBFS
+   script: The same eye. The same waves, cut deep into the rock, and an arm coiled round them, each sucker cut with care. It isn't worn. Someone has kept it clean.
+   heard:  the same eye, the same waves cut deep into the rock and an arm coiled round them, each sucker cut with care. It isn't worn. Someone has kept it clean.
+   words:  the@0.00 same@0.20 eye,@0.50 the@1.52 same@1.64 waves@2.00 cut@2.58 deep@3.16 into@3.56 the@3.92 rock@4.06 and@4.42 an@4.88 arm@5.04 coiled@5.46 round@6.00 them,@6.30 each@7.00 sucker@7.26 cut@7.62 with@7.94 care.@8.22 It@9.02 isn't@9.24 worn.@9.58 Someone@10.52 has@10.76 kept@10.98 it@11.22 clean.@11.42
+ending.found: word for word
+   15.31 s, 12.7 chars/s, -24.0 dB RMS, peak -3.2 dBFS
+   script: I do not remember reaching the boat. A steamer found me in it, they say, adrift and raving, days from any land. They tell me the sea never left. There was no shore, no stone, no tide drawn back.
+   heard:  I do not remember reaching the boat. A steamer found me in it, they say, adrift and raving, days from any land. They tell me the sea never left. There was no shore, no stone, no tide drawn back.
+   words:  I@0.00 do@0.22 not@0.38 remember@0.60 reaching@1.06 the@1.46 boat.@1.74 A@2.70 steamer@2.76 found@3.24 me@3.60 in@3.86 it,@4.04 they@4.22 say,@4.32 adrift@5.00 and@5.38 raving,@5.62 days@6.30 from@6.60 any@6.94 land.@7.22 They@8.26 tell@8.48 me@8.74 the@9.02 sea@9.22 never@9.54 left.@9.86 There@10.74 was@10.92 no@11.14 shore,@11.48 no@12.40 stone,@12.62 no@13.50 tide@13.70 drawn@14.12 back.@14.50
+ending.innsmouth: word for word (a recorded exception: 'innsmouth' heard as 'insemouth')
+   16.05 s, 13.8 chars/s, -24.0 dB RMS, peak -5.0 dBFS
+   script: Years later, in a fishing town called Innsmouth, I saw a bracelet in a shop window. That eye, above those waves. The man behind the counter asked how far out I had been. I did not tell him. He did not seem to need telling.
+   heard:  Years later, in a fishing-town called Insemouth, I saw a bracelet in a shop window, that eye above those waves. The man behind the counter asked how far out I had been. I did not tell him. He did not seem to need telling.
+   words:  Years@0.00 later,@0.34 in@1.04 a@1.18 fishing@1.32 -town@1.62 called@1.98 Insemouth,@2.46 I@3.62 saw@3.82 a@4.02 bracelet@4.26 in@4.54 a@4.78 shop@4.92 window,@5.14 that@6.08 eye@6.30 above@6.62 those@7.06 waves.@7.40 The@8.46 man@8.80 behind@9.04 the@9.40 counter@9.56 asked@9.90 how@10.24 far@10.50 out@10.82 I@11.04 had@11.20 been.@11.36 I@12.22 did@12.48 not@12.62 tell@12.84 him.@13.12 He@13.76 did@13.94 not@14.06 seem@14.28 to@14.58 need@14.84 telling.@15.10
+ending.listen: word for word
+   5.61 s, 14.3 chars/s, -24.0 dB RMS, peak -5.0 dBFS
+   script: I have stopped arguing. At night I listen to the water, and what moves under it.
+   heard:  I have stopped arguing. At night I listen to the water and what moves under it.
+   words:  I@0.00 have@0.24 stopped@0.34 arguing.@0.64 At@1.82 night@2.00 I@2.32 listen@2.64 to@2.86 the@3.14 water@3.28 and@3.60 what@4.14 moves@4.44 under@4.82 it.@5.10
+ending.rising: word for word
+   8.01 s, 15.2 chars/s, -24.0 dB RMS, peak -3.8 dBFS
+   script: Those figures bowed for a reason. Whatever rose that night did not rise for me, and I do not think it has finished rising.
+   heard:  Those figures bowed for a reason. Whatever rose that night did not rise for me, and I do not think it has finished rising.
+   words:  Those@0.00 figures@0.40 bowed@0.88 for@1.38 a@1.78 reason.@1.96 Whatever@2.84 rose@3.10 that@3.46 night@3.74 did@4.02 not@4.20 rise@4.46 for@4.78 me,@5.06 and@5.48 I@5.62 do@5.76 not@5.90 think@6.12 it@6.34 has@6.50 finished@6.72 rising.@7.16
+flee.back: word for word
+   2.19 s, 11.4 chars/s, -24.0 dB RMS, peak -7.0 dBFS
+   script: Don't look back. Don't...
+   heard:  Don't look back. Don't.
+   words:  Don't@0.00 look@0.32 back.@0.44 Don't.@1.56
+flee.sea: word for word
+   2.45 s, 13.1 chars/s, -24.0 dB RMS, peak -6.0 dBFS
+   script: The sea. The sea is coming back.
+   heard:  The sea. The sea is coming back.
+   words:  The@0.00 sea.@0.20 The@0.94 sea@1.18 is@1.40 coming@1.56 back.@1.78
+monolith.first: word for word
+   6.46 s, 13.3 chars/s, -24.0 dB RMS, peak -2.9 dBFS
+   script: The canyon opens, and then there is only that. I do not know who could have raised it.
+   heard:  The canyon opens, and then there is only that. I do not know who could have raised it.
+   words:  The@0.00 canyon@0.20 opens,@0.48 and@1.38 then@1.62 there@1.88 is@2.24 only@2.40 that.@2.68 I@3.60 do@3.88 not@4.10 know@4.40 who@4.72 could@5.12 have@5.36 raised@5.56 it.@5.86
+prologue.drift: word for word
+   8.00 s, 13.2 chars/s, -24.0 dB RMS, peak -3.2 dBFS
+   script: After that there was only the sea, and the sun, and no land in any direction. I stopped counting the days.
+   heard:  After that there was only the sea and the sun and no land in any direction. I stopped counting the days.
+   words:  After@0.00 that@0.42 there@0.74 was@1.04 only@1.24 the@1.64 sea@1.86 and@2.18 the@2.58 sun@2.74 and@3.08 no@3.68 land@3.96 in@4.36 any@4.58 direction.@4.84 I@5.90 stopped@6.12 counting@6.48 the@7.02 days.@7.28
+prologue.dry: word for word
+   3.70 s, 12.7 chars/s, -24.0 dB RMS, peak -4.7 dBFS
+   script: I slept at last. When I woke, the sea had gone.
+   heard:  I slept at last. When I woke, the sea had gone.
+   words:  I@0.00 slept@0.20 at@0.46 last.@0.68 When@1.58 I@1.76 woke,@1.90 the@2.64 sea@2.68 had@2.94 gone.@3.14
+prologue.escape: word for word (same sound: 'rowed' heard as 'rode')
+   7.86 s, 15.1 chars/s, -24.0 dB RMS, peak -2.9 dBFS
+   script: One night the watch was careless. I took a boat, a little water and some bread, and rowed until their lights were gone.
+   heard:  One night the watch was careless. I took a boat, a little water and some bread, and rode until their lights were gone.
+   words:  One@0.00 night@0.28 the@0.60 watch@0.92 was@1.22 careless.@1.64 I@2.82 took@3.02 a@3.18 boat,@3.34 a@3.78 little@3.86 water@4.00 and@4.40 some@4.64 bread,@4.86 and@5.40 rode@5.62 until@6.02 their@6.40 lights@6.60 were@6.88 gone.@7.12
+prologue.raider: word for word
+   7.39 s, 14.5 chars/s, -24.0 dB RMS, peak -4.4 dBFS
+   script: The war was two years old when a raider took our ship. They kept us below, and fed us when they remembered.
+   heard:  The war was two years old when a raider took our ship. They kept us below and fed us when they remembered.
+   words:  The@0.00 war@0.18 was@0.46 two@0.72 years@0.98 old@1.22 when@1.56 a@1.78 raider@1.94 took@2.22 our@2.48 ship.@2.74 They@3.86 kept@4.14 us@4.42 below@4.74 and@5.12 fed@5.58 us@5.90 when@6.12 they@6.30 remembered.@6.44
+shore.boat: word for word
+   5.82 s, 12.7 chars/s, -24.0 dB RMS, peak -2.9 dBFS
+   script: My boat lies on bare seabed. The sea has drawn back farther than any tide.
+   heard:  My boat lies on bare seabed. The sea has drawn back farther than any tide.
+   words:  My@0.00 boat@0.28 lies@0.60 on@1.04 bare@1.38 seabed.@1.64 The@2.62 sea@2.82 has@3.06 drawn@3.32 back@3.60 farther@3.96 than@4.32 any@4.70 tide.@5.08
+shore.fish: word for word
+   5.46 s, 14.3 chars/s, -24.0 dB RMS, peak -5.5 dBFS
+   script: Dead fish, rotting where the water left them. They have not been dry for long.
+   heard:  Dead fish, rotting where the water left them, they have not been dry for long.
+   words:  Dead@0.00 fish,@0.30 rotting@1.40 where@1.40 the@1.76 water@1.90 left@2.16 them,@2.44 they@3.26 have@3.42 not@3.56 been@3.78 dry@4.04 for@4.38 long.@4.64
+shore.talisman: word for word
+   9.76 s, 13.7 chars/s, -24.0 dB RMS, peak -3.1 dBFS
+   script: Something small, half sunk in the mud. An eye, cut above a line of waves. It is heavier than it should be, and someone wore it smooth.
+   heard:  Something small, half sunk in the mud, an eye cut above a line of waves. It is heavier than it should be, and someone wore it smooth.
+   words:  Something@0.00 small,@0.48 half@1.64 sunk@1.72 in@2.06 the@2.30 mud,@2.42 an@3.16 eye@3.28 cut@3.62 above@4.10 a@4.38 line@4.58 of@4.80 waves.@4.98 It@5.86 is@6.08 heavier@6.28 than@6.56 it@6.90 should@7.06 be,@7.26 and@7.84 someone@8.06 wore@8.52 it@8.88 smooth.@9.06
+story.awakened: word for word
+   4.73 s, 14.2 chars/s, -24.0 dB RMS, peak -4.5 dBFS
+   script: The stones answered. Somewhere behind the rock, something gave way.
+   heard:  the stones answered. Somewhere behind the rock, something gave way
+   words:  the@0.00 stones@0.16 answered.@0.52 Somewhere@1.52 behind@1.94 the@2.36 rock,@2.54 something@3.32 gave@3.58 way@3.94
+story.recoil: word for word
+   3.75 s, 12.8 chars/s, -24.0 dB RMS, peak -4.7 dBFS
+   script: The carving. The same arm, round the same stone.
+   heard:  The carving. The same arm round the same stone.
+   words:  The@0.00 carving.@0.20 The@1.12 same@1.34 arm@1.68 round@2.04 the@2.52 same@2.78 stone.@3.10
+story.reveal: word for word
+   3.63 s, 14.6 chars/s, -24.0 dB RMS, peak -5.3 dBFS
+   script: It was no ridge. It had been beside me the whole way.
+   heard:  It was no ridge. It had been beside me the whole way.
+   words:  It@0.00 was@0.20 no@0.38 ridge.@0.66 It@1.40 had@1.52 been@1.66 beside@1.82 me@2.30 the@2.60 whole@2.76 way.@2.96
+story.run: word for word
+   2.00 s, 11.5 chars/s, -24.0 dB RMS, peak -8.1 dBFS
+   script: Its head turned. I ran.
+   heard:  Its head turned. I ran.
+   words:  Its@0.00 head@0.24 turned.@0.46 I@1.32 ran.@1.38
+22 lines, 0 differing

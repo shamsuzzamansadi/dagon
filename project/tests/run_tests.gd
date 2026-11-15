@@ -25,12 +25,16 @@ const SUITES: Array[Script] = [
 	preload("res://tests/test_route.gd"),
 	preload("res://tests/test_narration.gd"),
 	preload("res://tests/test_narrative.gd"),
+	preload("res://tests/test_opening.gd"),
 ]
 const REQUIRED_CLASSES: Array[String] = ["PlayerController", "CameraRig", "Interactable", "Interactor", "StoryTrigger", "Hud", "PuzzleController", "GameDirector", "GameSession", "MenuController", "SettingsMenu"]
 const STORAGE_VARIABLE := "DAGON_STORAGE_DIR"
 const STORAGE_MARKER := "dagon-test-"
 ## Set by tools/export_check.sh. Export rewrites scenes, so the same tests also run on what actually ships.
 const PACK_VARIABLE := "DAGON_TEST_PACK"
+## For a focused run while working: only tests whose "suite.test" name contains this text. Such a run ends with a
+## PARTIAL line and never a RESULT line, so it cannot be taken for the suite.
+const ONLY_VARIABLE := "DAGON_TEST_ONLY"
 
 ## Watchdog in rendered frames, so a broken await cannot hang the run forever.
 const MAX_FRAMES := 400000
@@ -113,6 +117,7 @@ func _run() -> void:
 
 	var passed := 0
 	var failed := 0
+	var only := OS.get_environment(ONLY_VARIABLE)
 	for suite in SUITES:
 		# A suite that does not compile would otherwise hang the run until the watchdog.
 		if not suite.can_instantiate():
@@ -124,6 +129,8 @@ func _run() -> void:
 		for method in instance.get_method_list():
 			var test_name: String = method["name"]
 			if not test_name.begins_with("test_"):
+				continue
+			if not only.is_empty() and not ("%s.%s" % [suite_name, test_name]).contains(only):
 				continue
 			_trap.take()
 			var harness := Harness.new(self)
@@ -154,5 +161,8 @@ func _run() -> void:
 	var until := Time.get_ticks_msec() + 200
 	while Time.get_ticks_msec() < until:
 		await process_frame
-	print("RESULT passed=%d failed=%d" % [passed, failed])
+	if not only.is_empty():
+		print("PARTIAL passed=%d failed=%d only=%s" % [passed, failed, only])
+	else:
+		print("RESULT passed=%d failed=%d" % [passed, failed])
 	quit(0 if failed == 0 and passed > 0 else 1)

@@ -65,6 +65,8 @@ public:
 	godot::NodePath get_caption_label_path() const { return caption_label_path_; }
 	void set_voice_path(const godot::NodePath &p_value) { voice_path_ = p_value; }
 	godot::NodePath get_voice_path() const { return voice_path_; }
+	void set_examine_sound_path(const godot::NodePath &p_value) { examine_sound_path_ = p_value; }
+	godot::NodePath get_examine_sound_path() const { return examine_sound_path_; }
 	void set_fade_rect_path(const godot::NodePath &p_value) { fade_rect_path_ = p_value; }
 	godot::NodePath get_fade_rect_path() const { return fade_rect_path_; }
 	void set_caption_hold_seconds(float p_value) { caption_hold_seconds_ = p_value; }
@@ -86,6 +88,7 @@ private:
 	godot::NodePath caption_label_path_;
 	godot::NodePath fade_rect_path_;
 	godot::NodePath voice_path_;
+	godot::NodePath examine_sound_path_;
 	float caption_hold_seconds_ = 4.0f;
 
 	NodeRef<godot::Label> notice_label_;
@@ -93,6 +96,7 @@ private:
 	NodeRef<godot::Label> caption_label_;
 	NodeRef<godot::ColorRect> fade_rect_;
 	NodeRef<godot::AudioStreamPlayer> voice_;
+	NodeRef<godot::AudioStreamPlayer> examine_sound_;
 	NodeRef<Interactor> interactor_;
 	godot::Ref<godot::Tween> notice_tween_;
 	godot::Ref<godot::Tween> caption_tween_;

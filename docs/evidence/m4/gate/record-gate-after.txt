@@ -1,0 +1,14 @@
+exit=0
+RECORD closed-gate frame=13
+RECORD gate-try furthest_x=4286.0 gate_left=4292.0 beat=2
+RECORD to-the-stones frame=158
+RECORD stones-solved frame=429
+RECORD gate-open frame=641
+RECORD through-the-gate frame=784
+RECORD after x=4381.9 beat=3
+RECORD end frame=799
+total 17312
+drwxr-xr-x 2 sadi sadi     4096 Nov 15 17:54 .
+drwxr-xr-x 4 sadi sadi     4096 Nov 15 17:54 ..
+-rw-r--r-- 1 sadi sadi 17714852 Nov 15 17:54 record_gate.avi
+-rw-r--r-- 1 sadi sadi     1219 Nov 15 17:54 run.log

@@ -1,0 +1,10 @@
+RECORD title frame=0
+RECORD how-to-play frame=31
+RECORD line-1-prologue.raider frame=123
+RECORD line-2-prologue.escape frame=390
+RECORD line-3-prologue.drift frame=671
+RECORD line-4-prologue.dry frame=957
+RECORD game frame=1114
+RECORD control frame=1181
+RECORD first-steps frame=1211
+RECORD end frame=1739

@@ -1,0 +1,68 @@
+M4: deliberate breakage of the new logic, by tools/breakage.py with tools/breakage_m4.py. Simulated input only.
+Each breakage is built, then the native unit tests and the integration suite are run; clean controls before and after on each worker.
+
+== At e24d726: all 17, three workers
+CAUGHT           3  The prologue is silent
+CAUGHT           7  A new game opens on him already standing
+NOT CAUGHT       0  Every world built shows the waking, Continue and Restart too
+CAUGHT           1  He wakes outside the Shore
+CAUGHT           2  The waking has no pose
+CAUGHT           7  Finishing the prologue starts on him standing
+CAUGHT           1  The last picture's sea and wind fade before the cut
+CAUGHT           2  The menu's own focus is heard as a move
+CAUGHT           1  Settings' own focus is heard as a move
+CAUGHT           1  Moving between choices is silent
+CAUGHT           1  Choosing is silent
+CAUGHT           1  Going back is silent
+CAUGHT          26  A press that changes the scene still tries to sound
+CAUGHT           1  Examining is silent
+CAUGHT           1  Pressing a stone is heard as examining
+CAUGHT           1  The Abyss is one sound again
+CAUGHT           1  The recognition is cut off by the run
+
+commit e24d726, 17 breakages, {'CAUGHT': 16, 'NOT CAUGHT': 1}, controls held, summary complete, 912 s
+BREAKAGE_RESULT valid=yes
+
+== The survivor closed: d0d0606 adds a check that a new game's waking is spent once it begins. The one breakage, re-run alone with its controls:
+CAUGHT           1  Every world built shows the waking, Continue and Restart too
+
+commit d0d0606, 1 breakages, {'CAUGHT': 1}, controls held, summary complete, 299 s
+BREAKAGE_RESULT valid=yes
+=== Every world built shows the waking, Continue and Restart too: CAUGHT (1 failing)
+    unit exit=0 unit failed=0, runner exit=1 passed=438 failed=1
+    FAIL test_opening.test_a_new_game_opens_on_him_getting_up_and_then_the_game_is_his
+control after: NOT CAUGHT passed=439 failed=0
+control before: NOT CAUGHT passed=439 failed=0 unit_failed=0
+control after: NOT CAUGHT passed=439 failed=0
+
+== The owner's follow-up of 2026-11-15: the prologue's handover at the cut. One breakage, alone, with its controls, at 50de077 (code as ced2499):
+CAUGHT           1  The cut into the game is a plain change of scene again
+
+commit 50de077, 1 breakages, {'CAUGHT': 1}, controls held, summary complete, 269 s
+BREAKAGE_RESULT valid=yes
+=== The cut into the game is a plain change of scene again: CAUGHT (1 failing)
+    unit exit=0 unit failed=0, runner exit=1 passed=439 failed=1
+    FAIL test_narration.test_the_prologue_hands_its_sound_over_to_the_game_and_then_goes
+control after: NOT CAUGHT passed=440 failed=0
+control before: NOT CAUGHT passed=440 failed=0 unit_failed=0
+control after: NOT CAUGHT passed=440 failed=0
+
+== The owner's second report of 2026-11-15: the gate. Three breakages, alone, with their controls, at 8b30b33:
+CAUGHT           2  The gate's rise moves the hidden shape again
+CAUGHT           1  The trench's water rise moves the hidden shape again
+CAUGHT           8  The closed gate is drawn raised
+
+commit 8b30b33, 3 breakages, {'CAUGHT': 3}, controls held, summary complete, 413 s
+BREAKAGE_RESULT valid=yes
+control before: NOT CAUGHT passed=442 failed=0 unit_failed=0
+=== The gate's rise moves the hidden shape again: CAUGHT (2 failing)
+    FAIL test_revision.test_no_clip_animates_a_hidden_node_it_never_shows
+    FAIL test_puzzle.test_solving_raises_the_drawn_gate_and_then_opens_the_way
+=== The trench's water rise moves the hidden shape again: CAUGHT (1 failing)
+    FAIL test_revision.test_no_clip_animates_a_hidden_node_it_never_shows
+=== The closed gate is drawn raised: CAUGHT (8 failing)
+    FAIL test_puzzle.test_solving_raises_the_drawn_gate_and_then_opens_the_way
+    FAIL test_restore.test_every_savable_beat_rebuilds_the_right_world_with_nothing_replayed
+    FAIL test_restore.test_restart_checkpoint_rebuilds_the_same_world_at_every_beat
+    FAIL test_restore.test_a_partial_attempt_is_not_kept
+control after: NOT CAUGHT passed=442 failed=0

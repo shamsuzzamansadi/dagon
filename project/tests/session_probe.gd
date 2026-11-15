@@ -13,12 +13,17 @@ func _initialize() -> void:
 
 
 func _wait_for_session() -> Node:
-	for i in 120:
+	for i in 600:
 		await physics_frame
-		# New Game shows the prologue first. Skipping it starts the same game.
-		if is_instance_valid(current_scene) and current_scene.has_method("skip_prologue") and current_scene.is_node_ready():
+		if not is_instance_valid(current_scene) or not current_scene.is_node_ready():
+			continue
+		# New Game shows How to Play, then the prologue. Begin, and skipping, start the same game.
+		if current_scene.has_method("get_mode") and current_scene.get_mode() == 1 and current_scene.get_node("Center/Controls").visible:
+			current_scene.back()
+		elif current_scene.has_method("get_mode") and current_scene.get_mode() == 3:
 			current_scene.skip_prologue()
-		if is_instance_valid(current_scene) and current_scene.is_class("GameSession") and current_scene.is_node_ready():
+		# A new game opens on him getting up. The game is the player's once he has control.
+		elif current_scene.is_class("GameSession") and current_scene.get_world().get_node("Player").is_control_enabled():
 			return current_scene
 	return null
 

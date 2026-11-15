@@ -139,24 +139,32 @@ func test_a_backup_alone_being_damaged_is_explained(h) -> void:
 	h.check(_status(title).contains("damaged"), "the status reads '%s'" % _status(title))
 
 
+## New Game: the save, then How to Play on the main menu, then the prologue, then the game with nothing in between.
 func test_new_game_with_no_save_saves_first_then_starts_with_the_introduction(h) -> void:
 	var title := await _setup(h)
 	await h.tap_key(KEY_ENTER)
-	var session: Node = await h.wait_for_scene("GameSession")
 	h.check(h.read_storage_file(SAVE_FILE) == SHORE_SAVE, "the file holds: %s" % h.read_storage_file(SAVE_FILE))
-	h.check(session.get_session_beat() == 0 and session.get_persisted_beat() == 0, "the session is at %d, persisted %d" % [session.get_session_beat(), session.get_persisted_beat()])
-	h.check(not is_instance_valid(title) or not title.is_inside_tree(), "the main menu stayed in the tree")
-	var menu: Control = session.get_node("PauseLayer/PauseMenu")
-	var panel: Control = menu.get_node("Center/Controls")
-	h.check(h.tree.paused, "the introduction does not pause the game")
-	h.check(panel.visible, "no introduction")
+	h.check(h.tree.current_scene == title, "How to Play is not on the main menu")
+	var panel: Control = title.get_node("Center/Controls")
+	h.check(not h.tree.paused, "the introduction paused the main menu")
+	h.check(panel.visible and not title.get_node("Center/Main").visible, "no introduction")
 	h.check(panel.get_node("Items/Title").text == "How to Play", "the title reads '%s'" % panel.get_node("Items/Title").text)
 	h.check(panel.get_node("Items/Back").text == "Begin", "the button reads '%s'" % panel.get_node("Items/Back").text)
-	h.check(menu.get_viewport().gui_get_focus_owner() == panel.get_node("Items/Back"), "focus is on %s" % menu.get_viewport().gui_get_focus_owner())
+	h.check(title.get_viewport().gui_get_focus_owner() == panel.get_node("Items/Back"), "focus is on %s" % title.get_viewport().gui_get_focus_owner())
 	var text: String = panel.get_node("Items/Text").text
 	for line in ["Walk: A and D", "Jump: Space", "Examine: E", "Pause: Esc", "under Controls"]:
 		h.check(text.contains(line), "the text lacks '%s': %s" % [line, text])
 	h.check(not text.contains("controller"), "the short introduction lists a device not in use: %s" % text)
+	await h.tap_key(KEY_ENTER)
+	await h.steps(2)
+	var prologue: Node = h.tree.current_scene
+	h.check(h.is_prologue(prologue), "Begin did not start the prologue")
+	h.check(prologue.get_ending_line() == 0, "the press on Begin also moved the prologue on, to line %d" % prologue.get_ending_line())
+	var session: Node = await h.wait_for_scene("GameSession")
+	h.check(h.introductions_begun == 0 and h.prologues_skipped == 1, "the way in was not the introduction, then the prologue")
+	h.check(session.get_session_beat() == 0 and session.get_persisted_beat() == 0, "the session is at %d, persisted %d" % [session.get_session_beat(), session.get_persisted_beat()])
+	h.check(not is_instance_valid(title) or not title.is_inside_tree(), "the main menu stayed in the tree")
+	h.check(not h.tree.paused and not session.get_node("PauseLayer/PauseMenu").is_open(), "something stands between the prologue and the game")
 
 
 ## Every way into the game starts from a clean slate, whatever was left behind.
@@ -179,16 +187,22 @@ func test_starting_a_game_clears_a_time_scale_and_a_pause_left_behind(h) -> void
 
 
 func test_beginning_with_the_jump_key_starts_play_without_jumping(h) -> void:
-	await _setup(h)
+	var title := await _setup(h)
 	await h.tap_key(KEY_ENTER)
+	await h.tap_key(KEY_SPACE)
+	await h.steps(2)
+	h.check(h.tree.current_scene != title and h.is_prologue(h.tree.current_scene), "Space did not close the introduction")
+	h.check(h.tree.current_scene.get_ending_line() == 0, "beginning with Space also pressed the prologue's Continue")
 	var session: Node = await h.wait_for_scene("GameSession")
 	var player: CharacterBody2D = session.get_node("World/Player")
 	var jumps := [0]
 	player.jumped.connect(func() -> void: jumps[0] += 1)
+	# Space again while he is getting up: the game is not his yet, so it cannot jump either.
 	await h.tap_key(KEY_SPACE)
+	await h.wait_for_control(player)
 	await h.steps(10)
 	var menu: Control = session.get_node("PauseLayer/PauseMenu")
-	h.check(not menu.is_open(), "Space did not close the introduction")
+	h.check(not menu.is_open(), "the game began with a menu open")
 	h.check(not h.tree.paused, "still paused")
 	h.check(jumps[0] == 0, "beginning with Space jumped")
 	h.check(session.get_node("World/Hud/Prompt").visible, "no prompt once play began")
@@ -198,15 +212,18 @@ func test_beginning_with_the_jump_key_starts_play_without_jumping(h) -> void:
 
 func test_the_introduction_can_be_closed_with_back_and_uses_the_current_keys(h) -> void:
 	_write(h, SETTINGS_FILE, "dagon_settings=1\nmusic_volume=1\neffects_volume=1\nkey_move_left=74\nkey_move_right=76\nkey_jump=75\nkey_interact=85\n")
-	await _setup(h)
+	var title := await _setup(h)
 	await h.tap_key(KEY_ENTER)
-	var session: Node = await h.wait_for_scene("GameSession")
-	var menu: Control = session.get_node("PauseLayer/PauseMenu")
-	var text: String = menu.get_node("Center/Controls/Items/Text").text
+	var text: String = title.get_node("Center/Controls/Items/Text").text
 	for line in ["Walk: J and L", "Jump: K", "Examine: U"]:
 		h.check(text.contains(line), "the text lacks '%s': %s" % [line, text])
 	await h.tap_key(KEY_ESCAPE)
-	h.check(not menu.is_open() and not h.tree.paused, "Esc did not begin play")
+	await h.steps(2)
+	h.check(h.is_prologue(h.tree.current_scene) and h.tree.current_scene.get_ending_line() == 0, "Esc did not begin, or also skipped the prologue")
+	var session: Node = await h.wait_for_scene("GameSession")
+	h.check(not session.get_node("PauseLayer/PauseMenu").is_open() and not h.tree.paused, "the game did not begin")
+	await h.wait_for_control(session.get_node("World/Player"))
+	await h.steps(3)
 	h.check(session.get_node("World/Hud/Prompt").text == "[U] Examine", "the prompt reads '%s'" % session.get_node("World/Hud/Prompt").text)
 
 
