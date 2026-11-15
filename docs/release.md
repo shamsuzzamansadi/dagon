@@ -8,9 +8,11 @@ How a milestone prerelease is built, gated and published. The rules come from th
 
 | Milestone | Version | Promise | If it is not true |
 |---|---|---|---|
-| M3 | `v0.1.0-pre-alpha.1` | A usable playable slice, with working controls, interactions, checkpoint persistence and clearly documented limitations | Not published |
+| M4 (planned for M3; nothing was published at M3) | `v0.1.0-pre-alpha.1` | A usable playable slice, with working controls, interactions, checkpoint persistence and clearly documented limitations | Not published |
 | M5 | `v0.2.0-alpha.1` | The intended game is playable from beginning to end, with its principal gameplay and audio connected | Keep the pre-alpha label: `v0.1.0-pre-alpha.N` |
 | M7 | `v0.3.0-rc.1` | Intended scope complete, no known release-blocking defects, and final acceptance checks passed | Keep the earlier label |
+
+**The first prerelease moved from M3 to M4.** M3 was accepted as a milestone on 2026-11-10 with no release asked for, and its record stayed `planned`. On 2026-11-15 the owner asked for the first pre-alpha at M4 and accepted its candidate ([record](evidence/m4/owner-acceptance-2026-11-15.md)). The version is the same, never having been used; the promise is the same.
 
 **A correction is a new version:** `v0.1.0-pre-alpha.2`. A published version is never replaced.
 

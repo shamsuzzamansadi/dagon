@@ -1,26 +1,51 @@
 {
   "version": "v0.1.0-pre-alpha.1",
-  "milestone": "M3",
-  "state": "planned",
-  "summary": "",
+  "milestone": "M4",
+  "state": "publish",
+  "summary": "The first release of DAGON: Beneath the Black Tide: an early playable pre-alpha for Windows and Linux. It can be played from the prologue to the ending and the credits: the Shore, the cave, the exposed seabed, the crossing, the stone puzzle and its gate, the reveal, and the flight from the returning sea, with checkpoints, Continue, settings and rebinding.\n\nIt is the project as it stands after its fourth milestone, M4 (atmosphere): drawn environments along the whole route, a first sound pass, and narration in a generated voice. This version was first planned for the end of M3; nothing was published then, and this is the first release of any kind.\n\n**It is unfinished.** The creature, the staging of the reveal and the ending's pictures are the next milestone's work (M5). Checks on hardware and with first-time players come after that (M6). Read the limitations below first.",
   "owner_acceptance": {
-    "status": "pending",
-    "record": "",
-    "build": "",
-    "fingerprint": "",
-    "scope": ""
+    "status": "accepted",
+    "record": "docs/evidence/m4/owner-acceptance-2026-11-15.md",
+    "build": "`dagon-windows`, artifact 14172420108 of CI run 43738445550 (commit `8b30b33`), zip SHA-256 `6f914484562a24c7285836b0aa78d1573319c9586bebece830dd2a88d1fe306d`, named by the owner as the accepted artifact",
+    "fingerprint": "sha256:614f29b68865e037d9d0be817c537e7452b608626f50efc584760a2d508a7f6e",
+    "scope": "On 2026-11-15 the owner explicitly accepted the Windows candidate from commit `8b30b33` for M4's completion and for this first pre-alpha release, including the documented deferrals to M5. **The owner's own stated checks, and no others:** the sailor readable in the prologue's boat and the join from the prologue into the game (stated on the earlier build of `ced2499`), and the closed gate and the gate rising after the puzzle. The prologue's Skip was seen reaching the Shore in the owner's recording, from its frames. An independent reviewer, ChatGPT, inspected frames of the owner's recordings and analysed one recording's audio signal; **it did not listen.** No other manual or listening check is claimed. The packages below were built by CI from the merged commit, which has the accepted fingerprint; they are not the same bytes the owner ran."
   },
   "criteria": {
-    "playable_slice": { "status": "pending", "evidence": "" },
-    "working_controls": { "status": "pending", "evidence": "" },
-    "interactions": { "status": "pending", "evidence": "" },
-    "checkpoint_persistence": { "status": "pending", "evidence": "" }
+    "playable_slice": {
+      "status": "met",
+      "evidence": "docs/evidence/m4/release-criteria-v0.1.0-pre-alpha.1.md"
+    },
+    "working_controls": {
+      "status": "met",
+      "evidence": "docs/evidence/m4/release-criteria-v0.1.0-pre-alpha.1.md"
+    },
+    "interactions": {
+      "status": "met",
+      "evidence": "docs/evidence/m4/release-criteria-v0.1.0-pre-alpha.1.md"
+    },
+    "checkpoint_persistence": {
+      "status": "met",
+      "evidence": "docs/evidence/m4/release-criteria-v0.1.0-pre-alpha.1.md"
+    }
   },
-  "known_limitations": [],
+  "known_limitations": [
+    "**An early pre-alpha.** The art is not final, the sound is not final, and anything may change.",
+    "**The creature and the reveal (M5):** the creature has no animation of its own and does not stand out clearly from its background; a straight vertical seam shows in the background beside it when the camera draws back; the far figures of the ritual and the watcher are silhouettes.",
+    "**The ending's four pictures (M5):** the rescue boat looks empty; the sailor at the window is hard to read; the bracelet reads as a rectangular plaque; the crest in the last picture is not recognisably the creature; the four are not yet in one style.",
+    "**Sound:** every sound is synthesized, and the narration is an AI-generated voice (see `CREDITS.md` in the package). Levels were set from measurements. The mix, the newer sounds and the narration have not had a listening review, and the mix is not final.",
+    "**Art:** not final. The environments were checked by the developer in software-rendered captures.",
+    "**Examine lines past the Shore and the cave are text only,** without the voice.",
+    "**No first-time player has played it,** and the length of a first playthrough has not been measured (M6).",
+    "**Controllers:** supported, but the checks on physical hardware listed under \"Not tested\" have not been done.",
+    "**One unresolved report from M2:** in one scripted run on a loaded machine, an examine fired without its caption. It did not reproduce, and its cause is not established."
+  ],
   "deferred": [
     "All physical PlayStation hardware",
     "Individual physical Xbox actions, including disconnecting and reconnecting",
     "Key names under German on the real Windows build",
-    "Native Linux hardware-accelerated rendering"
+    "Native Linux hardware-accelerated rendering",
+    "A listening review of the mix, the sounds and the narration, beyond the owner's check of the join from the prologue into the game",
+    "The prologue's Skip by ear: it was seen reaching the Shore in the owner's recording, as frames only",
+    "Play by first-time players, and the length of a first playthrough (M6)"
   ]
 }

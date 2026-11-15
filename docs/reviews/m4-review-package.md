@@ -1,7 +1,7 @@
 # M4 Review Package: Atmosphere
 
 **To:** ChatGPT (independent reviewer), and the owner for listening and the playtest. **Date:** 2026-11-13, revised 2026-11-15 for the owner's follow-up and the gate (§0).
-**Status: complete for review, not accepted.** The owner approved [the plan](../m4-plan.md) on 2026-11-10 and authorized its implementation, stopping here: no merge, tag, release or itch.io submission, and M5 not started.
+**Status: accepted by the owner on 2026-11-15, at `8b30b33`, for M4's completion and the first pre-alpha release** ([record](../evidence/m4/owner-acceptance-2026-11-15.md)), with the M5 deferrals. The text below is as it stood for review. **No full independent review of M4 is recorded:** ChatGPT's part was the owner's recordings, as frames and one audio signal, and the cause of the gate not rising. The owner approved [the plan](../m4-plan.md) on 2026-11-10.
 
 | | |
 |---|---|

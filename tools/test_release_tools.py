@@ -390,15 +390,15 @@ class GateTests(unittest.TestCase):
         self.assertEqual(outcome["record"], release_gate.REHEARSAL_RECORD)
         self.assertTrue(release_gate.version_problems(outcome["version"]), "its version must be unpublishable")
 
-    def test_the_repository_records_are_valid_and_the_m3_record_has_no_acceptance(self):
+    def test_the_repository_records_are_valid_and_a_planned_record_has_no_acceptance(self):
         root = Path(__file__).parent.parent
         records = release_gate.load_records(root)
         self.assertTrue(records)
         for path, record in records:
             self.assertEqual(release_gate.format_problems(path, record), [], path.name)
-        m3 = next(record for _, record in records if record["version"] == PRE_ALPHA)
-        if m3["state"] == "planned":
-            self.assertEqual(m3["owner_acceptance"]["status"], "pending")
+        for path, record in records:
+            if record["state"] == "planned":
+                self.assertEqual(record["owner_acceptance"]["status"], "pending", path.name)
 
 
 class PackageTests(unittest.TestCase):

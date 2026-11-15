@@ -125,6 +125,7 @@ rebinding and save support are never removed silently (risk R20).
   [package](reviews/m2-review-package.md)). The main menu and save moved here from M3 (D36). Audio is volume controls and buses
   prepared, and nothing more (D42). M3–M7 not started.
 - [x] **M3 Complete gameplay, accepted by the owner on 2026-11-10 at `3980bc3`, as the agreed milestone, with the M4/M5, hardware and playtesting deferrals** ([record](evidence/m3/owner-acceptance-2026-11-10.md)). Package: [m3-review-package.md](reviews/m3-review-package.md). Milestone acceptance, not approval of a finished game. No release has been made. M4 started on 2026-11-10, on `m4/atmosphere`; the owner approved [its plan](m4-plan.md) the same day. M5–M7 not started.
+- [x] **M4 Atmosphere, accepted by the owner on 2026-11-15 at `8b30b33`, for M4's completion and for the first pre-alpha release, with the documented M5 deferrals** ([record](evidence/m4/owner-acceptance-2026-11-15.md)). Package: [m4-review-package.md](reviews/m4-review-package.md). The owner's own checks are the ones the record lists, and no others; no listening review of the mix is recorded. Release `v0.1.0-pre-alpha.1` is requested by its record with this merge ([release.md](release.md)). M5–M7 not started; M5's carried tasks are below.
 - **Every later playtest identifies the exact artifact or run it tested.**
 
 ## M3 implementation sequence (recorded 2026-11-04, as the owner asked)
@@ -234,7 +235,7 @@ Each is a GitHub prerelease, published when its gates pass, and not because a mi
 
 | Milestone | Version | Promise, or the earlier label is retained |
 |---|---|---|
-| M3 | `v0.1.0-pre-alpha.1` | A usable playable slice, with working controls, interactions, checkpoint persistence and clearly documented limitations |
+| M4 (planned for M3; nothing was published at M3) | `v0.1.0-pre-alpha.1` | A usable playable slice, with working controls, interactions, checkpoint persistence and clearly documented limitations |
 | M5 | `v0.2.0-alpha.1` | The intended game is playable from beginning to end, with its principal gameplay and audio connected |
 | M7 | `v0.3.0-rc.1` | Intended scope complete, no known release-blocking defects, and final acceptance checks passed |
 
