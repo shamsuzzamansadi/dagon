@@ -655,7 +655,8 @@ func test_skipping_the_prologue_leaves_none_of_its_sound_in_the_game(h) -> void:
 	await h.steps(10)
 	h.tree.current_scene.skip_prologue()
 	await h.wait_until(func() -> bool: return is_instance_valid(h.tree.current_scene) and h.tree.current_scene.is_class("GameSession"), 60, "the game")
-	await h.steps(5)
+	# Its sound goes on under the game's for a quarter of a second, fading, so the cut has no gap (D103). Then nothing.
+	await h.steps(30)
 	for name in ["Oars", "Water", "Wind"]:
 		for node in h.tree.root.find_children(name, "AudioStreamPlayer", true, false):
 			h.check(not node.playing, "the prologue's %s still plays in the game" % name)

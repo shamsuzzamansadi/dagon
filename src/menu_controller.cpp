@@ -17,9 +17,11 @@
 #include <godot_cpp/classes/resource_loader.hpp>
 #include <godot_cpp/classes/property_tweener.hpp>
 #include <godot_cpp/classes/scene_tree.hpp>
+#include <godot_cpp/classes/scene_tree_timer.hpp>
 #include <godot_cpp/classes/text_server.hpp>
 #include <godot_cpp/classes/tween.hpp>
 #include <godot_cpp/classes/viewport.hpp>
+#include <godot_cpp/classes/window.hpp>
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/core/error_macros.hpp>
 #include <godot_cpp/core/print_string.hpp>
@@ -46,6 +48,9 @@ constexpr double ENDING_LINE_MINIMUM_SECONDS = 3.0;
 constexpr double ENDING_LINE_PAUSE_SECONDS = 0.7;
 constexpr double CREDITS_FADE_SECONDS = 5.0;
 constexpr float FADE_OUT_DB = 36.0f;
+// After the cut the prologue's sound holds until the game's has come up, measured at under 0.1 s, then fades out.
+constexpr double HANDOVER_HOLD_SECONDS = 0.1;
+constexpr double HANDOVER_FADE_SECONDS = 0.15;
 constexpr float ENDING_LINE_FADE_SECONDS = 0.8f;
 constexpr float ENDING_LINE_WIDTH = 400.0f;
 
@@ -281,7 +286,7 @@ void MenuController::show_panel(int p_index) {
 
 // Every sound of this screen but the voice, down to nearly nothing, while it carries on playing. Those of one
 // picture can be kept as they are.
-void MenuController::fade_sounds(double p_seconds, const Node *p_keep_under) {
+void MenuController::fade_sounds(double p_seconds, const Node *p_keep_under, double p_delay) {
 	const AudioStreamPlayer *voice = voice_.get();
 	const TypedArray<Node> players = find_children("*", "AudioStreamPlayer", true, false);
 	for (int64_t i = 0; i < players.size(); i++) {
@@ -289,7 +294,11 @@ void MenuController::fade_sounds(double p_seconds, const Node *p_keep_under) {
 		if (sound == nullptr || sound == voice || !sound->is_playing() || (p_keep_under != nullptr && sound->get_parent() == p_keep_under)) {
 			continue;
 		}
-		sound->create_tween()->tween_property(sound, "volume_db", sound->get_volume_db() - FADE_OUT_DB, p_seconds);
+		Ref<Tween> tween = sound->create_tween();
+		if (p_delay > 0.0) {
+			tween->tween_interval(p_delay);
+		}
+		tween->tween_property(sound, "volume_db", sound->get_volume_db() - FADE_OUT_DB, p_seconds);
 	}
 }
 
@@ -335,7 +344,7 @@ void MenuController::finish_prologue(bool p_skipped) {
 	// on him getting up beside the boat. How to Play was shown before the prologue. The export check counts frames,
 	// not seconds, and has nobody to watch him get up, so for it he is already standing.
 	const bool unattended = !OS::get_singleton()->get_environment(AUTOSTART_VARIABLE).is_empty();
-	start_session(core::Beat::Shore, false, !unattended);
+	start_session(core::Beat::Shore, false, !unattended, true);
 }
 
 // Each line of the epilogue takes the card when the one before has been said or could be read, whether it has a
@@ -756,7 +765,7 @@ void MenuController::continue_game() {
 	start_session(loaded_save_.beat, false);
 }
 
-void MenuController::start_session(core::Beat p_beat, bool p_show_intro, bool p_waking) {
+void MenuController::start_session(core::Beat p_beat, bool p_show_intro, bool p_waking, bool p_seamless) {
 	ERR_FAIL_COND_MSG(game_scene_.is_null(), "MenuController: game_scene is not set; the game cannot start.");
 	reset_global_state();
 	GameSession *session = Object::cast_to<GameSession>(game_scene_->instantiate());
@@ -764,7 +773,26 @@ void MenuController::start_session(core::Beat p_beat, bool p_show_intro, bool p_
 	session->set_start(static_cast<int>(p_beat), true, p_show_intro);
 	session->set_waking(p_waking);
 	session->set_active_device(active_device_);
-	get_tree()->change_scene_to_node(session);
+	// The prologue's last picture is the Shore, with the Shore's sea and wind, and the game carries on from it. The
+	// game's own sound is silent for part of its first frame and comes up over the next few, so a plain change of
+	// scene left a gap of 12 to 23 ms at the cut, and a dip after it, measured. Here the prologue stays a moment after
+	// the game goes in, hidden and deaf to input, its sound held while the game's comes up and then faded out under
+	// it, and then goes. The voice has already stopped.
+	SceneTree *tree = get_tree();
+	Node *previous = tree->get_current_scene();
+	if (p_seamless && previous == this) {
+		tree->get_root()->add_child(session);
+		tree->set_current_scene(session);
+		set_visible(false);
+		set_process(false);
+		set_physics_process(false);
+		set_process_input(false);
+		set_process_unhandled_input(false);
+		fade_sounds(HANDOVER_FADE_SECONDS, nullptr, HANDOVER_HOLD_SECONDS);
+		tree->create_timer(HANDOVER_HOLD_SECONDS + HANDOVER_FADE_SECONDS + 0.05)->connect("timeout", callable_mp(static_cast<Node *>(this), &Node::queue_free));
+		return;
+	}
+	tree->change_scene_to_node(session);
 }
 
 void MenuController::back() {

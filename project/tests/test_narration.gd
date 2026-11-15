@@ -548,6 +548,29 @@ func test_skipping_the_prologue_stops_its_voice_at_once(h) -> void:
 		await h.unload_fixture()
 
 
+## At the cut, the last picture's sea and wind go on under the game until its own sound has come up, and then fade and
+## go with the prologue, hidden meanwhile. Its voice stops at once, as before. Without this the cut left a gap.
+func test_the_prologue_hands_its_sound_over_to_the_game_and_then_goes(h) -> void:
+	var prologue: Node = await h.load_main_fixture(PROLOGUE)
+	for step in 3:
+		await h.steps(5)
+		prologue.advance_ending()
+	await h.steps(10)
+	var voice: AudioStreamPlayer = prologue.get_node("Voice")
+	var sea: AudioStreamPlayer = prologue.get_node("Panels/Dry/Sea")
+	var wind: AudioStreamPlayer = prologue.get_node("Panels/Dry/Wind")
+	h.check(voice.playing and sea.playing and wind.playing, "the last picture is not playing: voice %s, sea %s, wind %s" % [voice.playing, sea.playing, wind.playing])
+	prologue.get_node("Card/Items/Buttons/Skip").pressed.emit()
+	h.check(not voice.playing, "the voice went on past the cut")
+	await h.wait_for_scene("GameSession")
+	h.check(h.tree.current_scene.is_class("GameSession"), "the game is not the current scene")
+	h.check(is_instance_valid(prologue) and not prologue.visible, "the prologue was not held, hidden, at the cut")
+	h.check(sea.playing and wind.playing, "the last picture's sound stopped at the cut")
+	await h.steps(40)
+	h.check(not is_instance_valid(prologue), "the prologue stayed after the handover")
+	h.check(_narration_playing(h).is_empty(), "the prologue's voice went on into the game")
+
+
 ## ---- Settings ----
 
 
