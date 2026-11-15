@@ -1,0 +1,45 @@
+extends SceneTree
+## Probe, not committed: the opening from the title to just past the cut into the game, under Movie Maker. Env:
+## DAGON_PROBE_DELAY=<frames> waited at the title first, to shift the timing; DAGON_PROBE_CONTINUE=1 presses Continue
+## on the last line instead of letting it end. Prints "RECORD cut frame=<n>" when the game's scene is current.
+
+const Harness := preload("res://tests/harness.gd")
+var h
+
+func _initialize() -> void:
+	_run()
+
+func _mark(stage: String) -> void:
+	print("RECORD %s frame=%d" % [stage, Engine.get_process_frames()])
+
+func _run() -> void:
+	h = Harness.new(self)
+	await h.load_main_fixture("res://scenes/ui/title.tscn")
+	await h.steps(30 + int(OS.get_environment("DAGON_PROBE_DELAY")))
+	await h.tap_key(KEY_ENTER)
+	await h.steps(60)
+	await h.tap_key(KEY_ENTER)
+	await h.wait_until(func() -> bool: return h.is_prologue(current_scene), 120, "the prologue")
+	var prologue: Node = current_scene
+	_mark("prologue")
+	var last: int = prologue.ending_lines.size() - 1
+	await h.wait_until(func() -> bool: return not is_instance_valid(prologue) or prologue.get_ending_line() >= last, 60 * 60, "the last line")
+	_mark("last-line")
+	if OS.get_environment("DAGON_PROBE_CONTINUE") == "1":
+		await h.steps(45)
+		await h.tap_key(KEY_ENTER)
+	var cut := [-1]
+	while cut[0] < 0:
+		await process_frame
+		if is_instance_valid(current_scene) and current_scene.is_class("GameSession"):
+			cut[0] = Engine.get_process_frames()
+	_mark("cut")
+	await h.steps(90)
+	_mark("end")
+	for type in ["AudioStreamPlayer", "AudioStreamPlayer2D"]:
+		for sound in root.find_children("*", type, true, false):
+			sound.stop()
+	var until := Time.get_ticks_msec() + 150
+	while Time.get_ticks_msec() < until:
+		await process_frame
+	quit(0)

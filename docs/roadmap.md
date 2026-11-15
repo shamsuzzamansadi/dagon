@@ -253,6 +253,15 @@ Each is a GitHub prerelease, published when its gates pass, and not because a mi
 - Tune the ducking prepared on the Music and Effects buses by ear, so speech stays clear ([D65](decisions.md)).
 - **Audio is not marked complete until a person has heard it in gameplay.** Automated checks cannot do this.
 
+### M5: carried from M4, open (owner's playtest of 2026-11-15)
+
+Seen in the owner's recording of 2026-11-15 ([record](evidence/m4/owner-playtest-2026-11-15.md)), and **not resolved in M4**:
+
+- **The reveal's background seam.** When the camera draws back for the reveal, a straight vertical boundary shows beside the creature's arm at x = 4544: left of it the Shore's sky layer, which is fixed to the screen and covers only part of it at that zoom; right of it the trench's backdrop. The greybox had it too. Fix it with the reveal's composition, not by patching one layer.
+- **The creature's separation from its background** during the reveal, with the creature's final art.
+
+Both belong to the reveal, which M5 redoes; M4 deliberately did not redesign the cinematic.
+
 ### M6 verification
 
 Verify settings and save persistence, rebinding, menu focus, quit/relaunch/continue, and display usability.

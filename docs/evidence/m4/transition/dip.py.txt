@@ -1,0 +1,13 @@
+"""dip.py DIR...: for each cut-<fps>-<delay>.wav with its log, the 20 ms RMS just before the cut (median of 0.3 s) and
+the lowest and highest 20 ms RMS in the 0.3 s after it, stepping 5 ms."""
+import glob, os, re, sys
+import numpy as np, soundfile as sf
+for d in sys.argv[1:]:
+    for wav in sorted(glob.glob(os.path.join(d, "cut-*.wav"))):
+        fps = float(os.path.basename(wav).split("-")[1])
+        x, sr = sf.read(wav, always_2d=True)
+        cut = int(re.search(r"RECORD cut frame=(\d+)", open(wav[:-4] + ".log").read()).group(1)) / fps
+        rms = lambda t: 20 * np.log10(np.sqrt(np.mean(x[int(t * sr):int((t + 0.02) * sr)] ** 2)) + 1e-9)
+        before = np.median([rms(cut - 0.32 + i * 0.005) for i in range(56)])
+        after = [rms(cut - 0.03 + i * 0.005) for i in range(66)]
+        print(f"{d.split('/')[-1]:18} {os.path.basename(wav):14} before {before:6.1f}  lowest after {min(after):6.1f} ({min(after) - before:+5.1f})  highest {max(after):6.1f} ({max(after) - before:+5.1f})")

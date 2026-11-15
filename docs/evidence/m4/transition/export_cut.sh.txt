@@ -1,0 +1,16 @@
+#!/bin/sh
+# export_cut.sh <export dir> <out dir> <fps> <runs> [hold seconds before Begin]: the exported game under Movie Maker on
+# the private display: New Game, then Begin after a wait that varies by run, then the prologue to its end and into the
+# game. Each run's soundtrack is measured within half a second of the cut, found from the export's verbose log.
+. $HOME/work/dagon-m4/bin/env.sh
+exp=$1; out=$2; fps=$3; runs=$4; mkdir -p $out
+for i in $(seq 1 $runs); do
+	d=$(mktemp -d $S/tmp/dagon-test-XXXXXX)
+	wait_begin=$(echo "0.6 + $i * 0.23" | bc)
+	unshare -rm $W/bin/xns.sh sh -c "
+		DAGON_STORAGE_DIR=$d XDG_DATA_HOME=$d $exp/dagon.x86_64 --verbose --resolution 480x270 --write-movie $out/run-$fps-$i.avi --fixed-fps $fps --quit-after $((fps * 100)) > $out/run-$fps-$i.log 2>&1 &
+		sleep 1; xdotool key Return; sleep $wait_begin; xdotool key Return; wait"
+	rm -rf "$d"
+	$FF -v error -y -i $out/run-$fps-$i.avi -vn -c:a pcm_s16le $out/run-$fps-$i.wav && rm -f $out/run-$fps-$i.avi
+	$S/venv/bin/python $NOTES/tools/export_gap.py $out/run-$fps-$i.wav $out/run-$fps-$i.log $fps "export=$(basename $exp) fps=$fps run=$i"
+done
