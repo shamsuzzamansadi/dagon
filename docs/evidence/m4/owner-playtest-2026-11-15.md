@@ -25,3 +25,16 @@ The recording itself is not on the developer's machine and is not in the reposit
 - The sailor in the boat: [prologue-readability](prologue-readability/README.md).
 - The gap at the transition: [transition](transition/README.md).
 - The reveal's boundary, and the creature's separation from the background: **open, M5** ([roadmap](../../roadmap.md)).
+
+## The owner's second report, later on 2026-11-15
+
+**The owner, in their words as relayed:**
+
+- **Personally tested** the improved sailor readability and the prologue-to-Shore audio transition: **both improvements are present.**
+- **Has not yet tested the Skip case.**
+- **Noticed that the stone gate no longer visibly rises after the final puzzle.**
+- **This is not final build acceptance.** The merge and the first pre-alpha release, already authorized, stay conditional on resolving this finding and the owner's final acceptance.
+
+The build was the candidate then named: `dagon-windows` from run 43731646562, the push run of `ced2499`.
+
+**ChatGPT**, from the owner's gameplay recording and the source at `4b959cf`, found the cause: the awakening clip's track targets `Monolith/Gate/Visual:position`; `Visual` is hidden; the visible slab is `Monolith/Gate/Drawn`, its sibling, which does not inherit the movement; and `GameDirector::open_gate()` separately disables the collision and hides the gate. What was done: [gate](gate/README.md).

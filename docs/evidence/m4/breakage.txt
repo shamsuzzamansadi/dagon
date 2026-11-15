@@ -46,3 +46,23 @@ BREAKAGE_RESULT valid=yes
 control after: NOT CAUGHT passed=440 failed=0
 control before: NOT CAUGHT passed=440 failed=0 unit_failed=0
 control after: NOT CAUGHT passed=440 failed=0
+
+== The owner's second report of 2026-11-15: the gate. Three breakages, alone, with their controls, at 8b30b33:
+CAUGHT           2  The gate's rise moves the hidden shape again
+CAUGHT           1  The trench's water rise moves the hidden shape again
+CAUGHT           8  The closed gate is drawn raised
+
+commit 8b30b33, 3 breakages, {'CAUGHT': 3}, controls held, summary complete, 413 s
+BREAKAGE_RESULT valid=yes
+control before: NOT CAUGHT passed=442 failed=0 unit_failed=0
+=== The gate's rise moves the hidden shape again: CAUGHT (2 failing)
+    FAIL test_revision.test_no_clip_animates_a_hidden_node_it_never_shows
+    FAIL test_puzzle.test_solving_raises_the_drawn_gate_and_then_opens_the_way
+=== The trench's water rise moves the hidden shape again: CAUGHT (1 failing)
+    FAIL test_revision.test_no_clip_animates_a_hidden_node_it_never_shows
+=== The closed gate is drawn raised: CAUGHT (8 failing)
+    FAIL test_puzzle.test_solving_raises_the_drawn_gate_and_then_opens_the_way
+    FAIL test_restore.test_every_savable_beat_rebuilds_the_right_world_with_nothing_replayed
+    FAIL test_restore.test_restart_checkpoint_rebuilds_the_same_world_at_every_beat
+    FAIL test_restore.test_a_partial_attempt_is_not_kept
+control after: NOT CAUGHT passed=442 failed=0
