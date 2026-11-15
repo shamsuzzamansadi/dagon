@@ -44,6 +44,22 @@ def night_sea(img, noise, top=HORIZON, calm=1.0):
                     put(img, x, y, "C5")
 
 
+def moon_path(img, noise):
+    """The moon's light broken on the water beneath it, widening toward us. The boat rows into it, so the man at the
+    oars stands dark against it rather than against dark water."""
+    mx = gen_shore.MOON[0]
+    for y in range(HORIZON + 1, 205):
+        d = y - HORIZON
+        half = 30 + d * 1.6
+        for x in range(max(0, round(mx - half * 1.6)), min(W, round(mx + half * 1.6))):
+            near = math.exp(-(((x - mx) / half) ** 2))
+            n = noise(x / 5.0, y * 0.7)
+            if y % 2 == 0 and n > 0.78 - 0.3 * near:
+                put(img, x, y, "C7" if n > 0.9 and near > 0.6 else "C6" if near > 0.35 else "C5")
+            elif near > 0.5 and n > 0.6:
+                put(img, x, y, "C3")
+
+
 def ship(img, x0, y_water, length, height, color, deck_color, funnels=2, guns=True, lights=()):
     hull = [(x0, y_water - height * 0.35), (x0 + length, y_water - height * 0.45), (x0 + length - 10, y_water + 2), (x0 + 12, y_water + 2)]
     fill(img, hull, color)
@@ -129,37 +145,90 @@ def panel_raider_layers():
     return img, {"lamp": (lamp(), (334, 110))}
 
 
+# The escape's boat, in its 110 x 26 layer: bow to the right, the waterline at BY. Larger than it was, so that the man
+# in it can be told from it at the game's size; the layer and its place in the scene are unchanged.
+BX, BY, BOAT_LEN = 34, 16, 60
+SEAT = BX + 30
+
+
+def hull(img, bx, by, length, depth):
+    """A small boat's hull from the side: dark planking, a lighter strake, and the gunwale caught by the light."""
+    fill(img, [(bx, by), (bx + length, by - 2), (bx + length - 8, by + depth), (bx + 8, by + depth)], "W1")
+    hline(img, bx + 4, bx + length - 6, by + depth // 2, "W2")
+    hline(img, bx + 2, bx + length - 2, by, "W3")
+
+
 def boat_with_rower(wake=True):
-    """The small boat from the side, a man at the oars, and its wake behind it. 110 x 26; the boat's bow at the right."""
+    """The small boat from the side, and its wake behind it. 110 x 26. The man at the oars is drawn with the oars,
+    in the two layers the scene swaps for each stroke, so that he rows with them."""
     img = blank(110, 26)
-    bx, by = 60, 16
-    fill(img, [(bx, by), (bx + 46, by - 2), (bx + 40, by + 7), (bx + 6, by + 7)], "W1")
-    hline(img, bx + 2, bx + 44, by, "W3")
-    fill(img, [(bx + 20, by - 1), (bx + 26, by - 1), (bx + 25, by - 12), (bx + 21, by - 12)], "C2")
-    for k in range(4):
-        put(img, bx + 22 + k // 2, by - 14 + k % 2, "S0")
+    hull(img, BX, BY, BOAT_LEN, 9)
     if wake:
-        for i in range(12):
-            x = bx - 4 - i * 5
-            y = by + 5 + i // 5
+        for i in range(8):
+            x = BX - 3 - i * 4
+            y = BY + 5 + i // 4
             if x >= 0:
                 put(img, x, y, "C6" if i % 3 else "C5")
                 put(img, x - 2, y + 1, "C4")
     return img
 
 
+def figure(img, hip, shoulder, hands, lit="C6", coat="C1", rim="C5", head_drop=0, head_forward=0, face_left=True):
+    """A seated man in a dark coat and cap, from the side: a thick back from hip to shoulder, an arm to his hands, a
+    head with a lighter face. The light comes from the upper right, so his top and right edges catch it."""
+    draw = ImageDraw.Draw(img)
+    hx, hy = hip
+    sx, sy = shoulder
+    draw.line([(hx, hy), (sx, sy)], fill=rgba(coat), width=4)
+    draw.line([(hx + 1, hy), (sx + 1, sy)], fill=rgba(coat), width=3)
+    # The back, catching the light along its right edge.
+    for t in range(0, 11):
+        x = round(hx + (sx - hx) * t / 10) + 2
+        y = round(hy + (sy - hy) * t / 10)
+        put(img, x, y, rim)
+    # The arm, a little lighter than the coat, so it reads in front of the body; the hands bare.
+    ax, ay = hands
+    draw.line([(sx - 1, sy + 1), (ax, ay)], fill=rgba("C2"), width=2)
+    put(img, ax, ay, "S1")
+    put(img, ax, ay + 1, "S0")
+    # The head: a cap on top, its crown lit; the face toward the way he faces, lighter than anything dark round it.
+    face = -1 if face_left else 1
+    cx, cy = sx + face * (1 + head_forward), sy - 3 + head_drop
+    for dx in (-1, 0, 1):
+        put(img, cx + dx, cy - 2, "C0")
+        put(img, cx + dx, cy - 1, "C0")
+    put(img, cx + 1, cy - 2, lit)
+    put(img, cx + 2, cy - 1, lit)
+    put(img, cx + face, cy, "S1")
+    put(img, cx, cy, "S0")
+    put(img, cx + face, cy + 1, "S0")
+    put(img, cx - face, cy, "C0")
+    put(img, cx - face, cy + 1, coat)
+    put(img, cx + face * 2, cy - 1, "C0")
+
+
 def oars(frame):
-    """The oars over the boat above, at the catch (0) or at the end of the stroke (1)."""
+    """The man at the oars and the oar, at the end of the stroke (0), leaning back with his hands drawn in and the
+    blade trailing astern, or at the catch (1), leaning forward with his arms out and the blade dipping ahead."""
     img = blank(110, 26)
-    bx, by = 60, 16
+    hip = (SEAT, BY - 1)
+    lock = (SEAT - 3, BY - 1)
     if frame == 0:
-        ImageDraw.Draw(img).line([(bx + 23, by - 6), (bx + 6, by + 9)], fill=rgba("W2"))
-        ImageDraw.Draw(img).line([(bx + 23, by - 6), (bx + 2, by + 6)], fill=rgba("W1"))
+        shoulder, hands = (SEAT + 2, BY - 11), (SEAT - 1, BY - 6)
     else:
-        ImageDraw.Draw(img).line([(bx + 23, by - 6), (bx + 42, by + 9)], fill=rgba("W2"))
-        ImageDraw.Draw(img).line([(bx + 23, by - 6), (bx + 46, by + 6)], fill=rgba("W1"))
+        shoulder, hands = (SEAT - 4, BY - 9), (SEAT - 10, BY - 5)
+    # The oar: through the rowlock from his hands, and on into the water.
+    dx, dy = lock[0] - hands[0], lock[1] - hands[1]
+    scale = (BY + 7 - lock[1]) / max(1, dy) if dy > 0 else 4.0
+    blade = (round(lock[0] + dx * scale), BY + 7)
+    draw = ImageDraw.Draw(img)
+    draw.line([hands, lock], fill=rgba("W3"))
+    draw.line([lock, blade], fill=rgba("W2"))
+    draw.line([(blade[0], blade[1] - 1), (blade[0] + (2 if dx > 0 else -2), blade[1])], fill=rgba("W1"), width=2)
+    if frame == 1:
         for k in range(3):
-            put(img, bx + 44 + k, by + 9 + k % 2, "C6")
+            put(img, blade[0] + k - 1, blade[1] + 1 + k % 2, "C6")
+    figure(img, hip, shoulder, hands)
     return img
 
 
@@ -169,6 +238,7 @@ def panel_escape_layers():
     img = gen_shore.sky()
     noise = Noise(402)
     night_sea(img, noise, top=HORIZON)
+    moon_path(img, noise)
     fill(img, [(0, 40), (150, 70), (170, H), (0, H)], "C0")
     for y in range(80, 230, 18):
         for x in range(10, 150, 12):
@@ -182,6 +252,12 @@ def panel_escape_layers():
         "oars_0": (oars(0), (0, 0)),
         "oars_1": (oars(1), (0, 0)),
     }
+
+
+# The drift's boat layer: six rows taller than it was, upward, so the slumped man fits above the gunwale. Its waterline
+# is on the same row of the screen as before, y = 172; the scene's place for it, and its bob, move up by those rows.
+DRIFT_W, DRIFT_H, DRIFT_BY = 76, 22, 14
+DRIFT_AT = (185, 158)
 
 
 def panel_drift_layers():
@@ -203,16 +279,17 @@ def panel_drift_layers():
             value = 3.2 - d * 1.8 + (noise(x / 60.0, y / 1.5) - 0.5) * 0.4
             put(img, x, y, ramp(["C2", "C3", "C4", "C5", "C6"], value, x, y, 0.4))
     hline(img, 0, W - 1, HORIZON, "C7")
-    # The boat, small, and no one rowing: the oars shipped, the man slumped low in it.
-    boat = blank(70, 16)
-    bx, by = 15, 8
-    fill(boat, [(bx, by), (bx + 40, by - 2), (bx + 35, by + 6), (bx + 5, by + 6)], "W1")
-    hline(boat, bx + 2, bx + 38, by, "W3")
-    fill(boat, [(bx + 16, by - 2), (bx + 24, by - 2), (bx + 24, by - 6), (bx + 16, by - 5)], "C2")
-    hline(boat, bx + 6, bx + 34, by - 3, "W2")
+    # The boat, and no one rowing: the oars shipped along it, the man slumped forward over his knees, his head hanging,
+    # one arm over the side to the water. Dark against the bright sea, his back caught by the sun.
+    boat = blank(DRIFT_W, DRIFT_H)
+    bx, by = 10, DRIFT_BY
+    hull(boat, bx, by, 50, 7)
+    hline(boat, bx + 8, bx + 46, by - 1, "W2")
+    seat = bx + 28
+    figure(boat, (seat, by - 1), (seat - 5, by - 7), (seat - 9, by + 3), lit="C7", rim="C6", head_drop=5, head_forward=1)
     for i in range(3):
-        hline(boat, bx - 10 + i * 4, bx + 50 - i * 4, by + 8 + min(i, 1) * 2 - (i == 2), "C3")
-    return img, {"boat": (boat, (185, 164))}
+        hline(boat, bx - 8 + i * 4, bx + 60 - i * 4, by + 9 + min(i, 1) * 2 - (i == 2), "C3")
+    return img, {"boat": (boat, DRIFT_AT)}
 
 
 def panel_raider():
