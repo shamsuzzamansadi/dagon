@@ -101,6 +101,9 @@ func _check_world(h, session: Node, beat: int, what: String) -> void:
 	var gate: StaticBody2D = world.get_node("Monolith/Gate")
 	h.check((gate.collision_layer == 0) == solved, "%s: gate layer %d" % [what, gate.collision_layer])
 	h.check(gate.visible != solved, "%s: gate visible=%s" % [what, gate.visible])
+	# What a player sees of a closed gate is where its collision is: never raised, never an invisible wall.
+	var slab: Sprite2D = gate.get_node("Drawn")
+	h.check(solved or (slab.position == Vector2(-8, -150) and slab.is_visible_in_tree()), "%s: the closed gate is drawn at %s, shown=%s" % [what, slab.position, slab.is_visible_in_tree()])
 
 	h.check(world.get_node("Tint").color.is_equal_approx(TINTS[beat]), "%s: the tint is %s" % [what, world.get_node("Tint").color])
 	var cinematics: AnimationPlayer = world.get_node("Cinematics")

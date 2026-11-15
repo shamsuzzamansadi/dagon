@@ -31,6 +31,10 @@ BREAKAGES = [
     ("The Abyss is one sound again", W, 'stream = ExtResource("a_abyss_deep")', 'stream = ExtResource("a_abyss")'),
     # The owner's follow-up of 2026-11-15: the prologue hands its sound over at the cut.
     ("The cut into the game is a plain change of scene again", M, "	start_session(core::Beat::Shore, false, !unattended, true);", "	start_session(core::Beat::Shore, false, !unattended, false);"),
+    # The owner's playtest of 2026-11-15, second report: the gate a player sees must rise.
+    ("The gate's rise moves the hidden shape again", W, 'tracks/7/path = NodePath("Monolith/Gate/Drawn:position")', 'tracks/7/path = NodePath("Monolith/Gate/Visual:position")'),
+    ("The trench's water rise moves the hidden shape again", W, 'tracks/8/path = NodePath("Trench/WaterDrawn:position")', 'tracks/8/path = NodePath("Trench/Water:position")'),
+    ("The closed gate is drawn raised", W, 'position = Vector2(-8, -150)\ntexture = ExtResource("r_abyss_gate")', 'position = Vector2(-8, -410)\ntexture = ExtResource("r_abyss_gate")'),
     # Item 5: the reveal's lines heard out.
     ("The recognition is cut off by the run", W, '"times": PackedFloat32Array(8.2),', '"times": PackedFloat32Array(9.6),'),
 ]
