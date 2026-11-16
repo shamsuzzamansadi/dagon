@@ -71,17 +71,22 @@ func _reveal() -> void:
 	await h.steps(3)
 
 
+func _frames(count: int) -> void:
+	for i in count:
+		await process_frame
+
+
 func _ending() -> void:
 	var ending: Node = (load("res://scenes/ui/ending.tscn") as PackedScene).instantiate()
 	root.add_child(ending)
 	for line in ending.ending_lines.size():
-		await h.steps(100)
+		await _frames(100)
 		_save("ending-%d-a" % (line + 1))
-		await h.steps(150)
+		await _frames(150)
 		_save("ending-%d-b" % (line + 1))
 		if line + 1 < ending.ending_lines.size():
 			ending.advance_ending()
 	for sound in ending.find_children("*", "AudioStreamPlayer", true, false):
 		sound.stop()
 	ending.queue_free()
-	await h.steps(3)
+	await _frames(3)
