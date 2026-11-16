@@ -23,14 +23,14 @@ UI_OUT = ROOT / "project" / "assets" / "ui"
 # light.png is a light mask, not artwork: its values multiply the lantern colour.
 ARTWORK = ["sky", "clouds", "far", "glints", "flats", "bank", "terrain", "foreground", "fish", "boat", "sailor", "talisman", "tentacle", "ribs"]
 REVEAL_OUT = ROOT / "project" / "assets" / "reveal"
-REVEAL_ARTWORK = ["monolith", "dagon_body", "dagon_head", "dagon_crest", "dagon_arm", "crossing_carving"]
+REVEAL_ARTWORK = ["monolith", "crossing_carving", "dagon_ridge", "water_drop"] + [f"dagon_{part}{lit}" for part in ("body", "head", "crest", "arm") for lit in ("", "_lit")]
 # The finished reference section, and the prologue. shaft.png is a light mask, like light.png.
 CAVE_OUT = ROOT / "project" / "assets" / "cave"
 CAVE_ARTWORK = ["cave_front", "cave_wall", "abyss_far", "ritual_far", "foreground_cave"]
 ABYSS_OUT = ROOT / "project" / "assets" / "abyss"
 ABYSS_TILES = 4
 ABYSS_ARTWORK = [f"abyss_ground_{i}" for i in range(ABYSS_TILES)] + ["abyss_far_plain", "abyss_escarpment", "abyss_slab", "abyss_stone", "abyss_canyon", "abyss_statues",
-    "abyss_gate", "abyss_trench", "abyss_trench_water", "abyss_mural_lit", "abyss_mural_fragments",
+    "abyss_gate", "abyss_trench", "abyss_trench_water", "abyss_trench_surge", "abyss_mural_lit", "abyss_mural_fragments",
     "abyss_tide", "abyss_returning_sea"] + [f"abyss_{kind}_{n}" for kind in ("rock", "dust") for n in ("near", "mid", "far")] + [f"abyss_glyph{n}{lit}" for n in ("kneel", "eye", "wave") for lit in ("", "_lit")]
 ABYSS_X0 = 1440
 ABYSS_GROUND = range(1440, 4520)

@@ -125,7 +125,8 @@ def main():
     gen_reveal.monolith().save(REVEAL_OUT / "monolith.png")
     gen_reveal.crossing_carving().save(REVEAL_OUT / "crossing_carving.png")
     for name, (image, _offset) in gen_reveal.dagon_parts().items():
-        image.save(REVEAL_OUT / f"dagon_{name}.png")
+        image.save(REVEAL_OUT / f"{name}.png")
+    gen_abyss.water_drop().save(REVEAL_OUT / "water_drop.png")
     CAVE_OUT.mkdir(parents=True, exist_ok=True)
     gen_cave.cave_front().save(CAVE_OUT / "cave_front.png")
     gen_cave.cave_wall().save(CAVE_OUT / "cave_wall.png")
@@ -148,6 +149,7 @@ def main():
         gen_abyss.glyph_stone(name, lit=True)[0].save(ABYSS_OUT / f"abyss_{name.lower()}_lit.png")
     gen_abyss.trench().save(ABYSS_OUT / "abyss_trench.png")
     gen_abyss.trench_water().save(ABYSS_OUT / "abyss_trench_water.png")
+    gen_abyss.trench_surge().save(ABYSS_OUT / "abyss_trench_surge.png")
     gen_abyss.mural_lit()[0].save(ABYSS_OUT / "abyss_mural_lit.png")
     gen_abyss.mural_fragments()[0].save(ABYSS_OUT / "abyss_mural_fragments.png")
     for name in gen_abyss.ROCKFALL:

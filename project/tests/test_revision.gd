@@ -538,7 +538,7 @@ func test_the_carving_at_the_ledges_shows_how_the_gap_is_crossed(h) -> void:
 func test_the_monolith_and_the_creature_are_drawn_over_the_shapes_the_clips_move(h) -> void:
 	var world := await _world(h, AWAKENED)
 	h.check(world.get_node("Monolith/Art").visible and not world.get_node("Monolith/Back").visible, "the monolith is still the greybox block")
-	for part in ["Body", "Head", "Crest", "Arm"]:
+	for part in ["Body", "Head", "Head/Crest", "Arm", "Ridge"]:
 		var shape: Polygon2D = world.get_node("Dagon/" + part)
 		var art: Sprite2D = world.get_node("Dagon/%s/Art" % part)
 		h.check(is_zero_approx(shape.color.a), "the flat %s still draws over its art" % part)
@@ -748,7 +748,13 @@ func test_the_abyss_sounds_deeper_as_he_goes_on(h) -> void:
 
 ## A clip moves only what can be seen: no track animates a node that is hidden in the scene and that the clip itself
 ## never shows. Art drawn over a greybox shape must be what the clip moves, or the motion is lost: the gate's rise and
-## the trench's water were, for a while in M4.
+## the trench's water were, for a while in M4. Hidden means hidden where it stands: a node under a hidden parent is
+## hidden too, unless the clip shows that parent.
+## The rock across the way back and the returning sea are shown by the director, as outcomes of the flight, not by its
+## clip: test_narrative and this file hold that they show with no clip at all.
+const SHOWN_BY_THE_DIRECTOR := ["Rockfall", "Tide"]
+
+
 func test_no_clip_animates_a_hidden_node_it_never_shows(h) -> void:
 	var world := await _world(h)
 	var checked := 0
@@ -764,11 +770,16 @@ func test_no_clip_animates_a_hidden_node_it_never_shows(h) -> void:
 			for track in clip.get_track_count():
 				var path := String(clip.track_get_path(track))
 				var node_path := path.get_slice(":", 0)
-				if clip.track_get_type(track) != Animation.TYPE_VALUE or path.ends_with(":visible") or shown.has(node_path):
+				if clip.track_get_type(track) != Animation.TYPE_VALUE or path.ends_with(":visible"):
 					continue
 				var node := world.get_node_or_null(node_path)
 				h.check(node != null, "%s animates %s, which does not exist" % [clip_name, path])
-				if node is CanvasItem:
-					checked += 1
-					h.check(node.visible, "%s animates %s, which is hidden and never shown by it" % [clip_name, path])
+				if not node is CanvasItem:
+					continue
+				checked += 1
+				var at: Node = node
+				while at != world and at != null:
+					if at is CanvasItem and not at.visible and not shown.has(String(world.get_path_to(at))) and not SHOWN_BY_THE_DIRECTOR.has(String(world.get_path_to(at))):
+						h.check(false, "%s animates %s, but %s is hidden and never shown by it" % [clip_name, path, world.get_path_to(at)])
+					at = at.get_parent()
 	h.check(checked > 10, "only %d tracks were checked" % checked)

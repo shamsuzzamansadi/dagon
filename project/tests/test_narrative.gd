@@ -437,9 +437,9 @@ func test_no_new_save_state_comes_with_any_of_this(h) -> void:
 func test_the_reveal_shows_a_head_body_and_hand_with_highlights_that_appear_in_order(h) -> void:
 	var world := await _world(h, AWAKENED)
 	var director: Node = world.get_node("GameDirector")
-	for part in ["Body", "Head", "Crest", "Arm", "Eye", "Pupil", "Rims"]:
-		h.check(not world.get_node("Dagon/" + part).visible, "%s shows before the reveal" % part)
-	h.check(world.get_node("Dagon/Ridge").visible, "the far ridge does not show before the reveal")
+	for part in ["Body", "Head", "Head/Crest", "Arm", "Head/Eye", "Head/Pupil", "Rims", "Head/Lit", "Arm/Lit"]:
+		h.check(not world.get_node("Dagon/" + part).is_visible_in_tree(), "%s shows before the reveal" % part)
+	h.check(world.get_node("Dagon/Ridge").visible and world.get_node("Dagon/Ridge/Art").is_visible_in_tree(), "the far ridge does not show before the reveal")
 	await h.stand_at(_player(h), Vector2(4420, -2))
 	var clips: AnimationPlayer = world.get_node("Cinematics")
 	h.check(clips.current_animation == &"dagon_reveal", "playing '%s'" % clips.current_animation)
@@ -448,7 +448,7 @@ func test_the_reveal_shows_a_head_body_and_hand_with_highlights_that_appear_in_o
 	while director.is_cinematic_active():
 		await h.steps(1)
 		for part in parts:
-			if world.get_node("Dagon/" + part).visible and not order.has(part):
+			if world.get_node("Dagon/" + ("Head/Eye" if part == "Eye" else part)).is_visible_in_tree() and not order.has(part):
 				order[part] = clips.current_animation_position
 	for part in parts:
 		h.check(order.has(part), "%s never showed" % part)
@@ -472,6 +472,90 @@ func test_the_hand_rests_on_the_monolith_and_the_head_is_in_frame_at_the_widest_
 	h.check(hand.x > 3860.0 and hand.x < 4296.0, "the hand at x=%.0f is not on the monolith" % hand.x)
 	h.check(hand.y > -520.0 and hand.y < 0.0, "the hand at y=%.0f is not on the monolith" % hand.y)
 	h.check(world.get_node("Dagon/Arm").z_index > 0, "the hand is drawn behind the monolith")
+
+
+## One night stands behind everything the reveal's camera shows. M4 had a straight edge at the last wall, x = 4544,
+## where the trench's backdrop began and nothing stood behind the canyon's end.
+func test_one_backdrop_stands_behind_the_whole_of_the_reveal(h) -> void:
+	var world := await _world(h, AWAKENED)
+	var clips: AnimationPlayer = world.get_node("Cinematics")
+	var camera: Camera2D = world.get_node("CameraRig")
+	var backdrop: Sprite2D = world.get_node("Trench/Drawn")
+	var night := Rect2(backdrop.global_position, backdrop.texture.get_size())
+	# The Monolith's drawn stone covers everything left of its narrowest right edge, to its top.
+	var stone: PackedVector2Array = world.get_node("Monolith/Back").polygon
+	var stone_right := 1.0e9
+	var stone_top := 0.0
+	for point in stone:
+		stone_top = minf(stone_top, point.y)
+	for point in stone:
+		if point.x > 4000.0:
+			stone_right = minf(stone_right, point.x)
+	h.check(night.position.x <= stone_right - 16.0, "the night begins at x=%.0f, not behind the Monolith, whose edge is at %.0f" % [night.position.x, stone_right])
+	await h.stand_at(_player(h), Vector2(4420, -2))
+	const SHAKE := 16.0
+	for tenth in range(1, 139, 3):
+		clips.seek(tenth / 10.0, true)
+		await h.steps(1)
+		var view := Rect2(camera.get_screen_center_position() - Vector2(240, 135) / camera.zoom.x, Vector2(480, 270) / camera.zoom.x).grow(SHAKE)
+		h.check(night.end.x >= view.end.x and night.position.y <= view.position.y, "at %.1f s the view %s runs past the night %s" % [tenth / 10.0, view, night])
+		h.check(view.position.x >= stone[0].x and view.position.y >= stone_top, "at %.1f s the view %s runs past the Monolith" % [tenth / 10.0, view])
+	var wall: PackedVector2Array = world.get_node("ActArt/CanyonBack").polygon
+	var rim_at_the_arm := 0.0
+	for i in wall.size() - 1:
+		if wall[i].x <= 4340.0 and wall[i + 1].x > 4340.0:
+			rim_at_the_arm = lerpf(wall[i].y, wall[i + 1].y, (4340.0 - wall[i].x) / (wall[i + 1].x - wall[i].x))
+	clips.seek(10.0, true)
+	await h.steps(1)
+	var arm_low: float = world.get_node("Dagon/Arm").to_global(Vector2(-350, -170)).y
+	h.check(rim_at_the_arm > arm_low, "the canyon's rim at %.0f stands behind the arm, whose underside is at %.0f" % [rim_at_the_arm, arm_low])
+
+
+## What the clip moves is what is seen: the drawn head, crest and eye move as one with the head's track, the drawn arm
+## turns about its shoulder and comes to rest where the tests above find the hand, and the moon's light comes up on
+## every part.
+func test_the_creature_moves_as_a_body_and_its_drawn_parts_move_with_it(h) -> void:
+	var world := await _world(h, AWAKENED)
+	var clips: AnimationPlayer = world.get_node("Cinematics")
+	await h.stand_at(_player(h), Vector2(4420, -2))
+	var dagon: Node2D = world.get_node("Dagon")
+	var head: Node2D = world.get_node("Dagon/Head")
+	var arm: Node2D = world.get_node("Dagon/Arm")
+	for path in ["Head/Art", "Head/Lit", "Head/Crest", "Head/Crest/Art", "Head/Crest/Lit", "Arm/Art", "Arm/Lit", "Rims/Body", "Body/Art", "Ridge/Art"]:
+		var art: CanvasItem = world.get_node("Dagon/" + path)
+		h.check(art.visible, "%s is hidden in the scene, so no clip could show it" % path)
+	clips.seek(1.0, true)
+	await h.steps(1)
+	var ridge_before: float = world.get_node("Dagon/Ridge/Art").global_position.y
+	h.check_near(dagon.position.y, 0.0, 0.01, "the ridge's height before it stirs")
+	clips.seek(5.6, true)
+	await h.steps(1)
+	var hand_coming: Vector2 = arm.to_global(Vector2(-460, -240))
+	h.check(arm.rotation < -0.2, "the arm is not turned about its shoulder as it comes: %.3f" % arm.rotation)
+	clips.seek(10.0, true)
+	await h.steps(1)
+	h.check(world.get_node("Dagon/Ridge/Art").global_position.y < ridge_before - 40.0, "the drawn shoulder rose only from %.0f to %.0f" % [ridge_before, world.get_node("Dagon/Ridge/Art").global_position.y])
+	h.check(is_zero_approx(arm.rotation) and arm.position.length() < 0.01, "the arm rests at %s, turned %.3f" % [arm.position, arm.rotation])
+	h.check(arm.to_global(Vector2(-460, -240)).distance_to(hand_coming) > 20.0, "the hand did not move between 5.6 s and its rest")
+	var eye_before: Vector2 = world.get_node("Dagon/Head/Eye").global_position
+	var art_before: Vector2 = world.get_node("Dagon/Head/Art").global_position
+	var crest_before: Vector2 = world.get_node("Dagon/Head/Crest/Art").global_position
+	for path in ["Rims", "Head/Lit", "Head/Crest/Lit", "Arm/Lit"]:
+		var lit: CanvasItem = world.get_node("Dagon/" + path)
+		h.check(lit.is_visible_in_tree() and lit.modulate.a > 0.95, "%s is not lit at 10 s: shown %s, alpha %.2f" % [path, lit.is_visible_in_tree(), lit.modulate.a])
+	clips.seek(13.0, true)
+	await h.steps(1)
+	var moved: Vector2 = world.get_node("Dagon/Head/Art").global_position - art_before
+	h.check(moved.length() > 3.0 and head.rotation < -0.02, "the head did not turn: moved %s, turned %.3f" % [moved, head.rotation])
+	h.check((world.get_node("Dagon/Head/Eye").global_position - eye_before).length() > 3.0, "the eye stayed where it was when the head turned")
+	h.check((world.get_node("Dagon/Head/Crest/Art").global_position - crest_before).length() > 3.0, "the crest stayed where it was when the head turned")
+	# It ends as it will stand through the flight: whole, lit, its arm on the stone, nothing still pouring.
+	clips.seek(14.0, true)
+	await h.steps(1)
+	h.check_near(dagon.position.y, -60.0, 0.5, "where it stands at the end")
+	for path in ["Runoff", "Head/Pour", "Arm/Drip"]:
+		h.check(not world.get_node("Dagon/" + path).emitting, "%s is still pouring at the end" % path)
+	h.check(not world.get_node("Trench/Splash").emitting, "the trench is still throwing spray at the end")
 
 
 func test_after_the_reveal_the_sailor_turns_back_and_the_camera_is_where_play_needs_it(h) -> void:

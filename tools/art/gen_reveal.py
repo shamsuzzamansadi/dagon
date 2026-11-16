@@ -6,7 +6,7 @@ wet streaks, texture, and on the monolith its carvings.
 
     monolith.png     the standing stone, world x 3830-4296, y -520-0, carved with the mark, worshippers, fish, and
                      high up the swimmer with its arm around a standing stone: what the reveal then shows, alive
-    dagon_body.png, dagon_head.png, dagon_crest.png, dagon_arm.png    the creature, one per animated part
+    dagon_*.png      the creature, by gen_creature.py: a dark base and a lit image for each animated part
     crossing_carving.png    the panel by the ledges at the gap: a stone dropped on a beam's raised end, then the beam
                             level with the stone on it and a figure walking over. Bold, to be read at the game's scale
 """
@@ -201,111 +201,11 @@ def monolith():
 # ---------------------------------------------------------------- the creature
 
 
-def shade_part(name, rim_side=-1, sheen=True):
-    """A dark, wet body part, rimmed by the moon on its upper edges, with a faint texture of scale."""
-    points = scene_polygon(name, "Dagon")
-    xs = [p[0] for p in points]
-    ys = [p[1] for p in points]
-    left, top = math.floor(min(xs)), math.floor(min(ys))
-    size = (math.ceil(max(xs)) - left + 1, math.ceil(max(ys)) - top + 1)
-    mask = mask_of(points, (left, top), size)
-    img = blank(*size)
-    noise = Noise(600 + len(name))
-    rng = random.Random(610 + len(name))
-    for y in range(size[1]):
-        for x in range(size[0]):
-            if mask.getpixel((x, y)) == 0:
-                continue
-            scale = noise((x + (y % 6 > 2) * 3) / 3.0, y / 3.0)
-            value = 0.9 + (scale - 0.5) * 1.0 + 0.6 * noise.fractal(x / 30.0, y / 30.0, 2)
-            put(img, x, y, ramp(DARK, value, x, y, 0.4))
-    # The rim: an edge pixel whose neighbour above, or on the lit side, is outside.
-    for y in range(size[1]):
-        for x in range(size[0]):
-            if mask.getpixel((x, y)) == 0:
-                continue
-            up = not inside(mask, x, y - 1)
-            side = not inside(mask, x + rim_side, y)
-            if up or side:
-                put(img, x, y, "T3" if noise(x / 5.0, y / 5.0) > 0.45 else "C6")
-                if inside(mask, x, y + 1):
-                    put(img, x, y + 1, "T2")
-                if inside(mask, x, y + 2) and rng.random() > 0.5:
-                    put(img, x, y + 2, "T1")
-    # Water running off: thin, broken streaks downward from the lit edges.
-    if sheen:
-        for _ in range(size[0] // 3):
-            x = rng.randrange(size[0])
-            y = next((yy for yy in range(size[1]) if mask.getpixel((x, yy))), None)
-            if y is None:
-                continue
-            for k in range(rng.randrange(8, 40)):
-                if inside(mask, x, y + 3 + k) and (k + x) % 5:
-                    put(img, x, y + 3 + k, "T1" if k < 10 else "C1")
-    return img, (left, top)
-
-
-def body_form(img):
-    """The body's form, so it reads as a body and not a wall. Moonlight from above and to the left rounds it: light
-    falls off inward from the edges that face the moon. Three broad plates curve across the chest, each a groove lit
-    along its lower lip. A fold of gill below the head."""
-    import numpy as np
-    from scipy import ndimage
-
-    w, h = img.size
-    alpha = np.array(img.split()[3]) > 0
-    depth = ndimage.distance_transform_edt(alpha)
-    gy, gx = np.gradient(ndimage.gaussian_filter(depth, 3))
-    norm = np.hypot(gx, gy) + 1e-6
-    # The surface faces away from the inside: its normal is the downhill direction of depth.
-    facing = np.clip((gx / norm) * 0.6 + (gy / norm) * 0.8, 0, 1)
-    light = facing * np.exp(-depth / 70.0)
-    noise = Noise(640)
-    for y in range(h):
-        for x in range(w):
-            if not alpha[y, x]:
-                continue
-            v = light[y, x] + (noise(x / 5.0, y / 5.0) - 0.5) * 0.14
-            if v > 0.8:
-                put(img, x, y, "T2")
-            elif v > 0.55:
-                put(img, x, y, "T1")
-            elif v > 0.32:
-                put(img, x, y, "E1")
-            elif v > 0.14:
-                put(img, x, y, "C1")
-    cx = w * 0.45
-    for k, (row, bend) in enumerate(((h * 0.42, 34), (h * 0.58, 30), (h * 0.74, 26))):
-        for x in range(int(w * 0.12), int(w * 0.84)):
-            y = int(row + bend * math.cos((x - cx) / (w * 0.42) * math.pi / 2) - bend)
-            if 2 <= y < h - 4 and alpha[y, x] and alpha[y + 3, x]:
-                for d in (-2, -1, 0):
-                    put(img, x, y + d, "C0")
-                put(img, x, y + 1, "T1" if x < cx else "E1")
-                if noise(x / 4.0, k) > 0.3:
-                    put(img, x, y + 2, "E1" if x < cx else "C1")
-    gx0, gy0 = int(w * 0.64), int(h * 0.06)
-    for k in range(3):
-        for t in range(48):
-            x = gx0 + k * 9 + round(5 * math.sin(t / 8.0))
-            y = gy0 + t
-            if 0 <= x < w - 1 and 0 <= y < h and alpha[y, x]:
-                put(img, x, y, "C0")
-                if alpha[y, x + 1]:
-                    put(img, x + 1, y, "T1")
-
-
 def dagon_parts():
-    parts = {}
-    body, offset = shade_part("Body")
-    body_form(body)
-    parts["body"] = (body, offset)
-    parts["head"] = shade_part("Head")
-    parts["crest"] = shade_part("Crest", rim_side=1)
-    arm, offset = shade_part("Arm", rim_side=1)
-    # The webbed hand: membranes between the fingers, and pale claws at their tips.
-    parts["arm"] = (arm, offset)
-    return parts
+    """The creature's images by file name, each with its place in the creature's space (gen_creature.py)."""
+    import gen_creature
+
+    return gen_creature.parts(lambda name: scene_polygon(name, "Dagon/Head" if name == "Crest" else "Dagon"))
 
 
 # ---------------------------------------------------------------- the clue at the gap
