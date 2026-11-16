@@ -1,0 +1,42 @@
+Stage and line marks of project/tests/record_finale.gd, as frames at 30 a second.
+
+main at 09d854e (before):
+RECORD gate-open frame=3
+RECORD reveal frame=105
+RECORD line-1-story.reveal frame=234
+RECORD line-2-story.recoil frame=351
+RECORD line-3-story.run frame=471
+RECORD escape-running frame=525
+RECORD line-4-story.run frame=525
+RECORD line-5-flee.back frame=622
+RECORD line-6-flee.sea frame=730
+RECORD collapse frame=823
+RECORD ending frame=1004
+RECORD line-7-ending.found frame=1004
+RECORD line-8-ending.listen frame=1509
+RECORD line-9-ending.innsmouth frame=1723
+RECORD line-10-ending.rising frame=2250
+RECORD last-line-over frame=2611
+RECORD credits frame=2612
+RECORD end frame=2792
+
+M5 at b1cb401 (after):
+RECORD gate-open frame=3
+RECORD reveal frame=105
+RECORD line-1-story.reveal frame=234
+RECORD line-2-story.recoil frame=351
+RECORD line-3-story.run frame=471
+RECORD escape-running frame=525
+RECORD line-4-flee.back frame=622
+RECORD line-5-flee.sea frame=730
+RECORD collapse frame=823
+RECORD ending frame=1004
+RECORD line-6-ending.found frame=1004
+RECORD line-7-ending.listen frame=1509
+RECORD line-8-ending.innsmouth frame=1723
+RECORD line-9-ending.rising frame=2250
+RECORD last-line-over frame=2611
+RECORD credits frame=2612
+RECORD end frame=2792
+
+The before run was made with the script's first version, which marked the run line a second time at the start of the flight (line-4-story.run), so its later lines are numbered one higher. The frames are the same.

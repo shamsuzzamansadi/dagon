@@ -1,0 +1,15 @@
+gate-open                     0.0-   3.4 s  at the ceiling   0.0 % of 10 ms windows
+reveal                        3.4-   7.7 s  at the ceiling   0.0 % of 10 ms windows
+line-1-story.reveal           7.7-  11.6 s  at the ceiling   0.0 % of 10 ms windows
+line-2-story.recoil          11.6-  15.6 s  at the ceiling   0.0 % of 10 ms windows
+line-3-story.run             15.6-  17.4 s  at the ceiling   0.0 % of 10 ms windows
+escape-running               17.4-  20.6 s  at the ceiling   0.0 % of 10 ms windows
+line-4-flee.back             20.6-  24.2 s  at the ceiling   0.0 % of 10 ms windows
+line-5-flee.sea              24.2-  27.3 s  at the ceiling   0.0 % of 10 ms windows
+collapse                     27.3-  33.4 s  at the ceiling   0.0 % of 10 ms windows
+line-6-ending.found          33.4-  50.2 s  at the ceiling   0.0 % of 10 ms windows
+line-7-ending.listen         50.2-  57.3 s  at the ceiling   0.0 % of 10 ms windows
+line-8-ending.innsmouth      57.3-  74.9 s  at the ceiling   0.0 % of 10 ms windows
+line-9-ending.rising         74.9-  86.9 s  at the ceiling   0.0 % of 10 ms windows
+last-line-over               86.9-  87.0 s  at the ceiling   0.0 % of 10 ms windows
+credits                      87.0-  93.0 s  at the ceiling   0.0 % of 10 ms windows

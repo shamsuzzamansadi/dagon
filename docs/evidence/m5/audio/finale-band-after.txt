@@ -1,0 +1,10 @@
+line                       wide: voice  beneath  above | 300-4k: voice  beneath  above | worst 0.5 s in band
+line-1-story.reveal              -23.6    -21.9   -1.8 |         -25.7    -31.8    6.0 |    1.0
+line-2-story.recoil              -23.8    -24.8    1.0 |         -26.5    -37.0   10.5 |    4.6
+line-3-story.run                 -23.1    -21.5   -1.6 |         -26.3    -33.0    6.7 |   -4.0
+line-4-flee.back                 -23.4    -24.2    0.8 |         -25.9    -34.1    8.2 |    8.5
+line-5-flee.sea                  -23.5    -31.6    8.1 |         -29.1    -39.3   10.2 |    0.3
+line-6-ending.found              -23.9    -34.3   10.4 |         -27.2    -37.5   10.3 |   -8.8
+line-7-ending.listen             -23.8    -31.5    7.7 |         -26.0    -39.2   13.2 |   -1.0
+line-8-ending.innsmouth          -23.9    -30.2    6.4 |         -26.4    -37.1   10.6 |   -6.5
+line-9-ending.rising             -23.8    -40.5   16.6 |         -25.8    -43.0   17.2 |    3.4

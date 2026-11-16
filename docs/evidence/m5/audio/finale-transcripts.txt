@@ -1,0 +1,37 @@
+story.reveal: word for word
+   3.90 s, 13.6 chars/s, -24.3 dB RMS, peak -5.7 dBFS
+   script: It was no ridge. It had been beside me the whole way.
+   heard:  It was no ridge, it had been beside me the whole way.
+story.recoil: word for word
+   4.00 s, 12.0 chars/s, -24.3 dB RMS, peak -4.9 dBFS
+   script: The carving. The same arm, round the same stone.
+   heard:  The Carving. The same arm round the same stone.
+story.run: word for word
+   1.80 s, 12.8 chars/s, -23.6 dB RMS, peak -8.1 dBFS
+   script: Its head turned. I ran.
+   heard:  Its head turned. I ran.
+flee.back: word for word
+   3.60 s, 6.9 chars/s, -26.2 dB RMS, peak -7.2 dBFS
+   script: Don't look back. Don't...
+   heard:  Don't look back. Don't.
+flee.sea: word for word
+   3.10 s, 10.3 chars/s, -25.1 dB RMS, peak -5.8 dBFS
+   script: The sea. The sea is coming back.
+   heard:  The sea. The sea is coming back.
+ending.found: word for word
+   16.83 s, 11.5 chars/s, -24.4 dB RMS, peak -3.4 dBFS
+   script: I do not remember reaching the boat. A steamer found me in it, they say, adrift and raving, days from any land. They tell me the sea never left. There was no shore, no stone, no tide drawn back.
+   heard:  I do not remember reaching the boat. A steamer found me in it, they say, adrift and raving, days from any land. They tell me the sea never left. There was no shore, no stone, no tide drawn back.
+ending.listen: word for word
+   7.13 s, 11.2 chars/s, -25.1 dB RMS, peak -5.0 dBFS
+   script: I have stopped arguing. At night I listen to the water, and what moves under it.
+   heard:  I have stopped arguing. At night I listen to the water and what moves under it.
+ending.innsmouth: word for word (a recorded exception: 'innsmouth' heard as 'insemouth')
+   17.57 s, 12.6 chars/s, -24.4 dB RMS, peak -4.7 dBFS
+   script: Years later, in a fishing town called Innsmouth, I saw a bracelet in a shop window. That eye, above those waves. The man behind the counter asked how far out I had been. I did not tell him. He did not seem to need telling.
+   heard:  Years later, in a fishing-town called Insemouth, I saw a bracelet in a shop window, that eye above those waves. The man behind the counter asked how far out I had been. I did not tell him. He did not seem to need telling.
+ending.rising: word for word
+   12.03 s, 10.1 chars/s, -25.8 dB RMS, peak -3.9 dBFS
+   script: Those figures bowed for a reason. Whatever rose that night did not rise for me, and I do not think it has finished rising.
+   heard:  Those figures bowed for a reason. Whatever rose that night did not rise for me, and I do not think it has finished rising.
+9 lines, 0 differing

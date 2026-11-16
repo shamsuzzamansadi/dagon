@@ -19,7 +19,7 @@ BREAKAGES = [
     # The regression checks kept from M4, and tightened: hidden art, and shapes that draw nothing.
     ("The clip animates the water before it, under a hidden parent", W, '[node name="TrenchFront" type="Node2D" parent="."]\n', '[node name="TrenchFront" type="Node2D" parent="."]\nvisible = false\n'),
     ("The watcher on the cliff carries no shown drawing", W, '[node name="Drawn" type="Sprite2D" parent="FarRidges/WatcherFar"]\n', '[node name="Drawn" type="Sprite2D" parent="FarRidges/WatcherFar"]\nvisible = false\n'),
-    ("The kneeling figures' drawing is not on what bows", W, '[node name="Drawn" type="Sprite2D" parent="RitualLayer/Figures/Watcher"]\n', '[node name="Drawn" type="Sprite2D" parent="RitualLayer/Figures/Watcher"]\nvisible = false\n'),
+    ("The one who stands at the ritual carries no shown drawing", W, '[node name="Drawn" type="Sprite2D" parent="RitualLayer/Figures/Watcher"]\n', '[node name="Drawn" type="Sprite2D" parent="RitualLayer/Figures/Watcher"]\nvisible = false\n'),
     # The ending: the card may not come up over the pictures.
     ("The ending's card rises over its pictures", E, "offset_top = -50.0\noffset_right = -24.0", "offset_top = -120.0\noffset_right = -24.0"),
 ]
