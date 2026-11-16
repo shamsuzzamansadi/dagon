@@ -13,6 +13,7 @@ import gen_abyss
 import gen_boat
 import gen_sailor
 import gen_cave
+import gen_figures
 import gen_reveal
 import gen_prologue
 import gen_shore
@@ -128,6 +129,8 @@ def main():
         image.save(REVEAL_OUT / f"{name}.png")
     gen_abyss.water_drop().save(REVEAL_OUT / "water_drop.png")
     CAVE_OUT.mkdir(parents=True, exist_ok=True)
+    for name, (image, _at) in gen_figures.all_figures().items():
+        image.save(CAVE_OUT / f"{name}.png")
     gen_cave.cave_front().save(CAVE_OUT / "cave_front.png")
     gen_cave.cave_wall().save(CAVE_OUT / "cave_wall.png")
     gen_cave.abyss_far().save(CAVE_OUT / "abyss_far.png")

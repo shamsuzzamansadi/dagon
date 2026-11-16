@@ -26,7 +26,7 @@ REVEAL_OUT = ROOT / "project" / "assets" / "reveal"
 REVEAL_ARTWORK = ["monolith", "crossing_carving", "dagon_ridge", "water_drop"] + [f"dagon_{part}{lit}" for part in ("body", "head", "crest", "arm") for lit in ("", "_lit")]
 # The finished reference section, and the prologue. shaft.png is a light mask, like light.png.
 CAVE_OUT = ROOT / "project" / "assets" / "cave"
-CAVE_ARTWORK = ["cave_front", "cave_wall", "abyss_far", "ritual_far", "foreground_cave"]
+CAVE_ARTWORK = ["cave_front", "cave_wall", "abyss_far", "ritual_far", "foreground_cave", "ritual_stones", "distant_shape", "ritual_watcher", "far_watcher", "canyon_figure"] + [f"ritual_kneeler_{i}" for i in range(1, 5)]
 ABYSS_OUT = ROOT / "project" / "assets" / "abyss"
 ABYSS_TILES = 4
 ABYSS_ARTWORK = [f"abyss_ground_{i}" for i in range(ABYSS_TILES)] + ["abyss_far_plain", "abyss_escarpment", "abyss_slab", "abyss_stone", "abyss_canyon", "abyss_statues",

@@ -93,6 +93,15 @@
 [ext_resource type="Texture2D" path="res://assets/reveal/dagon_arm_lit.png" id="r_dagon_arm_lit"]
 [ext_resource type="Texture2D" path="res://assets/reveal/water_drop.png" id="r_water_drop"]
 [ext_resource type="Texture2D" path="res://assets/abyss/abyss_trench_surge.png" id="r_trench_surge"]
+[ext_resource type="Texture2D" path="res://assets/cave/ritual_stones.png" id="r_ritual_stones"]
+[ext_resource type="Texture2D" path="res://assets/cave/ritual_kneeler_1.png" id="r_ritual_kneeler_1"]
+[ext_resource type="Texture2D" path="res://assets/cave/ritual_kneeler_2.png" id="r_ritual_kneeler_2"]
+[ext_resource type="Texture2D" path="res://assets/cave/ritual_kneeler_3.png" id="r_ritual_kneeler_3"]
+[ext_resource type="Texture2D" path="res://assets/cave/ritual_kneeler_4.png" id="r_ritual_kneeler_4"]
+[ext_resource type="Texture2D" path="res://assets/cave/ritual_watcher.png" id="r_ritual_watcher"]
+[ext_resource type="Texture2D" path="res://assets/cave/far_watcher.png" id="r_far_watcher"]
+[ext_resource type="Texture2D" path="res://assets/cave/distant_shape.png" id="r_distant_shape"]
+[ext_resource type="Texture2D" path="res://assets/cave/canyon_figure.png" id="r_canyon_figure"]
 
 [sub_resource type="RectangleShape2D" id="lifeboat_shape"]
 size = Vector2(112, 28)
@@ -1667,8 +1676,13 @@ scroll_scale = Vector2(0.35, 1)
 
 [node name="WatcherFar" type="Polygon2D" parent="FarRidges"]
 visible = false
-color = Color(0.03, 0.04, 0.07, 1)
+color = Color(0.03, 0.04, 0.07, 0)
 polygon = PackedVector2Array(1276.1, -140, 1276.1, -155.6, 1274.8, -159.5, 1277.4, -164.7, 1282.6, -164.7, 1285.2, -159.5, 1283.9, -155.6, 1283.9, -140)
+
+[node name="Drawn" type="Sprite2D" parent="FarRidges/WatcherFar"]
+position = Vector2(1274, -165)
+texture = ExtResource("r_far_watcher")
+centered = false
 
 [node name="Silhouette" type="Polygon2D" parent="FarRidges"]
 visible = false
@@ -1677,8 +1691,13 @@ polygon = PackedVector2Array(680, 60, 680, -44, 730, -50, 730, -70, 820, -68, 82
 
 [node name="DistantShape" type="Polygon2D" parent="FarRidges"]
 position = Vector2(1000, 0)
-color = Color(0.025, 0.035, 0.06, 1)
+color = Color(0.025, 0.035, 0.06, 0)
 polygon = PackedVector2Array(0, -150, 26, -196, 50, -214, 80, -205, 104, -170, 118, -150)
+
+[node name="Drawn" type="Sprite2D" parent="FarRidges/DistantShape"]
+position = Vector2(-1000, -220)
+texture = ExtResource("r_distant_shape")
+centered = false
 
 [node name="Escarpment" type="Sprite2D" parent="FarRidges"]
 light_mask = 2
@@ -1706,31 +1725,36 @@ color = Color(0.2, 0.27, 0.3, 1)
 polygon = PackedVector2Array(650, -28, 655, -66, 690, -86, 740, -94, 800, -88, 845, -70, 862, -28)
 
 [node name="Stone1" type="Polygon2D" parent="RitualLayer"]
-color = Color(0.03, 0.04, 0.07, 1)
+color = Color(0.03, 0.04, 0.07, 0)
 polygon = PackedVector2Array(672, -32, 671, -42.5, 674, -47, 679, -47, 680, -41, 680, -32)
 
 [node name="Stone2" type="Polygon2D" parent="RitualLayer"]
-color = Color(0.03, 0.04, 0.07, 1)
+color = Color(0.03, 0.04, 0.07, 0)
 polygon = PackedVector2Array(696, -32, 695, -46.7, 698, -53, 703, -53, 704, -44.6, 704, -32)
 
 [node name="Stone3" type="Polygon2D" parent="RitualLayer"]
-color = Color(0.03, 0.04, 0.07, 1)
+color = Color(0.03, 0.04, 0.07, 0)
 polygon = PackedVector2Array(771, -32, 770, -47.4, 773, -54, 778, -54, 779, -45.2, 779, -32)
 
 [node name="Stone4" type="Polygon2D" parent="RitualLayer"]
-color = Color(0.03, 0.04, 0.07, 1)
+color = Color(0.03, 0.04, 0.07, 0)
 polygon = PackedVector2Array(796, -32, 795, -43.2, 798, -48, 803, -48, 804, -41.6, 804, -32)
 
 [node name="MarkStone" type="Polygon2D" parent="RitualLayer"]
-color = Color(0.03, 0.04, 0.07, 1)
+color = Color(0.03, 0.04, 0.07, 0)
 polygon = PackedVector2Array(731, -34, 730, -56, 737, -64, 745, -64, 752, -56, 751, -34)
 
+[node name="Drawn" type="Sprite2D" parent="RitualLayer/MarkStone"]
+position = Vector2(671, -64)
+texture = ExtResource("r_ritual_stones")
+centered = false
+
 [node name="MarkEye" type="Polygon2D" parent="RitualLayer"]
-color = Color(0.3, 0.6, 0.52, 1)
+color = Color(0.3, 0.6, 0.52, 0)
 polygon = PackedVector2Array(735.6, -48.8, 738.6, -51.8, 743.4, -51.8, 746.4, -48.8, 743.4, -45.8, 738.6, -45.8)
 
 [node name="MarkWave" type="Polygon2D" parent="RitualLayer"]
-color = Color(0.3, 0.6, 0.52, 1)
+color = Color(0.3, 0.6, 0.52, 0)
 polygon = PackedVector2Array(736.2, -40.4, 738.6, -42.8, 741, -40.4, 743.4, -42.8, 745.8, -40.4, 745.8, -38.6, 743.4, -41, 741, -38.6, 738.6, -41, 736.2, -38.6)
 
 [node name="Figures" type="Node2D" parent="RitualLayer"]
@@ -1739,24 +1763,49 @@ visible = false
 [node name="Kneeling" type="Node2D" parent="RitualLayer/Figures"]
 
 [node name="Figure1" type="Polygon2D" parent="RitualLayer/Figures/Kneeling"]
-color = Color(0.01, 0.015, 0.03, 1)
+color = Color(0.01, 0.015, 0.03, 0)
 polygon = PackedVector2Array(682.6, -36.5, 682.6, -39.6, 686.9, -39.6, 690, -45.9, 693.1, -49, 697.4, -50.1, 698.4, -45.9, 695.2, -42.8, 692.1, -40.6, 690, -36.5)
 
+[node name="Drawn" type="Sprite2D" parent="RitualLayer/Figures/Kneeling/Figure1"]
+position = Vector2(682, -52)
+texture = ExtResource("r_ritual_kneeler_1")
+centered = false
+
 [node name="Figure2" type="Polygon2D" parent="RitualLayer/Figures/Kneeling"]
-color = Color(0.01, 0.015, 0.03, 1)
+color = Color(0.01, 0.015, 0.03, 0)
 polygon = PackedVector2Array(704.6, -36.5, 704.6, -39.6, 708.9, -39.6, 712, -45.9, 715.1, -49, 719.4, -50.1, 720.4, -45.9, 717.2, -42.8, 714.1, -40.6, 712, -36.5)
 
+[node name="Drawn" type="Sprite2D" parent="RitualLayer/Figures/Kneeling/Figure2"]
+position = Vector2(704, -52)
+texture = ExtResource("r_ritual_kneeler_2")
+centered = false
+
 [node name="Figure3" type="Polygon2D" parent="RitualLayer/Figures/Kneeling"]
-color = Color(0.01, 0.015, 0.03, 1)
+color = Color(0.01, 0.015, 0.03, 0)
 polygon = PackedVector2Array(775.4, -36.5, 775.4, -39.6, 771.1, -39.6, 768, -45.9, 764.9, -49, 760.6, -50.1, 759.6, -45.9, 762.8, -42.8, 765.9, -40.6, 768, -36.5)
 
+[node name="Drawn" type="Sprite2D" parent="RitualLayer/Figures/Kneeling/Figure3"]
+position = Vector2(759, -52)
+texture = ExtResource("r_ritual_kneeler_3")
+centered = false
+
 [node name="Figure4" type="Polygon2D" parent="RitualLayer/Figures/Kneeling"]
-color = Color(0.01, 0.015, 0.03, 1)
+color = Color(0.01, 0.015, 0.03, 0)
 polygon = PackedVector2Array(797.4, -36.5, 797.4, -39.6, 793.1, -39.6, 790, -45.9, 786.9, -49, 782.6, -50.1, 781.6, -45.9, 784.8, -42.8, 787.9, -40.6, 790, -36.5)
 
+[node name="Drawn" type="Sprite2D" parent="RitualLayer/Figures/Kneeling/Figure4"]
+position = Vector2(781, -52)
+texture = ExtResource("r_ritual_kneeler_4")
+centered = false
+
 [node name="Watcher" type="Polygon2D" parent="RitualLayer/Figures"]
-color = Color(0.01, 0.015, 0.03, 1)
+color = Color(0.01, 0.015, 0.03, 0)
 polygon = PackedVector2Array(821.5, -28, 821.5, -46, 820, -50.5, 823, -56.5, 829, -56.5, 832, -50.5, 830.5, -46, 830.5, -28)
+
+[node name="Drawn" type="Sprite2D" parent="RitualLayer/Figures/Watcher"]
+position = Vector2(820, -57)
+texture = ExtResource("r_ritual_watcher")
+centered = false
 
 [node name="CaveView" type="Polygon2D" parent="."]
 clip_children = 1
@@ -1852,8 +1901,13 @@ polygon = PackedVector2Array(2028, -1, 2030, -2, 2032, -1, 2031, 0, 2029, 0)
 [node name="CanyonFigure" type="Polygon2D" parent="ActArt"]
 visible = false
 position = Vector2(3690, 0)
-color = Color(0.03, 0.04, 0.07, 1)
+color = Color(0.03, 0.04, 0.07, 0)
 polygon = PackedVector2Array(-3.6, 0, -3.6, -14.4, -4.8, -18, -2.4, -22.8, 2.4, -22.8, 4.8, -18, 3.6, -14.4, 3.6, 0)
+
+[node name="Drawn" type="Sprite2D" parent="ActArt/CanyonFigure"]
+position = Vector2(-5, -23)
+texture = ExtResource("r_canyon_figure")
+centered = false
 
 [node name="Drawn" type="Sprite2D" parent="Trench"]
 position = Vector2(4160, -700)
