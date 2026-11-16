@@ -15,6 +15,7 @@ const AWAKENED := 3
 var h
 var only := ""
 var spoken := 0
+var last_line := &""
 
 
 func _initialize() -> void:
@@ -28,18 +29,17 @@ func _mark(stage: String) -> void:
 ## Steps until the condition holds, marking every story line the Hud starts on the way. With a runner, hops when he
 ## is stopped by something, as anyone running would.
 func _until(hud: Node, done: Callable, max_steps: int, runner: CharacterBody2D = null) -> void:
-	var last := &""
 	var last_x := runner.global_position.x if runner != null else 0.0
 	var stalled := 0
 	for i in max_steps:
 		if done.call():
 			return
 		var line: StringName = hud.get_current_line() if is_instance_valid(hud) else &""
-		if line != last:
+		if line != last_line:
 			if line != &"":
 				spoken += 1
 				_mark("line-%d-%s" % [spoken, line])
-			last = line
+			last_line = line
 		if runner != null and is_instance_valid(runner):
 			stalled = stalled + 1 if absf(runner.global_position.x - last_x) < 0.2 else 0
 			last_x = runner.global_position.x
@@ -51,17 +51,22 @@ func _until(hud: Node, done: Callable, max_steps: int, runner: CharacterBody2D =
 		await h.steps(1)
 
 
-func _run() -> void:
-	h = Harness.new(self)
-	only = OS.get_environment("DAGON_RECORD_ONLY")
+## Mutes everything but the narration. After each scene has loaded, as loading applies the saved volumes.
+func _voice_only() -> void:
 	if only == "voice":
 		for bus in ["Music", "Effects"]:
 			AudioServer.set_bus_mute(AudioServer.get_bus_index(bus), true)
+
+
+func _run() -> void:
+	h = Harness.new(self)
+	only = OS.get_environment("DAGON_RECORD_ONLY")
 	var session: Node = (load("res://scenes/level/game.tscn") as PackedScene).instantiate()
 	session.set_start(AWAKENED, true, false)
 	await h.load_with(session, true)
 	var route = RoutePlayer.new(h)
 	var hud: Node = route.world().get_node("Hud")
+	_voice_only()
 	if only == "bed":
 		hud.get_node("Voice").volume_db = -80.0
 	await h.landed_on_floor(route.player())
@@ -79,6 +84,7 @@ func _run() -> void:
 	_mark("collapse")
 	var ending: Node = await h.wait_for_scene("MenuController", 600)
 	_mark("ending")
+	_voice_only()
 	if only == "bed":
 		ending.get_node("Voice").volume_db = -80.0
 	for line in ending.ending_lines.size():
