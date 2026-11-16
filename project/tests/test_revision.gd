@@ -586,6 +586,22 @@ func test_the_cave_music_starts_on_the_way_in_and_never_on_restore(h) -> void:
 	h.check(not world.get_node("Sound/MusicCave").playing, "restoring in the cave replayed its music")
 
 
+## The pictures keep what matters above row 190 (tools/art/gen_ending.py). The card sizes to its line, so the
+## longest line sets how high it comes: it may not come higher than that row, in any of the four.
+func test_the_epilogue_card_stays_below_what_the_pictures_show(h) -> void:
+	const CLEAR_OF_THE_CARD := 190.0
+	var ending: Node = await h.load_main_fixture("res://scenes/ui/ending.tscn")
+	var card: Control = ending.get_node("Center/Card")
+	for line in ending.ending_lines.size():
+		await h.steps(4)
+		h.check(ending.get_ending_line() == line, "line %d is not showing" % line)
+		var top := card.get_global_rect().position.y
+		h.check(top >= CLEAR_OF_THE_CARD, "at line %d the card's top is at %.0f, over the picture" % [line, top])
+		h.check(top < 262.0 and card.get_global_rect().end.y <= 270.0, "at line %d the card is off the screen: %s" % [line, card.get_global_rect()])
+		if line + 1 < ending.ending_lines.size():
+			ending.advance_ending()
+
+
 func test_the_epilogue_shows_a_picture_for_each_line_over_the_sea(h) -> void:
 	var ending: Node = await h.load_main_fixture("res://scenes/ui/ending.tscn")
 	await h.steps(3)
@@ -750,6 +766,32 @@ func test_the_abyss_sounds_deeper_as_he_goes_on(h) -> void:
 ## never shows. Art drawn over a greybox shape must be what the clip moves, or the motion is lost: the gate's rise and
 ## the trench's water were, for a while in M4. Hidden means hidden where it stands: a node under a hidden parent is
 ## hidden too, unless the clip shows that parent.
+## What a clip moves must draw something. A shape kept only for its outline draws nothing itself (its colour is
+## clear), so it has to carry a drawing that is shown: otherwise the clip moves nothing anyone can see, which is how
+## the gate stood still in M4.
+func test_every_shape_a_clip_moves_or_fades_draws_something(h) -> void:
+	var world := await _world(h)
+	var checked := 0
+	for player_name in ["Cinematics", "Atmosphere", "Background"]:
+		var player: AnimationPlayer = world.get_node(player_name)
+		for clip_name in player.get_animation_list():
+			var clip := player.get_animation(clip_name)
+			for track in clip.get_track_count():
+				if clip.track_get_type(track) != Animation.TYPE_VALUE:
+					continue
+				var path := String(clip.track_get_path(track))
+				var shape := world.get_node_or_null(path.get_slice(":", 0)) as Polygon2D
+				if shape == null or shape.color.a > 0.0 or not shape.vertex_colors.is_empty():
+					continue
+				checked += 1
+				var drawings := shape.find_children("*", "Sprite2D", true, false)
+				var seen := false
+				for drawing in drawings:
+					seen = seen or (drawing.texture != null and drawing.visible)
+				h.check(seen, "%s animates %s, a shape that draws nothing and carries no shown drawing" % [clip_name, path])
+	h.check(checked >= 10, "only %d clear shapes were checked" % checked)
+
+
 ## The rock across the way back and the returning sea are shown by the director, as outcomes of the flight, not by its
 ## clip: test_narrative and this file hold that they show with no clip at all.
 const SHOWN_BY_THE_DIRECTOR := ["Rockfall", "Tide"]
