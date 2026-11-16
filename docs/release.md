@@ -12,7 +12,7 @@ How a milestone prerelease is built, gated and published. The rules come from th
 | M5 | `v0.2.0-alpha.1` | The intended game is playable from beginning to end, with its principal gameplay and audio connected | Keep the pre-alpha label: `v0.1.0-pre-alpha.N` |
 | M7 | `v0.3.0-rc.1` | Intended scope complete, no known release-blocking defects, and final acceptance checks passed | Keep the earlier label |
 
-**The first prerelease moved from M3 to M4.** M3 was accepted as a milestone on 2026-11-10 with no release asked for, and its record stayed `planned`. On 2026-11-15 the owner asked for the first pre-alpha at M4 and accepted its candidate ([record](evidence/m4/owner-acceptance-2026-11-15.md)). The version is the same, never having been used; the promise is the same.
+**`v0.1.0-pre-alpha.1` is published** ([https://github.com/shamsuzzamansadi/dagon/releases/tag/v0.1.0-pre-alpha.1](https://github.com/shamsuzzamansadi/dagon/releases/tag/v0.1.0-pre-alpha.1)), from `760a539`. **The first prerelease moved from M3 to M4.** M3 was accepted as a milestone on 2026-11-10 with no release asked for, and its record stayed `planned`. On 2026-11-15 the owner asked for the first pre-alpha at M4 and accepted its candidate ([record](evidence/m4/owner-acceptance-2026-11-15.md)). The version is the same, never having been used; the promise is the same.
 
 **A correction is a new version:** `v0.1.0-pre-alpha.2`. A published version is never replaced.
 
@@ -105,7 +105,9 @@ There is **one package per OS:** GCC on `ubuntu-22.04` for Linux, and MSVC on `w
 - **A rehearsal** runs the gate, packaging, smoke test and preparation for real, on any branch: `gh workflow run ci.yml --ref <branch> -f rehearse=true`. It uses version `.0`, which can never be published, and the `publish` job cannot run outside a push to `main`.
 - **A rehearsal also asks GitHub what exists, with its read-only token,** so those requests run for real.
 
-## Before the first real publication
+## The first real publication
+
+**`v0.1.0-pre-alpha.1` was published by this workflow on 2026-11-15** ([evidence](evidence/release-workflow/first-publication-v0.1.0-pre-alpha.1.md)). The write path, the tag created under the active ruleset, immutable releases and the target kept after publishing were all observed once, with no protection changed. **Still unproven:** removing a failed draft on a retry, and the ruleset refusing to move or delete a tag (not attempted). What was written before it, kept as the record of what was open:
 
 **No tag or release has ever been made by this workflow.** Whoever runs the first release should watch its `publish` job, because these are still unproven:
 
