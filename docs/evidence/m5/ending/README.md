@@ -15,6 +15,6 @@
 | **4. The last sea** (`Rising`) | The crest did not match the creature | **The crest is the reveal's own image** (`gen_creature.crest`), at the size it has on screen there, on a long low back just clear of the water, with white water where it leaves the sea, the sea pouring off the spines, rings running out, and a town's roofs, steeple and two lit windows beside it for its size |
 | **5. One style** | Framing, light and detail differed | The Shore's sailor in the first three, by the same marks; one sea and one moon's road in 1, 2 and 4; brick and plank where two had flat fills; the light from the upper right in all |
 
-**The card:** the pictures keep what matters above row 190 of 270. `test_the_epilogue_card_stays_below_what_the_pictures_show` holds the card at or below it for all four lines; the longest brings it to row 200.
+**The card:** the pictures keep what matters above row 190 of 270. `test_the_epilogue_card_stays_below_what_the_pictures_show` holds the card at or below it for all four lines. Measured in the captures, the tallest card, the rescue's, comes to row 194; the window's to 220.
 
 **Known:** amber is the lantern's alone in the game's palette rules; here it is also the bracelet's gold, the candle and three small lamps, as it was the bracelet's and the candle's in M3's pictures. The mark on the cuff follows the band's curve, so its eye is a little sheared.

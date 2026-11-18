@@ -4,7 +4,7 @@ A short 2D cinematic horror game for [GitHub Game Off 2026](https://itch.io/jam/
 (theme: SHIFT). A shipwrecked sailor wakes on a stretch of seabed that should be
 under the ocean. Godot 4.7 with gameplay in C++20 through GDExtension.
 
-**Status: M1, M2 and M3 are accepted by the owner, with documented deferrals** ([M3's record](docs/evidence/m3/owner-acceptance-2026-11-10.md)). M3's acceptance is of the milestone, not of a finished game, and no release has been made. M4 is next. The game opens on a main menu, with New Game, Continue
+**Status: M1 to M4 are accepted by the owner, with documented deferrals** ([M4's record](docs/evidence/m4/owner-acceptance-2026-11-15.md)). Each acceptance is of a milestone, not of a finished game. The first prerelease, [`v0.1.0-pre-alpha.1`](https://github.com/shamsuzzamansadi/dagon/releases/tag/v0.1.0-pre-alpha.1), was published at M4. **M5 is implemented on a branch and waits for independent review and the owner's playtest: it is not accepted** ([handoff](docs/handoff.md)). The game opens on a main menu, with New Game, Continue
 from one checkpoint save, Settings with key rebinding, Controls and Credits. New Game shows How to Play, then a short, spoken, skippable prologue whose last picture is the Shore itself. Play starts there, as he gets up beside his boat, on the Shore, in its accepted art direction: a
 sailor you can walk and jump with, on exposed seabed beside a stranded boat, with the sea far off. You can examine things, pause, and
 use a controller, with buttons named for the device in use.
@@ -45,7 +45,7 @@ device you are using, and an unrecognized controller is described by position.
 
 In Settings you can change the keyboard keys for walking, jumping and examining. The Left and Right arrows always move
 and Esc always pauses. Controller buttons are fixed. Narration has its own volume, and subtitles and controller vibration can each be switched off. They are on by default. The Music and Effects sliders are saved and set on their own buses, ready
-for the audio planned in M4 and M5. The sound so far is a first pass, synthesized, and the narration covers twelve lines.
+for the game's audio. The sound is synthesized, every story line is spoken in one voice, and the mix has been measured but not yet judged by ear.
 
 All of this is checked by automated tests with simulated input for each layout. In human tests, A, D, the Left and Right arrows and
 Space have worked, and the owner reports that the Xbox controller controls they tried worked, without listing them. Individual Xbox
