@@ -797,31 +797,106 @@ func test_every_shape_a_clip_moves_or_fades_draws_something(h) -> void:
 const SHOWN_BY_THE_DIRECTOR := ["Rockfall", "Tide"]
 
 
+## The nodes a clip shows. A :visible track counts only if it is enabled and has a key, within the clip, that sets
+## true: a track whose every key is false hides its node, it never shows it, so its being there proves nothing.
+static func _shown_by(clip: Animation) -> Dictionary:
+	var shown := {}
+	for track in clip.get_track_count():
+		var path := String(clip.track_get_path(track))
+		if clip.track_get_type(track) != Animation.TYPE_VALUE or not path.ends_with(":visible") or not clip.track_is_enabled(track):
+			continue
+		for key in clip.track_get_key_count(track):
+			var value = clip.track_get_key_value(track, key)
+			if value is bool and value and clip.track_get_key_time(track, key) <= clip.length:
+				shown[path.get_slice(":", 0)] = true
+	return shown
+
+
+## What a clip moves or fades under a node that is hidden and that the clip never shows, as "track: hidden node",
+## and the number of tracks looked at. The director's two are left out by their exact paths.
+static func _hidden_and_never_shown(world: Node, clip: Animation) -> Array:
+	var shown := _shown_by(clip)
+	var found := []
+	var checked := 0
+	for track in clip.get_track_count():
+		var path := String(clip.track_get_path(track))
+		if clip.track_get_type(track) != Animation.TYPE_VALUE or path.ends_with(":visible"):
+			continue
+		var node := world.get_node_or_null(path.get_slice(":", 0))
+		if node == null:
+			found.append("%s: missing" % path)
+			continue
+		if not node is CanvasItem:
+			continue
+		checked += 1
+		var at: Node = node
+		while at != world and at != null:
+			var at_path := String(world.get_path_to(at))
+			if at is CanvasItem and not at.visible and not shown.has(at_path) and not SHOWN_BY_THE_DIRECTOR.has(at_path):
+				found.append("%s: %s" % [path, at_path])
+			at = at.get_parent()
+	return [found, checked]
+
+
 func test_no_clip_animates_a_hidden_node_it_never_shows(h) -> void:
 	var world := await _world(h)
 	var checked := 0
 	for player_name in ["Cinematics", "Atmosphere", "Background"]:
 		var player: AnimationPlayer = world.get_node(player_name)
 		for clip_name in player.get_animation_list():
-			var clip := player.get_animation(clip_name)
-			var shown := {}
-			for track in clip.get_track_count():
-				var path := String(clip.track_get_path(track))
-				if path.ends_with(":visible"):
-					shown[path.get_slice(":", 0)] = true
-			for track in clip.get_track_count():
-				var path := String(clip.track_get_path(track))
-				var node_path := path.get_slice(":", 0)
-				if clip.track_get_type(track) != Animation.TYPE_VALUE or path.ends_with(":visible"):
-					continue
-				var node := world.get_node_or_null(node_path)
-				h.check(node != null, "%s animates %s, which does not exist" % [clip_name, path])
-				if not node is CanvasItem:
-					continue
-				checked += 1
-				var at: Node = node
-				while at != world and at != null:
-					if at is CanvasItem and not at.visible and not shown.has(String(world.get_path_to(at))) and not SHOWN_BY_THE_DIRECTOR.has(String(world.get_path_to(at))):
-						h.check(false, "%s animates %s, but %s is hidden and never shown by it" % [clip_name, path, world.get_path_to(at)])
-					at = at.get_parent()
+			var result := _hidden_and_never_shown(world, player.get_animation(clip_name))
+			checked += result[1]
+			for problem in result[0]:
+				h.check(false, "%s animates %s, which is hidden and never shown by it" % [clip_name, problem])
 	h.check(checked > 10, "only %d tracks were checked" % checked)
+
+
+## The check above, on a made-up clip: a :visible track whose keys are all false does not excuse moving a hidden node,
+## nor does a true key on a disabled track or past the clip's end; a true key within the clip does, and the
+## director's exemption covers only its own node.
+func test_a_visibility_track_that_only_hides_does_not_count_as_showing(h) -> void:
+	var world := Node2D.new()
+	var hidden := Sprite2D.new()
+	hidden.name = "Hidden"
+	hidden.visible = false
+	world.add_child(hidden)
+	var rock := Sprite2D.new()
+	rock.name = "Rockfall"
+	rock.visible = false
+	world.add_child(rock)
+	var under_rock := Sprite2D.new()
+	under_rock.name = "Stone"
+	under_rock.visible = false
+	rock.add_child(under_rock)
+
+	var clip := Animation.new()
+	clip.length = 2.0
+	var moves := clip.add_track(Animation.TYPE_VALUE)
+	clip.track_set_path(moves, "Hidden:position")
+	clip.track_insert_key(moves, 0.0, Vector2.ZERO)
+	clip.track_insert_key(moves, 1.0, Vector2(10, 0))
+	var shows := clip.add_track(Animation.TYPE_VALUE)
+	clip.track_set_path(shows, "Hidden:visible")
+	clip.track_insert_key(shows, 0.0, false)
+	clip.track_insert_key(shows, 1.0, false)
+	h.check(_hidden_and_never_shown(world, clip)[0] == ["Hidden:position: Hidden"], "a track of false keys was taken as showing the node: %s" % [_hidden_and_never_shown(world, clip)[0]])
+
+	clip.track_insert_key(shows, 3.0, true)
+	h.check(_hidden_and_never_shown(world, clip)[0] == ["Hidden:position: Hidden"], "a true key after the clip's end was taken as showing the node")
+	clip.track_remove_key_at_time(shows, 3.0)
+	clip.track_insert_key(shows, 1.5, true)
+	clip.track_set_enabled(shows, false)
+	h.check(_hidden_and_never_shown(world, clip)[0] == ["Hidden:position: Hidden"], "a true key on a disabled track was taken as showing the node")
+	clip.track_set_enabled(shows, true)
+	h.check(_hidden_and_never_shown(world, clip)[0].is_empty(), "a true key within the clip was not taken as showing the node: %s" % [_hidden_and_never_shown(world, clip)[0]])
+
+	var rock_clip := Animation.new()
+	rock_clip.length = 1.0
+	var rock_moves := rock_clip.add_track(Animation.TYPE_VALUE)
+	rock_clip.track_set_path(rock_moves, "Rockfall:position")
+	rock_clip.track_insert_key(rock_moves, 0.0, Vector2.ZERO)
+	var stone_moves := rock_clip.add_track(Animation.TYPE_VALUE)
+	rock_clip.track_set_path(stone_moves, "Rockfall/Stone:position")
+	rock_clip.track_insert_key(stone_moves, 0.0, Vector2.ZERO)
+	h.check(_hidden_and_never_shown(world, rock_clip)[0] == ["Rockfall/Stone:position: Rockfall/Stone"], "the director's exemption reached past its own node: %s" % [_hidden_and_never_shown(world, rock_clip)[0]])
+	world.free()

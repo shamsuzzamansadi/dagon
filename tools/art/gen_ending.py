@@ -233,7 +233,7 @@ def panel_listen():
         put(img, 388 + dx, wy1 + dy, "A0")
     # The man, close to the glass, his back to us: against the sea and the sky in the right-hand light. His shoulders
     # are drawn up, uneven, and his head is bent forward and turned, an ear to the pane. One hand is flat on the
-    # glass above him. The other grips the sill.
+    # glass beside his head. The other grips the sill.
     cx = 322
     coat = [(cx - 62, H), (cx - 60, 196), (cx - 54, 170), (cx - 44, 152), (cx - 26, 142), (cx - 10, 138), (cx + 14, 140), (cx + 34, 146), (cx + 48, 158), (cx + 54, 176), (cx + 56, H)]
     fill(img, coat, "C0")
@@ -241,10 +241,12 @@ def panel_listen():
     fill(img, [(cx - 30, H), (cx - 26, 190), (cx - 18, 164), (cx - 8, 150), (cx + 20, 150), (cx + 32, 164), (cx + 38, 190), (cx + 40, H)], "C1")
     line(img, cx + 2, 150, cx + 4, H, "C0")
     fill(img, [(cx - 20, 142), (cx - 16, 130), (cx + 18, 130), (cx + 24, 143), (cx + 2, 150)], "C1")
-    # The raised arm: upper arm out from the shoulder, forearm up the glass to the hand.
-    arm = [(cx + 34, 146), (cx + 48, 158), (cx + 62, 150), (cx + 70, 128), (cx + 72, 100), (cx + 60, 98), (cx + 56, 124), (cx + 48, 138)]
+    # The raised arm: upper arm out from the shoulder, the forearm up the glass to the cuff at the wrist. It stops
+    # below the bar of the window, so the hand that comes out of it lies on one pane.
+    cuff = 108
+    arm = [(cx + 34, 146), (cx + 48, 158), (cx + 62, 150), (cx + 70, 128), (cx + 70, cuff + 1), (cx + 57, cuff), (cx + 56, 124), (cx + 48, 138)]
     fill(img, arm, "C0")
-    fill(img, [(cx + 52, 146), (cx + 60, 142), (cx + 66, 126), (cx + 68, 104), (cx + 63, 103), (cx + 60, 126)], "C1")
+    fill(img, [(cx + 52, 146), (cx + 60, 142), (cx + 66, 126), (cx + 66, cuff + 4), (cx + 61, cuff + 4), (cx + 60, 126)], "C1")
     # The arm to the sill.
     fill(img, [(cx - 54, 170), (cx - 60, 196), (cx - 74, 180), (cx - 80, 170), (cx - 70, 164), (cx - 60, 164)], "C0")
     # The moon is beyond him and to his left: it runs along that side of everything, and over his shoulders.
@@ -279,23 +281,31 @@ def panel_listen():
     fill(img, [(hx + 4, hy + 10), (hx + 15, hy + 12), (hx + 12, hy + 21), (hx + 2, hy + 22), (hx - 2, hy + 16)], "W1")
     fill(img, [(hx + 9, hy + 13), (hx + 14, hy + 13), (hx + 11, hy + 20)], "W0")
     rows(img, hx + 3, hy - 4, [".sS.", "sSSs", "sSSs", ".sS."], SAILOR)
-    # The hand on the glass: pale against the night, the fingers spread.
-    rows(img, cx + 55, 70, [
-        "......s...s.......",
-        "..s...s...s...s...",
-        "..s...s...s...s...",
-        "..ss..s...s..ss...",
-        "...s..ss.ss..s....",
-        "...ss.ss.ss.ss....",
-        "s...sssssssss.....",
-        "ss..sssssssss.....",
-        ".ss.ssssssssS.....",
-        "..ssssssssssS.....",
-        "...sssssssssS.....",
-        "....sssssssSS.....",
-        ".....ssssssS......",
-        "......SSSSS.......",
+    # The hand on the glass, beside his ear: the back of the right hand, pale against the night, the fingers spread
+    # and the thumb out towards him. The wrist goes down into the cuff, and the cuff's edge crosses in front of it.
+    rows(img, cx + 52, cuff - 17, [
+        ".........s........",
+        "......s..s..s.....",
+        "......s..s..s.....",
+        "......s..s..s..s..",
+        "......s..s..s..s..",
+        "......ss.s..s.ss..",
+        ".......s.ss.s.s...",
+        ".......sssssssS...",
+        ".s.....ssssssSS...",
+        ".ss....ssssssSS...",
+        "..ss...ssssssSS...",
+        "...ss.sssssssSS...",
+        "....sssssssssS....",
+        ".....ssssssssS....",
+        "......sssssSS.....",
+        ".......sssSSS.....",
+        ".......sssSSS.....",
+        ".......sssSSS.....",
+        ".......sssSSS.....",
     ], SAILOR)
+    line(img, cx + 57, cuff, cx + 70, cuff + 1, "C6")
+    line(img, cx + 58, cuff + 1, cx + 69, cuff + 2, "C0")
     # The hand on the sill: the knuckles over its edge.
     rows(img, cx - 84, wy1 - 6, ["...ssss..", "..sssssss", ".ssSsSsSs", ".sSsSsSsS", "..S.S.S.S"], SAILOR)
     return img
