@@ -1,5 +1,10 @@
-"""voice_band.py MIX VOICE BED LOG: per spoken line, the voice against what is beneath it, wideband and in the speech band
-(300-4000 Hz), and the loudest sources. Measurement only."""
+"""voice_band.py MIX VOICE BED LOG: per spoken line, the voice's level against what plays beneath it, across the whole
+spectrum and within 300-4000 Hz, and the worst half second within that band. What is beneath is the mix take less the
+voice take; BED is read only so that the call matches listening.py narration's. tools/audio/subtraction_check.py shows
+whether that subtraction holds for a given set of takes.
+
+A diagnostic of level, not of intelligibility: it models no ear, no critical bands and no masking across frequency or
+time, and no figure from it says whether a line can be understood. Measurement only."""
 import sys, re, math
 import numpy as np, soundfile as sf
 from scipy import signal

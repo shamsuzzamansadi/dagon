@@ -1,0 +1,38 @@
+The hidden-art check after the independent review: a :visible track counts as showing its node only if it is enabled
+and has a key, within the clip, that sets true. Developer, scripted, on the native clone, 2026-11-18.
+
+1. The focused check on a made-up clip, test_revision.test_a_visibility_track_that_only_hides_does_not_count_as_showing:
+   a hidden node moved under a track of false keys is named; so is it with a true key after the clip's end, or on a
+   disabled track; a true key within the clip excuses it; the director's exemption for Rockfall covers that node and
+   not a hidden node under it.
+   PASS test_revision.test_a_visibility_track_that_only_hides_does_not_count_as_showing
+   PARTIAL passed=1 failed=0 only=test_revision.test_a_visibility_track_that_only_hides
+
+2. The scene as it is, test_revision.test_no_clip_animates_a_hidden_node_it_never_shows, tightened: no clip relied on
+   a track of false keys.
+   PASS test_revision.test_no_clip_animates_a_hidden_node_it_never_shows
+   PARTIAL passed=1 failed=0 only=test_revision.test_no_clip_animates_a_hidden
+
+3. One deliberate breakage, made by hand and put back: in shore.tscn the reveal clip's track Dagon/Head:visible keeps
+   its one key, at 3 s, with the value false instead of true. The head stays hidden while the clip turns and moves it.
+   The check as submitted for review (cd28f55) passes it, the hole the review found; the check as tightened names it.
+
+   As submitted:
+   PASS test_revision.test_no_clip_animates_a_hidden_node_it_never_shows
+   PARTIAL passed=1 failed=0 only=test_revision.test_no_clip_animates_a_hidden
+
+   Tightened:
+   FAIL test_revision.test_no_clip_animates_a_hidden_node_it_never_shows
+        dagon_reveal animates Dagon/Head/Pupil:position: Dagon/Head, which is hidden and never shown by it
+        dagon_reveal animates Dagon/Head:position: Dagon/Head, which is hidden and never shown by it
+        dagon_reveal animates Dagon/Head:rotation: Dagon/Head, which is hidden and never shown by it
+        dagon_reveal animates Dagon/Head/Crest:position: Dagon/Head, which is hidden and never shown by it
+        dagon_reveal animates Dagon/Head:modulate: Dagon/Head, which is hidden and never shown by it
+        dagon_reveal animates Dagon/Head/Lit:modulate: Dagon/Head, which is hidden and never shown by it
+        dagon_reveal animates Dagon/Head/Crest/Lit:modulate: Dagon/Head, which is hidden and never shown by it
+        dagon_reveal animates Dagon/Head/Eye:scale: Dagon/Head, which is hidden and never shown by it
+        dagon_reveal animates Dagon/Head/Pour:emitting: Dagon/Head, which is hidden and never shown by it
+   PARTIAL passed=0 failed=1 only=test_revision.test_no_clip_animates_a_hidden
+
+   After it, git status showed shore.tscn unchanged. Other tests (the reveal's order) may also notice this breakage;
+   only the two runs above were made. The breakage campaign of tools/breakage_m5.py was not run again.

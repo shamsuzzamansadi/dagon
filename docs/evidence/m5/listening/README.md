@@ -1,6 +1,6 @@
 # M5's listening package: the whole game, with its sound
 
-**For the owner's ears. Outside the game: nothing here is in the build.** Recorded from the game at `b1cb401`, which is the candidate's game.
+**For the owner's ears. Outside the game: nothing here is in the build.** Recorded from the game at `b1cb401`. **Its sound is the candidate's:** nothing that plays has changed since, and a take of the finale recorded again at the review's head is identical, sample for sample, for the 93.8 s both have. **One picture differs:** the window in the epilogue, from 4:27.7, shows the raised hand as it was before the independent review; the corrected one is in [the ending's record](../ending/README.md).
 
 **The developer cannot hear, and has seen this only as frames.** Everything marked *measured* was measured by the tools named in the [audio review](../audio/README.md). **Nobody on the project has listened to any of it, in M4 or in M5.** No listening pass is claimed here.
 
@@ -12,11 +12,11 @@ The same soundtrack, cut by stage, is in [mix/](mix/), named as M4's were.
 
 ## What needs the owner's ears, and where
 
-Times are in `m5-full-game.mp4`. Each has a measurement beside it, which is not an answer.
+Times are in `m5-full-game.mp4`. Each has a measurement beside it, which is not an answer. **The in-band figures** compare the voice's power within 300 to 4000 Hz with what plays beneath it (the mix less the voice, [checked](../audio/subtraction-check.txt) to the sample). They are a diagnostic of level, not a measure of whether a line is understood, and the 6 dB the tools flag is a prompt to listen, not a threshold.
 
 | # | At | Listen for | Measured |
 |---|---|---|---|
-| **1** | **3:45.2 to 3:48.7** | **The one change M5 made to the mix.** "It was no ridge. It had been beside me the whole way." Is the line clear over the water? Does the water drop noticeably as he begins to speak, and does that sound wrong? Compare [reveal-before.mp4](../reveal/reveal-before.mp4) and [reveal-after.mp4](../reveal/reveal-after.mp4), where the line begins at 0:06.3 | In the voice's band the line was 2.7 dB above its bed, and is 6.0 dB above. The cascade is 7 dB lower and the surge 5 dB lower from that moment |
+| **1** | **3:45.2 to 3:48.7** | **The one change M5 made to the mix.** "It was no ridge. It had been beside me the whole way." Is the line clear over the water? Does the water drop noticeably as he begins to speak, and does that sound wrong? Compare [reveal-before.mp4](../reveal/reveal-before.mp4) and [reveal-after.mp4](../reveal/reveal-after.mp4), where the line begins at 0:06.3 | Within 300 to 4000 Hz the line was 2.7 dB above its bed, and is 6.0 dB above: the water is lower, which does not say the line is heard. The cascade is 7 dB lower and the surge 5 dB lower from that moment |
 | **2** | **3:40.9 to 3:55.0** | **The reveal as a whole,** which M4 left to the owner's ear and nobody has heard: is it too loud, too quiet, too crowded? The surge at 3:42.4, the cascade at 3:43.9, the call at 3:44.2, the hand and the gasp at 3:47.9 | −18.0 LUFS; its loudest three seconds −16.6; the game's peak −1.2 dBFS; the limiter not reached |
 | **3** | **3:52.3 to 3:54.9** | "Its head turned. I ran." under the creature's second call, which starts at 3:52.3. **Left unchanged.** Is the line heard? | In band 6.7 dB above its bed, and 4.0 dB below it for half a second |
 | **4** | **3:55.0 to 4:05** | The flight: the sea's roar behind him, three blocks at 3:55.8, 3:57.6 and 4:00.4, "Don't look back" at 3:58.2, "The sea is coming back" at 4:01.8. Too heavy? Are both lines heard? | −18.3 LUFS, loudest three seconds −14.6, the loudest in the game. In band the lines are 8.2 and 10.2 dB above their beds |
