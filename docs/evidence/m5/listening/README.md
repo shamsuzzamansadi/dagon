@@ -1,6 +1,6 @@
 # M5's listening package: the whole game, with its sound
 
-**For the owner's ears. Outside the game: nothing here is in the build.** Recorded from the game at `b1cb401`. **Its sound is the candidate's:** nothing that plays has changed since, and a take of the finale recorded again at the review's head is identical, sample for sample, for the 93.8 s both have. **One picture differs:** the window in the epilogue, from 4:27.7, shows the raised hand as it was before the independent review; the corrected one is in [the ending's record](../ending/README.md).
+**For the owner's ears. Outside the game: nothing here is in the build.** Recorded from the game at `b1cb401`. **Its sound is the current candidate's, with one small exception:** from 12.0 to 13.9 s of the reveal (about 3:52.9 to 3:54.8 here) the camera now holds longer on the head, and the positional sounds that follow it differ by 35 to 65 dB below the mix; recordings of the finale from the build the owner played and from the candidate are otherwise identical, sample for sample, as the takes of 2026-11-16 and 11-18 were **One picture differs:** the window in the epilogue, from 4:27.7, shows the raised hand as it was before the independent review; the corrected one is in [the ending's record](../ending/README.md).
 
 **The developer cannot hear, and has seen this only as frames.** Everything marked *measured* was measured by the tools named in the [audio review](../audio/README.md). **Nobody on the project has listened to any of it, in M4 or in M5.** No listening pass is claimed here.
 

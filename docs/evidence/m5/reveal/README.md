@@ -24,7 +24,7 @@
 | **The head** | Still; only the pupil moved | Goes back as it calls; turns down toward him from 11.4 s, with "Its head turned"; the crest lifts; the eye opens over a quarter second | D107 |
 | **Water** | Dots thrown up at the trench; dots falling in a box before the body | A mound of white water heaved up before it and falling back; spray thrown wider; water pouring from its shoulders, jaw and arm; spray standing behind and before it | D108 |
 
-**Unchanged, and held by tests:** the clip's length, 14 s; every line and its time (4.3, 8.2, 12.2 s); every sound's time; the camera's keys and shake; the haptic cue; the light on the carving from 7 s and the hand beside it; control locked until the end; the director's outcomes on every exit path. **No C++ changed in M5.**
+**Unchanged, and held by tests:** the clip's length, 14 s; every line and its time (4.3, 8.2, 12.2 s); every sound's time; the camera's shake, and its keys to 12 s; the haptic cue; the light on the carving from 7 s and the hand beside it; control locked until the end; the director's outcomes on every exit path. **No C++ changed for the reveal.** After the owner's playtest of 2026-11-19 the head's turn was enlarged and the wide view held to 12.8 s, within the same 14 s and with every line and sound where it was (D114, `tools/scene/stage_turn_m5.py`; [clips](../playtest-2026-11-19/README.md)).
 
 ## GDD §8's checklist on the reveal, by the developer, from the frames
 
