@@ -21,7 +21,7 @@ import random
 from PIL import ImageDraw
 
 import gen_shore
-from art_common import Noise, blank, hline, put, ramp
+from art_common import Noise, blank, hline, line, put, ramp
 from palette import rgba
 
 W, H = 480, 270
@@ -135,9 +135,17 @@ def panel_raider_layers():
         for x in range(190, W):
             if noise(x / 6.0, y) > 0.55:
                 put(img, x, y, "C5")
-    # The deck: a gun along it, and a guard with a rifle on his shoulder.
-    ImageDraw.Draw(img).line([(260, 56), (318, 44)], fill=rgba("C1"), width=3)
-    fill(img, [(244, 58), (270, 58), (268, 50), (248, 50)], "C1")
+    # The deck: a gun trained over the bow on our ship, out over the open water to the left and a little down, its
+    # barrel against the sky above the rail and well clear of the moon; its breech behind the mount. And a guard with
+    # a rifle on his shoulder.
+    fill(img, [(244, 58), (270, 58), (268, 50), (248, 50)], "C0")
+    fill(img, [(268, 51), (275, 52), (275, 56), (268, 56)], "C0")
+    ImageDraw.Draw(img).line([(248, 53), (203, 55)], fill=rgba("C0"), width=3)
+    fill(img, [(200, 53), (204, 53), (204, 57), (200, 57)], "C0")
+    # The moon behind it catches the top of the shield, the barrel and the muzzle.
+    hline(img, 249, 267, 49, "C4")
+    line(img, 247, 51, 205, 53, "C4")
+    hline(img, 200, 204, 52, "C4")
     fill(img, [(372, 58), (372, 46), (370, 42), (372, 38), (376, 38), (378, 42), (376, 46), (376, 58)], "C1")
     ImageDraw.Draw(img).line([(377, 40), (382, 30)], fill=rgba("C1"))
     for cx in (240, 290, 340, 390, 440):

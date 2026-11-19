@@ -501,23 +501,38 @@ def panel_rising():
     horizon = 128
     night_sea(img, noise, top=horizon, calm=0.6)
     hline(img, 0, W - 1, horizon, "C3")
-    moon_road(img, noise, gen_shore.MOON[0] + 70, horizon + 1, CLEAR_OF_THE_CARD + 30, 34)
     # What breaks the water: the crest, and under it the top of the head it stands on, a long low back.
     cx, sea = 222, 166
     crest = crest_of_the_reveal()
-    img.alpha_composite(crest, (cx - 42, sea - 18 - crest.height + 16))
+    # Sunk a little into the water, so the head under it rises less far to meet it.
+    sink = 12
+    crest_x, crest_y = cx - 42, sea - 18 - crest.height + 16 + sink
+    img.alpha_composite(crest, (crest_x, crest_y))
+    # The crest's foot slopes as it does on the reveal's turned head, so the head rises under it to meet it: in each
+    # column the body comes up to the crest's lowest pixel, and on the left it rounds down into the back.
+    foot = {}
+    for col in range(crest.width):
+        ys = [y for y in range(crest.height) if crest.getpixel((col, y))[3] > 0]
+        if ys:
+            foot[crest_x + col] = crest_y + max(ys) + 1
+    first = min(foot)
+    shoulder = 26
+    for x in range(first - shoulder, first):
+        k = (x - first + shoulder) / shoulder
+        foot[x] = round(sea - (sea - foot[first]) * math.sqrt(max(0.0, 1 - (1 - k) ** 2)))
     back = {}
     for x in range(cx - 74, cx + 70):
         t = (x - cx + 4) / 74.0
         rise = 15 * math.sqrt(max(0.0, 1 - t * t)) * (1.0 - 0.25 * t)
         if rise < 1:
             continue
-        top = round(sea - rise)
+        top = min(round(sea - rise), foot.get(x, sea))
+        under_crest = top < round(sea - rise)
         back[x] = top
         for y in range(top, sea + 2):
-            lit = y - top < 2 and x > cx - 30
+            lit = y - top < 2 and x > cx - 30 and not under_crest
             put(img, x, y, ("T3" if (x + y) % 3 else "T2") if lit else ("C1" if y - top < 5 and noise(x / 5.0, y / 3.0) > 0.5 else "C0"))
-    # The sea it has lifted: a dark swell standing round it, the moon's road bent on its near slope, and the rings
+    # The sea it has lifted: a dark swell standing round it, and the rings
     # running out from it across the calm.
     for y in range(sea - 4, sea + 16):
         for x in range(cx - 130, cx + 126):
@@ -535,6 +550,15 @@ def panel_rising():
                 put(img, x, y, "C5" if ring < 2 else "C4")
                 if ring == 0 and noise(x / 3.0, 2.0) > 0.55:
                     put(img, x, y - 1, "C7")
+    # The moon's road, straight under the moon, over the swell and the rings, and never over the creature.
+    road = blank(W, H)
+    moon_road(road, noise, gen_shore.MOON[0], horizon + 1, CLEAR_OF_THE_CARD + 30, 34)
+    for y in range(horizon + 1, H):
+        for x in range(W):
+            stroke = road.getpixel((x, y))
+            on_crest = 0 <= x - crest_x < crest.width and 0 <= y - crest_y < crest.height and crest.getpixel((x - crest_x, y - crest_y))[3] > 0
+            if stroke[3] and not on_crest and not (x in back and y <= sea + 1):
+                img.putpixel((x, y), stroke)
     # White water where its back leaves the sea, and the sea pouring off the crest and the back.
     for x in sorted(back):
         if noise(x / 2.5, 7.0) > 0.25:
@@ -551,7 +575,7 @@ def panel_rising():
         for k in range(length):
             if (k + x) % 3:
                 put(img, x, back[x] + 2 + k, "C6" if k < 3 else "C4")
-    for tip_x, tip_y in ((cx - 36, sea - 62), (cx - 16, sea - 70), (cx + 2, sea - 68), (cx + 24, sea - 56), (cx + 42, sea - 40)):
+    for tip_x, tip_y in ((cx - 36, sea - 62 + sink), (cx - 16, sea - 70 + sink), (cx + 2, sea - 68 + sink), (cx + 24, sea - 56 + sink), (cx + 42, sea - 40 + sink)):
         length = rng.randrange(10, 22)
         for k in range(length):
             if (k + tip_x) % 4:
