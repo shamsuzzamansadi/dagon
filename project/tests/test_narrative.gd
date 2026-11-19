@@ -474,6 +474,40 @@ func test_the_hand_rests_on_the_monolith_and_the_head_is_in_frame_at_the_widest_
 	h.check(world.get_node("Dagon/Arm").z_index > 0, "the hand is drawn behind the monolith")
 
 
+## The owner's playtest of 2026-11-19: as "Its head turned. I ran." came up the camera was already leaving the head. The
+## head turns far enough to be seen, and the wide view holds on it while the line begins; the clip, its line and its
+## end are where they were, and the camera is back on the sailor before control returns.
+func test_the_head_turns_in_view_as_its_line_begins(h) -> void:
+	var world := await _world(h, AWAKENED)
+	var clips: AnimationPlayer = world.get_node("Cinematics")
+	var camera: Camera2D = world.get_node("CameraRig")
+	var head: Node2D = world.get_node("Dagon/Head")
+	var clip := clips.get_animation(&"dagon_reveal")
+	h.check_near(clip.length, 14.0, 0.001, "the reveal's length")
+	var said := -1.0
+	for track in clip.get_track_count():
+		if clip.track_get_type(track) == Animation.TYPE_METHOD and String(clip.track_get_path(track)) == "Hud":
+			for key in clip.track_get_key_count(track):
+				if clip.method_track_get_params(track, key) == [&"story.run"]:
+					said = clip.track_get_key_time(track, key)
+	h.check_near(said, 12.2, 0.001, "when the line is said")
+	await h.stand_at(_player(h), Vector2(4420, -2))
+	clips.seek(11.3, true)
+	await h.steps(1)
+	var before := head.rotation
+	for at in [12.2, 12.5, 12.7]:
+		clips.seek(at, true)
+		await h.steps(1)
+		h.check(camera.zoom.x <= 0.55, "at %.1f s the camera is at zoom %.2f, already leaving" % [at, camera.zoom.x])
+		var view := Rect2(camera.get_screen_center_position() - Vector2(240, 135) / camera.zoom.x, Vector2(480, 270) / camera.zoom.x)
+		var head_center: Vector2 = head.to_global(Vector2(-15, -325))
+		h.check(view.has_point(head_center), "at %.1f s the head at %s is out of the view %s" % [at, head_center, view])
+	h.check(head.rotation - before <= -0.12, "the head turned only %.3f rad" % (head.rotation - before))
+	clips.seek(13.9, true)
+	await h.steps(1)
+	h.check_near(camera.zoom.x, 1.0, 0.001, "the zoom before control returns")
+
+
 ## One night stands behind everything the reveal's camera shows. M4 had a straight edge at the last wall, x = 4544,
 ## where the trench's backdrop began and nothing stood behind the canyon's end.
 func test_one_backdrop_stands_behind_the_whole_of_the_reveal(h) -> void:
