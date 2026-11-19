@@ -6,7 +6,7 @@
 
 The owner personally played **`dagon-windows`, artifact 14478607459, from `20929cf`** (push run [44412125349](https://github.com/shamsuzzamansadi/dagon/actions/runs/44412125349), zip SHA-256 `3e5f8d657ac813633e3f8ea67ad4c0bcd4d0e81c32725d1c3ef4c9eb77e00ca8`), on Windows.
 
-The owner's timestamps refer to their recording `20261119-1024-22.2170049.mp4`. A file by that name is not on the developer's machine. A screen recording of the game from the same day, `Screen Recording 2026-11-19 112917.mp4`, 4 min 52 s, is, and the events below fall at the owner's timestamps in it; the developer looked at its frames and measured its sound's level around the Monolith, and did not listen to it. Neither recording is in the repository.
+The owner's timestamps refer to their recording `20261119-1024-22.2170049.mp4`. The developer worked from `Screen Recording 2026-11-19 112917.mp4`, 4 min 52 s, in which the events below fall at the owner's timestamps; it looked at its frames and measured its sound's level around the Monolith, and did not listen to it. **Corrected later the same day:** this record first said that no file of the owner's name was on the machine. It was, in the Snipping Tool's own folder, and it is byte for byte the same file as the screen recording used. Neither recording is in the repository.
 
 ## The owner's points
 

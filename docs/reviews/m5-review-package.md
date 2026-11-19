@@ -1,30 +1,30 @@
 # M5 Review Package: Cinematic horror and polish
 
-**To:** ChatGPT (independent reviewer), and the owner for listening and the playtest. **Date:** 2026-11-16, completed 2026-11-18, revised after the independent review on 2026-11-18 (§13) and after the owner's playtest of 2026-11-19 (§14).
-**Status: implemented, independently reviewed, and played by the owner on 2026-11-19; the review's three findings and the owner's five points are addressed (§13, §14). For the owner's playtest of the new candidate and acceptance. Not accepted, not merged, nothing tagged or released.** The owner approved the scope on 2026-11-16 ([plan](../m5-plan.md)). `v0.1.0-pre-alpha.1` is untouched. M6 is not started.
+**To:** ChatGPT (independent reviewer), and the owner for listening and the playtest. **Date:** 2026-11-16, completed 2026-11-18, revised after the independent review on 2026-11-18 (§13), after the owner's playtest of 2026-11-19 (§14), and after the owner's second playtest that day, of `59562c6` (§15).
+**Status: implemented, independently reviewed, and played by the owner twice on 2026-11-19; the review's three findings, the owner's five points and the owner's four visual points are addressed (§13 to §15). For the owner's playtest of the new candidate and acceptance. Not accepted, not merged, nothing tagged or released.** The owner approved the scope on 2026-11-16 ([plan](../m5-plan.md)). `v0.1.0-pre-alpha.1` is untouched. M6 is not started.
 
 | | |
 |---|---|
 | **Repository** | https://github.com/shamsuzzamansadi/dagon |
 | **Branch and pull request** | `m5/polish`, draft [#6](https://github.com/shamsuzzamansadi/dagon/pull/6) |
 | **Base** | `main` at `09d854e` (M4 and the record of its release), CI run [43835351375](https://github.com/shamsuzzamansadi/dagon/actions/runs/43835351375): passed; its release gate found `v0.1.0-pre-alpha.1` already published and published nothing |
-| **The tested code and the candidate for the owner** | **`59562c6`**, CI push run **[44519096516](https://github.com/shamsuzzamansadi/dagon/actions/runs/44519096516)**. The game itself last changed at `55f3d25`, the reveal's staging; `59562c6` adds the playtest's record and clips, and corrects one test's expectation. It replaces `20929cf`, which the owner played on 2026-11-19, and `5aab2a4` before it |
-| **Acceptance fingerprint of that commit** | `sha256:cb51c11a6e49f4d3323b7eb5d4efbe32d8179e6c34a74b5c9ae27b96ff4778e6` (`python tools/release_gate.py fingerprint --commit 59562c6`; the same at `55f3d25`). The build the owner played, `20929cf`, had `sha256:17cc0b91…c1bc`; the first submitted, `sha256:76ac6c4e…af61`. `main`'s is `sha256:614f29b6…7f6e`, M4's accepted one |
-| **Final HEAD** | A file cannot name its own commit; the pull request names it. Every commit after `59562c6` is documents only and changes nothing the fingerprint covers |
-| **The Windows candidate for the owner** | `dagon-windows` from run 44519096516, artifact 14526884514, zip SHA-256 **`f8cf8ecf0cdd7cacce1358725fed382d13ba8427b35d6b6caf18d54da948e8c4`** (§8) |
+| **The tested code and the candidate for the owner** | **`ea86ae9`**, CI push run **[44575980858](https://github.com/shamsuzzamansadi/dagon/actions/runs/44575980858)**. The game itself last changed at `a495d42`, the visual pass; `ea86ae9` adds its evidence scripts, which are not in the build. It replaces `59562c6`, which the owner played on 2026-11-19, and `20929cf`, played earlier that day |
+| **Acceptance fingerprint of that commit** | `sha256:a4f4d974921b965119fdc04524f23d7bf088e220fc633ab1aec31cbf5ac13304` (`python tools/release_gate.py fingerprint --commit ea86ae9`; the same at `a495d42`). The builds the owner played: `59562c6`, `sha256:cb51c11a…78e6`; `20929cf`, `sha256:17cc0b91…c1bc`. The first submitted, `sha256:76ac6c4e…af61`. `main`'s is `sha256:614f29b6…7f6e`, M4's accepted one |
+| **Final HEAD** | A file cannot name its own commit; the pull request names it. Every commit after `ea86ae9` is documents only and changes nothing the fingerprint covers |
+| **The Windows candidate for the owner** | `dagon-windows` from run 44575980858, artifact 14556713598, zip SHA-256 **`1a8dc2735587cf129c32c049929fba9a18471bc24726da46068506ee43b1e67e`** (§8) |
 
 **What has been verified, by whom.**
 
 | Result | Who or what ran it |
 |---|---|
-| Native tests, integration tests from source and on the exported pack, on GCC, Clang and MSVC | CI, at `59562c6` (§6) |
+| Native tests, integration tests from source and on the exported pack, on GCC, Clang and MSVC | CI, at `ea86ae9` (§6) |
 | The exported Linux and Windows release builds, played to the ending with window-system keys | CI, scripted, on the candidate; and, before the review, the developer's run of the Linux one on a private display (§6). Not a person, not a physical keyboard |
 | Deliberate breakage of what M5 added | Developer, scripted (§6). Simulated input only |
-| How the reveal, the ending's pictures and the far figures look | **Developer only,** from frames at the game's scale, software-rendered (§2 to §4) |
+| How the reveal, the ending's pictures, the far figures, the prologue's raider and the ritual look | **Developer only,** from frames and clips at the game's scale, software-rendered (§2 to §4, §15) |
 | What a recogniser hears in the finale's nine lines, from the game's own recording | A local Whisper model, word against script (§5) |
 | Levels, peaks, loudness, ducking, the voice against its bed | Measured by the tools in §5 |
 | **How any of it sounds** | **Nobody.** The developer cannot hear. No listening by the owner or anyone is recorded for M4's or M5's sound |
-| **M5, played** | **The owner, on 2026-11-19, `20929cf`** ([record](../evidence/m5/owner-playtest-2026-11-19.md)): five points, addressed in §14. Not acceptance. The new candidate has been played by the scripts only |
+| **M5, played** | **The owner, twice on 2026-11-19:** `20929cf` ([record](../evidence/m5/owner-playtest-2026-11-19.md)), five points, addressed in §14; then `59562c6` ([record](../evidence/m5/owner-playtest-2026-11-19-59562c6.md)), "the build is better", four visual points, addressed in §15. Not acceptance. The new candidate has been played by the scripts only |
 | A first-time player | Nobody, on any build (M6) |
 | Independent review | **ChatGPT, 2026-11-18,** of the head first submitted (`cd28f55`): it checked the final head's CI and rehearsal conclusions, the matching fingerprints, the art checker, selected code and the supplied frames. **It did not rerun the Godot integration tests or the exported routes, and did not listen to the audio.** Three findings, addressed in §13 |
 
@@ -73,9 +73,13 @@ Before and after, as the clip plays: [frames](../evidence/m5/reveal/before-after
 
 | What | Result | On |
 |---|---|---|
-| CI: GCC, Clang, MSVC, release tools | **Passed.** Integration 451/0, from source and on the exported pack, on GCC 11.4, Clang 18.1.3 and MSVC 19.44; the release tools | `59562c6`, push run 44519096516 |
-| CI: the exported route on Linux and Windows | **`runs=4 failed=0` on both** | the same run |
-| After the owner's playtest, local, clean tree: `run_godot_checks.sh` (clean import, classes, integration, three smoke runs), `export_check.sh linux`, the exported Linux route on a private display | **Passed:** debug and release builds; integration 451/0 and three smoke runs without stray errors; `export_check.sh linux` ok, 451/0 on the exported pack; the exported Linux route `runs=4 failed=0`, its reading run showing [E] Skip line at the mural while `monolith.first` was said, the press skipping it, then [E] Examine and the mural examined | `59562c6`, native Linux clone, clean tree |
+| CI: GCC, Clang, MSVC, release tools | **Passed.** Integration 452/0, from source and on the exported pack, on GCC 11.4, Clang 18.1.3 and MSVC 19.44; the release tools; the art check | `ea86ae9`, push run 44575980858; pull-request run 44575992415 |
+| CI: the exported route on Linux and Windows | **`runs=4 failed=0` on both** | the same runs |
+| After the visual pass, local, clean tree: debug and release builds, `run_godot_checks.sh` (clean import, classes, integration, three smoke runs), `export_check.sh linux`, the exported Linux route on a private display, with its stills and short silent video of the exported game | **Passed, the exported route on its second attempt:** debug and release builds; integration 452/0 and three smoke runs; `export_check.sh linux` ok, 452/0 on the exported pack; the exported Linux route `runs=4 failed=0` on its second and third attempts. **Its first attempt failed** in its first run, climbing to the stone, when a hop was not taken after a landing; nothing on that climb changed ([record](../evidence/m5/visual-pass-2026-11-19/exported/README.md)) | `ea86ae9`, native Linux clone, clean tree |
+| After the visual pass: `tools/art/check_art.py`, with two new checks: the ridge's top and left edge are the body's, it goes below the walkway farther than the creature rises, and the water covers its foot; the ritual's ground strip is the backdrop's, each kneeler's knee is on the crest, and bowing shows nothing below it | `CHECK_ART problems=0`. The ridge check, run on `59562c6`'s art, fails on all three counts | `a495d42` |
+| After the visual pass, focused: `test_revision.test_the_ridge_stands_in_water_and_the_ritual_ground_lies_before_the_kneelers`, new | Passes | `a495d42` |
+| After the visual pass: recordings of `59562c6` and of the pass with sound (the captivity and the escape, the ritual, the approach to the reveal) | Every stage mark on the same frame in both; the sound identical sample for sample, the ritual's and the approach's in full, the prologue's over the whole of the shorter take | `59562c6` and `a495d42` |
+| After the first playtest, local, clean tree: `run_godot_checks.sh`, `export_check.sh linux`, the exported Linux route | **Passed:** integration 451/0 and three smoke runs; the export check 451/0 on the pack; the route `runs=4 failed=0`, its reading run showing [E] Skip line at the mural while `monolith.first` was said, the press skipping it, then [E] Examine and the mural examined | `59562c6`, native Linux clone, clean tree |
 | CI on `ede8c71`, before the candidate | **Failed on one test,** `test_controller.test_examine_works_with_a_controller_at_the_boat_and_the_fish`, 450 of 451 passing on each compiler: it expected Examine at the boat while the boat's own line was said, where the prompt now rightly says Skip line (D113). The expectation is corrected in `59562c6`; the test file is not in the build | `ede8c71`, runs 44517994038 and 44518002808 |
 | After the owner's playtest, focused: the three new prompt tests and the staging test, each also run against the old code, where they fail on the prompt and on the camera | Pass on the fix; fail on the old code, on exactly the owner's points | `bde9cae`, `55f3d25` |
 | After the owner's playtest: recordings of both builds with sound (the prologue, the mural, the finale) | Every stage mark on the same frame in both; the mural's presses behave alike, the prompt differs as intended; the finale's sound identical, sample for sample, but for 12.0 to 13.9 s of the reveal, where positional sounds follow the camera, 35 to 65 dB below the mix | `20929cf` and `ede8c71` |
@@ -86,7 +90,7 @@ Before and after, as the clip plays: [frames](../evidence/m5/reveal/before-after
 | **Before the review,** local: `run_godot_checks.sh` (integration 446/0, all ok), `export_check.sh linux` (ok, 446/0 on the pack), the exported Linux route (`runs=4 failed=0`), `check_art.py` (0) | Passed. **Not run again in full locally after the review;** CI ran the suite and both routes on the candidate | `5aab2a4`, native Linux clone |
 | Deliberate breakage, `tools/breakage_m5.py`, 12 entries, 3 workers | **12 caught, 0 not caught, controls held** ([result](../evidence/m5/breakage.txt)). Not run again: the review's changes are a picture and a stricter test | `d9d3ab6`; `b1cb401` after it adds two volume tracks only |
 | The release packaging, rehearsed: both packages built, extracted and run headless on their own OS (main menu, New Game, a save, Continue), version `.0`, which cannot be published | **Run on the pull request's final head,** which has the same fingerprint. Its run is linked in the pull request's description, not here | final head |
-| Native unit tests | 127/127 on all three compilers in CI. **Not rerun locally;** the one C++ change, the Hud's, is covered by the integration tests | `59562c6` |
+| Native unit tests | 127/127 on all three compilers in CI. **Not rerun locally;** the one C++ change, the Hud's, is covered by the integration tests | `ea86ae9` |
 
 **Preserved behaviour, and the tests that hold it** (all in the suite above, all passing):
 
@@ -100,6 +104,8 @@ Before and after, as the clip plays: [frames](../evidence/m5/reveal/before-after
 | Cinematic completion paths | `test_cinematics`: a missing, looping and stuck clip for the awakening, the reveal and the collapse; the watchdog; `…the_reveal_keeps_control_locked_right_up_to_reveal_done` |
 | The prompt and the press | `test_narration`: `…at_the_mural_during_the_monolith_line_the_prompt_says_skip_and_the_line_runs_out`, `…a_press_during_the_monolith_line_only_skips_it_then_the_next_examines`, `…the_skip_prompt_names_a_rebound_key_and_a_controller_button`, `…a_stone_press_during_a_story_line_still_presses_the_stone` (now with its prompt) |
 | The head's turn, in view | `test_narrative.test_the_head_turns_in_view_as_its_line_begins`; the cinematic contract's tests unchanged and passing |
+| The story, controls, collision, narration and mix, through the visual pass | The whole suite and both exported routes; the scene's changes are drawings, their places and two sprites no clip moves (`test_revision.test_the_ridge_stands_in_water…`); the recordings' sound compared sample by sample |
+| The ridge in water and along the shoulder's outline; the ritual's ground | `check_art.py`'s ridge and ritual checks; `test_revision.test_the_ridge_stands_in_water_and_the_ritual_ground_lies_before_the_kneelers` |
 | No clip moving hidden legacy art | `test_revision.test_no_clip_animates_a_hidden_node_it_never_shows`, tightened, and after the review counting only a true key as showing; `…a_visibility_track_that_only_hides_does_not_count_as_showing`, new; `…every_shape_a_clip_moves_or_fades_draws_something`, new; four breakages |
 | Timing | The finale's stage and line marks fall on the same frames on `main` and on M5 ([marks](../evidence/m5/reveal/marks.txt)) |
 
@@ -111,19 +117,24 @@ Before and after, as the clip plays: [frames](../evidence/m5/reveal/before-after
 4. **The creature is drawn in blocks of two pixels,** right for the half zoom it is seen whole at, coarser than the stone beside it in the clip's first and last two seconds.
 5. **The haze is a smooth fall of colour,** not pixels, as the fog bank past the gate already was.
 6. **The waterline is under the caption at half zoom.** What shows the water is above it.
-7. **Frame time was not measured.** Fifteen sprites, two polygons and two small particle emitters were added to one scene, and six polygons removed.
+7. **Frame time was not measured.** Fifteen sprites, two polygons and two small particle emitters were added to one scene, and six polygons removed. The visual pass adds two sprites that never move.
 8. **Amber in the ending's pictures** is the bracelet's gold, a candle and three lamps, beyond the game's rule that it is the lantern's alone; M3's pictures did the same for the bracelet and the candle.
 9. **The far figures, the awakening and the collapse** were looked at in stills only. The awakening's and the collapse's clips were not changed: no defect was seen in them.
 10. **No measure of intelligibility** was made. The band figures are level, the transcripts are of the voice alone, and a recogniser would not stand for a listener.
-11. **The full recording's epilogue shows the window as first submitted,** and the opening's gun, the mural's prompt, the reveal's end and the last picture as they were before 2026-11-19; the corrected ones are in the clips.
+11. **The full recording's epilogue shows the window as first submitted,** and the opening's gun, the mural's prompt, the reveal's end and the last picture as they were before 2026-11-19, and the prologue's raider, the ritual and the ridge as they were before the visual pass; the corrected ones are in the clips.
 12. **The full-game recording's sound:** its sound is the candidate's except from 12.0 to 13.9 s of the reveal, where positional sounds follow the camera's new hold and differ by 35 to 65 dB below the mix (recordings of both builds compared sample by sample). The playtest's clips are scripted recordings.
-13. **Carried, unchanged:** the unresolved M2 J/caption event; the two breakage survivors of M3's revision.
+13. **For the second the body takes to fade in,** 3.0 to 4.3 s of the reveal, the ridge's right side still shows as an edge inside it (D116). Its left side and top are the body's own.
+14. **The escape's raider is seen from astern,** so its gun is out of frame; the funnel's band, the rail, the portholes and the band above the waterline carry the ship over (D117).
+15. **The clips are scaled by three** from the game's 480 × 270, nearest pixel. The exported build's own video has no sound: the private display has no audio device.
+16. **Carried, unchanged:** the unresolved M2 J/caption event; the two breakage survivors of M3's revision.
 
 ## 8. The build for the owner
 
-**One candidate:** `dagon-windows` from CI **push** run [44519096516](https://github.com/shamsuzzamansadi/dagon/actions/runs/44519096516), commit `59562c6`, artifact 14526884514: https://github.com/shamsuzzamansadi/dagon/actions/runs/44519096516/artifacts/14526884514. Zip SHA-256 **`f8cf8ecf0cdd7cacce1358725fed382d13ba8427b35d6b6caf18d54da948e8c4`**. Linux, the same run: `dagon-linux`, `9d4f2bb276e54b9acaabce37b93f64f744ba06e47ea0a7ff16ab8eb59e3377f4`. Both zips downloaded and hashed; they match GitHub's digests.
+**One candidate:** `dagon-windows` from CI **push** run [44575980858](https://github.com/shamsuzzamansadi/dagon/actions/runs/44575980858), commit `ea86ae9`, artifact 14556713598: https://github.com/shamsuzzamansadi/dagon/actions/runs/44575980858/artifacts/14556713598. Zip SHA-256 **`1a8dc2735587cf129c32c049929fba9a18471bc24726da46068506ee43b1e67e`**. Linux, the same run: `dagon-linux`, `ab9bd6a799df0653a9b289804543b06640be1db7eb4d037321b148665bf79155`. Both zips downloaded and hashed; they match GitHub's digests.
 
-**It replaces `20929cf`** (run 44412125349, Windows zip `3e5f8d65…0ca8`), which the owner played on 2026-11-19. What a player meets that differs: the raider's gun, the prompt during a line, the reveal's last seconds and the last picture (§14).
+**It replaces `59562c6`** (run 44519096516, Windows zip `f8cf8ecf…8c4`), which the owner played on 2026-11-19. What a player meets that differs: the captivity's and the escape's pictures, the ritual's figures, and the ridge, with the water at its foot (§15).
+
+**`59562c6` replaced `20929cf`** (run 44412125349, Windows zip `3e5f8d65…0ca8`), which the owner played first on 2026-11-19. What a player met that differed: the raider's gun, the prompt during a line, the reveal's last seconds and the last picture (§14).
 
 **It replaces `5aab2a4`** (run 43904143559, Windows zip `2f052d97…0418`), which has the window's hand as first submitted. Nothing else a player meets differs between the two.
 
@@ -137,6 +148,7 @@ It is the push run's, not the pull-request run's, which builds a merge commit wi
 | **The owner** | **Look, in play:** does the creature read, and stand apart from what is behind it; is the seam gone at your display's size; does its motion have weight without being busy; do the hand and the carving still belong together |
 | **The owner** | **The ending:** is the sailor readable in the boat; is the rescue shown enough and not too much; does the man at the window read as him, and as anxious; does the bracelet read as a bracelet; does the crest read as the creature's; do the four belong together |
 | **The owner** | Controller vibration and feel at the awakening, the hand and the fall, on hardware: the roadmap's "tuning by feel". Cues unchanged |
+| **The owner** | **The visual pass, in play:** the captivity's gun and guard and the escape's ship in motion; the ritual's figures, with and without the caption; the ridge in the water and its edge into the rising shoulder |
 | **The owner** | Acceptance of an identified build, or what to change |
 | **M6, unchanged and unmeasured** | Two external first-time players and their timings: **first-time duration is unknown,** and no 10 to 15 minute claim is made. All physical PlayStation hardware; individual physical Xbox actions, including reconnecting; key names under German on the real Windows build; native Linux hardware-accelerated rendering |
 
@@ -152,6 +164,7 @@ Green CI shows the game still works. It does not show any of this:
 | The carving and the hand | Unchanged: the same place, the same light, the same line | — |
 | Story, puzzle, collision, progression, contract intact | One C++ change, the Hud's prompt; the suite and the exported routes pass | — |
 | The four pictures | Each of the five points is answered in the drawing | Whether each reads to the owner |
+| The second playtest's four visual points | Each answered in the drawing and looked at in the game at its scale, the ritual also with the Hud hidden; the ridge's edge is the body's, checked | Whether each reads to the owner, in play |
 | Audio checked; no master change to hide a local problem | Checked by measurement; one local change; master untouched | **Everything about how it sounds** |
 | A playable candidate | Identified in §8 | The owner's playtest |
 
@@ -168,13 +181,15 @@ Green CI shows the game still works. It does not show any of this:
 ## 12. Reproducing it
 
 ```
-git clone --recurse-submodules https://github.com/shamsuzzamansadi/dagon && cd dagon && git checkout 59562c6
+git clone --recurse-submodules https://github.com/shamsuzzamansadi/dagon && cd dagon && git checkout ea86ae9
 scons platform=linux && tools/prepare_project.sh
 GODOT=<godot 4.7.2> sh tools/run_godot_checks.sh build/logs/checks
 python tools/art/check_art.py
 # Frames and recordings need a real window, on a private display (docs/toolchain.md §6a):
 godot --path project --resolution 1440x810 --fixed-fps 60 --script res://tests/capture_m5.gd -- <out>
 godot --path project --resolution 960x540 --write-movie <out.avi> --fixed-fps 30 --script res://tests/record_finale.gd
+godot --path project --resolution 1440x810 --fixed-fps 60 --script res://tests/capture_visual.gd -- <out> [prologue|ritual|approach]
+DAGON_RECORD_SCENE=approach godot --path project --write-movie <out.avi> --fixed-fps 30 --script res://tests/record_visual.gd
 ```
 
 ## 13. The independent review, and what was done
@@ -200,3 +215,14 @@ godot --path project --resolution 960x540 --write-movie <out.avi> --fixed-fps 30
 | 3 | The camera was leaving the head as "Its head turned. I ran." came up | The head lowers 0.16 rad toward the sailor from 11.4 to 12.5 s, and the wide view holds to 12.8 s; the line, the sounds' times, the 14 s, the return of control and the escape are unchanged; positional sounds follow the camera, so 12.0 to 13.9 s sounds very slightly different, 35 dB or more below the mix. A test holds it, failing on the old scene (`55f3d25`, D114) |
 | 4 | The last picture's reflection and the crest's base | The moon's road under the moon; the crest, still the reveal's own, stands on the head. Looked at in the game with the caption up (`c415efa`, D115) |
 | 5 | The audio evidence's wording | The 0.4 dB is called a constant-gain estimate; the limiter caveat stays; the second creature call stays flagged for listening; the master level is unchanged (`ede8c71`) |
+
+## 15. The owner's second playtest of 2026-11-19, of `59562c6`, and the visual pass
+
+**The owner personally played `59562c6`** (artifact 14526884514) and said the build is better. **Not acceptance;** the owner asked for this focused visual pass before M5 is presented for acceptance. The [record](../evidence/m5/owner-playtest-2026-11-19-59562c6.md) has the four points with the times in their recording; the [clips and stills](../evidence/m5/visual-pass-2026-11-19/README.md), before and after with the game's sound, show each change, and the [exported build's own](../evidence/m5/visual-pass-2026-11-19/exported/README.md) show the candidate as it ships.
+
+| # | The owner's point | Done |
+|---|---|---|
+| 1 | The captivity: the gun's base to meet the deck; the figure right of the moon to have a head, shoulders and planted feet | The gun, still trained left, on a pedestal through the rail to a base on the deck; the guard at an opening in the rail with cap, head, shoulders, greatcoat and boots apart; the raider given a ship's bow, an anchor, a band above the waterline and a funnel (`758007d`, D117) |
+| 2 | The escape: the cropped hull read as a wall or a cliff; a recognizable hull carried over from the captivity; its contact with the water; the rower readable | The same raider from astern: counter stern and rudder, rail, the funnel with its band, a mast, empty davits with their falls, white along its waterline and its reflection; the lamp, boat and oars where they were (`758007d`, D117) |
+| 3 | The ritual: heads, bowed torsos and kneeling poses readable, the watcher told apart, still distant and unsettling; the picture to tell it without the caption | Four hooded figures kneeling bowed toward the marked stone, knees on the crest; a watcher facing us with a pale face, a pointed hood and a crooked staff; a strip of the backdrop's ground hides what the clip's bow takes below the crest. Looked at with the Hud hidden (`a495d42`, D118) |
+| 4 | The approach: the ridge, his shoulder, embedded in water, and its contour followed into the rising shoulder; one take of the approach, the last still moment and the first movement; timing, dialogue and cues kept | The ridge's edge is the body's own up its left and over its top, and it goes below the walkway; water past the walkway at its foot, which it rises out of. The clip, lines and sounds untouched. The take is clip 3 (`a495d42`, D116) |
