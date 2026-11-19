@@ -108,18 +108,119 @@ def lamp():
     return img
 
 
+def sprite(img, rows, x0, y0, colors):
+    """Pixels from rows of letters; a dot is left clear."""
+    for y, row in enumerate(rows):
+        for x, ch in enumerate(row):
+            if ch != ".":
+                put(img, x0 + x, y0 + y, colors[ch])
+
+
+def stem_x(x0, top, bottom, y):
+    """The raider's stem: raked, the deck well forward of the forefoot, curving in toward the waterline."""
+    t = max(0.0, min(1.0, (y - (top + 3)) / (bottom + 4 - (top + 3))))
+    return x0 - 6 + 8 * t + 18 * t**3
+
+
+def boot_top(img, left, y0, y1, right=W - 1):
+    """The band above the waterline, a shade lighter than the side, that marks a ship's hull from any rock."""
+    for y in range(y0, y1 + 1):
+        for x in range(math.ceil(left(y)), right + 1):
+            put(img, x, y, "C2" if y > y0 else "C3")
+
+
+def rail(img, x0, x1, deck, height=9, gaps=()):
+    """A ship's rail: posts every six pixels on the deck's edge, and the rail along their tops, height pixels above
+    the deck. gaps are openings in it, from one x to another."""
+    def open_at(x):
+        return any(a <= x <= b for a, b in gaps)
+
+    for x in range(x0 + 2, x1, 6):
+        if not open_at(x):
+            for y in range(deck(x) - height + 1, deck(x) + 1):
+                put(img, x, y, "C1")
+    for x in range(x0, x1 + 1):
+        if not open_at(x):
+            put(img, x, deck(x) - height, "C2")
+
+
 def raider_hull(img, x0, top, bottom):
-    """The raider's side, close: black plates, rivets, a row of portholes, and its rail against the sky."""
-    fill(img, [(x0, top + 6), (W, top), (W, bottom), (x0 + 6, bottom + 4)], "C0")
+    """The raider's side, close: black plates, rivets, a row of portholes, and its rail against the sky. Its bow is
+    raked and its hull carries a band above the water, so that it reads as a ship's and not as a wall."""
+    edge = [(stem_x(x0, top, bottom, y), y) for y in range(top + 3, bottom + 5)]
+    fill(img, edge + [(W, bottom), (W, top + 3)], "C0")
     for y in range(top + 14, bottom - 4, 16):
         for x in range(x0 + 10, W, 12):
             put(img, x + (y // 16) % 2 * 6, y, "C2")
-    hline(img, x0 + 2, W - 1, top + 3, "C3")
-    hline(img, x0 + 2, W - 1, top + 4, "C2")
-    for x in range(x0 + 4, W, 6):
-        for y in range(top - 6, top + 3):
-            put(img, x, y, "C1")
-    hline(img, x0 + 2, W - 1, top - 7, "C2")
+    boot_top(img, lambda y: stem_x(x0, top, bottom, y) + 1, bottom - 10, bottom - 7)
+    left = round(stem_x(x0, top, bottom, top + 3))
+    hline(img, left + 1, W - 1, top + 3, "C3")
+    hline(img, left + 1, W - 1, top + 4, "C2")
+    # The stem, lit along its forward edge where the moon comes past it.
+    for x, y in edge[2:-6]:
+        put(img, math.ceil(x), y, "C2")
+    # The hawse pipe and the anchor stowed under it, a ship's mark at any size.
+    ax, ay = left + 14, top + 16
+    for x, y in ((ax - 1, ay - 1), (ax, ay - 1), (ax + 1, ay - 1), (ax - 2, ay), (ax + 2, ay), (ax - 1, ay + 1), (ax + 1, ay + 1)):
+        put(img, x, y, "C3")
+    put(img, ax, ay + 1, "C1")
+    for y in range(ay + 2, ay + 9):
+        put(img, ax, y, "C3")
+    hline(img, ax - 2, ax + 2, ay + 3, "C3")
+    for x, y in ((ax - 3, ay + 7), (ax - 2, ay + 8), (ax - 1, ay + 9), (ax + 1, ay + 9), (ax + 2, ay + 8), (ax + 3, ay + 7)):
+        put(img, x, y, "C3")
+
+
+def funnel(img, x, deck, top, width, rake, rim, band):
+    """A steamer's funnel, raked aft, with a cap and a pale band near its top. rim is the side the moon lights."""
+    for y in range(top, deck + 1):
+        shift = round(rake * (deck - y) / (deck - top))
+        for dx in range(width):
+            put(img, x + shift + dx, y, "C0")
+        put(img, x + shift + (0 if rim < 0 else width - 1), y, "C3")
+        if band <= y - top < band + 3:
+            for dx in range(1, width - 1):
+                put(img, x + shift + dx, y, "C3" if y - top == band else "C2")
+    shift = rake
+    hline(img, x + shift - 1, x + shift + width, top, "C0")
+    hline(img, x + shift - 1, x + shift + width, top + 1, "C0")
+    hline(img, x + shift, x + shift + width - 1, top - 1, "C4")
+
+
+GUARD = [
+    "....ddd....",
+    "...ddddd...",
+    ".rdddddd...",
+    "...rddd....",
+    "...rddd....",
+    "....ddd....",
+    "..rddddddd.",
+    ".rdddddddd.",
+    ".rdddddddd.",
+    ".rd.ddddd.d",
+    ".rd.ddddd.d",
+    ".dd.ddddd.d",
+    "...dddddd..",
+    "...rdddddd.",
+    "..rdddddd..",
+    "..rdddddd..",
+    "..rdd..dd..",
+    "..rd...dd..",
+    "..dd....dd.",
+    "..dd....dd.",
+    ".rdd....dd.",
+    ".ddd....ddd",
+]
+
+
+def guard(img, x, deck):
+    """The guard at the head of the gangway: cap, head, shoulders, a greatcoat to the knee, and his boots apart on the
+    deck. His rifle on his shoulder. The moon is behind him to the left, and lights his left edges."""
+    top = deck - len(GUARD) + 1
+    sprite(img, GUARD, x, top, {"d": "C0", "r": "C4"})
+    line(img, x + 9, top + 7, x + 12, top - 3, "C0")
+    put(img, x + 12, top - 4, "C0")
+    put(img, x + 11, top - 3, "C3")
 
 
 def panel_raider_layers():
@@ -131,23 +232,43 @@ def panel_raider_layers():
     ship(img, 24, HORIZON + 4, 118, 32, "C2", "C3", funnels=1, guns=False, lights=())
     ImageDraw.Draw(img).line([(140, HORIZON - 12), (196, 92)], fill=rgba("C3"))
     raider_hull(img, 190, 64, 188)
+    # The water along her: broken light at the waterline, and a wave folded back from the stem.
     for y in range(186, 194):
-        for x in range(190, W):
-            if noise(x / 6.0, y) > 0.55:
+        for x in range(184, W):
+            if x >= stem_x(190, 64, 188, y) - 2 and noise(x / 6.0, y) > 0.55:
                 put(img, x, y, "C5")
+    for y in range(181, 190):
+        x = math.floor(stem_x(190, 64, 188, y))
+        for k in range(1 + (y - 181) // 3):
+            put(img, x - 1 - k, y, "C7" if (k + y) % 3 else "C6")
+    for x, y in ((198, 189), (196, 190), (194, 190), (192, 191), (201, 190)):
+        put(img, x, y, "C6")
+
+    def deck(x):
+        return 66
+
+    # The funnel aft, raked, with its band: the mark carried into the escape.
+    funnel(img, 432, deck(440), 14, 22, 5, -1, 6)
     # The deck: a gun trained over the bow on our ship, out over the open water to the left and a little down, its
-    # barrel against the sky above the rail and well clear of the moon; its breech behind the mount. And a guard with
-    # a rifle on his shoulder.
+    # barrel against the sky above the rail and well clear of the moon; its breech behind the shield. It stands on a
+    # pedestal, which comes down through the rail to a base on the deck.
+    floor = deck(258)
+    fill(img, [(252, 58), (264, 58), (265, floor - 2), (251, floor - 2)], "C0")
+    fill(img, [(247, floor - 2), (269, floor - 2), (270, floor), (246, floor)], "C0")
     fill(img, [(244, 58), (270, 58), (268, 50), (248, 50)], "C0")
     fill(img, [(268, 51), (275, 52), (275, 56), (268, 56)], "C0")
     ImageDraw.Draw(img).line([(248, 53), (203, 55)], fill=rgba("C0"), width=3)
     fill(img, [(200, 53), (204, 53), (204, 57), (200, 57)], "C0")
-    # The moon behind it catches the top of the shield, the barrel and the muzzle.
+    # The moon behind it catches the top of the shield, the barrel and the muzzle, and the pedestal's near edge.
     hline(img, 249, 267, 49, "C4")
     line(img, 247, 51, 205, 53, "C4")
     hline(img, 200, 204, 52, "C4")
-    fill(img, [(372, 58), (372, 46), (370, 42), (372, 38), (376, 38), (378, 42), (376, 46), (376, 58)], "C1")
-    ImageDraw.Draw(img).line([(377, 40), (382, 30)], fill=rgba("C1"))
+    for y in range(59, floor - 2):
+        put(img, 251, y, "C3")
+    hline(img, 246, 250, floor - 3, "C3")
+    # The rail, open where the guard stands at the head of the gangway.
+    rail(img, round(stem_x(190, 64, 188, 67)) + 1, W - 1, deck, gaps=((364, 384),))
+    guard(img, 368, deck(374))
     for cx in (240, 290, 340, 390, 440):
         porthole(img, cx, 120 - (cx - 240) // 50)
     return img, {"lamp": (lamp(), (334, 110))}
@@ -240,20 +361,94 @@ def oars(frame):
     return img
 
 
+# The raider in the escape, from astern: its waterline, and its counter stern overhanging the water.
+ESCAPE_WATERLINE = 184
+ESCAPE_STERN = [(160, 74), (162, 80), (162, 88), (159, 96), (153, 103), (146, 108), (128, ESCAPE_WATERLINE)]
+
+
+def escape_deck(x):
+    """The raider's deck in the escape: its sheer rising toward the stern."""
+    return round(80 - 6 * x / 160)
+
+
+def escape_hull_right(y):
+    """How far right the raider's hull reaches on row y of the escape."""
+    for (x0, y0), (x1, y1) in zip(ESCAPE_STERN, ESCAPE_STERN[1:]):
+        if y0 <= y <= y1:
+            return x0 + (x1 - x0) * (y - y0) / max(1, y1 - y0)
+    return ESCAPE_STERN[-1][0] if y > ESCAPE_STERN[-1][1] else ESCAPE_STERN[0][0]
+
+
 def panel_escape_layers():
-    """The same raider's side from outside, at night, the lit porthole low on it. The boat pulls away from it to the
-    right, the oars dipping, and the lamp behind goes out."""
+    """The same raider from astern and a little off, at night: its counter stern over the water, the rail, the
+    funnel with its band, the mast; empty davits, their falls hanging, where the boat was. Its hull stands in the
+    water, which breaks white along it and gives back its dark. The lit porthole low on it. The boat pulls away from
+    it to the right, the oars dipping, and the lamp behind goes out."""
     img = gen_shore.sky()
     noise = Noise(402)
     night_sea(img, noise, top=HORIZON)
     moon_path(img, noise)
-    fill(img, [(0, 40), (150, 70), (170, H), (0, H)], "C0")
-    for y in range(80, 230, 18):
-        for x in range(10, 150, 12):
-            put(img, x + (y // 18) % 2 * 6, y, "C2")
-    for cx, cy in ((44, 100), (84, 104)):
-        porthole(img, cx, cy)
+    wl = ESCAPE_WATERLINE
+    # Its reflection first, under where the hull will stand: the sea darkened, broken by the swell's lit lines.
+    for y in range(wl + 1, 214):
+        d = y - wl
+        right = escape_hull_right(wl - d * 1.6) + 2 * math.sin(y * 1.3)
+        for x in range(0, round(right)):
+            n = noise(x / 9.0, y * 0.9)
+            if n > 0.22 + d * 0.016:
+                put(img, x, y, "C0" if n > 0.5 else "C1")
+            elif y % 3 == 0 and n < 0.12:
+                put(img, x, y, "C4")
+    hull_edge = [(escape_hull_right(y), y) for y in range(ESCAPE_STERN[0][1], wl + 1)]
+    # The rudder under the counter: it is her stern.
+    fill(img, [(136, 142), (143, 144), (144, wl), (131, wl)], "C0")
+    line(img, 143, 145, 144, wl - 1, "C2")
+    top_edge = [(x, escape_deck(x) + 1) for x in range(0, 161)]
+    fill(img, [(0, wl)] + top_edge + hull_edge, "C0")
+    for y in range(92, wl - 12, 16):
+        for x in range(8, round(escape_hull_right(y)) - 4, 12):
+            put(img, x + (y // 16) % 2 * 6, y, "C2")
+    boot_top(img, lambda y: 0, wl - 10, wl - 7, right=0)
+    for y in range(wl - 10, wl - 6):
+        for x in range(0, round(escape_hull_right(y))):
+            put(img, x, y, "C2" if y > wl - 10 else "C3")
+    for x in range(0, 161):
+        put(img, x, escape_deck(x) + 1, "C3")
+        put(img, x, escape_deck(x) + 2, "C2")
+    # The stern's edge lit by the moon on the right.
+    for x, y in hull_edge[1:-4]:
+        put(img, math.floor(x) - 1, y, "C2")
+    # Funnel and band, as in the captivity, the moon on its right side; the mast and its stay to the stern.
+    funnel(img, 34, escape_deck(44), 30, 18, 5, 1, 6)
+    for y in range(6, escape_deck(98) + 1):
+        put(img, 98, y, "C0")
+        put(img, 99, y, "C2" if y < 60 else "C0")
+    hline(img, 89, 109, 22, "C0")
+    hline(img, 90, 108, 21, "C2")
+    line(img, 99, 8, 158, escape_deck(158) - 8, "C1")
+    line(img, 157, escape_deck(157), 160, escape_deck(157) - 14, "C1")
+    # Empty davits, and their falls hanging down the side to where the boat was lowered.
+    for dx in (108, 136):
+        deck = escape_deck(dx)
+        for y in range(deck - 14, deck + 1):
+            put(img, dx, y, "C0")
+        for x, y in ((dx + 1, deck - 15), (dx + 2, deck - 16), (dx + 3, deck - 16), (dx + 4, deck - 15), (dx + 4, deck - 14)):
+            put(img, x, y, "C0")
+        put(img, dx + 2, deck - 17, "C3")
+        for y in range(deck - 13, ESCAPE_WATERLINE - 3):
+            put(img, dx + 4 + round(1.5 * math.sin((y - deck) / 30.0)), y, "C2")
+    rail(img, 0, 160, escape_deck, height=8)
+    for cx in (6, 44, 84):
+        porthole(img, cx, 108)
     porthole(img, 124, 108)
+    # Where the hull goes into the water: the swell breaking white along it, most at the stern.
+    for x in range(0, round(escape_hull_right(wl)) + 3):
+        for y in (wl - 1, wl, wl + 1):
+            n = noise(x / 3.0, y * 1.7)
+            if n > 0.5:
+                put(img, x, y, "C7" if n > 0.8 else ("C6" if n > 0.65 else "C5"))
+    for x, y in ((126, wl - 2), (128, wl - 1), (130, wl), (131, wl - 1), (133, wl + 1), (124, wl + 1), (135, wl)):
+        put(img, x, y, "C7")
     return img, {
         "lamp": (lamp(), (118, 102)),
         "boat": (boat_with_rower(), (190, 158)),
