@@ -220,8 +220,11 @@ func test_examine_works_with_a_controller_at_the_boat_and_the_fish(h) -> void:
 		var boat: Node = h.fixture.get_node("World/Props/Lifeboat")
 		var fish: Node = h.fixture.get_node("World/Props/FishNearRock")
 		await h.tap_pad(JOY_BUTTON_X)
-		h.check(_prompt(h).text == LAYOUTS[controller_name]["prompt"], "%s: at the boat the prompt reads '%s'" % [controller_name, _prompt(h).text])
 		h.check(_caption(h).visible and _caption(h).text == boat.caption, "%s: west at the boat shows '%s'" % [controller_name, _caption(h).text])
+		# The press made the controller the device, so the prompt names its button. While the boat's own line is said,
+		# another press would only cut it short, and the prompt says so (D113).
+		var skip: String = LAYOUTS[controller_name]["prompt"].replace("Examine", "Skip line")
+		h.check(_prompt(h).text == skip, "%s: during the boat's line the prompt reads '%s'" % [controller_name, _prompt(h).text])
 
 		_stick(h, 1.0)
 		await h.steps(22)
