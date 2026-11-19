@@ -7,6 +7,7 @@ wet streaks, texture, and on the monolith its carvings.
     monolith.png     the standing stone, world x 3830-4296, y -520-0, carved with the mark, worshippers, fish, and
                      high up the swimmer with its arm around a standing stone: what the reveal then shows, alive
     dagon_*.png      the creature, by gen_creature.py: a dark base and a lit image for each animated part
+    ridge_water.png  the water at the ridge's foot past the walkway, which the ridge stands in before the reveal
     crossing_carving.png    the panel by the ledges at the gap: a stone dropped on a beam's raised end, then the beam
                             level with the stone on it and a figure walking over. Bold, to be read at the game's scale
 """
@@ -206,6 +207,47 @@ def dagon_parts():
     import gen_creature
 
     return gen_creature.parts(lambda name: scene_polygon(name, "Dagon/Head" if name == "Crest" else "Dagon"))
+
+
+def dagon_at():
+    text = SCENE.read_text()
+    match = re.search(r'\[node name="Dagon" type="Node2D" parent="\."\]\nposition = Vector2\(([-0-9.]+), ([-0-9.]+)\)', text)
+    return float(match.group(1)), float(match.group(2))
+
+
+# The water past the walkway, from the Monolith's edge to where the walkway ends, in the rows above its top.
+SHALLOWS_X0, SHALLOWS_X1 = 4290, 4544
+SHALLOWS_TOP, SHALLOWS_BOTTOM = -9, -1
+
+
+def ridge_water():
+    """The water at the ridge's foot, seen past the walkway: before the reveal the ridge stands in it, broken white
+    where it goes in, and the water gives back its dark. Laid in front of the creature and behind the walkway, it stays
+    where it is when the creature rises out of it, and covers the ridge's foot until then. Returns the image and its
+    place in the world."""
+    dx, dy = dagon_at()
+    ridge = [(x + dx, y + dy) for x, y in scene_polygon("Ridge", "Dagon")]
+    foot = [x for x in range(SHALLOWS_X0, SHALLOWS_X1) if _in_polygon(ridge, x + 0.5, SHALLOWS_TOP + 0.5)]
+    left, right = min(foot), max(foot)
+    width, height = SHALLOWS_X1 - SHALLOWS_X0, SHALLOWS_BOTTOM - SHALLOWS_TOP + 1
+    img = blank(width, height)
+    noise = Noise(521)
+    for c in range(width):
+        x = SHALLOWS_X0 + c
+        # Most broken where the ridge's flank goes into the water, and along the foot of the wall.
+        churn = math.exp(-(((x - left) / 7.0) ** 2)) + 0.5 * math.exp(-(((x - right) / 7.0) ** 2))
+        for d in range(height):
+            y = SHALLOWS_TOP + d
+            n = noise(x / 4.0, y * 1.9)
+            if d == 0:
+                color = "C8" if n > 0.8 - 0.4 * churn else ("C7" if n > 0.5 - 0.3 * churn else "C5")
+            elif d == 1:
+                color = "C7" if n > 0.85 - 0.5 * churn else ("C5" if n > 0.62 else "T1")
+            else:
+                ripple = d % 2 == 1 and noise(x / (3.0 + d), d * 7.0) > 0.66 - 0.02 * d
+                color = ("C5" if d > 5 and n > 0.6 else "C4") if ripple else ("C0" if n < 0.35 else ("T0" if n < 0.7 else "C1"))
+            put(img, c, d, color)
+    return img, (SHALLOWS_X0, SHALLOWS_TOP)
 
 
 # ---------------------------------------------------------------- the clue at the gap

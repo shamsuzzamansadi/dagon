@@ -128,6 +128,7 @@ def main():
     for name, (image, _offset) in gen_reveal.dagon_parts().items():
         image.save(REVEAL_OUT / f"{name}.png")
     gen_abyss.water_drop().save(REVEAL_OUT / "water_drop.png")
+    gen_reveal.ridge_water()[0].save(REVEAL_OUT / "ridge_water.png")
     CAVE_OUT.mkdir(parents=True, exist_ok=True)
     for name, (image, _at) in gen_figures.all_figures().items():
         image.save(CAVE_OUT / f"{name}.png")

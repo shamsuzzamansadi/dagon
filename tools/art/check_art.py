@@ -23,10 +23,10 @@ UI_OUT = ROOT / "project" / "assets" / "ui"
 # light.png is a light mask, not artwork: its values multiply the lantern colour.
 ARTWORK = ["sky", "clouds", "far", "glints", "flats", "bank", "terrain", "foreground", "fish", "boat", "sailor", "talisman", "tentacle", "ribs"]
 REVEAL_OUT = ROOT / "project" / "assets" / "reveal"
-REVEAL_ARTWORK = ["monolith", "crossing_carving", "dagon_ridge", "water_drop"] + [f"dagon_{part}{lit}" for part in ("body", "head", "crest", "arm") for lit in ("", "_lit")]
+REVEAL_ARTWORK = ["monolith", "crossing_carving", "dagon_ridge", "ridge_water", "water_drop"] + [f"dagon_{part}{lit}" for part in ("body", "head", "crest", "arm") for lit in ("", "_lit")]
 # The finished reference section, and the prologue. shaft.png is a light mask, like light.png.
 CAVE_OUT = ROOT / "project" / "assets" / "cave"
-CAVE_ARTWORK = ["cave_front", "cave_wall", "abyss_far", "ritual_far", "foreground_cave", "ritual_stones", "distant_shape", "ritual_watcher", "far_watcher", "canyon_figure"] + [f"ritual_kneeler_{i}" for i in range(1, 5)]
+CAVE_ARTWORK = ["cave_front", "cave_wall", "abyss_far", "ritual_far", "foreground_cave", "ritual_stones", "distant_shape", "ritual_watcher", "far_watcher", "canyon_figure", "ritual_ground"] + [f"ritual_kneeler_{i}" for i in range(1, 5)]
 ABYSS_OUT = ROOT / "project" / "assets" / "abyss"
 ABYSS_TILES = 4
 ABYSS_ARTWORK = [f"abyss_ground_{i}" for i in range(ABYSS_TILES)] + ["abyss_far_plain", "abyss_escarpment", "abyss_slab", "abyss_stone", "abyss_canyon", "abyss_statues",
@@ -180,6 +180,90 @@ def check_far_cliff(problems):
     print("far cliff: the watcher's footing and the distant shape's foot compared with the scene")
 
 
+def sprite_position(name, parent):
+    block = re.search(r'\[node name="%s" type="Sprite2D" parent="%s"\]\n(.*?)\n\n' % (name, re.escape(parent)), SCENE.read_text(), re.S).group(1)
+    match = re.search(r"position = Vector2\(([-0-9.]+), ([-0-9.]+)\)", block)
+    return round(float(match.group(1))), round(float(match.group(2)))
+
+
+def opaque(image, x, y):
+    return 0 <= x < image.width and 0 <= y < image.height and image.getpixel((x, y))[3] != 0
+
+
+def check_ridge(problems):
+    """The ridge is the creature's near shoulder before the reveal (D105). Over its left side and its top its edge is
+    the body's own, so the line followed along it is the shoulder's as it rises (D116); it goes on below the walkway
+    farther than the creature rises, so its cut foot never shows; and the water past the walkway covers its foot."""
+    body = Image.open(REVEAL_OUT / "dagon_body.png").convert("RGBA")
+    ridge = Image.open(REVEAL_OUT / "dagon_ridge.png").convert("RGBA")
+    bx, by = sprite_position("Art", "Dagon/Body")
+    rx, ry = sprite_position("Art", "Dagon/Ridge")
+    crest = min(range(ridge.width), key=lambda c: next((r for r in range(ridge.height) if opaque(ridge, c, r)), ridge.height))
+    for c in range(crest + 1):
+        top = next((r for r in range(ridge.height) if opaque(ridge, c, r)), None)
+        body_top = next((r for r in range(body.height) if opaque(body, c + rx - bx, r)), None)
+        if top is None or top + ry != body_top + by:
+            problems.append(f"the ridge's top at x {c + rx} is at {None if top is None else top + ry}, the body's at {body_top + by}")
+            break
+    for r in range(ridge.height):
+        left = next((c for c in range(ridge.width) if opaque(ridge, c, r)), None)
+        if left is None:
+            continue
+        body_left = next(c for c in range(body.width) if opaque(body, c, r + ry - by))
+        if left + rx != body_left + bx:
+            problems.append(f"the ridge's left edge at y {r + ry} is at {left + rx}, the body's at {body_left + bx}")
+            break
+    rise = 64
+    if ry + ridge.height - 1 < rise:
+        problems.append(f"the ridge ends {ry + ridge.height - 1} below the walkway; the creature rises {rise}")
+    water = Image.open(REVEAL_OUT / "ridge_water.png").convert("RGBA")
+    wx, wy = sprite_position("Shallows", "TrenchFront")
+    dagon_x = 4700
+    uncovered = [c + rx + dagon_x for c in range(ridge.width) if opaque(ridge, c, -1 - ry) and 4290 <= c + rx + dagon_x < 4544
+                 and not opaque(water, c + rx + dagon_x - wx, -1 - wy)]
+    if uncovered:
+        problems.append(f"the ridge's foot shows past the water at {len(uncovered)} columns, from x {uncovered[0]}")
+    print(f"ridge: its top over {crest + 1} columns and its left side over {ridge.height} rows are the body's; the water covers its foot")
+
+
+def check_ritual(problems):
+    """The four who kneel rest their knees on the crest the backdrop draws. When the clip bows them, four pixels down,
+    whatever goes below the crest is behind the strip of ground laid before them, which is the backdrop's own pixels
+    (D118), except over a standing stone, which comes down to the crest itself."""
+    sys.path.insert(0, str(pathlib.Path(__file__).parent))
+    import gen_figures
+
+    backdrop = Image.open(CAVE_OUT / "ritual_far.png").convert("RGBA")
+    back_x, back_y = sprite_position("Backdrop", "RitualLayer")
+    ground = Image.open(CAVE_OUT / "ritual_ground.png").convert("RGBA")
+    gx, gy = sprite_position("Ground", "RitualLayer")
+    for y in range(ground.height):
+        for x in range(ground.width):
+            if opaque(ground, x, y) and ground.getpixel((x, y)) != backdrop.getpixel((x + gx - back_x, y + gy - back_y)):
+                problems.append(f"the ritual's ground strip differs from the backdrop at ({x + gx}, {y + gy})")
+                return
+    stones = [scene_node(n, "RitualLayer") for n in ("Stone1", "Stone2", "Stone3", "Stone4", "MarkStone")]
+    on_stone = lambda x: any(min(px for px, _ in st) - 1 <= x <= max(px for px, _ in st) + 1 for st in stones)
+    bob = 4
+    for i in range(1, 5):
+        image = Image.open(CAVE_OUT / f"ritual_kneeler_{i}.png").convert("RGBA")
+        kx, ky = sprite_position("Drawn", f"RitualLayer/Figures/Kneeling/Figure{i}")
+        crest = {x: gen_figures.crest(x) for x in range(kx, kx + image.width)}
+        lit = {x: backdrop.getpixel((x - back_x, crest[x] - back_y)) for x in crest}
+        if any(c not in (rgba("C3"), rgba("C4")) for c in lit.values()):
+            problems.append(f"the crest under kneeler {i} is not where the backdrop draws it")
+        _start, face_right = gen_figures.KNEELERS[i]
+        knee = kx + (gen_figures.KNEE_COLUMN if face_right else image.width - 1 - gen_figures.KNEE_COLUMN)
+        lowest = max(y for y in range(image.height) if opaque(image, knee - kx, y)) + ky
+        if lowest != crest[knee] - 1:
+            problems.append(f"kneeler {i}'s knee is at row {lowest}, the crest under it at {crest[knee]}")
+        shown = [(x + kx, y + ky + bob) for y in range(image.height) for x in range(image.width) if opaque(image, x, y)]
+        bare = [(x, y) for x, y in shown if y >= crest[x] and not on_stone(x) and not opaque(ground, x - gx, y - gy)]
+        if bare:
+            problems.append(f"bowing, kneeler {i} shows below the crest at {len(bare)} pixels, first {bare[0]}")
+    print("ritual: the ground strip is the backdrop's; each kneeler's knee on the crest; bowing, nothing shows below it")
+
+
 def main():
     problems = []
     for name in ARTWORK:
@@ -222,6 +306,8 @@ def main():
     check_cave_surface(problems)
     check_abyss_surface(problems)
     check_far_cliff(problems)
+    check_ridge(problems)
+    check_ritual(problems)
 
     for problem in problems:
         print(f"PROBLEM {problem}")

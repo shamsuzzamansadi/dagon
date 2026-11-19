@@ -549,6 +549,31 @@ func test_the_monolith_and_the_creature_are_drawn_over_the_shapes_the_clips_move
 		h.check(art.position.distance_to(box.position) <= 1.0, "%s's art is placed at %s, its shape at %s" % [part, art.position, box.position])
 
 
+## The ridge beside the walkway stands in water before the reveal (D116): the water is drawn over the creature and
+## under the walkway, shown from the start, covers the ridge's foot where it stands, and no clip moves or hides it.
+## The ritual's strip of ground is drawn over the four who kneel and lit as the backdrop it copies (D118).
+func test_the_ridge_stands_in_water_and_the_ritual_ground_lies_before_the_kneelers(h) -> void:
+	var world := await _world(h, AWAKENED)
+	var water: Sprite2D = world.get_node("TrenchFront/Shallows")
+	var dagon: Node2D = world.get_node("Dagon")
+	h.check(water.visible and water.texture != null and water.get_parent().visible, "the water at the ridge's foot is not shown")
+	h.check(water.get_parent().get_index() > dagon.get_index(), "the water is drawn under the creature")
+	h.check(water.get_parent().get_index() < world.get_node("AbyssGround").get_index(), "the water is drawn over the walkway")
+	var ridge: Sprite2D = world.get_node("Dagon/Ridge/Art")
+	var foot := ridge.global_position.y + ridge.texture.get_height()
+	h.check(foot > 0.0 and water.global_position.y + water.texture.get_height() >= 0.0, "the ridge's foot is not under the water and the walkway: %.0f" % foot)
+	for player_name in ["Cinematics", "Atmosphere", "Background"]:
+		var player: AnimationPlayer = world.get_node(player_name)
+		for clip_name in player.get_animation_list():
+			var clip := player.get_animation(clip_name)
+			for track in clip.get_track_count():
+				h.check(not String(clip.track_get_path(track)).begins_with("TrenchFront/Shallows"), "%s moves the water at the ridge's foot" % clip_name)
+	var ground: Sprite2D = world.get_node("RitualLayer/Ground")
+	var figures: Node2D = world.get_node("RitualLayer/Figures")
+	h.check(ground.get_index() > figures.get_index(), "the ritual's ground is drawn under the kneelers")
+	h.check(ground.light_mask == (world.get_node("RitualLayer/Backdrop") as CanvasItem).light_mask, "the ritual's ground is lit unlike the backdrop it copies")
+
+
 ## The great carving high on the stone, the lit mural, and the reveal show the same thing: an arm round a stone.
 func test_the_lit_mural_carries_the_motif_the_reveal_then_shows(h) -> void:
 	var world := await _world(h, AWAKENED)

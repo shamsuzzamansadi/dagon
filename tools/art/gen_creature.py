@@ -18,7 +18,7 @@ import math
 import random
 
 import numpy as np
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFilter
 from scipy import ndimage
 
 from art_common import BAYER, Noise
@@ -301,9 +301,13 @@ def parts(polygon):
     out = {}
     (base, lit, at), body_mask = body(polygon("Body"))
     out["dagon_body"], out["dagon_body_lit"] = (base, at), (lit, at)
-    # The ridge is the near shoulder, seen before anyone knows it for one: the body's own pixels inside its shape.
+    # The ridge is the near shoulder, seen before anyone knows it for one: the body's own pixels inside its shape. The
+    # shape runs a little outside the body's own outline on the left and over the top, so the ridge's edge there is
+    # the body's: the line followed along it before the reveal is the shoulder's as it rises. It goes on below the
+    # water at its foot (gen_reveal.ridge_water), which hides it until it lifts.
     ridge = Image.new("L", base.size, 0)
     ImageDraw.Draw(ridge).polygon([(x - at[0], y - at[1]) for x, y in polygon("Ridge")], fill=255)
+    ridge = ridge.filter(ImageFilter.MaxFilter(5))
     shown = Image.new("RGBA", base.size, (0, 0, 0, 0))
     shown.paste(base, (0, 0), ridge)
     box = shown.getbbox()
