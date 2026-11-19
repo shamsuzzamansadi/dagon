@@ -24,7 +24,7 @@ line-8-ending.innsmouth     1   +0  0.9999 -0.0002 |            -72.1           
 line-9-ending.rising        0   +0  0.9994 -0.0033 |            -49.5            -48.3
 line-9-ending.rising        1   +0  0.9999 -0.0008 |            -62.2            -61.0
 
-the largest leftover against beneath: -27.4 dB, which moves the beneath level by at most 0.36 dB
+a constant-gain estimate: the largest leftover against beneath is -27.4 dB, which would move a level for what is beneath by at most 0.36 dB. A difference in processing that changed during a line would not show in it (the limiter, below)
 
 the limiter: ceiling -1.0 dBFS
   mix   peak  -1.00 dBFS; 1 samples at the ceiling, at 11.67 s

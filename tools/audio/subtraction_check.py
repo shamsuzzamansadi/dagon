@@ -16,8 +16,11 @@ is processed the same way in both. Event marks on the same video frames show nei
   the limiter    each take's peak against the Master limiter's ceiling, and where a take reaches it within a spoken
                  stretch: a take whose limiter acted there was not processed as the others were
 
-The gain's distance from 1 also holds the bed's chance likeness to the voice, so the leftover it implies is an upper
-bound. Measurement only: it says whether the subtraction is sound, not how anything sounds.
+The leftover, and how far it could move a figure for what is beneath, are a constant-gain estimate: they take any
+difference in how the two takes processed the voice to be one fixed gain over each line and channel. Within that model
+the estimate is an upper bound, as the gain's distance from 1 also holds the bed's chance likeness to the voice. A
+difference that changed during a line, such as a limiter acting in one take and not the other, is outside it, which is
+why the limiter is reported apart. Measurement only: it says whether the subtraction is sound, not how anything sounds.
 """
 import math
 import pathlib
@@ -101,8 +104,9 @@ def main(mix_path, voice_path, bed_path, log_path):
             left_band = 20 * math.log10(max(abs(gain - 1), 1e-9)) + db(vb) - db(ub)
             worst = max(worst, left_wide, left_band)
             print(f"{stage:26} {ch:>2} {lag:>+4d} {gain:7.4f} {corr:+7.4f} | {left_wide:16.1f} {left_band:16.1f}")
-    print(f"\nthe largest leftover against beneath: {worst:.1f} dB, which moves the beneath level by at most"
-          f" {10 * math.log10(1 + 10 ** (worst / 10) + 2 * 10 ** (worst / 20)):.2f} dB")
+    print(f"\na constant-gain estimate: the largest leftover against beneath is {worst:.1f} dB, which would move a level"
+          f" for what is beneath by at most {10 * math.log10(1 + 10 ** (worst / 10) + 2 * 10 ** (worst / 20)):.2f} dB."
+          f" A difference in processing that changed during a line would not show in it (the limiter, below)")
 
     print(f"\nthe limiter: ceiling {20 * math.log10(ceiling):.1f} dBFS")
     for name, take in (("mix", mix), ("voice", voice), ("bed", bed)):

@@ -10,10 +10,10 @@
 
 - **Aligned to the sample.** The mix and bed-alone takes are the same, sample for sample, until the voice begins: they first differ by one 16-bit step, 0.2 ms before the voice take's first sample that is not zero, where the voice is still under one step. For all nine lines, on both channels, mix and voice correlate best at a lag of 0 samples. A take of the mix recorded again on 2026-11-18, at the review's head, is identical to the 2026-11-16 take for all 93.8 s they share.
 - **The voice processed alike in both takes.** The Narration bus has no effects. The Master limiter (ceiling −1 dB) never reached its ceiling in the mix or the voice take after the change (peaks −1.3 and −3.2 dBFS); before it, the mix reached it once, at 11.67 s, outside any spoken stretch. The voice's gain in the mix, by least squares, is 0.983 to 1.009 on each channel of each line.
-- **What that can leave.** Even if all of that gain's distance from 1 were voice left behind, it would lie at least 26.9 dB under what is beneath, and move a figure for what is beneath by at most 0.4 dB.
+- **What that can leave: a constant-gain estimate.** The 0.4 dB rests on a model in which the two takes differ in the voice by at most one fixed gain over each line and channel. Within it, even if all of that gain's distance from 1 were voice left behind, it would lie at least 26.9 dB under what is beneath, and move a figure for what is beneath by at most 0.4 dB. A difference that changed during a line is outside the model, which is why the limiter is checked apart (next point).
 - **Where the takes are not alike.** The bed-alone take reached the limiter's ceiling at 10.70 and 11.67 s, inside the reveal's first line, where the mix did not. For that line, `listening.py narration`'s unducked level and how far it ducks are **estimates.** No figure in the masking row uses the bed-alone take.
 
-So the figures below are measurements of what played beneath each line, to within 0.4 dB. **What they measure is still only level** ([below](#what-the-figures-are-and-are-not)).
+So the figures below are measurements of what played beneath each line, to within 0.4 dB on that constant-gain estimate, with the limiter's caveat for the first line's bed-alone figures. **What they measure is still only level** ([below](#what-the-figures-are-and-are-not)).
 
 | Tool | Says |
 |---|---|
