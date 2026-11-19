@@ -23,6 +23,8 @@ namespace {
 
 constexpr float CAPTION_FADE_SECONDS = 0.25f;
 constexpr float NOTICE_HOLD_SECONDS = 2.5f;
+// What the prompt says while a press would only cut the speaking line short.
+constexpr const char *SKIP_PROMPT = "Skip line";
 
 } // namespace
 
@@ -109,18 +111,29 @@ void Hud::_unhandled_input(const Ref<InputEvent> &p_event) {
 	if (Engine::get_singleton()->is_editor_hint() || !speaking_ || !p_event->is_action_pressed("interact")) {
 		return;
 	}
-	const Interactor *interactor = interactor_.get();
-	const Interactable *focus = interactor != nullptr ? interactor->get_focus() : nullptr;
-	if (focus != nullptr && focus->is_available()) {
-		const bool is_a_move_in_the_game = focus->get_line_id().is_empty();
-		const bool starts_another_optional_line = focus->get_line_id() != current_line_ && current_priority_ == core::LinePriority::Optional;
-		if (is_a_move_in_the_game || starts_another_optional_line) {
-			return;
-		}
+	if (press_reaches(current_focus())) {
+		return;
 	}
 	print_verbose("dagon: line skipped: ", current_line_);
 	hide_caption();
 	get_viewport()->set_input_as_handled();
+}
+
+Interactable *Hud::current_focus() const {
+	const Interactor *interactor = interactor_.get();
+	return interactor != nullptr ? interactor->get_focus() : nullptr;
+}
+
+bool Hud::press_reaches(const Interactable *p_focus) const {
+	if (!speaking_) {
+		return true;
+	}
+	if (p_focus == nullptr || !p_focus->is_available()) {
+		return false;
+	}
+	const bool is_a_move_in_the_game = p_focus->get_line_id().is_empty();
+	const bool starts_another_optional_line = p_focus->get_line_id() != current_line_ && current_priority_ == core::LinePriority::Optional;
+	return is_a_move_in_the_game || starts_another_optional_line;
 }
 
 void Hud::set_input_device(int p_device) {
@@ -130,7 +143,6 @@ void Hud::set_input_device(int p_device) {
 
 void Hud::on_focus_changed(Object *p_target) {
 	const Interactable *target = Object::cast_to<Interactable>(p_target);
-	prompt_text_ = target != nullptr ? target->get_prompt() : String();
 	if (target != nullptr && !target->get_line_id().is_empty()) {
 		print_verbose("dagon: focus: ", target->get_line_id());
 	}
@@ -142,14 +154,20 @@ void Hud::refresh_prompt() {
 	if (label == nullptr) {
 		return;
 	}
-	if (prompt_text_.is_empty()) {
+	const Interactable *focus = current_focus();
+	const String what = focus == nullptr ? String() : (press_reaches(focus) ? focus->get_prompt() : String(SKIP_PROMPT));
+	if (what.is_empty()) {
 		if (label->is_visible()) {
 			print_verbose("dagon: prompt hidden");
 		}
 		label->hide();
 		return;
 	}
-	label->set_text(String("[") + input_labels::interact_label(input_device_, label->get_theme_font("font")) + "] " + prompt_text_);
+	const String text = String("[") + input_labels::interact_label(input_device_, label->get_theme_font("font")) + "] " + what;
+	if (label->is_visible() && label->get_text() == text) {
+		return;
+	}
+	label->set_text(text);
 	label->show();
 	// Positive proof for the export check, which cannot see the screen.
 	print_verbose("dagon: prompt: ", label->get_text());
@@ -203,6 +221,7 @@ void Hud::say(const StringName &p_id) {
 	speaking_ = true;
 	current_line_ = p_id;
 	current_priority_ = priority;
+	refresh_prompt();
 	// Subtitles only ever hide what can be heard, so text with no voice always shows.
 	const bool visible = !voiced || storage::subtitles_enabled();
 	const double seconds = core::line_seconds(static_cast<std::size_t>(text.length()), voiced ? stream->get_length() : 0.0, caption_hold_seconds_);
@@ -246,6 +265,7 @@ void Hud::on_caption_finished() {
 		voice->stop();
 	}
 	speaking_ = false;
+	refresh_prompt();
 }
 
 void Hud::show_notice(const String &p_text) {

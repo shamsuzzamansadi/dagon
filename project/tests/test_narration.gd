@@ -41,6 +41,7 @@ const OTHER_TEXT_LINE := &"abyss.footprint"
 const STORY_LINE := &"abyss.ritual"
 const TALISMAN_X := 349.0
 const FISH_X := 189.0
+const ABYSS := 1
 const MONOLITH := 2
 const AWAKENED := 3
 const WITNESS_X := 860.0
@@ -313,6 +314,8 @@ func test_a_stone_press_during_a_story_line_still_presses_the_stone(h) -> void:
 	var puzzle: Node = h.fixture.get_node("Monolith/Puzzle")
 	await h.stand_at(_player(h), Vector2(4170, -2))
 	_hud(h).say(STORY_LINE)
+	await h.steps(1)
+	h.check(_prompt(h).text == "[E] Press the wave stone", "during a story line the stone's prompt reads '%s'" % _prompt(h).text)
 	await h.tap_key(KEY_E)
 	h.check(puzzle.get_progress() == 1, "speech swallowed the press: progress %d" % puzzle.get_progress())
 	h.check(_caption(h).text == "The stone lights, and holds.", "the caption reads '%s'" % _caption(h).text)
@@ -333,6 +336,105 @@ func test_during_a_cinematic_a_press_skips_the_line_and_cannot_reach_a_stone(h) 
 	h.check(not _hud(h).is_speaking(), "the press did not skip")
 	h.check(h.fixture.get_node("GameDirector").is_cinematic_active(), "skipping ended the cinematic")
 	h.check(signals[0] == 0, "the press reached a stone")
+
+
+## ---- The prompt says what the next press will do (the owner's playtest of 2026-11-19) ----
+## Walking in to the Monolith, the sailor reaches the mural while its first line is still being said. A press there
+## only cuts the line short, so the prompt must say so, and say Examine again only once a press would examine.
+
+const MURAL_X := 3898.0
+
+
+func _prompt(h) -> Label:
+	return h.fixture.get_node("Hud/Prompt")
+
+
+## From the Abyss, walking right with the real action, through the trigger that says monolith.first, to the mural.
+## Returns how many physics steps the line has been going.
+func _walk_to_the_mural_while_the_monolith_speaks(h) -> int:
+	await _world(h, ABYSS)
+	# Past the low block the player jumps on the way, and short of the trigger at 3620.
+	await h.stand_at(_player(h), Vector2(3606, -2))
+	var began := -1
+	var step := 0
+	Input.action_press("move_right")
+	while _player(h).global_position.x < MURAL_X - 4.0 and step < 600:
+		await h.steps(1)
+		step += 1
+		if began < 0 and _hud(h).get_current_line() == &"monolith.first":
+			began = step
+	Input.action_release("move_right")
+	await h.steps(2)
+	h.check(began >= 0, "monolith.first was not said on the way in")
+	h.check(_hud(h).get_current_line() == &"monolith.first", "the line is %s at the mural" % _hud(h).get_current_line())
+	h.check(_player(h).get_node("Interactor").get_focus() == h.fixture.get_node("Monolith/Mural"), "the mural is not in focus")
+	return step + 2 - began
+
+
+func test_at_the_mural_during_the_monolith_line_the_prompt_says_skip_and_the_line_runs_out(h) -> void:
+	var going := await _walk_to_the_mural_while_the_monolith_speaks(h)
+	h.check(_prompt(h).visible and _prompt(h).text == "[E] Skip line", "while the line is said the prompt reads '%s'" % _prompt(h).text)
+	var length := _audio(&"monolith.first").get_length()
+	h.check(length > 6.0, "the line's audio is %.2f s" % length)
+	while _hud(h).is_speaking() and going < 900:
+		await h.steps(1)
+		going += 1
+		if _hud(h).is_speaking() and float(going) / 60.0 < length - 0.1:
+			h.check(_voice(h).playing, "the voice stopped at %.2f s of %.2f" % [float(going) / 60.0, length])
+	# Standing at the mural with nothing pressed, the whole line is heard: the caption holds a little past the voice.
+	h.check(float(going) / 60.0 >= length, "the line ended at %.2f s, before its %.2f s of audio" % [float(going) / 60.0, length])
+	h.check(not _hud(h).is_speaking(), "the line never ended")
+	h.check(_prompt(h).visible and _prompt(h).text == "[E] Examine", "after the line the prompt reads '%s'" % _prompt(h).text)
+	await h.tap_key(KEY_E)
+	h.check(_hud(h).get_current_line() == &"mural.before", "the press after the line did not examine the mural: %s" % _hud(h).get_current_line())
+
+
+func test_at_the_mural_a_press_during_the_monolith_line_only_skips_it_then_the_next_examines(h) -> void:
+	await _walk_to_the_mural_while_the_monolith_speaks(h)
+	var mural: Node = h.fixture.get_node("Monolith/Mural")
+	var examined := [0]
+	mural.interacted.connect(func(_id: StringName) -> void: examined[0] += 1)
+	h.check(_prompt(h).text == "[E] Skip line", "the prompt reads '%s'" % _prompt(h).text)
+	await h.tap_key(KEY_E)
+	h.check(not _hud(h).is_speaking(), "the press did not skip the line")
+	h.check(not _voice(h).playing and not _caption(h).visible, "the voice or caption outlived the skip")
+	h.check(examined[0] == 0, "the press that skipped also examined")
+	h.check(_prompt(h).text == "[E] Examine", "after skipping the prompt reads '%s'" % _prompt(h).text)
+	await h.wait_until(mural.is_available, 40, "the mural to be available")
+	await h.tap_key(KEY_E)
+	h.check(examined[0] == 1, "the next press examined %d times" % examined[0])
+	h.check(_hud(h).get_current_line() == &"mural.before", "the line is %s" % _hud(h).get_current_line())
+	# Its own line: another press would cut it short, so the prompt says that too, once the mural is in focus again.
+	await h.wait_until(mural.is_available, 40, "the mural to be available")
+	await h.steps(2)
+	h.check(_prompt(h).text == "[E] Skip line", "during the mural's own line the prompt reads '%s'" % _prompt(h).text)
+
+
+func test_the_skip_prompt_names_a_rebound_key_and_a_controller_button(h) -> void:
+	h.use_controller("Xbox Wireless Controller")
+	await _world(h, MONOLITH)
+	var mural: Node = h.fixture.get_node("Monolith/Mural")
+	var examined := [0]
+	mural.interacted.connect(func(_id: StringName) -> void: examined[0] += 1)
+	await h.stand_at(_player(h), Vector2(MURAL_X, -2))
+	InputMap.action_erase_events("interact")
+	InputMap.action_add_event("interact", h.key_event(KEY_U, true))
+	_hud(h).set_input_device(-1)
+	_hud(h).say(&"monolith.first")
+	h.check(_prompt(h).text == "[U] Skip line", "with interact on U the prompt reads '%s'" % _prompt(h).text)
+	await h.tap_key(KEY_U)
+	h.check(not _hud(h).is_speaking() and examined[0] == 0, "U did not only skip")
+	h.check(_prompt(h).text == "[U] Examine", "after skipping the prompt reads '%s'" % _prompt(h).text)
+	InputMap.load_from_project_settings()
+	_hud(h).set_input_device(0)
+	_hud(h).say(&"monolith.first")
+	h.check(_prompt(h).text == "[X] Skip line", "on a controller the prompt reads '%s'" % _prompt(h).text)
+	await h.tap_pad(JOY_BUTTON_X)
+	h.check(not _hud(h).is_speaking() and examined[0] == 0, "the controller's button did not only skip")
+	h.check(_prompt(h).text == "[X] Examine", "after skipping on a controller the prompt reads '%s'" % _prompt(h).text)
+	await h.wait_until(mural.is_available, 40, "the mural to be available")
+	await h.tap_pad(JOY_BUTTON_X)
+	h.check(examined[0] == 1, "the controller's next press examined %d times" % examined[0])
 
 
 ## ---- Pause, restart and scene changes ----
