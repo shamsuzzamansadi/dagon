@@ -1,0 +1,19 @@
+CAUGHT           1  The night begins at the last wall again
+CAUGHT           1  The canyon's wall stands behind the arm again
+CAUGHT           1  The head's turn moves nothing
+CAUGHT           2  The arm slides and does not turn
+CAUGHT           1  The moon never comes up on the head
+CAUGHT           1  The drawn head is hidden
+CAUGHT           1  The ridge jumps as the reveal begins
+CAUGHT           1  Water still pours off it when it is over
+CAUGHT           1  The clip animates the water before it, under a hidden parent
+CAUGHT           1  The watcher on the cliff carries no shown drawing
+CAUGHT           1  The kneeling figures' drawing is not on what bows
+CAUGHT           2  The ending's card rises over its pictures
+
+commit d9d3ab6, 12 breakages, {'CAUGHT': 12}, controls held, summary complete, 616 s
+BREAKAGE_RESULT valid=yes
+
+Run by: python tools/breakage.py tools/breakage_m5.py <workdir> --workers 3, GCC debug, on the native Linux clone.
+After this run the eleventh entry was renamed to say what it breaks: it hides the drawing of the one who stands at the ritual, not of those who kneel. Its text is unchanged.
+b1cb401, the commit after, adds two volume tracks to the reveal's clip and nothing these entries touch.

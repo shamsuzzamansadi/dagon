@@ -76,7 +76,13 @@ protected:
 	static void _bind_methods();
 
 private:
+	// The prompt says what the next press of interact will do: the focus's own prompt when the press reaches it, and
+	// SKIP_PROMPT when the press would only cut the speaking line short.
 	void refresh_prompt();
+	// Whether a press of interact now goes on to this focus, or is used up cutting the line short. The press and the
+	// prompt both ask this, so they cannot disagree.
+	bool press_reaches(const Interactable *p_focus) const;
+	Interactable *current_focus() const;
 	void on_caption_finished();
 	void run_caption(const godot::String &p_text, double p_hold_seconds, bool p_visible);
 	void on_notice_finished();
@@ -101,7 +107,6 @@ private:
 	godot::Ref<godot::Tween> notice_tween_;
 	godot::Ref<godot::Tween> caption_tween_;
 	godot::Ref<godot::Tween> fade_tween_;
-	godot::String prompt_text_;
 	int input_device_ = -1;
 	std::vector<core::NarrationLine> script_;
 	bool speaking_ = false;

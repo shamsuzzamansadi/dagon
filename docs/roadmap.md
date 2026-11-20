@@ -85,8 +85,8 @@ starts only after M6 is green, and is time-boxed.
 3. The ledges, slab and stone at the crossing.
 4. The trench, the gate and the stones at the monolith.
 5. The lit mural's panel.
-6. The creature's own animation.
-7. The ritual and the watcher, as more than silhouettes.
+6. The creature's own animation. *Implemented in M5, at review (D107).*
+7. The ritual and the watcher, as more than silhouettes. *Implemented in M5, at review (D111).*
 8. The escape's rockfall and returning sea.
 
 **Cut order if the schedule slips (approved):**
@@ -126,6 +126,7 @@ rebinding and save support are never removed silently (risk R20).
   prepared, and nothing more (D42). M3–M7 not started.
 - [x] **M3 Complete gameplay, accepted by the owner on 2026-11-10 at `3980bc3`, as the agreed milestone, with the M4/M5, hardware and playtesting deferrals** ([record](evidence/m3/owner-acceptance-2026-11-10.md)). Package: [m3-review-package.md](reviews/m3-review-package.md). Milestone acceptance, not approval of a finished game. No release has been made. M4 started on 2026-11-10, on `m4/atmosphere`; the owner approved [its plan](m4-plan.md) the same day. M5–M7 not started.
 - [x] **M4 Atmosphere, accepted by the owner on 2026-11-15 at `8b30b33`, for M4's completion and for the first pre-alpha release, with the documented M5 deferrals** ([record](evidence/m4/owner-acceptance-2026-11-15.md)). Package: [m4-review-package.md](reviews/m4-review-package.md). The owner's own checks are the ones the record lists, and no others; no listening review of the mix is recorded. Squash-merged into `main` as `760a539` through [#4](https://github.com/shamsuzzamansadi/dagon/pull/4). **Released as [`v0.1.0-pre-alpha.1`](https://github.com/shamsuzzamansadi/dagon/releases/tag/v0.1.0-pre-alpha.1) on 2026-11-15,** a pre-alpha prerelease, by `main`'s CI ([evidence](evidence/release-workflow/first-publication-v0.1.0-pre-alpha.1.md)). M5–M7 not started; M5's carried tasks are below.
+- [x] **M5 Cinematic horror and polish, accepted by the owner on 2026-11-20 at `b7303bf`, as the completed milestone** ([record](evidence/m5/owner-acceptance-2026-11-20.md)), and merged into `main` from [#6](https://github.com/shamsuzzamansadi/dagon/pull/6). Scope approved by the owner on 2026-11-16 ([plan](m5-plan.md)). Package: [m5-review-package.md](reviews/m5-review-package.md). The owner played the running route; the standing-still ending has scripted coverage only. **A milestone acceptance only:** no `v0.2.0-alpha.1` without the owner's separate approval. **Open for M6, as the owner said:** intelligibility of the reveal's dialogue by ear; and, as before, controller tuning by feel, first-time players and the hardware checks. M6 is not started; its plan waits for the owner's approval.
 - **Every later playtest identifies the exact artifact or run it tested.**
 
 ## M3 implementation sequence (recorded 2026-11-04, as the owner asked)
@@ -254,7 +255,9 @@ Each is a GitHub prerelease, published when its gates pass, and not because a mi
 - Tune the ducking prepared on the Music and Effects buses by ear, so speech stays clear ([D65](decisions.md)).
 - **Audio is not marked complete until a person has heard it in gameplay.** Automated checks cannot do this.
 
-### M5: carried from M4, open (owner's playtest of 2026-11-15)
+### M5: carried from M4 (owner's playtest of 2026-11-15)
+
+**State: each item below was done in M5 and accepted with it on 2026-11-20** ([record](evidence/m5/owner-acceptance-2026-11-20.md); [the reveal](evidence/m5/reveal/README.md), [the ending's pictures](evidence/m5/ending/README.md)). The text below is as it was recorded.
 
 Seen in the owner's recording of 2026-11-15 ([record](evidence/m4/owner-playtest-2026-11-15.md)), and **not resolved in M4**:
 

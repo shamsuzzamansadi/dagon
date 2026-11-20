@@ -790,6 +790,9 @@ def statues():
 
 # Past the last wall, x 4544 to 5400: never on screen in play, only when the camera draws back for what rises.
 TRENCH_X1 = 5400
+# The night behind the trench is carried back behind the canyon's end and the Monolith, to where the Monolith itself
+# covers it: when the camera draws back, one sky stands behind everything it shows, with no edge at the last wall.
+BACKDROP_X0 = 4160
 TRENCH_TOP = -700
 TRENCH_BOTTOM = 60
 TRENCH_WATER = 20
@@ -829,13 +832,13 @@ def trench_water():
 def trench():
     """What stands behind the creature: the night as the Shore's sky has it, going down to a haze the moon lights over
     the trench, kept lighter than the creature so its shape reads against it; the far side, a low black bank and its
-    wall down to the water; and the water, black, the moon on it in a broken line. Origin (X1, TRENCH_TOP)."""
-    width, height = TRENCH_X1 - X1, TRENCH_BOTTOM - TRENCH_TOP
+    wall down to the water; and the water, black, the moon on it in a broken line. Origin (BACKDROP_X0, TRENCH_TOP)."""
+    width, height = TRENCH_X1 - BACKDROP_X0, TRENCH_BOTTOM - TRENCH_TOP
     img = blank(width, height)
     noise = Noise(431)
     rng = random.Random(432)
     for col in range(width):
-        x = X1 + col
+        x = BACKDROP_X0 + col
         bank = -10 - round(7 * noise(x / 40.0, 3.0) + 3 * noise(x / 9.0, 4.0))
         for row in range(height):
             y = TRENCH_TOP + row
@@ -852,10 +855,55 @@ def trench():
                 # No ordered dither: the camera draws back to half size and through every size between, and a fine
                 # pattern folds into shapes that are not there. The bands' edges drift with the haze instead.
                 value += 0.7 * (noise(x / 47.0, y / 13.0) - 0.5)
+                # Spray and mist stand over the trench where it rises, and the moon is in them: the lightest of the
+                # night is behind its head and shoulders, so that they are an outline against it.
+                value += 1.5 * math.exp(-(((x - 4650) / 400.0) ** 2) - ((y + 320) / 200.0) ** 2)
                 color = ramp(SKY, value, x, y, 0.0)
                 if value < 2.4 and rng.random() > 0.9985:
                     color = rng.choice(("C6", "C7", "C8"))
             put(img, col, row, color)
+    return img
+
+
+# What the rising throws up. Drawn at half size and doubled, as the creature is (gen_creature.py), for the same reason.
+SURGE_SIZE = (270, 56)
+
+
+def trench_surge():
+    """The water it heaves up round itself as it comes out: a broken mound, white along its top where it tears,
+    dark and streaked beneath, with spray standing off it."""
+    width, height = SURGE_SIZE
+    img = blank(width, height)
+    noise = Noise(455)
+    rng = random.Random(456)
+    for x in range(width):
+        ends = smooth(x, 0, 46) * smooth(width - 1 - x, 0, 46)
+        top = round(height - 6 - (height - 18) * ends * (0.55 + 0.45 * noise(x / 26.0, 1.0)) - 5 * noise(x / 5.0, 2.0))
+        for y in range(max(0, top), height):
+            depth = y - top
+            foam = noise(x / 3.0, y / 3.0)
+            if depth < 2 + 3 * noise(x / 7.0, 3.0):
+                color = "C9" if foam > 0.55 else "C8"
+            elif depth < 9 and foam > 0.62:
+                color = "C7"
+            elif noise(x / 2.0, y / 11.0) > 0.7 and depth < 26:
+                color = "T4" if depth < 12 else "T3"
+            else:
+                color = ramp(["T2", "T1", "T0", "C0"], depth / 11.0, x, y, 0.3)
+            put(img, x, y, color)
+        # Spray thrown clear of the top.
+        if rng.random() > 0.7 and ends > 0.3:
+            for _ in range(rng.randrange(1, 3)):
+                put(img, x, top - rng.randrange(2, 10), rng.choice(("C8", "C7", "C9")))
+    return img.resize((width * 2, height * 2), 0)
+
+
+def water_drop():
+    """One falling run of water, for the particles that pour off it."""
+    img = blank(2, 8)
+    for y in range(8):
+        for x in range(2):
+            put(img, x, y, "C9" if y > 4 else "C8")
     return img
 
 
@@ -949,11 +997,6 @@ def sea_front(points, seed):
 def tide():
     """The sea as it comes back over the Abyss after him, from the trench: in the tide's own space."""
     return sea_front(gen_reveal.scene_polygon("Water", "Tide"), 461)
-
-
-def returning_sea():
-    """The sea as it closes over him at the end, across the whole screen: in its own screen space."""
-    return sea_front(gen_reveal.scene_polygon("Water", "ReturningSea"), 471)
 
 
 def ground_tiles():

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dvxtpn2rx5451"
-path="res://.godot/imported/abyss_returning_sea.png-b6815b201dc9e76a84da7798c376cd85.ctex"
+uid="uid://ciungwetwmomm"
+path="res://.godot/imported/dagon_crest_reach.png-bca3b33184b6b9ca891b805c261bacbf.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/abyss/abyss_returning_sea.png"
-dest_files=["res://.godot/imported/abyss_returning_sea.png-b6815b201dc9e76a84da7798c376cd85.ctex"]
+source_file="res://assets/reveal/dagon_crest_reach.png"
+dest_files=["res://.godot/imported/dagon_crest_reach.png-bca3b33184b6b9ca891b805c261bacbf.ctex"]
 
 [params]
 

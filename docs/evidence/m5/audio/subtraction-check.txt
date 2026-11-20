@@ -1,0 +1,32 @@
+takes: 93.8 s in common at 48000 Hz, 1600 samples a frame
+
+render: mix and bed takes first differ at 7.7793 s, and by more than one 16-bit step at 7.7797 s; the voice take's first sound, the first sample not zero, is at 7.7795 s: the same, sample for sample, before the voice to within one step
+between lines: from a second after any voice (21% of the take), mix less bed -64.5 dB, the bed -24.2 dB: 40.3 dB below it; in the closest whole second, at 92 s, 29.5 dB below it
+
+line                       ch  lag    gain    corr | leftover against beneath, at most
+                               smp                 |          wide dB        300-4k dB
+line-1-story.reveal         0   +0  0.9921 -0.0046 |            -46.7            -38.3
+line-1-story.reveal         1   +0  1.0039 +0.0032 |            -50.0            -43.8
+line-2-story.recoil         0   +0  0.9885 -0.0091 |            -40.8            -30.2
+line-2-story.recoil         1   +0  0.9860 -0.0163 |            -35.8            -26.9
+line-3-story.run            0   +0  1.0014 +0.0010 |            -60.1            -52.3
+line-3-story.run            1   +0  1.0088 +0.0071 |            -42.9            -34.6
+line-4-flee.back            0   +0  0.9929 -0.0068 |            -43.4            -36.3
+line-4-flee.back            1   +0  0.9834 -0.0172 |            -35.3            -27.8
+line-5-flee.sea             0   +0  1.0026 +0.0061 |            -44.3            -42.1
+line-5-flee.sea             1   +0  0.9990 -0.0020 |            -54.0            -50.7
+line-6-ending.found         0   +0  1.0024 +0.0059 |            -44.5            -44.3
+line-6-ending.found         1   +0  1.0023 +0.0062 |            -44.2            -43.8
+line-7-ending.listen        0   +0  0.9970 -0.0061 |            -44.3            -39.3
+line-7-ending.listen        1   +0  0.9940 -0.0130 |            -37.7            -32.4
+line-8-ending.innsmouth     0   +0  0.9990 -0.0020 |            -54.2            -51.3
+line-8-ending.innsmouth     1   +0  1.0007 +0.0013 |            -57.8            -53.8
+line-9-ending.rising        0   +0  1.0002 +0.0009 |            -60.9            -59.7
+line-9-ending.rising        1   +0  1.0007 +0.0036 |            -48.9            -47.6
+
+a constant-gain estimate: the largest leftover against beneath is -26.9 dB, which would move a level for what is beneath by at most 0.38 dB. A difference in processing that changed during a line would not show in it (the limiter, below)
+
+the limiter: ceiling -1.0 dBFS
+  mix   peak  -1.30 dBFS; 0 samples at the ceiling
+  voice peak  -3.23 dBFS; 0 samples at the ceiling
+  bed   peak  -1.00 dBFS; 3 samples at the ceiling, at 10.70, 11.67 s; within line-1-story.reveal

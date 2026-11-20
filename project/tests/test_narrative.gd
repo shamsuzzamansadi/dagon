@@ -437,9 +437,9 @@ func test_no_new_save_state_comes_with_any_of_this(h) -> void:
 func test_the_reveal_shows_a_head_body_and_hand_with_highlights_that_appear_in_order(h) -> void:
 	var world := await _world(h, AWAKENED)
 	var director: Node = world.get_node("GameDirector")
-	for part in ["Body", "Head", "Crest", "Arm", "Eye", "Pupil", "Rims"]:
-		h.check(not world.get_node("Dagon/" + part).visible, "%s shows before the reveal" % part)
-	h.check(world.get_node("Dagon/Ridge").visible, "the far ridge does not show before the reveal")
+	for part in ["Body", "Head", "Head/Crest", "Arm", "Head/Eye", "Head/Pupil", "Rims", "Head/Lit", "Arm/Lit"]:
+		h.check(not world.get_node("Dagon/" + part).is_visible_in_tree(), "%s shows before the reveal" % part)
+	h.check(world.get_node("Dagon/Ridge").visible and world.get_node("Dagon/Ridge/Art").is_visible_in_tree(), "the far ridge does not show before the reveal")
 	await h.stand_at(_player(h), Vector2(4420, -2))
 	var clips: AnimationPlayer = world.get_node("Cinematics")
 	h.check(clips.current_animation == &"dagon_reveal", "playing '%s'" % clips.current_animation)
@@ -448,7 +448,7 @@ func test_the_reveal_shows_a_head_body_and_hand_with_highlights_that_appear_in_o
 	while director.is_cinematic_active():
 		await h.steps(1)
 		for part in parts:
-			if world.get_node("Dagon/" + part).visible and not order.has(part):
+			if world.get_node("Dagon/" + ("Head/Eye" if part == "Eye" else part)).is_visible_in_tree() and not order.has(part):
 				order[part] = clips.current_animation_position
 	for part in parts:
 		h.check(order.has(part), "%s never showed" % part)
@@ -472,6 +472,124 @@ func test_the_hand_rests_on_the_monolith_and_the_head_is_in_frame_at_the_widest_
 	h.check(hand.x > 3860.0 and hand.x < 4296.0, "the hand at x=%.0f is not on the monolith" % hand.x)
 	h.check(hand.y > -520.0 and hand.y < 0.0, "the hand at y=%.0f is not on the monolith" % hand.y)
 	h.check(world.get_node("Dagon/Arm").z_index > 0, "the hand is drawn behind the monolith")
+
+
+## The owner's playtest of 2026-11-19: as "Its head turned. I ran." came up the camera was already leaving the head. The
+## head turns far enough to be seen, and the wide view holds on it while the line begins; the clip, its line and its
+## end are where they were, and the camera is back on the sailor before control returns.
+func test_the_head_turns_in_view_as_its_line_begins(h) -> void:
+	var world := await _world(h, AWAKENED)
+	var clips: AnimationPlayer = world.get_node("Cinematics")
+	var camera: Camera2D = world.get_node("CameraRig")
+	var head: Node2D = world.get_node("Dagon/Head")
+	var clip := clips.get_animation(&"dagon_reveal")
+	h.check_near(clip.length, 14.0, 0.001, "the reveal's length")
+	var said := -1.0
+	for track in clip.get_track_count():
+		if clip.track_get_type(track) == Animation.TYPE_METHOD and String(clip.track_get_path(track)) == "Hud":
+			for key in clip.track_get_key_count(track):
+				if clip.method_track_get_params(track, key) == [&"story.run"]:
+					said = clip.track_get_key_time(track, key)
+	h.check_near(said, 12.2, 0.001, "when the line is said")
+	await h.stand_at(_player(h), Vector2(4420, -2))
+	clips.seek(11.3, true)
+	await h.steps(1)
+	var before := head.rotation
+	for at in [12.2, 12.5, 12.7]:
+		clips.seek(at, true)
+		await h.steps(1)
+		h.check(camera.zoom.x <= 0.55, "at %.1f s the camera is at zoom %.2f, already leaving" % [at, camera.zoom.x])
+		var view := Rect2(camera.get_screen_center_position() - Vector2(240, 135) / camera.zoom.x, Vector2(480, 270) / camera.zoom.x)
+		var head_center: Vector2 = head.to_global(Vector2(-15, -325))
+		h.check(view.has_point(head_center), "at %.1f s the head at %s is out of the view %s" % [at, head_center, view])
+	h.check(head.rotation - before <= -0.12, "the head turned only %.3f rad" % (head.rotation - before))
+	clips.seek(13.9, true)
+	await h.steps(1)
+	h.check_near(camera.zoom.x, 1.0, 0.001, "the zoom before control returns")
+
+
+## One night stands behind everything the reveal's camera shows. M4 had a straight edge at the last wall, x = 4544,
+## where the trench's backdrop began and nothing stood behind the canyon's end.
+func test_one_backdrop_stands_behind_the_whole_of_the_reveal(h) -> void:
+	var world := await _world(h, AWAKENED)
+	var clips: AnimationPlayer = world.get_node("Cinematics")
+	var camera: Camera2D = world.get_node("CameraRig")
+	var backdrop: Sprite2D = world.get_node("Trench/Drawn")
+	var night := Rect2(backdrop.global_position, backdrop.texture.get_size())
+	# The Monolith's drawn stone covers everything left of its narrowest right edge, to its top.
+	var stone: PackedVector2Array = world.get_node("Monolith/Back").polygon
+	var stone_right := 1.0e9
+	var stone_top := 0.0
+	for point in stone:
+		stone_top = minf(stone_top, point.y)
+	for point in stone:
+		if point.x > 4000.0:
+			stone_right = minf(stone_right, point.x)
+	h.check(night.position.x <= stone_right - 16.0, "the night begins at x=%.0f, not behind the Monolith, whose edge is at %.0f" % [night.position.x, stone_right])
+	await h.stand_at(_player(h), Vector2(4420, -2))
+	const SHAKE := 16.0
+	for tenth in range(1, 139, 3):
+		clips.seek(tenth / 10.0, true)
+		await h.steps(1)
+		var view := Rect2(camera.get_screen_center_position() - Vector2(240, 135) / camera.zoom.x, Vector2(480, 270) / camera.zoom.x).grow(SHAKE)
+		h.check(night.end.x >= view.end.x and night.position.y <= view.position.y, "at %.1f s the view %s runs past the night %s" % [tenth / 10.0, view, night])
+		h.check(view.position.x >= stone[0].x and view.position.y >= stone_top, "at %.1f s the view %s runs past the Monolith" % [tenth / 10.0, view])
+	var wall: PackedVector2Array = world.get_node("ActArt/CanyonBack").polygon
+	var rim_at_the_arm := 0.0
+	for i in wall.size() - 1:
+		if wall[i].x <= 4340.0 and wall[i + 1].x > 4340.0:
+			rim_at_the_arm = lerpf(wall[i].y, wall[i + 1].y, (4340.0 - wall[i].x) / (wall[i + 1].x - wall[i].x))
+	clips.seek(10.0, true)
+	await h.steps(1)
+	var arm_low: float = world.get_node("Dagon/Arm").to_global(Vector2(-350, -170)).y
+	h.check(rim_at_the_arm > arm_low, "the canyon's rim at %.0f stands behind the arm, whose underside is at %.0f" % [rim_at_the_arm, arm_low])
+
+
+## What the clip moves is what is seen: the drawn head, crest and eye move as one with the head's track, the drawn arm
+## turns about its shoulder and comes to rest where the tests above find the hand, and the moon's light comes up on
+## every part.
+func test_the_creature_moves_as_a_body_and_its_drawn_parts_move_with_it(h) -> void:
+	var world := await _world(h, AWAKENED)
+	var clips: AnimationPlayer = world.get_node("Cinematics")
+	await h.stand_at(_player(h), Vector2(4420, -2))
+	var dagon: Node2D = world.get_node("Dagon")
+	var head: Node2D = world.get_node("Dagon/Head")
+	var arm: Node2D = world.get_node("Dagon/Arm")
+	for path in ["Head/Art", "Head/Lit", "Head/Crest", "Head/Crest/Art", "Head/Crest/Lit", "Arm/Art", "Arm/Lit", "Shoulder/Art", "Shoulder/Lit", "Rims/Body", "Body/Art", "Ridge/Art"]:
+		var art: CanvasItem = world.get_node("Dagon/" + path)
+		h.check(art.visible, "%s is hidden in the scene, so no clip could show it" % path)
+	clips.seek(1.0, true)
+	await h.steps(1)
+	var ridge_before: float = world.get_node("Dagon/Ridge/Art").global_position.y
+	h.check_near(dagon.position.y, 0.0, 0.01, "the ridge's height before it stirs")
+	clips.seek(5.6, true)
+	await h.steps(1)
+	var hand_coming: Vector2 = arm.to_global(Vector2(-460, -240))
+	h.check(arm.rotation < -0.2, "the arm is not turned about its shoulder as it comes: %.3f" % arm.rotation)
+	clips.seek(10.0, true)
+	await h.steps(1)
+	h.check(world.get_node("Dagon/Ridge/Art").global_position.y < ridge_before - 40.0, "the drawn shoulder rose only from %.0f to %.0f" % [ridge_before, world.get_node("Dagon/Ridge/Art").global_position.y])
+	h.check(is_zero_approx(arm.rotation) and arm.position.length() < 0.01, "the arm rests at %s, turned %.3f" % [arm.position, arm.rotation])
+	h.check(arm.to_global(Vector2(-460, -240)).distance_to(hand_coming) > 20.0, "the hand did not move between 5.6 s and its rest")
+	var eye_before: Vector2 = world.get_node("Dagon/Head/Eye").global_position
+	var art_before: Vector2 = world.get_node("Dagon/Head/Art").global_position
+	var crest_before: Vector2 = world.get_node("Dagon/Head/Crest/Art").global_position
+	for path in ["Rims", "Head/Lit", "Head/Crest/Lit", "Arm/Lit"]:
+		var lit: CanvasItem = world.get_node("Dagon/" + path)
+		h.check(lit.is_visible_in_tree() and lit.modulate.a > 0.95, "%s is not lit at 10 s: shown %s, alpha %.2f" % [path, lit.is_visible_in_tree(), lit.modulate.a])
+	clips.seek(13.0, true)
+	await h.steps(1)
+	var moved: Vector2 = world.get_node("Dagon/Head/Art").global_position - art_before
+	h.check(moved.length() > 3.0 and head.rotation < -0.02, "the head did not turn: moved %s, turned %.3f" % [moved, head.rotation])
+	h.check((world.get_node("Dagon/Head/Eye").global_position - eye_before).length() > 3.0, "the eye stayed where it was when the head turned")
+	h.check((world.get_node("Dagon/Head/Crest/Art").global_position - crest_before).length() > 3.0, "the crest stayed where it was when the head turned")
+	# It ends as it will stand through the flight: whole, lit, its arm on the stone, nothing still pouring.
+	clips.seek(14.0, true)
+	await h.steps(1)
+	h.check_near(dagon.position.y, -60.0, 0.5, "where it stands at the end")
+	for path in ["Runoff", "Head/Pour", "Arm/Drip"]:
+		h.check(not world.get_node("Dagon/" + path).emitting, "%s is still pouring at the end" % path)
+	h.check(not world.get_node("Trench/Splash").emitting, "the trench is still throwing spray at the end")
 
 
 func test_after_the_reveal_the_sailor_turns_back_and_the_camera_is_where_play_needs_it(h) -> void:
@@ -652,38 +770,61 @@ func test_restarting_during_the_flee_clears_the_way_back(h) -> void:
 ## ---- The sea comes back ----
 
 
-func test_the_sea_comes_back_over_him_and_then_the_screen_fades(h) -> void:
+## The farthest a runner can be ahead of the sea when he reaches the collapse: walking from where the reveal begins to
+## the collapse's trigger without a stop or a hop, under the flee's rule for the front. The route measured 297 px.
+func _runner_lead(world: Node) -> float:
+	var director: Node = world.get_node("GameDirector")
+	var start: float = world.get_node("Triggers/Witness").global_position.x
+	var end: float = world.get_node("Triggers/Collapse").global_position.x
+	var seconds: float = (start - end) / float(world.get_node("Player").walk_speed)
+	return director.tide_start_x - director.tide_speed * maxf(0.0, seconds - director.tide_delay) - end
+
+
+## The owner's playtest of 2026-11-19 of ea86ae9: the sea that followed him stopped where it was at the collapse, and a
+## second sea rose from the foot of the screen. The collapse now moves the same sea on from wherever the flee left it
+## (D121): at the flee's own pace at first, so it does not stop; fast enough, as the rush is heard, to reach him
+## before the screen fades from as far behind as a runner can be; and up until it fills the view. It is a picture: a
+## restored world rests it where the flee's rule puts it.
+func test_the_sea_that_followed_him_comes_on_over_him_and_then_the_screen_fades(h) -> void:
 	var world := await _world(h, AWAKENED)
-	var sea: CanvasLayer = world.get_node("ReturningSea")
-	h.check(not sea.visible, "the sea is there before its moment")
+	h.check(world.get_node_or_null("ReturningSea") == null, "a second sea is still there")
+	var director: Node = world.get_node("GameDirector")
 	var clip: Animation = world.get_node("Cinematics").get_animation(&"collapse")
-	var rise := clip.find_track(NodePath("ReturningSea/Water:position"), Animation.TYPE_VALUE)
-	var show := clip.find_track(NodePath("ReturningSea:visible"), Animation.TYPE_VALUE)
+	var sea := clip.find_track(NodePath("Tide/Water:position"), Animation.TYPE_VALUE)
 	var fade := clip.find_track(NodePath("Hud/Fade:modulate"), Animation.TYPE_VALUE)
-	h.check(rise >= 0 and show >= 0 and fade >= 0, "a track is missing: %d %d %d" % [rise, show, fade])
-	var last := clip.track_get_key_count(rise) - 1
-	h.check(clip.track_get_key_value(rise, 0).y >= 270.0, "the water starts on screen: %s" % clip.track_get_key_value(rise, 0))
-	h.check(clip.track_get_key_value(rise, last).y <= 0.0, "the water never covers the screen: %s" % clip.track_get_key_value(rise, last))
-	# He has finished falling first, and it is up to him before the fade begins.
-	h.check(clip.track_get_key_time(show, 0) > 1.3, "the sea arrives while he is still falling")
-	var halfway: Vector2 = clip.value_track_interpolate(rise, clip.track_get_key_time(fade, 0))
-	h.check(halfway.y < 180.0, "the fade begins with the water only at y=%.0f" % halfway.y)
+	var rush := clip.find_track(NodePath("Sound/SeaRush"), Animation.TYPE_METHOD)
+	h.check(sea >= 0 and fade >= 0 and rush >= 0, "a track is missing: %d %d %d" % [sea, fade, rush])
+	if sea < 0 or fade < 0 or rush < 0:
+		return
+	h.check(clip.track_get_key_time(sea, 0) == 0.0 and clip.track_get_key_value(sea, 0) == Vector2.ZERO, "the sea jumps at the collapse")
+	var pace: Vector2 = clip.track_get_key_value(sea, 1) / clip.track_get_key_time(sea, 1)
+	h.check(absf(-pace.x - director.tide_speed) < 1.0 and pace.y == 0.0, "the sea goes on at %s px/s where it came at %.0f" % [pace, director.tide_speed])
+	h.check(is_equal_approx(clip.track_get_key_time(sea, 1), clip.track_get_key_time(rush, 0)), "the sea does not rush on as its rush is heard")
+	var lead := _runner_lead(world)
+	h.check(lead > 250.0, "a runner can only be %.0f px ahead" % lead)
+	var at_fade: Vector2 = clip.value_track_interpolate(sea, clip.track_get_key_time(fade, 0))
+	h.check(at_fade.x <= -lead, "the fade begins with the sea %.0f px on, short of a runner %.0f px ahead" % [-at_fade.x, lead])
 	h.check(clip.track_get_key_time(fade, 1) < clip.length, "the fade is not finished by the end of the clip")
-	# The clip is a picture: a restored world has none of it, and the collapse's outcome does not depend on it.
-	h.check(world.get_node("ReturningSea/Water").position.y >= 270.0, "the water rests on screen")
+	h.check(world.get_node("Tide/Water").position == Vector2.ZERO, "the water rests away from the flee's front")
 
 
-func test_the_water_covers_the_whole_screen_at_its_height(h) -> void:
+## At its height the sea covers the whole view, whether it had him or he was as far ahead of it as a runner can be,
+## wherever the camera's look-ahead and shake put the view about him.
+func test_the_water_covers_the_whole_view_at_its_height(h) -> void:
 	var world := await _world(h, AWAKENED)
-	var water: Polygon2D = world.get_node("ReturningSea/Water")
+	var drawn: Sprite2D = world.get_node("Tide/Water/Drawn")
 	var clip: Animation = world.get_node("Cinematics").get_animation(&"collapse")
-	var rise := clip.find_track(NodePath("ReturningSea/Water:position"), Animation.TYPE_VALUE)
-	var top: Vector2 = clip.track_get_key_value(rise, clip.track_get_key_count(rise) - 1)
-	var box := Rect2(water.polygon[0], Vector2.ZERO)
-	for point in water.polygon:
-		box = box.expand(point)
-	box.position += top
-	h.check(box.has_point(Vector2(0, 0)) and box.has_point(Vector2(479, 269)), "the water reaches %s at its height" % box)
+	var sea := clip.find_track(NodePath("Tide/Water:position"), Animation.TYPE_VALUE)
+	var zoom := clip.find_track(NodePath("CameraRig:zoom"), Animation.TYPE_VALUE)
+	var top: Vector2 = clip.track_get_key_value(sea, clip.track_get_key_count(sea) - 1)
+	var near: float = clip.track_get_key_value(zoom, clip.track_get_key_count(zoom) - 1).x
+	var camera: Node = world.get_node("CameraRig")
+	var reach: float = absf(world.get_node("GameDirector").flee_look_ahead) + camera.max_shake
+	var water := Rect2(drawn.position + top, drawn.texture.get_size())
+	for lead in [0.0, _runner_lead(world)]:
+		# In the sea's own space, whose front is at x = 0; he lies on the ground, y = 0.
+		var view := Rect2(Vector2(-lead, camera.vertical_offset) - Vector2(240, 135) / near - Vector2(reach, camera.max_shake), Vector2(480, 270) / near + 2.0 * Vector2(reach, camera.max_shake))
+		h.check(water.encloses(view), "%.0f px ahead of the sea, the view %s is not all inside the water %s" % [lead, view, water])
 
 
 ## Examining is heard, under the line; pressing a stone is heard only as the stone, with no examining sound on it.

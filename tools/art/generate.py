@@ -13,6 +13,7 @@ import gen_abyss
 import gen_boat
 import gen_sailor
 import gen_cave
+import gen_figures
 import gen_reveal
 import gen_prologue
 import gen_shore
@@ -125,8 +126,12 @@ def main():
     gen_reveal.monolith().save(REVEAL_OUT / "monolith.png")
     gen_reveal.crossing_carving().save(REVEAL_OUT / "crossing_carving.png")
     for name, (image, _offset) in gen_reveal.dagon_parts().items():
-        image.save(REVEAL_OUT / f"dagon_{name}.png")
+        image.save(REVEAL_OUT / f"{name}.png")
+    gen_abyss.water_drop().save(REVEAL_OUT / "water_drop.png")
+    gen_reveal.ridge_water()[0].save(REVEAL_OUT / "ridge_water.png")
     CAVE_OUT.mkdir(parents=True, exist_ok=True)
+    for name, (image, _at) in gen_figures.all_figures().items():
+        image.save(CAVE_OUT / f"{name}.png")
     gen_cave.cave_front().save(CAVE_OUT / "cave_front.png")
     gen_cave.cave_wall().save(CAVE_OUT / "cave_wall.png")
     gen_cave.abyss_far().save(CAVE_OUT / "abyss_far.png")
@@ -148,13 +153,13 @@ def main():
         gen_abyss.glyph_stone(name, lit=True)[0].save(ABYSS_OUT / f"abyss_{name.lower()}_lit.png")
     gen_abyss.trench().save(ABYSS_OUT / "abyss_trench.png")
     gen_abyss.trench_water().save(ABYSS_OUT / "abyss_trench_water.png")
+    gen_abyss.trench_surge().save(ABYSS_OUT / "abyss_trench_surge.png")
     gen_abyss.mural_lit()[0].save(ABYSS_OUT / "abyss_mural_lit.png")
     gen_abyss.mural_fragments()[0].save(ABYSS_OUT / "abyss_mural_fragments.png")
     for name in gen_abyss.ROCKFALL:
         gen_abyss.fallen_rock(name)[0].save(ABYSS_OUT / f"abyss_rock_{name.lower()}.png")
         gen_abyss.dust(name)[0].save(ABYSS_OUT / f"abyss_dust_{name.lower()}.png")
     gen_abyss.tide()[0].save(ABYSS_OUT / "abyss_tide.png")
-    gen_abyss.returning_sea()[0].save(ABYSS_OUT / "abyss_returning_sea.png")
     PROLOGUE_OUT.mkdir(parents=True, exist_ok=True)
     for name, draw in gen_prologue.PANELS.items():
         draw().save(PROLOGUE_OUT / name)

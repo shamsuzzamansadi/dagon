@@ -224,7 +224,9 @@ def level_db(x):
 
 def narration(mix_path, voice_path, bed_path, log_path):
     """The voice against what plays beneath it, line by line. The bed beneath a line is the real mix less the voice
-    alone, which holds because Movie Maker renders each run from the same first sample."""
+    alone. Marks on the same frames do not show that the two takes line up: tools/audio/subtraction_check.py checks the
+    alignment and the processing for a given set of takes. The 6 dB flag is a prompt to listen, not a threshold of
+    hearing, and no figure here says whether a line is understood."""
     mix, rate = read(mix_path)
     voice, _ = read(voice_path)
     bed, _ = read(bed_path)

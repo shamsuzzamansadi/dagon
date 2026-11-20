@@ -538,7 +538,7 @@ func test_the_carving_at_the_ledges_shows_how_the_gap_is_crossed(h) -> void:
 func test_the_monolith_and_the_creature_are_drawn_over_the_shapes_the_clips_move(h) -> void:
 	var world := await _world(h, AWAKENED)
 	h.check(world.get_node("Monolith/Art").visible and not world.get_node("Monolith/Back").visible, "the monolith is still the greybox block")
-	for part in ["Body", "Head", "Crest", "Arm"]:
+	for part in ["Body", "Head", "Head/Crest", "Arm", "Ridge"]:
 		var shape: Polygon2D = world.get_node("Dagon/" + part)
 		var art: Sprite2D = world.get_node("Dagon/%s/Art" % part)
 		h.check(is_zero_approx(shape.color.a), "the flat %s still draws over its art" % part)
@@ -547,6 +547,175 @@ func test_the_monolith_and_the_creature_are_drawn_over_the_shapes_the_clips_move
 		for point in shape.polygon:
 			box = box.expand(point)
 		h.check(art.position.distance_to(box.position) <= 1.0, "%s's art is placed at %s, its shape at %s" % [part, art.position, box.position])
+
+
+## The ridge beside the walkway stands in water before the reveal (D116): the water is drawn over the creature and
+## under the walkway, shown from the start, covers the ridge's foot where it stands, and no clip moves or hides it.
+## The ritual's strip of ground is drawn over the four who kneel and lit as the backdrop it copies (D118).
+func test_the_ridge_stands_in_water_and_the_ritual_ground_lies_before_the_kneelers(h) -> void:
+	var world := await _world(h, AWAKENED)
+	var water: Sprite2D = world.get_node("TrenchFront/Shallows")
+	var dagon: Node2D = world.get_node("Dagon")
+	h.check(water.visible and water.texture != null and water.get_parent().visible, "the water at the ridge's foot is not shown")
+	h.check(water.get_parent().get_index() > dagon.get_index(), "the water is drawn under the creature")
+	h.check(water.get_parent().get_index() < world.get_node("AbyssGround").get_index(), "the water is drawn over the walkway")
+	var ridge: Sprite2D = world.get_node("Dagon/Ridge/Art")
+	var foot := ridge.global_position.y + ridge.texture.get_height()
+	h.check(foot > 0.0 and water.global_position.y + water.texture.get_height() >= 0.0, "the ridge's foot is not under the water and the walkway: %.0f" % foot)
+	for player_name in ["Cinematics", "Atmosphere", "Background"]:
+		var player: AnimationPlayer = world.get_node(player_name)
+		for clip_name in player.get_animation_list():
+			var clip := player.get_animation(clip_name)
+			for track in clip.get_track_count():
+				h.check(not String(clip.track_get_path(track)).begins_with("TrenchFront/Shallows"), "%s moves the water at the ridge's foot" % clip_name)
+	var ground: Sprite2D = world.get_node("RitualLayer/Ground")
+	var figures: Node2D = world.get_node("RitualLayer/Figures")
+	h.check(ground.get_index() > figures.get_index(), "the ritual's ground is drawn under the kneelers")
+	h.check(ground.light_mask == (world.get_node("RitualLayer/Backdrop") as CanvasItem).light_mask, "the ritual's ground is lit unlike the backdrop it copies")
+
+
+const EMERGE := "res://assets/reveal/emerge.gdshader"
+
+
+## The owner's playtest of 2026-11-19 of ea86ae9, the emergence. The creature comes out of the fog from the ridge
+## outward (D119): the body, the head and the crest draw through one shader, each with its own map of how far it lies
+## from the ridge, at half its drawing's size, and the fades that drive it are the clip's own, where they were. The
+## water runs before the whole creature, from the ridge's foot across the trench and down below the lowest the camera
+## shows, its shake included, so nothing of it shows under the waterline; the trench's own water, behind it, is no
+## longer moved.
+func test_the_creature_comes_out_from_the_ridge_and_out_of_one_water(h) -> void:
+	var world := await _world(h, AWAKENED)
+	for path in ["Dagon/Body/Art", "Dagon/Head/Art", "Dagon/Head/Crest/Art"]:
+		var art: Sprite2D = world.get_node(path)
+		var material := art.material as ShaderMaterial
+		h.check(material != null and material.shader != null and material.shader.resource_path == EMERGE, "%s does not come out from the ridge" % path)
+		if material == null:
+			continue
+		var reach: Texture2D = material.get_shader_parameter("reach")
+		h.check(reach != null and reach.get_size() * 2.0 == art.texture.get_size(), "%s's reach is not half the size of its drawing" % path)
+	var clip: Animation = world.get_node("Cinematics").get_animation(&"dagon_reveal")
+	for path in ["Dagon/Body:modulate", "Dagon/Head:modulate"]:
+		var track := clip.find_track(NodePath(path), Animation.TYPE_VALUE)
+		h.check(track >= 0 and clip.track_get_key_count(track) == 2, "%s is not one fade" % path)
+		if track < 0:
+			continue
+		h.check(is_equal_approx(clip.track_get_key_time(track, 0), 3.0) and is_equal_approx(clip.track_get_key_time(track, 1), 4.3), "%s no longer fades from 3.0 to 4.3 s" % path)
+		h.check(clip.track_get_key_value(track, 0).a == 0.0 and clip.track_get_key_value(track, 1).a == 1.0, "%s does not fade from 0 to 1" % path)
+	h.check(clip.find_track(NodePath("Trench/WaterDrawn:position"), Animation.TYPE_VALUE) < 0, "the reveal still moves the trench's water")
+	var water: Sprite2D = world.get_node("TrenchFront/Shallows")
+	var shown := Rect2(water.global_position, water.texture.get_size())
+	var body: Sprite2D = world.get_node("Dagon/Body/Art")
+	var camera: Camera2D = world.get_node("CameraRig")
+	var widest := clip.find_track(NodePath("CameraRig:limit_right"), Animation.TYPE_VALUE)
+	h.check(shown.position.x <= body.global_position.x and shown.end.x >= float(clip.track_get_key_value(widest, 0)), "the water %s does not run before the whole creature" % shown)
+	h.check(shown.end.y >= camera.limit_bottom + camera.max_shake, "the water stops at y=%.0f, above the lowest the camera shows" % shown.end.y)
+	var image := water.texture.get_image()
+	var gaps := 0
+	for y in image.get_height():
+		for x in image.get_width():
+			gaps += 1 if image.get_pixel(x, y).a < 1.0 else 0
+	h.check(gaps == 0, "the water has %d clear pixels" % gaps)
+
+
+## The shader and the particles are drawn from the moment the level loads, beside the camera and showing nothing, so
+## that neither is first drawn, and the game stalled, in the middle of the reveal (D119): the crest through its own
+## material, at an alpha Godot draws, below which its map brings out none of it; and one clear particle.
+func test_the_reveal_does_not_stall_on_a_first_draw(h) -> void:
+	var world := await _world(h, AWAKENED)
+	var camera: Node = world.get_node("CameraRig")
+	var warm: Sprite2D = world.get_node("CameraRig/Warm/Emerge")
+	var crest: Sprite2D = world.get_node("Dagon/Head/Crest/Art")
+	h.check(warm.is_visible_in_tree() and warm.get_parent().get_parent() == camera, "the shader's warm-up is not drawn beside the camera")
+	h.check(warm.material == crest.material and warm.texture == crest.texture, "the warm-up is not the crest through its own material")
+	var alpha := warm.modulate.a
+	h.check(alpha >= 0.01, "the warm-up at alpha %.3f may not be drawn at all" % alpha)
+	var reach: Image = ((crest.material as ShaderMaterial).get_shader_parameter("reach") as Texture2D).get_image()
+	var drawing := crest.texture.get_image()
+	var nearest := 1.0
+	for y in reach.get_height():
+		for x in reach.get_width():
+			if drawing.get_pixel(x * 2, y * 2).a > 0.0 or drawing.get_pixel(x * 2 + 1, y * 2 + 1).a > 0.0:
+				nearest = minf(nearest, reach.get_pixel(x, y).r)
+	h.check(alpha * 1.25 < nearest - 0.05, "at alpha %.2f the warm-up would show the crest where its reach is %.2f" % [alpha, nearest])
+	var particles: CPUParticles2D = world.get_node("CameraRig/Warm/Particles")
+	h.check(particles.is_visible_in_tree() and particles.emitting and particles.color.a == 0.0, "the particles' warm-up is missing, still, or seen")
+
+
+## The owner's playtest of 2026-11-19 of ea86ae9: the hand looked detached from the body. The arm turns about one point
+## on the body's outline, within the turn its drawing is made for (D107), and the body's own pixels where the arm
+## crosses the body are laid over it from the moment it shows, lit as the body is (D120): so wherever the arm lies over
+## the body, at any moment of its swing, the body is drawn over it, and its root never shows. Its fade-in brings it
+## out from the shoulder to the hand, through the same shader as the body: its map is 0 at the shoulder and greatest
+## at the fingertips.
+func test_the_arm_comes_out_from_under_the_shoulder(h) -> void:
+	const SHOULDER := Vector2(-305, -166)
+	var world := await _world(h, AWAKENED)
+	var clip: Animation = world.get_node("Cinematics").get_animation(&"dagon_reveal")
+	var moves := clip.find_track(NodePath("Dagon/Arm:position"), Animation.TYPE_VALUE)
+	var turns := clip.find_track(NodePath("Dagon/Arm:rotation"), Animation.TYPE_VALUE)
+	h.check(moves >= 0 and turns >= 0 and clip.track_get_key_count(moves) == clip.track_get_key_count(turns), "the arm's keys do not pair")
+	for key in clip.track_get_key_count(turns):
+		var turn: float = clip.track_get_key_value(turns, key)
+		var at: Vector2 = clip.track_get_key_value(moves, key)
+		h.check(turn >= -0.5001 and turn <= 0.2201, "at %.2f s the arm turns %.3f, past what its shoulder is drawn for" % [clip.track_get_key_time(turns, key), turn])
+		h.check((at + SHOULDER.rotated(turn)).distance_to(SHOULDER) < 0.6, "at %.2f s the arm does not turn about its shoulder" % clip.track_get_key_time(turns, key))
+	var arm: Node2D = world.get_node("Dagon/Arm")
+	var arm_material := (world.get_node("Dagon/Arm/Art") as CanvasItem).material as ShaderMaterial
+	h.check(arm_material != null and arm_material.shader != null and arm_material.shader.resource_path == EMERGE, "the arm does not come out from the shoulder")
+	if arm_material != null:
+		var arm_reach: Image = (arm_material.get_shader_parameter("reach") as Texture2D).get_image()
+		var arm_drawn: Sprite2D = world.get_node("Dagon/Arm/Art")
+		h.check(arm_reach.get_size() * 2 == Vector2i(arm_drawn.texture.get_size()), "the arm's reach is not half the size of its drawing")
+		var at_shoulder := Vector2i((SHOULDER - arm_drawn.position) / 2.0)
+		h.check(arm_reach.get_pixelv(at_shoulder).r == 0.0, "the arm does not start at the shoulder")
+		var fingertip := Vector2i((Vector2(-490, -244) - arm_drawn.position) / 2.0)
+		h.check(arm_reach.get_pixelv(fingertip).r > 0.9, "the arm's hand is not the last of it to come")
+	var over: Node2D = world.get_node("Dagon/Shoulder")
+	h.check(not over.visible, "the shoulder over the arm shows before the arm")
+	var arm_shows := clip.find_track(NodePath("Dagon/Arm:visible"), Animation.TYPE_VALUE)
+	var over_shows := clip.find_track(NodePath("Dagon/Shoulder:visible"), Animation.TYPE_VALUE)
+	h.check(over_shows >= 0 and clip.track_get_key_time(over_shows, 0) == clip.track_get_key_time(arm_shows, 0), "the shoulder does not show with the arm")
+	h.check(over.z_index == arm.z_index and over.get_index() > arm.get_index(), "the shoulder is drawn under the arm")
+	var rims := clip.find_track(NodePath("Dagon/Rims:modulate"), Animation.TYPE_VALUE)
+	var lit := clip.find_track(NodePath("Dagon/Shoulder/Lit:modulate"), Animation.TYPE_VALUE)
+	h.check(lit >= 0 and clip.track_get_key_count(lit) == clip.track_get_key_count(rims), "the shoulder is not lit as the body is")
+	if lit >= 0:
+		for key in clip.track_get_key_count(rims):
+			h.check(clip.track_get_key_time(lit, key) == clip.track_get_key_time(rims, key) and clip.track_get_key_value(lit, key) == clip.track_get_key_value(rims, key), "the shoulder's light differs from the body's at key %d" % key)
+	# Its pixels are the body's own, where it lies.
+	var body: Sprite2D = world.get_node("Dagon/Body/Art")
+	var body_image := body.texture.get_image()
+	var art: Sprite2D = world.get_node("Dagon/Shoulder/Art")
+	var art_image := art.texture.get_image()
+	var offset := Vector2i(art.position - body.position)
+	var differ := 0
+	for y in art_image.get_height():
+		for x in art_image.get_width():
+			if art_image.get_pixel(x, y).a > 0.0 and art_image.get_pixel(x, y) != body_image.get_pixelv(offset + Vector2i(x, y)):
+				differ += 1
+	h.check(differ == 0, "%d of the shoulder's pixels are not the body's" % differ)
+	# Wherever the arm lies over the body, the shoulder lies over the arm: as it comes, at the top of its swing, just
+	# before it lands, as it lands, and at rest.
+	await h.stand_at(_player(h), Vector2(4420, -2))
+	var clips: AnimationPlayer = world.get_node("Cinematics")
+	var arm_art: Sprite2D = world.get_node("Dagon/Arm/Art")
+	var arm_image := arm_art.texture.get_image()
+	for seconds in [5.6, 6.5, 6.95, 7.0, 10.0]:
+		clips.seek(seconds, true)
+		await h.steps(1)
+		var open := 0
+		for y in arm_image.get_height():
+			for x in arm_image.get_width():
+				if arm_image.get_pixel(x, y).a == 0.0:
+					continue
+				var p: Vector2 = arm.transform * (arm_art.position + Vector2(x, y) + Vector2(0.5, 0.5))
+				var on_body := Vector2i((p - body.position).floor())
+				if on_body.x < 0 or on_body.y < 0 or on_body.x >= body_image.get_width() or on_body.y >= body_image.get_height() or body_image.get_pixelv(on_body).a == 0.0:
+					continue
+				var on_art := Vector2i((p - art.position).floor())
+				var covered := on_art.x >= 0 and on_art.y >= 0 and on_art.x < art_image.get_width() and on_art.y < art_image.get_height() and art_image.get_pixelv(on_art).a > 0.0
+				open += 0 if covered else 1
+		h.check(open == 0, "at %.2f s %d of the arm's pixels lie over the body and out from under the shoulder" % [seconds, open])
 
 
 ## The great carving high on the stone, the lit mural, and the reveal show the same thing: an arm round a stone.
@@ -584,6 +753,22 @@ func test_the_cave_music_starts_on_the_way_in_and_never_on_restore(h) -> void:
 	world = await _world(h, ABYSS)
 	await h.steps(10)
 	h.check(not world.get_node("Sound/MusicCave").playing, "restoring in the cave replayed its music")
+
+
+## The pictures keep what matters above row 190 (tools/art/gen_ending.py). The card sizes to its line, so the
+## longest line sets how high it comes: it may not come higher than that row, in any of the four.
+func test_the_epilogue_card_stays_below_what_the_pictures_show(h) -> void:
+	const CLEAR_OF_THE_CARD := 190.0
+	var ending: Node = await h.load_main_fixture("res://scenes/ui/ending.tscn")
+	var card: Control = ending.get_node("Center/Card")
+	for line in ending.ending_lines.size():
+		await h.steps(4)
+		h.check(ending.get_ending_line() == line, "line %d is not showing" % line)
+		var top := card.get_global_rect().position.y
+		h.check(top >= CLEAR_OF_THE_CARD, "at line %d the card's top is at %.0f, over the picture" % [line, top])
+		h.check(top < 262.0 and card.get_global_rect().end.y <= 270.0, "at line %d the card is off the screen: %s" % [line, card.get_global_rect()])
+		if line + 1 < ending.ending_lines.size():
+			ending.advance_ending()
 
 
 func test_the_epilogue_shows_a_picture_for_each_line_over_the_sea(h) -> void:
@@ -748,27 +933,139 @@ func test_the_abyss_sounds_deeper_as_he_goes_on(h) -> void:
 
 ## A clip moves only what can be seen: no track animates a node that is hidden in the scene and that the clip itself
 ## never shows. Art drawn over a greybox shape must be what the clip moves, or the motion is lost: the gate's rise and
-## the trench's water were, for a while in M4.
-func test_no_clip_animates_a_hidden_node_it_never_shows(h) -> void:
+## the trench's water were, for a while in M4. Hidden means hidden where it stands: a node under a hidden parent is
+## hidden too, unless the clip shows that parent.
+## What a clip moves must draw something. A shape kept only for its outline draws nothing itself (its colour is
+## clear), so it has to carry a drawing that is shown: otherwise the clip moves nothing anyone can see, which is how
+## the gate stood still in M4.
+func test_every_shape_a_clip_moves_or_fades_draws_something(h) -> void:
 	var world := await _world(h)
 	var checked := 0
 	for player_name in ["Cinematics", "Atmosphere", "Background"]:
 		var player: AnimationPlayer = world.get_node(player_name)
 		for clip_name in player.get_animation_list():
 			var clip := player.get_animation(clip_name)
-			var shown := {}
 			for track in clip.get_track_count():
-				var path := String(clip.track_get_path(track))
-				if path.ends_with(":visible"):
-					shown[path.get_slice(":", 0)] = true
-			for track in clip.get_track_count():
-				var path := String(clip.track_get_path(track))
-				var node_path := path.get_slice(":", 0)
-				if clip.track_get_type(track) != Animation.TYPE_VALUE or path.ends_with(":visible") or shown.has(node_path):
+				if clip.track_get_type(track) != Animation.TYPE_VALUE:
 					continue
-				var node := world.get_node_or_null(node_path)
-				h.check(node != null, "%s animates %s, which does not exist" % [clip_name, path])
-				if node is CanvasItem:
-					checked += 1
-					h.check(node.visible, "%s animates %s, which is hidden and never shown by it" % [clip_name, path])
+				var path := String(clip.track_get_path(track))
+				var shape := world.get_node_or_null(path.get_slice(":", 0)) as Polygon2D
+				if shape == null or shape.color.a > 0.0 or not shape.vertex_colors.is_empty():
+					continue
+				checked += 1
+				var drawings := shape.find_children("*", "Sprite2D", true, false)
+				var seen := false
+				for drawing in drawings:
+					seen = seen or (drawing.texture != null and drawing.visible)
+				h.check(seen, "%s animates %s, a shape that draws nothing and carries no shown drawing" % [clip_name, path])
+	h.check(checked >= 10, "only %d clear shapes were checked" % checked)
+
+
+## The rock across the way back and the returning sea are shown by the director, as outcomes of the flight, not by its
+## clip: test_narrative and this file hold that they show with no clip at all.
+const SHOWN_BY_THE_DIRECTOR := ["Rockfall", "Tide"]
+
+
+## The nodes a clip shows. A :visible track counts only if it is enabled and has a key, within the clip, that sets
+## true: a track whose every key is false hides its node, it never shows it, so its being there proves nothing.
+static func _shown_by(clip: Animation) -> Dictionary:
+	var shown := {}
+	for track in clip.get_track_count():
+		var path := String(clip.track_get_path(track))
+		if clip.track_get_type(track) != Animation.TYPE_VALUE or not path.ends_with(":visible") or not clip.track_is_enabled(track):
+			continue
+		for key in clip.track_get_key_count(track):
+			var value = clip.track_get_key_value(track, key)
+			if value is bool and value and clip.track_get_key_time(track, key) <= clip.length:
+				shown[path.get_slice(":", 0)] = true
+	return shown
+
+
+## What a clip moves or fades under a node that is hidden and that the clip never shows, as "track: hidden node",
+## and the number of tracks looked at. The director's two are left out by their exact paths.
+static func _hidden_and_never_shown(world: Node, clip: Animation) -> Array:
+	var shown := _shown_by(clip)
+	var found := []
+	var checked := 0
+	for track in clip.get_track_count():
+		var path := String(clip.track_get_path(track))
+		if clip.track_get_type(track) != Animation.TYPE_VALUE or path.ends_with(":visible"):
+			continue
+		var node := world.get_node_or_null(path.get_slice(":", 0))
+		if node == null:
+			found.append("%s: missing" % path)
+			continue
+		if not node is CanvasItem:
+			continue
+		checked += 1
+		var at: Node = node
+		while at != world and at != null:
+			var at_path := String(world.get_path_to(at))
+			if at is CanvasItem and not at.visible and not shown.has(at_path) and not SHOWN_BY_THE_DIRECTOR.has(at_path):
+				found.append("%s: %s" % [path, at_path])
+			at = at.get_parent()
+	return [found, checked]
+
+
+func test_no_clip_animates_a_hidden_node_it_never_shows(h) -> void:
+	var world := await _world(h)
+	var checked := 0
+	for player_name in ["Cinematics", "Atmosphere", "Background"]:
+		var player: AnimationPlayer = world.get_node(player_name)
+		for clip_name in player.get_animation_list():
+			var result := _hidden_and_never_shown(world, player.get_animation(clip_name))
+			checked += result[1]
+			for problem in result[0]:
+				h.check(false, "%s animates %s, which is hidden and never shown by it" % [clip_name, problem])
 	h.check(checked > 10, "only %d tracks were checked" % checked)
+
+
+## The check above, on a made-up clip: a :visible track whose keys are all false does not excuse moving a hidden node,
+## nor does a true key on a disabled track or past the clip's end; a true key within the clip does, and the
+## director's exemption covers only its own node.
+func test_a_visibility_track_that_only_hides_does_not_count_as_showing(h) -> void:
+	var world := Node2D.new()
+	var hidden := Sprite2D.new()
+	hidden.name = "Hidden"
+	hidden.visible = false
+	world.add_child(hidden)
+	var rock := Sprite2D.new()
+	rock.name = "Rockfall"
+	rock.visible = false
+	world.add_child(rock)
+	var under_rock := Sprite2D.new()
+	under_rock.name = "Stone"
+	under_rock.visible = false
+	rock.add_child(under_rock)
+
+	var clip := Animation.new()
+	clip.length = 2.0
+	var moves := clip.add_track(Animation.TYPE_VALUE)
+	clip.track_set_path(moves, "Hidden:position")
+	clip.track_insert_key(moves, 0.0, Vector2.ZERO)
+	clip.track_insert_key(moves, 1.0, Vector2(10, 0))
+	var shows := clip.add_track(Animation.TYPE_VALUE)
+	clip.track_set_path(shows, "Hidden:visible")
+	clip.track_insert_key(shows, 0.0, false)
+	clip.track_insert_key(shows, 1.0, false)
+	h.check(_hidden_and_never_shown(world, clip)[0] == ["Hidden:position: Hidden"], "a track of false keys was taken as showing the node: %s" % [_hidden_and_never_shown(world, clip)[0]])
+
+	clip.track_insert_key(shows, 3.0, true)
+	h.check(_hidden_and_never_shown(world, clip)[0] == ["Hidden:position: Hidden"], "a true key after the clip's end was taken as showing the node")
+	clip.track_remove_key_at_time(shows, 3.0)
+	clip.track_insert_key(shows, 1.5, true)
+	clip.track_set_enabled(shows, false)
+	h.check(_hidden_and_never_shown(world, clip)[0] == ["Hidden:position: Hidden"], "a true key on a disabled track was taken as showing the node")
+	clip.track_set_enabled(shows, true)
+	h.check(_hidden_and_never_shown(world, clip)[0].is_empty(), "a true key within the clip was not taken as showing the node: %s" % [_hidden_and_never_shown(world, clip)[0]])
+
+	var rock_clip := Animation.new()
+	rock_clip.length = 1.0
+	var rock_moves := rock_clip.add_track(Animation.TYPE_VALUE)
+	rock_clip.track_set_path(rock_moves, "Rockfall:position")
+	rock_clip.track_insert_key(rock_moves, 0.0, Vector2.ZERO)
+	var stone_moves := rock_clip.add_track(Animation.TYPE_VALUE)
+	rock_clip.track_set_path(stone_moves, "Rockfall/Stone:position")
+	rock_clip.track_insert_key(stone_moves, 0.0, Vector2.ZERO)
+	h.check(_hidden_and_never_shown(world, rock_clip)[0] == ["Rockfall/Stone:position: Rockfall/Stone"], "the director's exemption reached past its own node: %s" % [_hidden_and_never_shown(world, rock_clip)[0]])
+	world.free()

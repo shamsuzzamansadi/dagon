@@ -1,130 +1,50 @@
 # Handoff: current state
 
-Changing task state only. The lasting rules are in [AGENTS.md](../AGENTS.md). **Check this against `git log`, the pull request and CI before relying on it.**
+Changing task state only. The lasting rules are in [AGENTS.md](../AGENTS.md). **Check this against `git log`, the pull requests and CI before relying on it.** M5's step-by-step record is in the [M5 package](reviews/m5-review-package.md); M4's in `git show 09d854e:docs/handoff.md` and the [M4 package](reviews/m4-review-package.md).
 
-**Last updated:** 2026-11-15, **M4 accepted, merged and released.** The owner accepted the Windows candidate from `8b30b33` for M4's completion and the first pre-alpha release ([record](evidence/m4/owner-acceptance-2026-11-15.md)). Squash-merged as `760a539`; `main`'s CI published **[`v0.1.0-pre-alpha.1`](https://github.com/shamsuzzamansadi/dagon/releases/tag/v0.1.0-pre-alpha.1)**, verified ([evidence](evidence/release-workflow/first-publication-v0.1.0-pre-alpha.1.md)). The M4 branch is deleted. **M5 is next and not started;** its carried tasks are in the [roadmap](roadmap.md).
+**Last updated:** 2026-11-20. **M5 is accepted by the owner, on 2026-11-20 at `b7303bf`, as the completed milestone, and merged into `main` by the squash merge of [#6](https://github.com/shamsuzzamansadi/dagon/pull/6).** A milestone acceptance only: nothing tagged or released since `v0.1.0-pre-alpha.1`. **M6 is not started:** its plan is drafted and waits for the owner's approval.
 
 ## Where things are
 
 | | |
 |---|---|
-| **Milestone** | **M4 accepted by the owner on 2026-11-15 at `8b30b33`,** for M4's completion and the first pre-alpha release, with the documented M5 deferrals ([record](evidence/m4/owner-acceptance-2026-11-15.md)). The owner's own checks are the ones that record lists, and no others. M3 was accepted on 2026-11-10 at `3980bc3` ([record](evidence/m3/owner-acceptance-2026-11-10.md)) |
-| **Review** | **No full independent review of M4 is recorded.** ChatGPT inspected frames of the owner's recordings and analysed one recording's audio signal, without listening, and found the cause of the gate not rising ([record](evidence/m4/owner-playtest-2026-11-15.md)) |
-| **Acceptance fingerprint** | `sha256:614f29b68865e037d9d0be817c537e7452b608626f50efc584760a2d508a7f6e` (M4, `8b30b33`, unchanged at `760a539`) |
-| **Releases** | **[`v0.1.0-pre-alpha.1`](https://github.com/shamsuzzamansadi/dagon/releases/tag/v0.1.0-pre-alpha.1),** published 2026-11-15 by run [43748080655](https://github.com/shamsuzzamansadi/dagon/actions/runs/43748080655) from `760a539`: prerelease, immutable, tag at `760a539`, both packages, `SHA256SUMS.txt` and `PROVENANCE.txt`. Linux `605f110908b5...`, Windows `09e7e2e56aea...` ([evidence](evidence/release-workflow/first-publication-v0.1.0-pre-alpha.1.md)). **A correction is a new version, `v0.1.0-pre-alpha.2`;** a published version is never replaced |
-| **Merged** | **M4:** squash commit `760a539` on `main`, through [#4](https://github.com/shamsuzzamansadi/dagon/pull/4); `main`'s CI, run [43748080655](https://github.com/shamsuzzamansadi/dagon/actions/runs/43748080655), passed every job including the release. `m4/atmosphere` is deleted, locally and remotely; its tree is the merged one. **M3:** `ad6df8c`, through [#3](https://github.com/shamsuzzamansadi/dagon/pull/3) |
-| **Now** | **Between milestones. M5, Cinematic horror, is next and not started;** it needs the owner's go-ahead on its plan. Its carried tasks are in the [roadmap](roadmap.md): the reveal's background seam, the creature against its background, the five issues in the ending's four pictures, with the owner's limits. **The owner's target is still completion before 20 November** |
+| **Milestones** | M1 to M5 accepted ([roadmap](roadmap.md)). M5: [record](evidence/m5/owner-acceptance-2026-11-20.md), [package](reviews/m5-review-package.md) §17 |
+| **The accepted build** | `b7303bf`, `dagon-windows`, artifact [14627487176](https://github.com/shamsuzzamansadi/dagon/actions/runs/44731893136/artifacts/14627487176) of push run 44731893136, zip SHA-256 `97ef6bd1e621e54875b213a41dd5189afca4554f7277a769ac10c2cf689a71ac`. Fingerprint `sha256:1f724cdc2c582c997c9b7b780ff092f4763c0077b5defe9805c6cce37533dc8d`, unchanged by the documents after it and by the squash merge |
+| **What the owner tested** | The running route on that build, recorded: the ridge reads as Dagon's shoulder, the arm stays connected through the hand landing, the same wave overtakes the fallen sailor. The standing-still ending has scripted coverage only. ChatGPT compared the owner's video frames and measured the recorded audio against the owner's earlier clip; it did not listen |
+| **Branch** | `main` only. `m5/polish` is merged and deleted |
+| **Releases** | Only [`v0.1.0-pre-alpha.1`](https://github.com/shamsuzzamansadi/dagon/releases/tag/v0.1.0-pre-alpha.1), at `760a539`, untouched. **`v0.2.0-alpha.1`, M5's planned prerelease, needs the owner's separate approval;** none is made |
 
-## M3 requirements: done and accepted
+## Open
 
-| Requirement | Where |
-|---|---|
-| The route, puzzle, cinematic contract, saves, narration plumbing and vibration | Package §1–§12 |
-| A short skippable prologue: captivity, escape, drift, waking, with restrained motion and its own sound | D71, D88 |
-| One environmental interaction in Act II: a stone pushed onto a raised slab, with a readable carving | D72, D83, D87 |
-| A visible returning sea in the escape, with a bounded fallback | D73 |
-| The stranded tentacle, the Shore's remains, and the carvings that echo them | D82, D84 |
-| The sailor's progression | D76, D84 |
-| A script whose chronology holds | D81, D86 |
-| An initial sound pass, music in five places, the mix measured and fixed | D74, D85, D91 |
-| One finished reference section, and a coherent boundary into the greybox | D77, D89 |
-| The monolith, the creature and the reveal as a payoff | D84, D90 |
-| A short visual epilogue, fully voiced in voice A, the owner's choice | D86, D94 |
-| A voice audition, a listening package, and recordings with sound | D79, D92, D94 |
+**For M6, before anything else:** the owner's approval of the M6 plan, drafted on 2026-11-20 from the [roadmap](roadmap.md)'s M6 row and "M6 verification". Until then nothing of M6 is implemented.
 
-## Deferred, and not passed
+**Open from M5, as the owner said:** the intelligibility of the reveal's dialogue by ear, in the full mix ("Its head turned. I ran." under the second call stays flagged, [listening package](evidence/m5/listening/README.md)).
 
-**To M4 and M5** (the [roadmap](roadmap.md) lists them):
+**For M6, unmeasured:** two external first-time players and their timings, so **first-time duration is unknown;** controller vibration by feel; all physical PlayStation hardware; individual physical Xbox actions, including reconnecting; key names under German on the real Windows build; native Linux hardware-accelerated rendering; displays at 1280 × 720 and 1920 × 1080, windowed and fullscreen. **Carried:** the unresolved M2 J/caption event; the two breakage survivors of M3's revision.
 
-1. **Narration:** the rest of the script in voice A, the prologue first.
-2. **Art past x = 1440:** the Exposed Abyss's ground, canyon walls, rib arch and far view; the shelves and tablets; the crossing's ledges, slab and stone; the trench, gate and stones at the monolith; the lit mural's panel; the creature's own animation; the ritual and watcher beyond silhouettes; the escape's rockfall and returning sea.
-3. **Sound:** the final mix by ear, interface sounds, a sound for examining.
+**Known, recorded** ([package](reviews/m5-review-package.md) §7): the band figures are a diagnostic; the creature's two-pixel blocks at full zoom; frame time not measured beyond the reveal's first-draw stalls; amber in the ending's pictures beyond the lantern; the full-game recording predates the changes of 2026-11-18 to 11-20.
 
-**Hardware:** all physical PlayStation hardware; individual physical Xbox actions, including disconnecting and reconnecting; key names under German on the real Windows build; native Linux hardware-accelerated rendering.
+## Owner feedback, and review, in order
 
-**Playtesting, for M6:** two external first-time players, their timings, and first-time duration, all unmeasured so far.
-
-**Carried over:** the unresolved M2 J/caption event. The two breakage survivors of the revision, which the reviewer considered non-blocking.
-
-**M3 is closed. Its deferrals are M4's and later milestones' work, not reasons to reopen it.**
-
-## Owner feedback, in order
-
-- **2026-11-04:** improved but not engaging enough ([record](evidence/m3/owner-playtest-2026-11-04.md)).
-- **2026-11-09, on `5fe820b`:** functional, but too brief, too passive and not atmospheric enough ([record](evidence/m3/owner-playtest-2026-11-09.md)).
-- **2026-11-09, on a build of `53e8d23`:** improved substantially; four concerns, answered by D87–D93.
-- **2026-11-10:** chose voice A; then accepted M3 at `3980bc3`.
-
-## M4 progress
-
-| # | Item of [the plan](m4-plan.md) | State | Commit |
-|---|---|---|---|
-| 1 | The prologue spoken in voice A | **Done.** Four lines, each transcribed word for word; tests; a recording with sound; the voice measured against the music and sea beneath it ([narration record](evidence/m4/narration/README.md), [recording and measurements](evidence/m4/prologue/README.md), D95, D96). **Not listened to by anyone yet** | `2ccde53` |
-| 2 | Continuity from the prologue into the Shore; the Shore's first lines voiced | **Done.** New Game, How to Play, Begin, prologue, then straight into the game with nothing between: the last picture is the Shore's own opening view, the sailor gets up beside his boat under the cinematic contract (`shore_wake`), and the last picture carries the Shore's sea and wind so the sound does not drop at the cut. `shore.boat` and `shore.fish` in voice A, word for word; twelve lines voiced in all ([recording and measurements](evidence/m4/opening/README.md), D97–D99). Continue and Restart never show the prologue or the waking. **Not listened to by anyone yet** | `6e4a4ab` |
-| 3 | Environment art past x = 1440, in route order | **Done: seven stretches, no greybox shape left on the route** ([captures](evidence/m4/art/README.md), D100). A ground and far view; B the rib arch; C the crossing; D the shelves, tablets and props; E the canyon, the puzzle stones, the gate and the trench behind the reveal; F the mural, faint and lit; G the flight's rock, dust, the two seas and the fog's edge (M3 deferred these with the art past 1440). What still shows as a flat shape is M5's: the creature and the ritual's far figures. **Known:** a seam beside the creature's arm at the reveal, from the Shore's screen-fixed sky; the greybox had it; the reveal's composition is M5's. **Looked at by the developer only** | `622ca0e` A, `cdb1ba6` B, `a9bbd3c` C, `b5bd3b2` D, `5ed5c01` E, `c8cb324` F, `27d918f` G |
-| 4 | Audio polish | **Made and measured; not heard by anyone** ([record](evidence/m4/audio/README.md), D101). Interface sounds, an examine sound, three Abyss beds, weight for the rockfall and both seas. The game's mix recorded and measured, and cut into a [listening package](evidence/m4/listening/README.md) for the owner. **Waiting on:** the owner's listening, to set the reveal's level and the mix | `6eea116`; package `5d83ea6` |
-| 5 | Further narration | **Done: every story line spoken,** 22 lines in all, each word-checked; the reveal's lines respaced so each is heard out, and a test holds every clip to it ([record](evidence/m4/narration/README.md), D102). Examine lines stay text. **Not listened to by anyone** | `8589ebd` |
-| 6 | Validation, review package, identified build | **Done.** [Review package](reviews/m4-review-package.md). Breakage ([result](evidence/m4/breakage.txt)), the whole game recorded with sound ([listening package](evidence/m4/listening/README.md)), the integration point and CI on `4fcdd6b` (below). *Superseded on 2026-11-15:* the build first named for the owner, push run 43503636921's, zip `1ec50645…aded8a`; **the candidate now is `ced2499`'s, below.** Draft pull request [#4](https://github.com/shamsuzzamansadi/dagon/pull/4), not for merging | `4fcdd6b`; package after it |
-
-**Results on `6e4a4ab`,** all run on the native Linux clone after the tree was recovered (see below), GCC: `scons unit_tests` 127 test cases passed; `tools/run_godot_checks.sh` (debug build): import, classes, integration **434 passed, 0 failed**, three smoke runs, all ok; release build; `tools/export_check.sh linux` ok; the exported route by `tools/route_check.py` on a private display: `ROUTE_RESULT runs=4 failed=0`. CI on this commit: check the pull request.
-
-**CI on `3c3e550`** (item 2 and its handoff): runs [42976363793](https://github.com/shamsuzzamansadi/dagon/actions/runs/42976363793) and [42976444602](https://github.com/shamsuzzamansadi/dagon/actions/runs/42976444602), both passed: GCC, Clang, MSVC and the release tools.
-
-**Results on `622ca0e`** (stretch A), native Linux clone, GCC debug: `tools/art/check_art.py` problems=0, including the new comparison of the Abyss's ground with the collision (3080 columns) and of the far cliff with the watcher and the distant shape; integration **435 passed, 0 failed**.
-
-**CI on `7781ea4`** (stretch A and its handoff; the code is `622ca0e`'s): pull-request run [43441243947](https://github.com/shamsuzzamansadi/dagon/actions/runs/43441243947) **passed**: GCC, Clang, MSVC and the release tools. Push run [43441235507](https://github.com/shamsuzzamansadi/dagon/actions/runs/43441235507): GCC, Clang and the release tools passed; its Windows job was still running when this was written.
-
-**Results on `cdb1ba6` to `27d918f`** (art B to G), native Linux clone, GCC debug, each on its own commit: `check_art.py` problems=0; integration **435 passed, 0 failed**. Captures, and frames of the reveal and the flight as they play, looked at by the developer only. CI on each of `cdb1ba6` to `c8cb324` passed (GCC, Clang, MSVC, release tools).
-
-**The integration point, on `27d918f`** (all of item 3; [logs](#working-resources) in `$W/notes/int-27d918f`): debug and release builds up to date; `tools/run_godot_checks.sh`: clean import, classes, integration **435 passed, 0 failed**, three smoke runs, all ok; `tools/export_check.sh linux` ok (release extension loaded, new game and continue ran); the exported route by `tools/route_check.py` on a private display: **`ROUTE_RESULT runs=4 failed=0`**. No C++ changed between `6e4a4ab` and `27d918f`, so `6e4a4ab`'s unit tests (127 passed) stand for it.
-
-**Results on `6eea116`** (item 4), GCC debug: integration **438 passed, 0 failed**, three new tests among them. A first run found the scene-changing presses playing a sound outside the tree (fixed: such a press is not played) and the two new beds not looping (fixed in their import settings); both were caught by the suite.
-
-**How the art goes in.** Static pieces are baked into the ground strip in `gen_abyss.ground()`, painted before the mud so it lies against their feet; their greybox polygons are hidden, not deleted. Moving pieces get a `Drawn` sprite on their own body (the slab on `Crossing`, the boulder on `CrossingStone`), so the puzzle moves the drawing. Still to come that way: the gate and the three puzzle stones with their lit signs. The recorded wiring scripts are in `$W/notes/drafts/` (below).
-
-**Measured on the opening's recording, not heard:** each prologue line 9.1 to 13.9 dB above the music and sea under it; the bed ducks 4.4 to 5.3 dB for the voice; the mix peaks at −2.8 dBFS; no sudden change in level at the cut into the game. Whether it sounds right is the owner's to judge.
-
-**An interruption on 2026-11-11, and what it cost.** The machine restarted and emptied `/tmp`, where the native clone, the voice tools and item 2's uncommitted work and validation logs were. Nothing pushed was lost. Item 2 was rebuilt by replaying the session's own recorded edit commands onto a fresh clone of `ecad573`, each checked against its recorded output; the two voice lines were regenerated with the same seed and settings (same durations, pace and peaks, transcribed again); the recording was made again and its measurements came out the same. **The earlier validation results were not carried over: every result above is from a fresh run on the recovered tree.** The step 1 video's double-size copy was made from its committed file, since its raw recording was gone. The clone and tools now live under the home folder, not `/tmp`.
-
-**Results on `8589ebd`** (item 5), GCC debug: narration tests 46 passed; integration **439 passed, 0 failed**, after a clean import (an incremental import once crashed Godot at shutdown, signal 11, leaving one recording without its import file; a clean import did not). 22 recordings transcribed word for word, Innsmouth's recorded exception aside. CI passed on `0212a95`, `8589ebd`, `e24d726` and `5d83ea6`: GCC, Clang, MSVC, release tools.
-
-**Breakage, at `e24d726`** (`tools/breakage_m4.py`, 17 entries, 3 workers, controls held): **16 caught, 1 not caught.** The survivor, dropping `waking_ = false`, had no effect but `is_waking()` reporting a spent waking as pending; `d0d0606` adds that check, and the breakage alone, re-run with its controls on `d0d0606`: **caught; the clean controls passed, the one after it 439 passed, 0 failed**.
-
-**The recording, at `e24d726`** (`record_play.gd`, 5 min 39 s): `MIX_CHECK problems=0`; no clipping, true peak −1.0 dBTP; the reveal −17.4 LUFS. **One unexpected change: a 20 ms drop at the cut into the game,** absent from a second recording of the same build with `record_prologue.gd`; cause not established; recorded as such.
-
-**The integration point, on `4fcdd6b`** (clean tree; logs in `$W/notes/int-4fcdd6b`): debug and release builds; `tools/run_godot_checks.sh`: clean import, classes, integration **439 passed, 0 failed**, three smoke runs, all ok; `tools/export_check.sh linux` ok; the exported route **`ROUTE_RESULT runs=4 failed=0`**. **CI on `4fcdd6b`**, push run [43503636921](https://github.com/shamsuzzamansadi/dagon/actions/runs/43503636921): passed; integration 439/0 on GCC, Clang and MSVC, the exported route 4/0 on Linux and Windows, native tests 127/127. Acceptance fingerprint `sha256:024a966bb1515d5708a7490af2b15765f12e92a351781ce412a2af913e631c5c`, the same for `e24d726` to `4fcdd6b`.
-
-**Risks and forecast, as of this update (13 November):** M4's approved work is complete within the window. **No blocker on the developer's side.** What waits: the owner's listening, which sets the reveal's level and the mix (item 4's last step); the independent review; the owner's playtest and decision. Open and recorded: a 20 ms drop at the cut into the game in one of two recordings, cause not established; the reveal's seam beside the arm, M5's with the reveal.
-
-**The owner's follow-up, 2026-11-15** ([feedback](evidence/m4/owner-playtest-2026-11-15.md)): the gameplay feels good and has improved substantially; the sailor is hard to tell apart in the prologue's boat; not yet acceptance. Done: the sailor redrawn, rowing and then slumped (`2c976de`, [record](evidence/m4/prologue-readability/README.md), D104); the cut's gap measured in the game's own output, editor and exported, narrowed to the scene's audio lifecycle, and closed with a 0.25 s handover (`ced2499`, [record](evidence/m4/transition/README.md), D103). **Measured, not heard.** The reveal's seam and the creature against its background stay **M5**, in the roadmap.
-
-**Results on `ced2499`:** locally, integration **440/0**, `run_godot_checks.sh` all ok, the Linux export check ok, the exported route **`runs=4 failed=0`**; the handover's breakage caught, controls held (at `50de077`, same code). CI push run [43731646562](https://github.com/shamsuzzamansadi/dagon/actions/runs/43731646562): integration 440/0 on GCC, Clang and MSVC, the exported route 4/0 on Linux and Windows, native tests 127/127. Fingerprint `sha256:9be07de66103f9683be95f918457b5ba8420d1c1a7f2093e4d05963223c1cab3`, unchanged by every later commit.
-
-*Superseded by `8b30b33`'s (below):* `dagon-windows` from run [43731646562](https://github.com/shamsuzzamansadi/dagon/actions/runs/43731646562) (artifact 14168993633), zip SHA-256 **`d57985364e28ef83dd61b6269c78369a113264960c78785123c0db2a37da8dc1`**. Linux: `dagon-linux`, zip `ceef058d642d05a68487f898b3dd1748b61c49289bd6311d5fe764e5c3e0b14c`.
-
-**The owner's second report, 2026-11-15** ([record](evidence/m4/owner-playtest-2026-11-15.md)): personally tested the sailor's readability and the prologue-to-Shore transition, both present; **not the Skip case**; **the gate no longer visibly rose.** Not acceptance. Cause found by ChatGPT: the awakening moved `Monolith/Gate/Visual`, hidden since stretch E, not `Drawn` beside it. Fixed (`8484212`): the track moves `Drawn` from its own offset; the body is untouched. A scan of every clip found `Trench/Water` the same way; fixed with its own sprite. Checks added on the rendered slab, on every clip, and on a closed gate at restore (`8b30b33`); three breakages caught ([record](evidence/m4/gate/README.md)).
-
-**Results on `8b30b33`:** locally, integration **442/0**, `run_godot_checks.sh` all ok, the Linux export check ok, the exported route **`runs=4 failed=0`** with screenshots of the gate rising in the exported game, and an exported try at the closed gate (blocked; no beat or clip reached). CI push run [43738445550](https://github.com/shamsuzzamansadi/dagon/actions/runs/43738445550): integration 442/0 on GCC, Clang and MSVC, the route 4/0 on Linux and Windows, native 127/127. Fingerprint `sha256:614f29b68865e037d9d0be817c537e7452b608626f50efc584760a2d508a7f6e`.
-
-**The owner's third report, 2026-11-15** ([record](evidence/m4/owner-playtest-2026-11-15.md)): the owner personally tested **the closed gate and the gate's opening: both satisfactory.** The owner's second video shows **the prologue's Skip reaching the Shore and play continuing;** ChatGPT confirmed that from frames and **did not listen, so no auditory pass is recorded.** **Not yet explicit acceptance of the whole candidate.** Five issues in the ending's four pictures are recorded as **M5 tasks** in the [roadmap](roadmap.md), with the owner's limits (story and narration unchanged, the missing memory intended, the owner's quick presses on the last cards not a defect unless reproduced). **Documents only: no code, scene or asset changed, so the candidate and its fingerprint are the same.**
-
-**The candidate for the owner now:** `dagon-windows` from run [43738445550](https://github.com/shamsuzzamansadi/dagon/actions/runs/43738445550) (artifact 14172420108), zip SHA-256 **`6f914484562a24c7285836b0aa78d1573319c9586bebece830dd2a88d1fe306d`**. Linux: `dagon-linux`, `b283c85d29c395c6daa1b3cf13c8b04c8ac0db4a2cce938a6ebd0f4b7632d092`. *Superseded:* `ced2499`'s, `d5798536…`.
+- **2026-11-04 to 11-10:** M3's playtests and acceptance ([records](evidence/m3/)).
+- **2026-11-15:** three reports on M4's candidates, then acceptance of `8b30b33` and the first pre-alpha release ([acceptance](evidence/m4/owner-acceptance-2026-11-15.md)).
+- **2026-11-16:** approved M5's scope.
+- **2026-11-18:** ChatGPT's independent review of `cd28f55`.
+- **2026-11-19:** the owner played `20929cf`, `59562c6` and `ea86ae9` ([records](evidence/m5/)), with five points, four visual points and three points in motion, addressed in turn.
+- **2026-11-20:** the owner played `b7303bf` and accepted M5 ([record](evidence/m5/owner-acceptance-2026-11-20.md)); authorized the squash merge and the branch's clean-up, and no tag or release.
 
 ## Working resources
 
-Outside the repository, outside `/tmp` and outside caches. Everything finished is pushed.
+Outside the repository and outside `/tmp`.
 
 | What | Where |
 |---|---|
-| Durable work, `$W` = `~/work/dagon-m4` | `$W/clone`: the native clone, where M4 is built and tested. `$W/notes`: logs, captures by stretch (`cap-b`, `cap-c`, ...), commit messages, `drafts/` (the recorded wiring scripts `wire_a.py`, `wire_b.py`, `wire_c.py`, and handoff edits), `proto/` (offline previews), `setup-logs/`. `$W/replay`: the session commands used in the 11 November recovery |
-| Helpers, `$W/bin` | `env.sh` (source it: sets `W`, `S`, `CLONE`, `NOTES`, `SCONS_CACHE`, `GODOT`, `FF`), `xns.sh` (private X display in `unshare -rm`, docs/toolchain.md §6a; one at a time), `cap.sh <dir> [filter]` (route captures and sheets), `focus.sh <text>` (integration run; empty text runs everything), `record.sh <script> <dir>` (Movie Maker on the private display) |
-| Rebuildable environments, `$S` = `~/.cache/dagon-m4/S` | `$S/venv` (scons, Pillow, NumPy, SciPy, soundfile, `imageio_ffmpeg`); `SCONS_CACHE=~/.cache/dagon-scons`; voice: `$S/tts/` (conda, Python 3.11: torch 2.6.0 CPU, chatterbox-tts 0.1.2, kokoro-onnx 0.4.9, numpy 1.26.4, setuptools < 81, soundfile, scipy), `$S/voice-models/`, `$S/hf/` (`HF_HOME`), speech data in `~/.cache/dagon-voice-short/data` (`ESPEAK_DATA_PATH`); X: `$S/xroot`, `$S/xdeb`, `$S/ovl`. `~/.cache/dagon-m4/voice-src/tree` is a clean checkout of `ecad573` |
-| Pushing from the clone | `git -c credential.helper= -c credential.helper='!gh auth git-credential' push origin <branch>`. The clone's `origin/HEAD` was left pointing at the deleted M4 branch; it is reset to `main` |
+| The native clone | `~/work/dagon-m4/clone`, on `main` after the merge. The folder's name is M4's. **The Windows working copy follows `main`;** work is done in the clone and pushed |
+| Helpers, `$W` = `~/work/dagon-m4` | `bin/env.sh` (source it), `xns.sh` (private X display, docs/toolchain.md §6a), `integration_point.sh <name>` and its `_v` and `_m` forms with silent video of the exported game, `focus.sh <name>`; `notes/` |
+| M5's working files, `~/work/dagon-m5` | `bin/` (`recp.sh` for lossless Movie Maker takes, `timing.sh` for frame times at the game's own pace), `notes/` (the passes' takes, sheets and scripts), the accepted candidate's zips |
+| Rebuildable environments | `~/.cache/dagon-m4/S`: `venv`, `tts`, the private X server |
+| Pushing from the clone | `git -c credential.helper= -c credential.helper='!gh auth git-credential' push origin <branch>` |
 
 ## Next concrete action
 
-**M4 is complete: accepted, merged, released and its branch deleted.** Nothing is in progress.
-
-**Next: M5, when the owner asks for it.** Draft its plan from the roadmap's M5 row and its carried tasks (the reveal's seam, the creature against its background, the ending's four pictures, the mix by the owner's ear), for the owner's approval before implementation. Start it on a new branch from `main`. **No M5 implementation before that approval.**
-
-**If the release needs a correction,** it is a new version, `v0.1.0-pre-alpha.2`, through a new record and the same workflow; never a change to the published one.
+**Nothing, until the owner approves the M6 plan or changes it.** Then M6 on its own branch from `main`, through a pull request, with its own candidates. **A tag or release needs the owner's explicit word.**

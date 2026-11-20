@@ -21,7 +21,7 @@ import random
 from PIL import ImageDraw
 
 import gen_shore
-from art_common import Noise, blank, hline, put, ramp
+from art_common import Noise, blank, hline, line, put, ramp
 from palette import rgba
 
 W, H = 480, 270
@@ -108,18 +108,119 @@ def lamp():
     return img
 
 
+def sprite(img, rows, x0, y0, colors):
+    """Pixels from rows of letters; a dot is left clear."""
+    for y, row in enumerate(rows):
+        for x, ch in enumerate(row):
+            if ch != ".":
+                put(img, x0 + x, y0 + y, colors[ch])
+
+
+def stem_x(x0, top, bottom, y):
+    """The raider's stem: raked, the deck well forward of the forefoot, curving in toward the waterline."""
+    t = max(0.0, min(1.0, (y - (top + 3)) / (bottom + 4 - (top + 3))))
+    return x0 - 6 + 8 * t + 18 * t**3
+
+
+def boot_top(img, left, y0, y1, right=W - 1):
+    """The band above the waterline, a shade lighter than the side, that marks a ship's hull from any rock."""
+    for y in range(y0, y1 + 1):
+        for x in range(math.ceil(left(y)), right + 1):
+            put(img, x, y, "C2" if y > y0 else "C3")
+
+
+def rail(img, x0, x1, deck, height=9, gaps=()):
+    """A ship's rail: posts every six pixels on the deck's edge, and the rail along their tops, height pixels above
+    the deck. gaps are openings in it, from one x to another."""
+    def open_at(x):
+        return any(a <= x <= b for a, b in gaps)
+
+    for x in range(x0 + 2, x1, 6):
+        if not open_at(x):
+            for y in range(deck(x) - height + 1, deck(x) + 1):
+                put(img, x, y, "C1")
+    for x in range(x0, x1 + 1):
+        if not open_at(x):
+            put(img, x, deck(x) - height, "C2")
+
+
 def raider_hull(img, x0, top, bottom):
-    """The raider's side, close: black plates, rivets, a row of portholes, and its rail against the sky."""
-    fill(img, [(x0, top + 6), (W, top), (W, bottom), (x0 + 6, bottom + 4)], "C0")
+    """The raider's side, close: black plates, rivets, a row of portholes, and its rail against the sky. Its bow is
+    raked and its hull carries a band above the water, so that it reads as a ship's and not as a wall."""
+    edge = [(stem_x(x0, top, bottom, y), y) for y in range(top + 3, bottom + 5)]
+    fill(img, edge + [(W, bottom), (W, top + 3)], "C0")
     for y in range(top + 14, bottom - 4, 16):
         for x in range(x0 + 10, W, 12):
             put(img, x + (y // 16) % 2 * 6, y, "C2")
-    hline(img, x0 + 2, W - 1, top + 3, "C3")
-    hline(img, x0 + 2, W - 1, top + 4, "C2")
-    for x in range(x0 + 4, W, 6):
-        for y in range(top - 6, top + 3):
-            put(img, x, y, "C1")
-    hline(img, x0 + 2, W - 1, top - 7, "C2")
+    boot_top(img, lambda y: stem_x(x0, top, bottom, y) + 1, bottom - 10, bottom - 7)
+    left = round(stem_x(x0, top, bottom, top + 3))
+    hline(img, left + 1, W - 1, top + 3, "C3")
+    hline(img, left + 1, W - 1, top + 4, "C2")
+    # The stem, lit along its forward edge where the moon comes past it.
+    for x, y in edge[2:-6]:
+        put(img, math.ceil(x), y, "C2")
+    # The hawse pipe and the anchor stowed under it, a ship's mark at any size.
+    ax, ay = left + 14, top + 16
+    for x, y in ((ax - 1, ay - 1), (ax, ay - 1), (ax + 1, ay - 1), (ax - 2, ay), (ax + 2, ay), (ax - 1, ay + 1), (ax + 1, ay + 1)):
+        put(img, x, y, "C3")
+    put(img, ax, ay + 1, "C1")
+    for y in range(ay + 2, ay + 9):
+        put(img, ax, y, "C3")
+    hline(img, ax - 2, ax + 2, ay + 3, "C3")
+    for x, y in ((ax - 3, ay + 7), (ax - 2, ay + 8), (ax - 1, ay + 9), (ax + 1, ay + 9), (ax + 2, ay + 8), (ax + 3, ay + 7)):
+        put(img, x, y, "C3")
+
+
+def funnel(img, x, deck, top, width, rake, rim, band):
+    """A steamer's funnel, raked aft, with a cap and a pale band near its top. rim is the side the moon lights."""
+    for y in range(top, deck + 1):
+        shift = round(rake * (deck - y) / (deck - top))
+        for dx in range(width):
+            put(img, x + shift + dx, y, "C0")
+        put(img, x + shift + (0 if rim < 0 else width - 1), y, "C3")
+        if band <= y - top < band + 3:
+            for dx in range(1, width - 1):
+                put(img, x + shift + dx, y, "C3" if y - top == band else "C2")
+    shift = rake
+    hline(img, x + shift - 1, x + shift + width, top, "C0")
+    hline(img, x + shift - 1, x + shift + width, top + 1, "C0")
+    hline(img, x + shift, x + shift + width - 1, top - 1, "C4")
+
+
+GUARD = [
+    "....ddd....",
+    "...ddddd...",
+    ".rdddddd...",
+    "...rddd....",
+    "...rddd....",
+    "....ddd....",
+    "..rddddddd.",
+    ".rdddddddd.",
+    ".rdddddddd.",
+    ".rd.ddddd.d",
+    ".rd.ddddd.d",
+    ".dd.ddddd.d",
+    "...dddddd..",
+    "...rdddddd.",
+    "..rdddddd..",
+    "..rdddddd..",
+    "..rdd..dd..",
+    "..rd...dd..",
+    "..dd....dd.",
+    "..dd....dd.",
+    ".rdd....dd.",
+    ".ddd....ddd",
+]
+
+
+def guard(img, x, deck):
+    """The guard at the head of the gangway: cap, head, shoulders, a greatcoat to the knee, and his boots apart on the
+    deck. His rifle on his shoulder. The moon is behind him to the left, and lights his left edges."""
+    top = deck - len(GUARD) + 1
+    sprite(img, GUARD, x, top, {"d": "C0", "r": "C4"})
+    line(img, x + 9, top + 7, x + 12, top - 3, "C0")
+    put(img, x + 12, top - 4, "C0")
+    put(img, x + 11, top - 3, "C3")
 
 
 def panel_raider_layers():
@@ -131,15 +232,43 @@ def panel_raider_layers():
     ship(img, 24, HORIZON + 4, 118, 32, "C2", "C3", funnels=1, guns=False, lights=())
     ImageDraw.Draw(img).line([(140, HORIZON - 12), (196, 92)], fill=rgba("C3"))
     raider_hull(img, 190, 64, 188)
+    # The water along her: broken light at the waterline, and a wave folded back from the stem.
     for y in range(186, 194):
-        for x in range(190, W):
-            if noise(x / 6.0, y) > 0.55:
+        for x in range(184, W):
+            if x >= stem_x(190, 64, 188, y) - 2 and noise(x / 6.0, y) > 0.55:
                 put(img, x, y, "C5")
-    # The deck: a gun along it, and a guard with a rifle on his shoulder.
-    ImageDraw.Draw(img).line([(260, 56), (318, 44)], fill=rgba("C1"), width=3)
-    fill(img, [(244, 58), (270, 58), (268, 50), (248, 50)], "C1")
-    fill(img, [(372, 58), (372, 46), (370, 42), (372, 38), (376, 38), (378, 42), (376, 46), (376, 58)], "C1")
-    ImageDraw.Draw(img).line([(377, 40), (382, 30)], fill=rgba("C1"))
+    for y in range(181, 190):
+        x = math.floor(stem_x(190, 64, 188, y))
+        for k in range(1 + (y - 181) // 3):
+            put(img, x - 1 - k, y, "C7" if (k + y) % 3 else "C6")
+    for x, y in ((198, 189), (196, 190), (194, 190), (192, 191), (201, 190)):
+        put(img, x, y, "C6")
+
+    def deck(x):
+        return 66
+
+    # The funnel aft, raked, with its band: the mark carried into the escape.
+    funnel(img, 432, deck(440), 14, 22, 5, -1, 6)
+    # The deck: a gun trained over the bow on our ship, out over the open water to the left and a little down, its
+    # barrel against the sky above the rail and well clear of the moon; its breech behind the shield. It stands on a
+    # pedestal, which comes down through the rail to a base on the deck.
+    floor = deck(258)
+    fill(img, [(252, 58), (264, 58), (265, floor - 2), (251, floor - 2)], "C0")
+    fill(img, [(247, floor - 2), (269, floor - 2), (270, floor), (246, floor)], "C0")
+    fill(img, [(244, 58), (270, 58), (268, 50), (248, 50)], "C0")
+    fill(img, [(268, 51), (275, 52), (275, 56), (268, 56)], "C0")
+    ImageDraw.Draw(img).line([(248, 53), (203, 55)], fill=rgba("C0"), width=3)
+    fill(img, [(200, 53), (204, 53), (204, 57), (200, 57)], "C0")
+    # The moon behind it catches the top of the shield, the barrel and the muzzle, and the pedestal's near edge.
+    hline(img, 249, 267, 49, "C4")
+    line(img, 247, 51, 205, 53, "C4")
+    hline(img, 200, 204, 52, "C4")
+    for y in range(59, floor - 2):
+        put(img, 251, y, "C3")
+    hline(img, 246, 250, floor - 3, "C3")
+    # The rail, open where the guard stands at the head of the gangway.
+    rail(img, round(stem_x(190, 64, 188, 67)) + 1, W - 1, deck, gaps=((364, 384),))
+    guard(img, 368, deck(374))
     for cx in (240, 290, 340, 390, 440):
         porthole(img, cx, 120 - (cx - 240) // 50)
     return img, {"lamp": (lamp(), (334, 110))}
@@ -232,20 +361,94 @@ def oars(frame):
     return img
 
 
+# The raider in the escape, from astern: its waterline, and its counter stern overhanging the water.
+ESCAPE_WATERLINE = 184
+ESCAPE_STERN = [(160, 74), (162, 80), (162, 88), (159, 96), (153, 103), (146, 108), (128, ESCAPE_WATERLINE)]
+
+
+def escape_deck(x):
+    """The raider's deck in the escape: its sheer rising toward the stern."""
+    return round(80 - 6 * x / 160)
+
+
+def escape_hull_right(y):
+    """How far right the raider's hull reaches on row y of the escape."""
+    for (x0, y0), (x1, y1) in zip(ESCAPE_STERN, ESCAPE_STERN[1:]):
+        if y0 <= y <= y1:
+            return x0 + (x1 - x0) * (y - y0) / max(1, y1 - y0)
+    return ESCAPE_STERN[-1][0] if y > ESCAPE_STERN[-1][1] else ESCAPE_STERN[0][0]
+
+
 def panel_escape_layers():
-    """The same raider's side from outside, at night, the lit porthole low on it. The boat pulls away from it to the
-    right, the oars dipping, and the lamp behind goes out."""
+    """The same raider from astern and a little off, at night: its counter stern over the water, the rail, the
+    funnel with its band, the mast; empty davits, their falls hanging, where the boat was. Its hull stands in the
+    water, which breaks white along it and gives back its dark. The lit porthole low on it. The boat pulls away from
+    it to the right, the oars dipping, and the lamp behind goes out."""
     img = gen_shore.sky()
     noise = Noise(402)
     night_sea(img, noise, top=HORIZON)
     moon_path(img, noise)
-    fill(img, [(0, 40), (150, 70), (170, H), (0, H)], "C0")
-    for y in range(80, 230, 18):
-        for x in range(10, 150, 12):
-            put(img, x + (y // 18) % 2 * 6, y, "C2")
-    for cx, cy in ((44, 100), (84, 104)):
-        porthole(img, cx, cy)
+    wl = ESCAPE_WATERLINE
+    # Its reflection first, under where the hull will stand: the sea darkened, broken by the swell's lit lines.
+    for y in range(wl + 1, 214):
+        d = y - wl
+        right = escape_hull_right(wl - d * 1.6) + 2 * math.sin(y * 1.3)
+        for x in range(0, round(right)):
+            n = noise(x / 9.0, y * 0.9)
+            if n > 0.22 + d * 0.016:
+                put(img, x, y, "C0" if n > 0.5 else "C1")
+            elif y % 3 == 0 and n < 0.12:
+                put(img, x, y, "C4")
+    hull_edge = [(escape_hull_right(y), y) for y in range(ESCAPE_STERN[0][1], wl + 1)]
+    # The rudder under the counter: it is her stern.
+    fill(img, [(136, 142), (143, 144), (144, wl), (131, wl)], "C0")
+    line(img, 143, 145, 144, wl - 1, "C2")
+    top_edge = [(x, escape_deck(x) + 1) for x in range(0, 161)]
+    fill(img, [(0, wl)] + top_edge + hull_edge, "C0")
+    for y in range(92, wl - 12, 16):
+        for x in range(8, round(escape_hull_right(y)) - 4, 12):
+            put(img, x + (y // 16) % 2 * 6, y, "C2")
+    boot_top(img, lambda y: 0, wl - 10, wl - 7, right=0)
+    for y in range(wl - 10, wl - 6):
+        for x in range(0, round(escape_hull_right(y))):
+            put(img, x, y, "C2" if y > wl - 10 else "C3")
+    for x in range(0, 161):
+        put(img, x, escape_deck(x) + 1, "C3")
+        put(img, x, escape_deck(x) + 2, "C2")
+    # The stern's edge lit by the moon on the right.
+    for x, y in hull_edge[1:-4]:
+        put(img, math.floor(x) - 1, y, "C2")
+    # Funnel and band, as in the captivity, the moon on its right side; the mast and its stay to the stern.
+    funnel(img, 34, escape_deck(44), 30, 18, 5, 1, 6)
+    for y in range(6, escape_deck(98) + 1):
+        put(img, 98, y, "C0")
+        put(img, 99, y, "C2" if y < 60 else "C0")
+    hline(img, 89, 109, 22, "C0")
+    hline(img, 90, 108, 21, "C2")
+    line(img, 99, 8, 158, escape_deck(158) - 8, "C1")
+    line(img, 157, escape_deck(157), 160, escape_deck(157) - 14, "C1")
+    # Empty davits, and their falls hanging down the side to where the boat was lowered.
+    for dx in (108, 136):
+        deck = escape_deck(dx)
+        for y in range(deck - 14, deck + 1):
+            put(img, dx, y, "C0")
+        for x, y in ((dx + 1, deck - 15), (dx + 2, deck - 16), (dx + 3, deck - 16), (dx + 4, deck - 15), (dx + 4, deck - 14)):
+            put(img, x, y, "C0")
+        put(img, dx + 2, deck - 17, "C3")
+        for y in range(deck - 13, ESCAPE_WATERLINE - 3):
+            put(img, dx + 4 + round(1.5 * math.sin((y - deck) / 30.0)), y, "C2")
+    rail(img, 0, 160, escape_deck, height=8)
+    for cx in (6, 44, 84):
+        porthole(img, cx, 108)
     porthole(img, 124, 108)
+    # Where the hull goes into the water: the swell breaking white along it, most at the stern.
+    for x in range(0, round(escape_hull_right(wl)) + 3):
+        for y in (wl - 1, wl, wl + 1):
+            n = noise(x / 3.0, y * 1.7)
+            if n > 0.5:
+                put(img, x, y, "C7" if n > 0.8 else ("C6" if n > 0.65 else "C5"))
+    for x, y in ((126, wl - 2), (128, wl - 1), (130, wl), (131, wl - 1), (133, wl + 1), (124, wl + 1), (135, wl)):
+        put(img, x, y, "C7")
     return img, {
         "lamp": (lamp(), (118, 102)),
         "boat": (boat_with_rower(), (190, 158)),
@@ -344,167 +547,16 @@ def prologue_parts():
 # ---------------------------------------------------------------- the epilogue's pictures, after the escape
 
 
-def panel_found():
-    """Grey morning. A steamer, stopped, its boat lowered, and beside it the small boat with a man lying in it."""
-    img = blank(W, H)
-    noise = Noise(411)
-    horizon = 132
-    for y in range(horizon + 1):
-        for x in range(W):
-            put(img, x, y, ramp(["C3", "C4", "C5", "C6"], 2.4 - y / horizon * 1.2 + (noise(x / 40.0, y / 12.0) - 0.5) * 0.5, x, y, 0.4))
-    night_sea(img, noise, top=horizon, calm=0.7)
-    # The steamer, broadside, one funnel smoking into the grey.
-    ship(img, 210, horizon + 24, 230, 64, "C1", "C2", funnels=1, guns=False, lights=())
-    for k in range(18):
-        put(img, 300 + k * 2 + (k % 3), horizon - 40 - k * 2 - (k % 2), "C3")
-        put(img, 301 + k * 2, horizon - 41 - k * 2, "C4")
-    for x in range(222, 430, 9):
-        put(img, x, horizon + 6, "C4")
-    # A ladder down its side, and its own boat in the water below.
-    for y in range(horizon + 2, horizon + 26, 3):
-        hline(img, 262, 268, y, "W2")
-    fill(img, [(244, horizon + 28), (290, horizon + 26), (286, horizon + 33), (248, horizon + 33)], "C2")
-    for k, fx in enumerate((256, 266, 276)):
-        fill(img, [(fx, horizon + 27), (fx + 4, horizon + 27), (fx + 4, horizon + 19), (fx, horizon + 19)], "C1")
-        put(img, fx + 1 + k % 2, horizon + 17, "C1")
-    # Ours, nearer: the man in the bottom of it, not moving.
-    bx, by = 132, 168
-    fill(img, [(bx, by), (bx + 58, by - 3), (bx + 52, by + 8), (bx + 6, by + 8)], "W1")
-    hline(img, bx + 2, bx + 56, by - 1, "W3")
-    fill(img, [(bx + 12, by - 4), (bx + 38, by - 6), (bx + 38, by - 2), (bx + 12, by)], "C2")
-    for k in range(4):
-        put(img, bx + 40 + k, by - 6, "S0")
-    for i in range(3):
-        hline(img, bx - 8 + i * 4, bx + 64 - i * 4, by + 10 + i * 2, "C3")
-    return img
+def _ending(name):
+    """The epilogue's pictures are drawn in gen_ending.py, which uses this file's sea and ship."""
+    import gen_ending
 
-
-def panel_listen():
-    """Night, years on. A small room, a man at the window, the sea and the moon beyond it. He is awake."""
-    img = blank(W, H)
-    noise = Noise(412)
-    for y in range(H):
-        for x in range(W):
-            put(img, x, y, ramp(["C0", "W0", "E1"], 0.9 + (noise(x / 30.0, y / 30.0) - 0.5) * 0.6, x, y, 0.4))
-    wx0, wy0, wx1, wy1 = 250, 24, 400, 150
-    sky = gen_shore.sky()
-    for y in range(wy0, wy1):
-        for x in range(wx0, wx1):
-            if y < 112:
-                img.putpixel((x, y), sky.getpixel((x - wx0 + 240, y - wy0 + 16)))
-            else:
-                put(img, x, y, "T0" if (x + y) % 3 else "C2")
-    # The moon's path on the water, through the glass.
-    for y in range(113, wy1):
-        for x in range(316, 340):
-            if (x * 7 + y * 3) % 5 == 0 and abs(x - 328) < 4 + (y - 112) // 3:
-                put(img, x, y, "C6")
-    for x in range(wx0, wx1):
-        put(img, x, wy0, "W2")
-        put(img, x, wy1, "W2")
-        put(img, x, 88, "W1")
-    for y in range(wy0, wy1 + 1):
-        put(img, wx0, y, "W2")
-        put(img, wx1, y, "W2")
-        put(img, (wx0 + wx1) // 2, y, "W1")
-    # The sill, and the man at it, seated, his back to us, his head turned a little toward the sea.
-    fill(img, [(240, 150), (410, 150), (410, 156), (240, 156)], "W1")
-    fill(img, [(298, 270), (294, 168), (304, 150), (326, 148), (334, 166), (330, 270)], "C1")
-    fill(img, [(306, 150), (305, 132), (312, 126), (322, 128), (324, 140), (322, 150)], "C1")
-    put(img, 324, 134, "W1")
-    fill(img, [(276, 270), (280, 210), (350, 210), (354, 270)], "W0")
-    # A candle on the sill, burnt low.
-    fill(img, [(262, 150), (266, 150), (266, 142), (262, 142)], "C6")
-    put(img, 264, 140, "A2")
-    put(img, 264, 139, "A3")
-    return img
-
-
-def panel_shop():
-    """A shop window on a grey street. On a cloth, a gold band: an eye, above a line of waves."""
-    img = blank(W, H)
-    noise = Noise(413)
-    for y in range(H):
-        for x in range(W):
-            put(img, x, y, ramp(["E1", "E2", "E3", "C3"], 1.6 + (noise(x / 25.0, y / 25.0) - 0.5) * 0.6, x, y, 0.4))
-    wx0, wy0, wx1, wy1 = 100, 18, 380, 182
-    fill(img, [(wx0, wy0), (wx1, wy0), (wx1, wy1), (wx0, wy1)], "C1")
-    for x in range(wx0, wx1 + 1):
-        put(img, x, wy0, "W3")
-        put(img, x, wy1, "W3")
-    for y in range(wy0, wy1 + 1):
-        put(img, wx0, y, "W3")
-        put(img, wx1, y, "W3")
-    # The cloth, and odds and ends on it: a compass, a pipe, a coin or two.
-    fill(img, [(140, 128), (340, 128), (360, 176), (120, 176)], "W1")
-    hline(img, 141, 339, 128, "W2")
-    for a in range(0, 360, 10):
-        put(img, 170 + round(9 * math.cos(math.radians(a))), 150 + round(4 * math.sin(math.radians(a))), "C5")
-    hline(img, 300, 318, 156, "W3")
-    put(img, 318, 155, "W3")
-    for cx_, cy_ in ((286, 166), (294, 168)):
-        put(img, cx_, cy_, "A1")
-        put(img, cx_ + 1, cy_, "A2")
-    # The band, standing on its edge, its face toward the street: gold, and on it the mark.
-    bx0, by0, bx1, by1 = 196, 112, 284, 146
-    fill(img, [(bx0 + 4, by0), (bx1 - 4, by0), (bx1, by0 + 4), (bx1, by1 - 4), (bx1 - 4, by1), (bx0 + 4, by1), (bx0, by1 - 4), (bx0, by0 + 4)], "A1")
-    hline(img, bx0 + 4, bx1 - 4, by0, "A3")
-    hline(img, bx0 + 2, bx1 - 2, by0 + 1, "A2")
-    hline(img, bx0 + 4, bx1 - 4, by1, "W2")
-    for y in range(by0 + 2, by1 - 1):
-        put(img, bx0 + 1, y, "A2")
-        put(img, bx1 - 1, y, "W2")
-    cx, cy = (bx0 + bx1) // 2, by0 + 13
-    for x in range(cx - 14, cx + 15):
-        h = round(6 * math.sqrt(max(0, 1 - ((x - cx) / 14.5) ** 2)))
-        put(img, x, cy - h, "W1")
-        put(img, x, cy + h, "W1")
-    for x in range(cx - 3, cx + 4):
-        for y in range(cy - 3, cy + 4):
-            if (x - cx) ** 2 + (y - cy) ** 2 <= 10:
-                put(img, x, y, "W1")
-    for row in (cy + 11, cy + 16):
-        for i in range(36):
-            put(img, cx - 18 + i, row - round(2 * abs(math.sin(i * math.pi / 6))), "W1")
-    # The faint reflection of a man, looking in.
-    for y in range(40, 120):
-        for x in range(300, 344):
-            if (x - 322) ** 2 / 360 + (y - 80) ** 2 / 1300 < 1 and (x + y) % 3 == 0:
-                put(img, x, y, "C3")
-    return img
-
-
-def panel_rising():
-    """The sea at night from the shore. Calm, and under the moon's path a slow swell that should not be there, and
-    breaking it, for a moment, a row of dark points."""
-    img = gen_shore.sky()
-    noise = Noise(414)
-    horizon = 128
-    night_sea(img, noise, top=horizon, calm=0.6)
-    for y in range(horizon + 6, horizon + 40):
-        for x in range(250, 390):
-            d = ((x - 320) / 66.0) ** 2 + ((y - horizon - 22) / 14.0) ** 2
-            if d < 1 and (x + y) % 2 == 0:
-                put(img, x, y, "T1" if d > 0.5 else "T2")
-    # The crest: spines, uneven, the tallest in the middle, water running off them.
-    for k, (sx, tall) in enumerate(((300, 6), (309, 9), (318, 12), (327, 10), (336, 7), (344, 4))):
-        base = horizon + 20
-        for t in range(tall):
-            half = max(0, (tall - t) // 4)
-            for x in range(sx - half, sx + half + 1):
-                put(img, x, base - t, "C0")
-        put(img, sx, base - tall + 1, "C5")
-        put(img, sx + 1, base + 1, "T2")
-    for x in range(W):
-        for y in range(H - 18, H):
-            put(img, x, y, "E0" if noise(x / 9.0, y) > 0.4 else "E1")
-    return img
+    return getattr(gen_ending, name)
 
 
 ENDING_PANELS = {
-    "ending_1_found.png": panel_found,
-    "ending_2_listen.png": panel_listen,
-    "ending_3_shop.png": panel_shop,
-    "ending_4_rising.png": panel_rising,
+    "ending_1_found.png": lambda: _ending("panel_found")(),
+    "ending_2_listen.png": lambda: _ending("panel_listen")(),
+    "ending_3_shop.png": lambda: _ending("panel_shop")(),
+    "ending_4_rising.png": lambda: _ending("panel_rising")(),
 }
-

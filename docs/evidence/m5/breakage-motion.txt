@@ -1,0 +1,14 @@
+CAUGHT           1  The body fades in whole over the ridge again
+CAUGHT           1  The water stops short of the walkway's end again
+CAUGHT           2  The shoulder never shows over the arm
+CAUGHT           1  The shoulder lies beside the arm's root, not over it
+CAUGHT           1  The arm fades in whole in the air again
+CAUGHT           1  The shader is first drawn in the reveal again
+CAUGHT           1  The warm-up is too clear to be drawn
+CAUGHT           1  The sea stops dead at the collapse again
+CAUGHT           2  The sea's rush falls short of a runner
+
+commit b7303bf, 9 breakages, {'CAUGHT': 9}, controls held, summary complete, 493 s
+BREAKAGE_RESULT valid=yes
+
+Run by: python tools/breakage.py tools/breakage_motion_m5.py <workdir> --workers 3, GCC debug, on the native Linux clone, on the candidate b7303bf. Each entry puts back one fault of the motion pass (D119 to D121); a breakage counts as caught only when the project's own unit and integration tests, run in full, fail.

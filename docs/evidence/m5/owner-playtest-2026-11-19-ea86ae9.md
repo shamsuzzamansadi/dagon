@@ -1,0 +1,33 @@
+# The owner's playtest of `ea86ae9`
+
+**Recorded as relayed to the developer on 2026-11-19.** The owner's points are summarised, limited to what was said. **This is an owner playtest, not acceptance:** the owner asked for one focused pass on these points before accepting M5, which is pending.
+
+## The build
+
+The owner personally played the Windows candidate **`ea86ae9`**: `dagon-windows`, artifact 14556713598, from push run [44575980858](https://github.com/shamsuzzamansadi/dagon/actions/runs/44575980858), zip SHA-256 `1a8dc2735587cf129c32c049929fba9a18471bc24726da46068506ee43b1e67e`. That was the candidate after the visual pass on their playtest of `59562c6` ([record](owner-playtest-2026-11-19-59562c6.md)). **The owner said they were broadly satisfied with the previous visual fixes, and that three issues remain in motion.**
+
+No recording of this playtest was named, and none newer than the previous playtest's was on the developer's machine. The points below were reproduced from the game itself.
+
+## The owner's points
+
+| # | The owner asked |
+|---|---|
+| 1 | **Dagon emerging from the water.** Watch the exported sequence at normal speed, from the last moment the shoulder looks like a ridge until Dagon is fully visible. Check the known internal edge at 3.0 to 4.3 s and follow the waterline as the body rises: be able to follow the same submerged shape as it becomes the shoulder. Correct any visible jump, double outline or abrupt change of water contact that is reproduced |
+| 2 | **The detached hand,** seen in play. Follow the shoulder, arm, wrist and hand through the movement, including when the hand lands beside the carving. Find the first frame where the connection breaks and its cause in the scene or the art, and fix it so the arm reads as one connected limb at the game's size, including while the camera moves. Check the pose just before contact as well as the landing |
+| 3 | **The advancing sea.** Play the escape twice, running and letting the sea catch the sailor. Watch where the leading edge comes from, how it moves against the ground and the sailor, and where the water is when the scene cuts to the collapse. Identify the discontinuity that can be reproduced and fix it, keeping both outcomes. If what the owner saw stays ambiguous, show a short timestamped clip of each path |
+
+Also asked: `ea86ae9` as the before build; short, uninterrupted before-and-after clips at normal speed and the game's scale, with its sound, from the emergence through the hand's landing and from the advancing sea through the collapse; the relevant checks and exported routes; then one Windows candidate with its commit, artifact link and zip SHA-256, and a stop for the owner's playtest and explicit acceptance before any merge or M6. Keep the pass within M5.
+
+## What was found and done
+
+Reproduced on recordings of `ea86ae9` made by Godot's Movie Maker, lossless, frame by frame ([clips and stills](motion-pass-2026-11-19/README.md)).
+
+| # | Found | Done | Evidence |
+|---|---|---|---|
+| 1 | **A double outline:** from 3.0 to about 4.2 s the ridge stays solid while the body fades in uniformly over it, so the ridge's straight right side stands as a dark diagonal edge inside a half-faded body. **An abrupt change of water contact:** the strip of water at the ridge's foot ended at the walkway's end, and the trench's water lay behind the creature, so past the walkway's end the ridge's foot, then the body, went on down past the water; part of the creature showed below the waterline in all 271 frames of the reveal, most at 3.6 s. **A jump, at the game's own pace:** the first time the spray is drawn, at 2.6 s, the game took a long frame and the clip jumped ahead after it, about 180 ms on this machine's software renderer; this pass's shader, the first time it drew, added the same at 3.0 and 5.5 s | The body, the head and the crest come out of the fog from the ridge outward, through a shader driven by the clip's own unchanged fade: over the ridge the body is whole at once, and it spreads from there with a soft front. The water runs before the whole creature, across the trench and below the lowest the camera shows; in the same take nothing of the creature shows below the waterline. The shader and a particle are drawn, showing nothing, from the moment the level loads, so nothing is first drawn in the reveal: no frame over 100 ms in its first 7 s | D119 |
+| 2 | **The arm was never joined.** It was a separate drawing over the body, ending at the shoulder in a straight cut that its art lit like an outer edge. Turned about a point on the body's sloping outline, the cut met the body along its lower corner only, its upper corner up to 18 px clear of it, with sky in the notch: so from its first frame, 5.5 s into the reveal, to the end. **And for its first 0.45 s it faded in whole, already out in the air:** the half-seen hand stood dark against the pale Monolith while the forearm was lost against the night, a hand on its own | The arm's root is rounded about the shoulder, and the body's own pixels are laid over it wherever it crosses the body, so it comes out from under the shoulder at every turn and zoom. Through the same shader its fade-in brings it out from the shoulder to the hand. Checked at the top of the swing, just before contact (6.95 s), at the landing (7.0 s) and at rest | D120 |
+| 3 | **At the collapse the sea stopped dead,** because the director moves it only while he flees. Caught, he fell forward out of it and lay beside a still wall of water for three seconds; running, it stopped at the edge of the view and the zoom took it out of sight. **2.5 s in, a second sea, in the screen's own space and at a finer pixel, rose from the bottom of the screen** in front of the stone floor, with the first still standing in view when it had caught him. The leading edge comes from the trench at the right, rising for 2.5 s, then comes on at an even 64 px/s over level ground; that part is unchanged | The same sea comes on from wherever the flee left it: at the flee's own pace for 2.4 s, then, as its rush is heard, fast enough to reach him from as far behind as a runner can be, then up until it fills the view as the screen fades. The second sea is gone. Both outcomes are kept, and the flee's rule is unchanged | D121 |
+
+**Kept.** No line, sound, haptic cue, camera key, collision or outcome changed, and the clips' lengths are as they were. Recordings of both builds put every stage on the same frame, and their sound is identical sample for sample over each whole take.
+
+**Not claimed:** that anyone has listened to the game's sound; that the pictures read to anyone but the developer; that what is fixed is what the owner saw, which only the owner can say; or that M5 is accepted.
