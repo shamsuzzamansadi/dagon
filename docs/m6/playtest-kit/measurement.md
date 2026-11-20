@@ -12,7 +12,7 @@ From each player's recording, frame by frame where it matters, with times from t
 
 **Time to the first ending card** = first ending card − New Game. **Time to the menu** = return to the menu − New Game; it includes however long the player stays on the ending's card and the credits, which is reported on its own too. Both are reported, separately, and both against the 10 to 15 minute target (GDD §4, R11). The prologue, which the player may watch or skip, is within both, and its own length is reported beside them.
 
-For comparison, the scripted route on `a4250f0`, which knows the puzzle (from `tools/route_check.py`, after the prologue): **reading everything, 4 min 2 s to the first ending card and 4 min 55 s to the menu; straight through, 2 min 9 s and 2 min 13 s.** Scripted, not a playtest.
+For comparison, the scripted route on the baseline's own Linux build, which knows the puzzle (`tools/route_check.py`, timed from the end of the prologue, so without How to Play and the prologue): **reading everything, 4 min 3 s to the first ending card and 4 min 56 s to the menu, with a 36 s prologue before it; straight through, 2 min 7 s and 2 min 11 s, the prologue skipped.** Scripted, not a playtest.
 
 ## Also from the recording
 
