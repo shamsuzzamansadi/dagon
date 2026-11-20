@@ -12,13 +12,20 @@ moon and the wet pick out, and the clip fades it in over the base.
 
     dagon_<part>.png, dagon_<part>_lit.png    body, head, crest, arm
     dagon_ridge.png                           the shoulder as it shows before the reveal: the same pixels as the body's
+    dagon_shoulder.png, dagon_shoulder_lit.png
+                                              the body's own pixels wherever the arm, turning, crosses it: laid over
+                                              the arm, so that it comes out from under the shoulder's outline (D120)
+    dagon_<part>_reach.png                    body, head, crest: how far each pixel lies from the ridge, 0 on it and
+                                              255 at the farthest that shows (D119); arm: how far from the shoulder,
+                                              0 at it and 255 at the fingertips (D120). Not artwork: data for the
+                                              shader the parts come out through, project/assets/reveal/emerge.gdshader
 """
 
 import math
 import random
 
 import numpy as np
-from PIL import Image, ImageDraw, ImageFilter
+from PIL import Image, ImageChops, ImageDraw, ImageFilter
 from scipy import ndimage
 
 from art_common import BAYER, Noise
@@ -27,6 +34,16 @@ from palette import rgba
 SKIN = ["C0", "C1", "T0", "T1", "T2", "T3"]
 LIGHT = np.array([0.50, -0.76, 0.42])
 LIGHT = LIGHT / np.linalg.norm(LIGHT)
+
+# The point on the body's outline that the reveal's clip turns the arm about, and how far it turns it either way
+# (D107). A test holds the clip to them.
+SHOULDER = (-305, -166)
+ARM_TURN = (-0.5, 0.22)
+# The arm's root is rounded about that point, so that its outline there is the same at every turn.
+SHOULDER_RADIUS = 27
+# What shows of the creature once the fog has left it: down to the water, at y = -9 in the world, with the creature
+# then 41 px up from its rest (the reveal's clip at 4.3 s).
+SHOWN_TO = -9 + 41
 
 
 def frame(points):
@@ -261,9 +278,17 @@ def crest(points):
     return double(base), double(lit), (left, top)
 
 
+def shoulder_disc():
+    cx, cy = SHOULDER
+    return [(cx + SHOULDER_RADIUS * math.cos(a), cy + SHOULDER_RADIUS * math.sin(a)) for a in np.linspace(0, 2 * math.pi, 48, endpoint=False)]
+
+
 def arm(points):
-    left, top, w, h = frame(points)
-    mask = raster([points], left, top, w, h)
+    """The arm and its hand. Its root is rounded about the shoulder it turns on: it ended in a straight cut, which the
+    moon lit like an outer edge, and whose corner stood clear of the body."""
+    disc = shoulder_disc()
+    left, top, w, h = frame(points + disc)
+    mask = raster([points, disc], left, top, w, h)
     # The web between the fingers, from the knuckles to half their length.
     web = Image.new("L", (w, h), 0)
     draw = ImageDraw.Draw(web)
@@ -316,4 +341,75 @@ def parts(polygon):
     for name, draw in (("head", head), ("crest", crest), ("arm", arm)):
         base, lit, at = draw(polygon(name.capitalize()))
         out[f"dagon_{name}"], out[f"dagon_{name}_lit"] = (base, at), (lit, at)
+    out.update(shoulder(out))
+    out.update(reach(polygon, body_mask))
     return out
+
+
+def shoulder(out):
+    """The body's own pixels wherever the arm crosses the body at any turn the clip gives it, with a little to spare
+    for the screen's rounding. Laid over the arm, they put its root under the shoulder's outline, so that the arm
+    always comes out from the body and never shows where it was cut."""
+    body_base, (bx, by) = out["dagon_body"]
+    body_lit, _ = out["dagon_body_lit"]
+    arm_base, (ax, ay) = out["dagon_arm"]
+    # The arm's shape, placed in the body's image, turned about the shoulder through the clip's whole turn.
+    placed = Image.new("L", body_base.size, 0)
+    placed.paste(arm_base.getchannel("A"), (ax - bx, ay - by))
+    pivot = (SHOULDER[0] - bx, SHOULDER[1] - by)
+    swept = Image.new("L", body_base.size, 0)
+    for turn in np.arange(ARM_TURN[0] - 0.04, ARM_TURN[1] + 0.045, 0.005):
+        swept = ImageChops.lighter(swept, placed.rotate(-math.degrees(turn), resample=Image.NEAREST, center=pivot))
+    cover = ImageChops.multiply(swept.filter(ImageFilter.MaxFilter(7)), body_base.getchannel("A"))
+    box = cover.getbbox()
+    box = (box[0] // 2 * 2, box[1] // 2 * 2, box[2], box[3])
+    images = {}
+    for name, source in (("dagon_shoulder", body_base), ("dagon_shoulder_lit", body_lit)):
+        image = Image.new("RGBA", body_base.size, (0, 0, 0, 0))
+        image.paste(source, (0, 0), cover)
+        images[name] = (image.crop(box), (bx + box[0], by + box[1]))
+    return images
+
+
+def reach(polygon, body_mask):
+    """For the body, the head and the crest, how far each pixel lies from the ridge, in the creature's space at rest,
+    as a grey image at the half scale the parts are drawn at: 0 on the ridge, 255 at the farthest pixel that shows
+    when the fog has gone. The reveal's shader brings each part out where its fade has reached (D119)."""
+    frames = {"body": frame(polygon("Body")), "head": frame(polygon("Head")), "crest": frame(polygon("Crest"))}
+    left = min(f[0] for f in frames.values())
+    top = min(f[1] for f in frames.values())
+    right = max(f[0] + 2 * f[2] for f in frames.values())
+    bottom = max(f[1] + 2 * f[3] for f in frames.values())
+    w, h = (right - left) // 2, (bottom - top) // 2
+    # As wide as the ridge's drawing, which takes in two pixels round its shape.
+    ridge = ndimage.binary_dilation(raster([polygon("Ridge")], left, top, w, h))
+    distance = 2.0 * ndimage.distance_transform_edt(~ridge)
+    shows = np.zeros((h, w), dtype=bool)
+    fl, ft, fw, fh = frames["body"]
+    rows = np.arange(fh)[:, None] * 2 + ft < SHOWN_TO
+    shows[(ft - top) // 2:(ft - top) // 2 + fh, (fl - left) // 2:(fl - left) // 2 + fw] |= body_mask & rows
+    for name in ("head", "crest"):
+        fl, ft, fw, fh = frames[name]
+        shows[(ft - top) // 2:(ft - top) // 2 + fh, (fl - left) // 2:(fl - left) // 2 + fw] |= raster([polygon(name.capitalize())], fl, ft, fw, fh)
+    farthest = distance[shows].max()
+    value = np.clip(np.round(255.0 * distance / farthest), 0, 255).astype(np.uint8)
+    out = {}
+    for name, (fl, ft, fw, fh) in frames.items():
+        part = value[(ft - top) // 2:(ft - top) // 2 + fh, (fl - left) // 2:(fl - left) // 2 + fw]
+        out[f"dagon_{name}_reach"] = (Image.fromarray(part, "L"), (fl, ft))
+    out["dagon_arm_reach"] = arm_reach(polygon("Arm"))
+    return out
+
+
+def arm_reach(points):
+    """For the arm, at rest, how far each pixel lies from the shoulder it turns on, as a grey image at the half scale
+    it is drawn at: 0 over its rounded root, 255 at the fingertips. Through the shader, its fade-in brings it out from
+    the shoulder to the hand (D120), where it faded in whole, the hand dark against the pale stone and the rest lost
+    against the night."""
+    disc = shoulder_disc()
+    left, top, w, h = frame(points + disc)
+    yy, xx = np.mgrid[0:h, 0:w]
+    distance = np.hypot(left + 2 * xx + 1 - SHOULDER[0], top + 2 * yy + 1 - SHOULDER[1]) - SHOULDER_RADIUS
+    farthest = distance[raster([points, disc], left, top, w, h)].max()
+    value = np.clip(np.round(255.0 * distance / farthest), 0, 255).astype(np.uint8)
+    return Image.fromarray(value, "L"), (left, top)

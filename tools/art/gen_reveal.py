@@ -215,16 +215,19 @@ def dagon_at():
     return float(match.group(1)), float(match.group(2))
 
 
-# The water past the walkway, from the Monolith's edge to where the walkway ends, in the rows above its top.
-SHALLOWS_X0, SHALLOWS_X1 = 4290, 4544
-SHALLOWS_TOP, SHALLOWS_BOTTOM = -9, -1
+# The water the creature stands in, seen past the walkway: from the Monolith's edge across the whole trench, its
+# surface in the rows above the walkway's top. Below them it goes on down as deep water, behind the walkway and past
+# its end, to below the lowest the camera shows, its shake included (limit_bottom 50, max_shake 8).
+SHALLOWS_X0, SHALLOWS_X1 = 4290, 5400
+SHALLOWS_TOP, SHALLOWS_BOTTOM = -9, 60
 
 
 def ridge_water():
-    """The water at the ridge's foot, seen past the walkway: before the reveal the ridge stands in it, broken white
-    where it goes in, and the water gives back its dark. Laid in front of the creature and behind the walkway, it stays
-    where it is when the creature rises out of it, and covers the ridge's foot until then. Returns the image and its
-    place in the world."""
+    """The water the creature stands in. Before the reveal the ridge stands in it, broken white where it goes in, and
+    the water gives back its dark; the reveal brings the rest of the body up out of the same water, at the same line,
+    from the ridge's foot across the trench (D119). Laid in front of the creature and behind the walkway, it stays
+    where it is when the creature rises out of it, and covers its foot until then. Returns the image and its place in
+    the world."""
     dx, dy = dagon_at()
     ridge = [(x + dx, y + dy) for x, y in scene_polygon("Ridge", "Dagon")]
     foot = [x for x in range(SHALLOWS_X0, SHALLOWS_X1) if _in_polygon(ridge, x + 0.5, SHALLOWS_TOP + 0.5)]
@@ -243,9 +246,13 @@ def ridge_water():
                 color = "C8" if n > 0.8 - 0.4 * churn else ("C7" if n > 0.5 - 0.3 * churn else "C5")
             elif d == 1:
                 color = "C7" if n > 0.85 - 0.5 * churn else ("C5" if n > 0.62 else "T1")
-            else:
+            elif d < 9:
                 ripple = d % 2 == 1 and noise(x / (3.0 + d), d * 7.0) > 0.66 - 0.02 * d
                 color = ("C5" if d > 5 and n > 0.6 else "C4") if ripple else ("C0" if n < 0.35 else ("T0" if n < 0.7 else "C1"))
+            else:
+                # Deeper, the moon's ripples thin out and the water darkens.
+                ripple = d % 3 == 0 and noise(x / (4.0 + d), d * 7.0) > 0.62 + 0.012 * d
+                color = "C4" if ripple else ("C0" if n < 0.45 + 0.006 * d else ("T0" if n < 0.78 else "C1"))
             put(img, c, d, color)
     return img, (SHALLOWS_X0, SHALLOWS_TOP)
 

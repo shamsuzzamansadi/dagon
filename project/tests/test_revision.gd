@@ -574,6 +574,126 @@ func test_the_ridge_stands_in_water_and_the_ritual_ground_lies_before_the_kneele
 	h.check(ground.light_mask == (world.get_node("RitualLayer/Backdrop") as CanvasItem).light_mask, "the ritual's ground is lit unlike the backdrop it copies")
 
 
+const EMERGE := "res://assets/reveal/emerge.gdshader"
+
+
+## The owner's playtest of 2026-11-19 of ea86ae9, the emergence. The creature comes out of the fog from the ridge
+## outward (D119): the body, the head and the crest draw through one shader, each with its own map of how far it lies
+## from the ridge, at half its drawing's size, and the fades that drive it are the clip's own, where they were. The
+## water runs before the whole creature, from the ridge's foot across the trench and down below the lowest the camera
+## shows, its shake included, so nothing of it shows under the waterline; the trench's own water, behind it, is no
+## longer moved.
+func test_the_creature_comes_out_from_the_ridge_and_out_of_one_water(h) -> void:
+	var world := await _world(h, AWAKENED)
+	for path in ["Dagon/Body/Art", "Dagon/Head/Art", "Dagon/Head/Crest/Art"]:
+		var art: Sprite2D = world.get_node(path)
+		var material := art.material as ShaderMaterial
+		h.check(material != null and material.shader != null and material.shader.resource_path == EMERGE, "%s does not come out from the ridge" % path)
+		if material == null:
+			continue
+		var reach: Texture2D = material.get_shader_parameter("reach")
+		h.check(reach != null and reach.get_size() * 2.0 == art.texture.get_size(), "%s's reach is not half the size of its drawing" % path)
+	var clip: Animation = world.get_node("Cinematics").get_animation(&"dagon_reveal")
+	for path in ["Dagon/Body:modulate", "Dagon/Head:modulate"]:
+		var track := clip.find_track(NodePath(path), Animation.TYPE_VALUE)
+		h.check(track >= 0 and clip.track_get_key_count(track) == 2, "%s is not one fade" % path)
+		if track < 0:
+			continue
+		h.check(is_equal_approx(clip.track_get_key_time(track, 0), 3.0) and is_equal_approx(clip.track_get_key_time(track, 1), 4.3), "%s no longer fades from 3.0 to 4.3 s" % path)
+		h.check(clip.track_get_key_value(track, 0).a == 0.0 and clip.track_get_key_value(track, 1).a == 1.0, "%s does not fade from 0 to 1" % path)
+	h.check(clip.find_track(NodePath("Trench/WaterDrawn:position"), Animation.TYPE_VALUE) < 0, "the reveal still moves the trench's water")
+	var water: Sprite2D = world.get_node("TrenchFront/Shallows")
+	var shown := Rect2(water.global_position, water.texture.get_size())
+	var body: Sprite2D = world.get_node("Dagon/Body/Art")
+	var camera: Camera2D = world.get_node("CameraRig")
+	var widest := clip.find_track(NodePath("CameraRig:limit_right"), Animation.TYPE_VALUE)
+	h.check(shown.position.x <= body.global_position.x and shown.end.x >= float(clip.track_get_key_value(widest, 0)), "the water %s does not run before the whole creature" % shown)
+	h.check(shown.end.y >= camera.limit_bottom + camera.max_shake, "the water stops at y=%.0f, above the lowest the camera shows" % shown.end.y)
+	var image := water.texture.get_image()
+	var gaps := 0
+	for y in image.get_height():
+		for x in image.get_width():
+			gaps += 1 if image.get_pixel(x, y).a < 1.0 else 0
+	h.check(gaps == 0, "the water has %d clear pixels" % gaps)
+
+
+## The owner's playtest of 2026-11-19 of ea86ae9: the hand looked detached from the body. The arm turns about one point
+## on the body's outline, within the turn its drawing is made for (D107), and the body's own pixels where the arm
+## crosses the body are laid over it from the moment it shows, lit as the body is (D120): so wherever the arm lies over
+## the body, at any moment of its swing, the body is drawn over it, and its root never shows. Its fade-in brings it
+## out from the shoulder to the hand, through the same shader as the body: its map is 0 at the shoulder and greatest
+## at the fingertips.
+func test_the_arm_comes_out_from_under_the_shoulder(h) -> void:
+	const SHOULDER := Vector2(-305, -166)
+	var world := await _world(h, AWAKENED)
+	var clip: Animation = world.get_node("Cinematics").get_animation(&"dagon_reveal")
+	var moves := clip.find_track(NodePath("Dagon/Arm:position"), Animation.TYPE_VALUE)
+	var turns := clip.find_track(NodePath("Dagon/Arm:rotation"), Animation.TYPE_VALUE)
+	h.check(moves >= 0 and turns >= 0 and clip.track_get_key_count(moves) == clip.track_get_key_count(turns), "the arm's keys do not pair")
+	for key in clip.track_get_key_count(turns):
+		var turn: float = clip.track_get_key_value(turns, key)
+		var at: Vector2 = clip.track_get_key_value(moves, key)
+		h.check(turn >= -0.5001 and turn <= 0.2201, "at %.2f s the arm turns %.3f, past what its shoulder is drawn for" % [clip.track_get_key_time(turns, key), turn])
+		h.check((at + SHOULDER.rotated(turn)).distance_to(SHOULDER) < 0.6, "at %.2f s the arm does not turn about its shoulder" % clip.track_get_key_time(turns, key))
+	var arm: Node2D = world.get_node("Dagon/Arm")
+	var arm_material := (world.get_node("Dagon/Arm/Art") as CanvasItem).material as ShaderMaterial
+	h.check(arm_material != null and arm_material.shader != null and arm_material.shader.resource_path == EMERGE, "the arm does not come out from the shoulder")
+	if arm_material != null:
+		var arm_reach: Image = (arm_material.get_shader_parameter("reach") as Texture2D).get_image()
+		var arm_drawn: Sprite2D = world.get_node("Dagon/Arm/Art")
+		h.check(arm_reach.get_size() * 2 == Vector2i(arm_drawn.texture.get_size()), "the arm's reach is not half the size of its drawing")
+		var at_shoulder := Vector2i((SHOULDER - arm_drawn.position) / 2.0)
+		h.check(arm_reach.get_pixelv(at_shoulder).r == 0.0, "the arm does not start at the shoulder")
+		var fingertip := Vector2i((Vector2(-490, -244) - arm_drawn.position) / 2.0)
+		h.check(arm_reach.get_pixelv(fingertip).r > 0.9, "the arm's hand is not the last of it to come")
+	var over: Node2D = world.get_node("Dagon/Shoulder")
+	h.check(not over.visible, "the shoulder over the arm shows before the arm")
+	var arm_shows := clip.find_track(NodePath("Dagon/Arm:visible"), Animation.TYPE_VALUE)
+	var over_shows := clip.find_track(NodePath("Dagon/Shoulder:visible"), Animation.TYPE_VALUE)
+	h.check(over_shows >= 0 and clip.track_get_key_time(over_shows, 0) == clip.track_get_key_time(arm_shows, 0), "the shoulder does not show with the arm")
+	h.check(over.z_index == arm.z_index and over.get_index() > arm.get_index(), "the shoulder is drawn under the arm")
+	var rims := clip.find_track(NodePath("Dagon/Rims:modulate"), Animation.TYPE_VALUE)
+	var lit := clip.find_track(NodePath("Dagon/Shoulder/Lit:modulate"), Animation.TYPE_VALUE)
+	h.check(lit >= 0 and clip.track_get_key_count(lit) == clip.track_get_key_count(rims), "the shoulder is not lit as the body is")
+	if lit >= 0:
+		for key in clip.track_get_key_count(rims):
+			h.check(clip.track_get_key_time(lit, key) == clip.track_get_key_time(rims, key) and clip.track_get_key_value(lit, key) == clip.track_get_key_value(rims, key), "the shoulder's light differs from the body's at key %d" % key)
+	# Its pixels are the body's own, where it lies.
+	var body: Sprite2D = world.get_node("Dagon/Body/Art")
+	var body_image := body.texture.get_image()
+	var art: Sprite2D = world.get_node("Dagon/Shoulder/Art")
+	var art_image := art.texture.get_image()
+	var offset := Vector2i(art.position - body.position)
+	var differ := 0
+	for y in art_image.get_height():
+		for x in art_image.get_width():
+			if art_image.get_pixel(x, y).a > 0.0 and art_image.get_pixel(x, y) != body_image.get_pixelv(offset + Vector2i(x, y)):
+				differ += 1
+	h.check(differ == 0, "%d of the shoulder's pixels are not the body's" % differ)
+	# Wherever the arm lies over the body, the shoulder lies over the arm: as it comes, at the top of its swing, just
+	# before it lands, as it lands, and at rest.
+	await h.stand_at(_player(h), Vector2(4420, -2))
+	var clips: AnimationPlayer = world.get_node("Cinematics")
+	var arm_art: Sprite2D = world.get_node("Dagon/Arm/Art")
+	var arm_image := arm_art.texture.get_image()
+	for seconds in [5.6, 6.5, 6.95, 7.0, 10.0]:
+		clips.seek(seconds, true)
+		await h.steps(1)
+		var open := 0
+		for y in arm_image.get_height():
+			for x in arm_image.get_width():
+				if arm_image.get_pixel(x, y).a == 0.0:
+					continue
+				var p: Vector2 = arm.transform * (arm_art.position + Vector2(x, y) + Vector2(0.5, 0.5))
+				var on_body := Vector2i((p - body.position).floor())
+				if on_body.x < 0 or on_body.y < 0 or on_body.x >= body_image.get_width() or on_body.y >= body_image.get_height() or body_image.get_pixelv(on_body).a == 0.0:
+					continue
+				var on_art := Vector2i((p - art.position).floor())
+				var covered := on_art.x >= 0 and on_art.y >= 0 and on_art.x < art_image.get_width() and on_art.y < art_image.get_height() and art_image.get_pixelv(on_art).a > 0.0
+				open += 0 if covered else 1
+		h.check(open == 0, "at %.2f s %d of the arm's pixels lie over the body and out from under the shoulder" % [seconds, open])
+
+
 ## The great carving high on the stone, the lit mural, and the reveal show the same thing: an arm round a stone.
 func test_the_lit_mural_carries_the_motif_the_reveal_then_shows(h) -> void:
 	var world := await _world(h, AWAKENED)

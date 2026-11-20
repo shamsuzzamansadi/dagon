@@ -555,7 +555,7 @@ func test_the_creature_moves_as_a_body_and_its_drawn_parts_move_with_it(h) -> vo
 	var dagon: Node2D = world.get_node("Dagon")
 	var head: Node2D = world.get_node("Dagon/Head")
 	var arm: Node2D = world.get_node("Dagon/Arm")
-	for path in ["Head/Art", "Head/Lit", "Head/Crest", "Head/Crest/Art", "Head/Crest/Lit", "Arm/Art", "Arm/Lit", "Rims/Body", "Body/Art", "Ridge/Art"]:
+	for path in ["Head/Art", "Head/Lit", "Head/Crest", "Head/Crest/Art", "Head/Crest/Lit", "Arm/Art", "Arm/Lit", "Shoulder/Art", "Shoulder/Lit", "Rims/Body", "Body/Art", "Ridge/Art"]:
 		var art: CanvasItem = world.get_node("Dagon/" + path)
 		h.check(art.visible, "%s is hidden in the scene, so no clip could show it" % path)
 	clips.seek(1.0, true)
@@ -770,38 +770,61 @@ func test_restarting_during_the_flee_clears_the_way_back(h) -> void:
 ## ---- The sea comes back ----
 
 
-func test_the_sea_comes_back_over_him_and_then_the_screen_fades(h) -> void:
+## The farthest a runner can be ahead of the sea when he reaches the collapse: walking from where the reveal begins to
+## the collapse's trigger without a stop or a hop, under the flee's rule for the front. The route measured 297 px.
+func _runner_lead(world: Node) -> float:
+	var director: Node = world.get_node("GameDirector")
+	var start: float = world.get_node("Triggers/Witness").global_position.x
+	var end: float = world.get_node("Triggers/Collapse").global_position.x
+	var seconds: float = (start - end) / float(world.get_node("Player").walk_speed)
+	return director.tide_start_x - director.tide_speed * maxf(0.0, seconds - director.tide_delay) - end
+
+
+## The owner's playtest of 2026-11-19 of ea86ae9: the sea that followed him stopped where it was at the collapse, and a
+## second sea rose from the foot of the screen. The collapse now moves the same sea on from wherever the flee left it
+## (D121): at the flee's own pace at first, so it does not stop; fast enough, as the rush is heard, to reach him
+## before the screen fades from as far behind as a runner can be; and up until it fills the view. It is a picture: a
+## restored world rests it where the flee's rule puts it.
+func test_the_sea_that_followed_him_comes_on_over_him_and_then_the_screen_fades(h) -> void:
 	var world := await _world(h, AWAKENED)
-	var sea: CanvasLayer = world.get_node("ReturningSea")
-	h.check(not sea.visible, "the sea is there before its moment")
+	h.check(world.get_node_or_null("ReturningSea") == null, "a second sea is still there")
+	var director: Node = world.get_node("GameDirector")
 	var clip: Animation = world.get_node("Cinematics").get_animation(&"collapse")
-	var rise := clip.find_track(NodePath("ReturningSea/Water:position"), Animation.TYPE_VALUE)
-	var show := clip.find_track(NodePath("ReturningSea:visible"), Animation.TYPE_VALUE)
+	var sea := clip.find_track(NodePath("Tide/Water:position"), Animation.TYPE_VALUE)
 	var fade := clip.find_track(NodePath("Hud/Fade:modulate"), Animation.TYPE_VALUE)
-	h.check(rise >= 0 and show >= 0 and fade >= 0, "a track is missing: %d %d %d" % [rise, show, fade])
-	var last := clip.track_get_key_count(rise) - 1
-	h.check(clip.track_get_key_value(rise, 0).y >= 270.0, "the water starts on screen: %s" % clip.track_get_key_value(rise, 0))
-	h.check(clip.track_get_key_value(rise, last).y <= 0.0, "the water never covers the screen: %s" % clip.track_get_key_value(rise, last))
-	# He has finished falling first, and it is up to him before the fade begins.
-	h.check(clip.track_get_key_time(show, 0) > 1.3, "the sea arrives while he is still falling")
-	var halfway: Vector2 = clip.value_track_interpolate(rise, clip.track_get_key_time(fade, 0))
-	h.check(halfway.y < 180.0, "the fade begins with the water only at y=%.0f" % halfway.y)
+	var rush := clip.find_track(NodePath("Sound/SeaRush"), Animation.TYPE_METHOD)
+	h.check(sea >= 0 and fade >= 0 and rush >= 0, "a track is missing: %d %d %d" % [sea, fade, rush])
+	if sea < 0 or fade < 0 or rush < 0:
+		return
+	h.check(clip.track_get_key_time(sea, 0) == 0.0 and clip.track_get_key_value(sea, 0) == Vector2.ZERO, "the sea jumps at the collapse")
+	var pace: Vector2 = clip.track_get_key_value(sea, 1) / clip.track_get_key_time(sea, 1)
+	h.check(absf(-pace.x - director.tide_speed) < 1.0 and pace.y == 0.0, "the sea goes on at %s px/s where it came at %.0f" % [pace, director.tide_speed])
+	h.check(is_equal_approx(clip.track_get_key_time(sea, 1), clip.track_get_key_time(rush, 0)), "the sea does not rush on as its rush is heard")
+	var lead := _runner_lead(world)
+	h.check(lead > 250.0, "a runner can only be %.0f px ahead" % lead)
+	var at_fade: Vector2 = clip.value_track_interpolate(sea, clip.track_get_key_time(fade, 0))
+	h.check(at_fade.x <= -lead, "the fade begins with the sea %.0f px on, short of a runner %.0f px ahead" % [-at_fade.x, lead])
 	h.check(clip.track_get_key_time(fade, 1) < clip.length, "the fade is not finished by the end of the clip")
-	# The clip is a picture: a restored world has none of it, and the collapse's outcome does not depend on it.
-	h.check(world.get_node("ReturningSea/Water").position.y >= 270.0, "the water rests on screen")
+	h.check(world.get_node("Tide/Water").position == Vector2.ZERO, "the water rests away from the flee's front")
 
 
-func test_the_water_covers_the_whole_screen_at_its_height(h) -> void:
+## At its height the sea covers the whole view, whether it had him or he was as far ahead of it as a runner can be,
+## wherever the camera's look-ahead and shake put the view about him.
+func test_the_water_covers_the_whole_view_at_its_height(h) -> void:
 	var world := await _world(h, AWAKENED)
-	var water: Polygon2D = world.get_node("ReturningSea/Water")
+	var drawn: Sprite2D = world.get_node("Tide/Water/Drawn")
 	var clip: Animation = world.get_node("Cinematics").get_animation(&"collapse")
-	var rise := clip.find_track(NodePath("ReturningSea/Water:position"), Animation.TYPE_VALUE)
-	var top: Vector2 = clip.track_get_key_value(rise, clip.track_get_key_count(rise) - 1)
-	var box := Rect2(water.polygon[0], Vector2.ZERO)
-	for point in water.polygon:
-		box = box.expand(point)
-	box.position += top
-	h.check(box.has_point(Vector2(0, 0)) and box.has_point(Vector2(479, 269)), "the water reaches %s at its height" % box)
+	var sea := clip.find_track(NodePath("Tide/Water:position"), Animation.TYPE_VALUE)
+	var zoom := clip.find_track(NodePath("CameraRig:zoom"), Animation.TYPE_VALUE)
+	var top: Vector2 = clip.track_get_key_value(sea, clip.track_get_key_count(sea) - 1)
+	var near: float = clip.track_get_key_value(zoom, clip.track_get_key_count(zoom) - 1).x
+	var camera: Node = world.get_node("CameraRig")
+	var reach: float = absf(world.get_node("GameDirector").flee_look_ahead) + camera.max_shake
+	var water := Rect2(drawn.position + top, drawn.texture.get_size())
+	for lead in [0.0, _runner_lead(world)]:
+		# In the sea's own space, whose front is at x = 0; he lies on the ground, y = 0.
+		var view := Rect2(Vector2(-lead, camera.vertical_offset) - Vector2(240, 135) / near - Vector2(reach, camera.max_shake), Vector2(480, 270) / near + 2.0 * Vector2(reach, camera.max_shake))
+		h.check(water.encloses(view), "%.0f px ahead of the sea, the view %s is not all inside the water %s" % [lead, view, water])
 
 
 ## Examining is heard, under the line; pressing a stone is heard only as the stone, with no examining sound on it.

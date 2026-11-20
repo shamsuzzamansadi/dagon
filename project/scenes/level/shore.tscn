@@ -49,7 +49,6 @@
 [ext_resource type="Texture2D" path="res://assets/abyss/abyss_dust_mid.png" id="r_abyss_dust_mid"]
 [ext_resource type="Texture2D" path="res://assets/abyss/abyss_dust_far.png" id="r_abyss_dust_far"]
 [ext_resource type="Texture2D" path="res://assets/abyss/abyss_tide.png" id="r_abyss_tide"]
-[ext_resource type="Texture2D" path="res://assets/abyss/abyss_returning_sea.png" id="r_abyss_returning_sea"]
 [ext_resource type="Texture2D" path="res://assets/abyss/abyss_glyphkneel.png" id="r_abyss_glyphkneel"]
 [ext_resource type="Texture2D" path="res://assets/abyss/abyss_glyphkneel_lit.png" id="r_abyss_glyphkneel_lit"]
 [ext_resource type="Texture2D" path="res://assets/abyss/abyss_glypheye.png" id="r_abyss_glypheye"]
@@ -104,6 +103,13 @@
 [ext_resource type="Texture2D" path="res://assets/cave/canyon_figure.png" id="r_canyon_figure"]
 [ext_resource type="Texture2D" path="res://assets/reveal/ridge_water.png" id="r_ridge_water"]
 [ext_resource type="Texture2D" path="res://assets/cave/ritual_ground.png" id="r_ritual_ground"]
+[ext_resource type="Shader" path="res://assets/reveal/emerge.gdshader" id="s_emerge"]
+[ext_resource type="Texture2D" path="res://assets/reveal/dagon_body_reach.png" id="r_dagon_body_reach"]
+[ext_resource type="Texture2D" path="res://assets/reveal/dagon_head_reach.png" id="r_dagon_head_reach"]
+[ext_resource type="Texture2D" path="res://assets/reveal/dagon_crest_reach.png" id="r_dagon_crest_reach"]
+[ext_resource type="Texture2D" path="res://assets/reveal/dagon_arm_reach.png" id="r_dagon_arm_reach"]
+[ext_resource type="Texture2D" path="res://assets/reveal/dagon_shoulder.png" id="r_dagon_shoulder"]
+[ext_resource type="Texture2D" path="res://assets/reveal/dagon_shoulder_lit.png" id="r_dagon_shoulder_lit"]
 
 [sub_resource type="RectangleShape2D" id="lifeboat_shape"]
 size = Vector2(112, 28)
@@ -723,19 +729,19 @@ tracks/7/keys = {
 tracks/8/type = "value"
 tracks/8/imported = false
 tracks/8/enabled = true
-tracks/8/path = NodePath("Trench/WaterDrawn:position")
+tracks/8/path = NodePath("Dagon/Body:visible")
 tracks/8/interp = 1
 tracks/8/loop_wrap = true
 tracks/8/keys = {
-"times": PackedFloat32Array(1.5, 5),
-"transitions": PackedFloat32Array(1, 1),
-"update": 0,
-"values": [Vector2(4544, 20), Vector2(4544, 6)]
+"times": PackedFloat32Array(3),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
 }
 tracks/9/type = "value"
 tracks/9/imported = false
 tracks/9/enabled = true
-tracks/9/path = NodePath("Dagon/Body:visible")
+tracks/9/path = NodePath("Dagon/Head:visible")
 tracks/9/interp = 1
 tracks/9/loop_wrap = true
 tracks/9/keys = {
@@ -747,11 +753,11 @@ tracks/9/keys = {
 tracks/10/type = "value"
 tracks/10/imported = false
 tracks/10/enabled = true
-tracks/10/path = NodePath("Dagon/Head:visible")
+tracks/10/path = NodePath("Dagon/Arm:visible")
 tracks/10/interp = 1
 tracks/10/loop_wrap = true
 tracks/10/keys = {
-"times": PackedFloat32Array(3),
+"times": PackedFloat32Array(5.5),
 "transitions": PackedFloat32Array(1),
 "update": 1,
 "values": [true]
@@ -759,59 +765,59 @@ tracks/10/keys = {
 tracks/11/type = "value"
 tracks/11/imported = false
 tracks/11/enabled = true
-tracks/11/path = NodePath("Dagon/Arm:visible")
+tracks/11/path = NodePath("Dagon/Arm:position")
 tracks/11/interp = 1
 tracks/11/loop_wrap = true
 tracks/11/keys = {
-"times": PackedFloat32Array(5.5),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [true]
-}
-tracks/12/type = "value"
-tracks/12/imported = false
-tracks/12/enabled = true
-tracks/12/path = NodePath("Dagon/Arm:position")
-tracks/12/interp = 1
-tracks/12/loop_wrap = true
-tracks/12/keys = {
 "times": PackedFloat32Array(5.5, 5.55, 5.6, 5.65, 5.7, 5.75, 5.8, 5.85, 5.9, 5.95, 6, 6.05, 6.1, 6.15, 6.2, 6.25, 6.3, 6.35, 6.4, 6.45, 6.5, 6.55, 6.6, 6.65, 6.7, 6.75, 6.8, 6.85, 6.9, 6.95, 7, 7.05, 7.1, 7.15, 7.2, 7.25, 7.3, 7.35, 7.4, 7.45, 7.5),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
 "update": 0,
 "values": [Vector2(42.25, -166.55), Vector2(41.51, -143.32), Vector2(39.36, -121.32), Vector2(36.03, -100.61), Vector2(31.74, -81.24), Vector2(26.69, -63.23), Vector2(21.07, -46.58), Vector2(15.05, -31.28), Vector2(8.8, -17.31), Vector2(2.47, -4.62), Vector2(-3.8, 6.8), Vector2(-9.9, 17.03), Vector2(-15.72, 26.09), Vector2(-21.16, 34.05), Vector2(-26.15, 40.94), Vector2(-30.6, 46.81), Vector2(-34.47, 51.7), Vector2(-37.7, 55.65), Vector2(-40.25, 58.69), Vector2(-42.09, 60.85), Vector2(-43.2, 62.13), Vector2(-43.58, 62.56), Vector2(-42.96, 61.85), Vector2(-41.11, 59.71), Vector2(-38.07, 56.1), Vector2(-33.89, 50.99), Vector2(-28.67, 44.3), Vector2(-22.51, 35.95), Vector2(-15.56, 25.85), Vector2(-7.99, 13.9), Vector2(0, 0), Vector2(1.64, -3.06), Vector2(3.26, -6.13), Vector2(3.12, -5.87), Vector2(2.76, -5.17), Vector2(2.24, -4.19), Vector2(1.64, -3.06), Vector2(1.04, -1.93), Vector2(0.52, -0.95), Vector2(0.14, -0.26), Vector2(0, 0)]
 }
-tracks/13/type = "value"
-tracks/13/imported = false
-tracks/13/enabled = true
-tracks/13/path = NodePath("Dagon/Rims:visible")
-tracks/13/interp = 1
-tracks/13/loop_wrap = true
-tracks/13/keys = {
+tracks/12/type = "value"
+tracks/12/imported = false
+tracks/12/enabled = true
+tracks/12/path = NodePath("Dagon/Rims:visible")
+tracks/12/interp = 1
+tracks/12/loop_wrap = true
+tracks/12/keys = {
 "times": PackedFloat32Array(5),
 "transitions": PackedFloat32Array(1),
 "update": 1,
 "values": [true]
 }
-tracks/14/type = "value"
-tracks/14/imported = false
-tracks/14/enabled = true
-tracks/14/path = NodePath("Dagon/Rims:modulate")
-tracks/14/interp = 1
-tracks/14/loop_wrap = true
-tracks/14/keys = {
+tracks/13/type = "value"
+tracks/13/imported = false
+tracks/13/enabled = true
+tracks/13/path = NodePath("Dagon/Rims:modulate")
+tracks/13/interp = 1
+tracks/13/loop_wrap = true
+tracks/13/keys = {
 "times": PackedFloat32Array(5, 9),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
 }
+tracks/14/type = "value"
+tracks/14/imported = false
+tracks/14/enabled = true
+tracks/14/path = NodePath("Dagon/Head/Eye:visible")
+tracks/14/interp = 1
+tracks/14/loop_wrap = true
+tracks/14/keys = {
+"times": PackedFloat32Array(9.5),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
 tracks/15/type = "value"
 tracks/15/imported = false
 tracks/15/enabled = true
-tracks/15/path = NodePath("Dagon/Head/Eye:visible")
+tracks/15/path = NodePath("Dagon/Head/Pupil:visible")
 tracks/15/interp = 1
 tracks/15/loop_wrap = true
 tracks/15/keys = {
-"times": PackedFloat32Array(9.5),
+"times": PackedFloat32Array(9.74),
 "transitions": PackedFloat32Array(1),
 "update": 1,
 "values": [true]
@@ -819,47 +825,49 @@ tracks/15/keys = {
 tracks/16/type = "value"
 tracks/16/imported = false
 tracks/16/enabled = true
-tracks/16/path = NodePath("Dagon/Head/Pupil:visible")
+tracks/16/path = NodePath("Dagon/Head/Pupil:position")
 tracks/16/interp = 1
 tracks/16/loop_wrap = true
 tracks/16/keys = {
-"times": PackedFloat32Array(9.74),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [true]
-}
-tracks/17/type = "value"
-tracks/17/imported = false
-tracks/17/enabled = true
-tracks/17/path = NodePath("Dagon/Head/Pupil:position")
-tracks/17/interp = 1
-tracks/17/loop_wrap = true
-tracks/17/keys = {
 "times": PackedFloat32Array(11.5, 12.2),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [Vector2(0, 0), Vector2(-14, 2)]
 }
-tracks/18/type = "value"
-tracks/18/imported = false
-tracks/18/enabled = true
-tracks/18/path = NodePath("Dagon:position")
-tracks/18/interp = 1
-tracks/18/loop_wrap = true
-tracks/18/keys = {
+tracks/17/type = "value"
+tracks/17/imported = false
+tracks/17/enabled = true
+tracks/17/path = NodePath("Dagon:position")
+tracks/17/interp = 1
+tracks/17/loop_wrap = true
+tracks/17/keys = {
 "times": PackedFloat32Array(0, 1.5, 1.6, 1.7, 1.8, 1.9, 2, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9, 3, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9, 4, 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8, 4.9, 5, 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 5.8, 5.9, 6, 6.1, 6.2, 6.3, 6.4, 6.5, 6.6, 6.7, 6.8, 6.9, 7, 7.1, 7.2, 7.3, 7.4, 7.5, 7.6, 7.7, 7.8, 7.9, 8, 8.1, 8.2, 8.3, 8.4, 8.5, 8.6, 8.7, 8.8, 8.9, 9, 9.1, 9.2, 9.3, 9.4, 9.5, 9.6, 9.7, 9.8, 9.9, 10, 10.1, 10.2, 10.3, 10.4, 10.5, 10.6, 10.7, 10.8, 10.9, 11, 11.1, 11.2, 11.3, 11.4, 11.5, 11.6, 11.7, 11.8, 11.9, 12, 12.1, 12.2, 12.3, 12.4, 12.5, 12.6, 12.7, 12.8, 12.9, 13, 13.1, 13.2, 13.3, 13.4, 13.5, 13.6, 13.7, 13.8, 13.9, 14),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
 "update": 0,
 "values": [Vector2(4700, 0), Vector2(4700, 0), Vector2(4700, -0.05), Vector2(4700, -0.21), Vector2(4700, -0.48), Vector2(4700, -0.85), Vector2(4700, -1.33), Vector2(4700, -1.92), Vector2(4700, -2.61), Vector2(4700, -3.41), Vector2(4700, -4.32), Vector2(4700, -5.33), Vector2(4700, -6.45), Vector2(4700, -7.68), Vector2(4700, -9.01), Vector2(4700, -10.45), Vector2(4700, -12), Vector2(4700, -15.32), Vector2(4700, -18.46), Vector2(4700, -21.43), Vector2(4700, -24.24), Vector2(4700, -26.88), Vector2(4700, -29.34), Vector2(4700, -31.64), Vector2(4700, -33.76), Vector2(4700, -35.72), Vector2(4700, -37.5), Vector2(4700, -39.11), Vector2(4700, -40.56), Vector2(4700, -41.83), Vector2(4700, -42.94), Vector2(4700, -43.88), Vector2(4700, -44.64), Vector2(4700, -45.23), Vector2(4700, -45.66), Vector2(4700, -45.91), Vector2(4700, -46), Vector2(4700, -47.17), Vector2(4700, -48.28), Vector2(4700, -49.33), Vector2(4700, -50.32), Vector2(4700, -51.25), Vector2(4700, -52.12), Vector2(4700, -52.93), Vector2(4700, -53.68), Vector2(4700, -54.37), Vector2(4700, -55), Vector2(4700, -55.57), Vector2(4700, -56.08), Vector2(4700, -56.53), Vector2(4700, -56.92), Vector2(4700, -57.25), Vector2(4700, -57.52), Vector2(4700, -57.73), Vector2(4700, -57.88), Vector2(4700, -57.97), Vector2(4700, -58), Vector2(4700, -55.78), Vector2(4700, -54.44), Vector2(4700, -54), Vector2(4700, -54.08), Vector2(4700, -54.33), Vector2(4700, -54.75), Vector2(4700, -55.31), Vector2(4700, -55.99), Vector2(4700, -56.76), Vector2(4700, -57.61), Vector2(4700, -58.5), Vector2(4700, -59.4), Vector2(4700, -60.29), Vector2(4700, -61.15), Vector2(4700, -61.93), Vector2(4700, -62.62), Vector2(4700, -63.2), Vector2(4700, -63.63), Vector2(4700, -63.91), Vector2(4700, -64), Vector2(4700, -63.96), Vector2(4700, -63.86), Vector2(4700, -63.68), Vector2(4700, -63.45), Vector2(4700, -63.17), Vector2(4700, -62.84), Vector2(4700, -62.49), Vector2(4700, -62.12), Vector2(4700, -61.74), Vector2(4700, -61.37), Vector2(4700, -61.03), Vector2(4700, -60.72), Vector2(4700, -60.45), Vector2(4700, -60.24), Vector2(4700, -60.1), Vector2(4700, -60.01), Vector2(4700, -60), Vector2(4700, -60.06), Vector2(4700, -60.19), Vector2(4700, -60.39), Vector2(4700, -60.63), Vector2(4700, -60.93), Vector2(4700, -61.27), Vector2(4700, -61.63), Vector2(4700, -62), Vector2(4700, -62.38), Vector2(4700, -62.74), Vector2(4700, -63.08), Vector2(4700, -63.37), Vector2(4700, -63.62), Vector2(4700, -63.81), Vector2(4700, -63.94), Vector2(4700, -64), Vector2(4700, -63.98), Vector2(4700, -63.9), Vector2(4700, -63.75), Vector2(4700, -63.54), Vector2(4700, -63.27), Vector2(4700, -62.96), Vector2(4700, -62.62), Vector2(4700, -62.25), Vector2(4700, -61.87), Vector2(4700, -61.5), Vector2(4700, -61.15), Vector2(4700, -60.82), Vector2(4700, -60.54), Vector2(4700, -60.31), Vector2(4700, -60.14), Vector2(4700, -60.04), Vector2(4700, -60)]
 }
+tracks/18/type = "method"
+tracks/18/imported = false
+tracks/18/enabled = true
+tracks/18/path = NodePath("Sound/MusicReveal")
+tracks/18/interp = 1
+tracks/18/loop_wrap = true
+tracks/18/keys = {
+"times": PackedFloat32Array(0.05),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [0.0],
+"method": &"play"
+}]
+}
 tracks/19/type = "method"
 tracks/19/imported = false
 tracks/19/enabled = true
-tracks/19/path = NodePath("Sound/MusicReveal")
+tracks/19/path = NodePath("Sound/WaterSurge")
 tracks/19/interp = 1
 tracks/19/loop_wrap = true
 tracks/19/keys = {
-"times": PackedFloat32Array(0.05),
+"times": PackedFloat32Array(1.5),
 "transitions": PackedFloat32Array(1),
 "values": [{
 "args": [0.0],
@@ -869,11 +877,11 @@ tracks/19/keys = {
 tracks/20/type = "method"
 tracks/20/imported = false
 tracks/20/enabled = true
-tracks/20/path = NodePath("Sound/WaterSurge")
+tracks/20/path = NodePath("Sound/CreatureCall")
 tracks/20/interp = 1
 tracks/20/loop_wrap = true
 tracks/20/keys = {
-"times": PackedFloat32Array(1.5),
+"times": PackedFloat32Array(3.3),
 "transitions": PackedFloat32Array(1),
 "values": [{
 "args": [0.0],
@@ -883,11 +891,11 @@ tracks/20/keys = {
 tracks/21/type = "method"
 tracks/21/imported = false
 tracks/21/enabled = true
-tracks/21/path = NodePath("Sound/CreatureCall")
+tracks/21/path = NodePath("Sound/HandImpact")
 tracks/21/interp = 1
 tracks/21/loop_wrap = true
 tracks/21/keys = {
-"times": PackedFloat32Array(3.3),
+"times": PackedFloat32Array(7),
 "transitions": PackedFloat32Array(1),
 "values": [{
 "args": [0.0],
@@ -897,11 +905,11 @@ tracks/21/keys = {
 tracks/22/type = "method"
 tracks/22/imported = false
 tracks/22/enabled = true
-tracks/22/path = NodePath("Sound/HandImpact")
+tracks/22/path = NodePath("Player/Gasp")
 tracks/22/interp = 1
 tracks/22/loop_wrap = true
 tracks/22/keys = {
-"times": PackedFloat32Array(7),
+"times": PackedFloat32Array(7.05),
 "transitions": PackedFloat32Array(1),
 "values": [{
 "args": [0.0],
@@ -911,11 +919,11 @@ tracks/22/keys = {
 tracks/23/type = "method"
 tracks/23/imported = false
 tracks/23/enabled = true
-tracks/23/path = NodePath("Player/Gasp")
+tracks/23/path = NodePath("Sound/CreatureTurn")
 tracks/23/interp = 1
 tracks/23/loop_wrap = true
 tracks/23/keys = {
-"times": PackedFloat32Array(7.05),
+"times": PackedFloat32Array(11.4),
 "transitions": PackedFloat32Array(1),
 "values": [{
 "args": [0.0],
@@ -925,24 +933,10 @@ tracks/23/keys = {
 tracks/24/type = "method"
 tracks/24/imported = false
 tracks/24/enabled = true
-tracks/24/path = NodePath("Sound/CreatureTurn")
+tracks/24/path = NodePath("Hud")
 tracks/24/interp = 1
 tracks/24/loop_wrap = true
 tracks/24/keys = {
-"times": PackedFloat32Array(11.4),
-"transitions": PackedFloat32Array(1),
-"values": [{
-"args": [0.0],
-"method": &"play"
-}]
-}
-tracks/25/type = "method"
-tracks/25/imported = false
-tracks/25/enabled = true
-tracks/25/path = NodePath("Hud")
-tracks/25/interp = 1
-tracks/25/loop_wrap = true
-tracks/25/keys = {
 "times": PackedFloat32Array(8.2),
 "transitions": PackedFloat32Array(1),
 "values": [{
@@ -950,37 +944,37 @@ tracks/25/keys = {
 "method": &"say"
 }]
 }
-tracks/26/type = "value"
-tracks/26/imported = false
-tracks/26/enabled = true
-tracks/26/path = NodePath("Player/Visual:position")
-tracks/26/interp = 1
-tracks/26/loop_wrap = true
-tracks/26/keys = {
+tracks/25/type = "value"
+tracks/25/imported = false
+tracks/25/enabled = true
+tracks/25/path = NodePath("Player/Visual:position")
+tracks/25/interp = 1
+tracks/25/loop_wrap = true
+tracks/25/keys = {
 "times": PackedFloat32Array(7, 7.25, 9, 9.6),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 0,
 "values": [Vector2(0, 0), Vector2(-5, 0), Vector2(-5, 0), Vector2(0, 0)]
 }
-tracks/27/type = "value"
-tracks/27/imported = false
-tracks/27/enabled = true
-tracks/27/path = NodePath("Player/Visual:rotation")
-tracks/27/interp = 1
-tracks/27/loop_wrap = true
-tracks/27/keys = {
+tracks/26/type = "value"
+tracks/26/imported = false
+tracks/26/enabled = true
+tracks/26/path = NodePath("Player/Visual:rotation")
+tracks/26/interp = 1
+tracks/26/loop_wrap = true
+tracks/26/keys = {
 "times": PackedFloat32Array(7, 7.2, 8.2, 9.6),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 0,
 "values": [0.0, -0.15, -0.05, 0.0]
 }
-tracks/28/type = "method"
-tracks/28/imported = false
-tracks/28/enabled = true
-tracks/28/path = NodePath("Sound/WaterCascade")
-tracks/28/interp = 1
-tracks/28/loop_wrap = true
-tracks/28/keys = {
+tracks/27/type = "method"
+tracks/27/imported = false
+tracks/27/enabled = true
+tracks/27/path = NodePath("Sound/WaterCascade")
+tracks/27/interp = 1
+tracks/27/loop_wrap = true
+tracks/27/keys = {
 "times": PackedFloat32Array(3),
 "transitions": PackedFloat32Array(1),
 "values": [{
@@ -988,14 +982,26 @@ tracks/28/keys = {
 "method": &"play"
 }]
 }
+tracks/28/type = "value"
+tracks/28/imported = false
+tracks/28/enabled = true
+tracks/28/path = NodePath("Trench/Splash:emitting")
+tracks/28/interp = 1
+tracks/28/loop_wrap = true
+tracks/28/keys = {
+"times": PackedFloat32Array(0, 2.6, 6.2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [false, true, false]
+}
 tracks/29/type = "value"
 tracks/29/imported = false
 tracks/29/enabled = true
-tracks/29/path = NodePath("Trench/Splash:emitting")
+tracks/29/path = NodePath("Dagon/Runoff:emitting")
 tracks/29/interp = 1
 tracks/29/loop_wrap = true
 tracks/29/keys = {
-"times": PackedFloat32Array(0, 2.6, 6.2),
+"times": PackedFloat32Array(0, 3.2, 10.5),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 1,
 "values": [false, true, false]
@@ -1003,83 +1009,83 @@ tracks/29/keys = {
 tracks/30/type = "value"
 tracks/30/imported = false
 tracks/30/enabled = true
-tracks/30/path = NodePath("Dagon/Runoff:emitting")
+tracks/30/path = NodePath("Monolith/CarvingLight:energy")
 tracks/30/interp = 1
 tracks/30/loop_wrap = true
 tracks/30/keys = {
-"times": PackedFloat32Array(0, 3.2, 10.5),
-"transitions": PackedFloat32Array(1, 1, 1),
-"update": 1,
-"values": [false, true, false]
-}
-tracks/31/type = "value"
-tracks/31/imported = false
-tracks/31/enabled = true
-tracks/31/path = NodePath("Monolith/CarvingLight:energy")
-tracks/31/interp = 1
-tracks/31/loop_wrap = true
-tracks/31/keys = {
 "times": PackedFloat32Array(0, 7, 7.5, 11.5, 13.5),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1),
 "update": 0,
 "values": [0.0, 0.0, 1.4, 0.9, 0.0]
 }
+tracks/31/type = "value"
+tracks/31/imported = false
+tracks/31/enabled = true
+tracks/31/path = NodePath("Dagon/Head:position")
+tracks/31/interp = 1
+tracks/31/loop_wrap = true
+tracks/31/keys = {
+"times": PackedFloat32Array(3, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9, 4, 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8, 4.9, 5, 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 5.8, 5.9, 6, 6.1, 6.2, 6.3, 6.4, 6.5, 6.6, 6.7, 6.8, 6.9, 7, 7.1, 7.2, 7.3, 7.4, 7.5, 7.6, 7.7, 7.8, 7.9, 8, 8.1, 8.2, 8.3, 8.4, 8.5, 8.6, 8.7, 8.8, 8.9, 9, 9.1, 9.2, 9.3, 9.4, 9.5, 9.6, 9.7, 9.8, 9.9, 10, 10.1, 10.2, 10.3, 10.4, 10.5, 10.6, 10.7, 10.8, 10.9, 11, 11.1, 11.2, 11.3, 11.4, 11.5, 11.6, 11.7, 11.8, 11.9, 12, 12.1, 12.2, 12.3, 12.4, 12.5, 12.6, 12.7, 12.8, 12.9, 13, 13.1, 13.2, 13.3, 13.4, 13.5, 13.6, 13.7, 13.8, 13.9, 14),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(-0.95, -0.11), Vector2(-3.32, -0.41), Vector2(-6.39, -0.83), Vector2(-9.46, -1.29), Vector2(-11.82, -1.66), Vector2(-12.76, -1.82), Vector2(-12.76, -1.82), Vector2(-12.76, -1.82), Vector2(-12.76, -1.82), Vector2(-12.76, -1.82), Vector2(-12.76, -1.82), Vector2(-12.76, -1.82), Vector2(-12.4, -1.76), Vector2(-11.43, -1.6), Vector2(-10.01, -1.37), Vector2(-8.28, -1.11), Vector2(-6.39, -0.83), Vector2(-4.5, -0.57), Vector2(-2.76, -0.34), Vector2(-1.33, -0.16), Vector2(-0.36, -0.04), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, -0.01), Vector2(0, -0.05), Vector2(0, -0.13), Vector2(0, -0.23), Vector2(0, -0.37), Vector2(0, -0.52), Vector2(0, -0.7), Vector2(0, -0.88), Vector2(0, -1.07), Vector2(0, -1.25), Vector2(0, -1.43), Vector2(0, -1.59), Vector2(0, -1.73), Vector2(0, -1.85), Vector2(0, -1.93), Vector2(0, -1.98), Vector2(0, -2), Vector2(0, -1.98), Vector2(0, -1.93), Vector2(0, -1.84), Vector2(0, -1.73), Vector2(0, -1.58), Vector2(0, -1.42), Vector2(0, -1.24), Vector2(0, -1.06), Vector2(0, -0.87), Vector2(0, -0.69), Vector2(0, -0.52), Vector2(0, -0.36), Vector2(0, -0.23), Vector2(0, -0.12), Vector2(0, -0.05), Vector2(0, -0.01), Vector2(0, -0), Vector2(0, -0.03), Vector2(0, -0.1), Vector2(0.81, 0.01), Vector2(3.05, 0.42), Vector2(6.39, 1.03), Vector2(10.54, 1.71), Vector2(15.16, 2.37), Vector2(19.95, 2.94), Vector2(24.58, 3.36), Vector2(28.74, 3.63), Vector2(32.1, 3.75), Vector2(34.35, 3.77), Vector2(35.17, 3.7), Vector2(35.17, 3.6), Vector2(35.17, 3.54), Vector2(35.17, 3.51), Vector2(35.17, 3.52), Vector2(35.17, 3.56), Vector2(35.17, 3.63), Vector2(35.17, 3.74), Vector2(35.17, 3.87), Vector2(35.17, 4.03), Vector2(35.17, 4.2), Vector2(35.17, 4.39), Vector2(35.17, 4.57), Vector2(35.17, 4.76), Vector2(35.17, 4.94), Vector2(35.17, 5.1)]
+}
 tracks/32/type = "value"
 tracks/32/imported = false
 tracks/32/enabled = true
-tracks/32/path = NodePath("Dagon/Head:position")
+tracks/32/path = NodePath("Dagon/Head:rotation")
 tracks/32/interp = 1
 tracks/32/loop_wrap = true
 tracks/32/keys = {
 "times": PackedFloat32Array(3, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9, 4, 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8, 4.9, 5, 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 5.8, 5.9, 6, 6.1, 6.2, 6.3, 6.4, 6.5, 6.6, 6.7, 6.8, 6.9, 7, 7.1, 7.2, 7.3, 7.4, 7.5, 7.6, 7.7, 7.8, 7.9, 8, 8.1, 8.2, 8.3, 8.4, 8.5, 8.6, 8.7, 8.8, 8.9, 9, 9.1, 9.2, 9.3, 9.4, 9.5, 9.6, 9.7, 9.8, 9.9, 10, 10.1, 10.2, 10.3, 10.4, 10.5, 10.6, 10.7, 10.8, 10.9, 11, 11.1, 11.2, 11.3, 11.4, 11.5, 11.6, 11.7, 11.8, 11.9, 12, 12.1, 12.2, 12.3, 12.4, 12.5, 12.6, 12.7, 12.8, 12.9, 13, 13.1, 13.2, 13.3, 13.4, 13.5, 13.6, 13.7, 13.8, 13.9, 14),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
 "update": 0,
-"values": [Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(-0.95, -0.11), Vector2(-3.32, -0.41), Vector2(-6.39, -0.83), Vector2(-9.46, -1.29), Vector2(-11.82, -1.66), Vector2(-12.76, -1.82), Vector2(-12.76, -1.82), Vector2(-12.76, -1.82), Vector2(-12.76, -1.82), Vector2(-12.76, -1.82), Vector2(-12.76, -1.82), Vector2(-12.76, -1.82), Vector2(-12.4, -1.76), Vector2(-11.43, -1.6), Vector2(-10.01, -1.37), Vector2(-8.28, -1.11), Vector2(-6.39, -0.83), Vector2(-4.5, -0.57), Vector2(-2.76, -0.34), Vector2(-1.33, -0.16), Vector2(-0.36, -0.04), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, -0.01), Vector2(0, -0.05), Vector2(0, -0.13), Vector2(0, -0.23), Vector2(0, -0.37), Vector2(0, -0.52), Vector2(0, -0.7), Vector2(0, -0.88), Vector2(0, -1.07), Vector2(0, -1.25), Vector2(0, -1.43), Vector2(0, -1.59), Vector2(0, -1.73), Vector2(0, -1.85), Vector2(0, -1.93), Vector2(0, -1.98), Vector2(0, -2), Vector2(0, -1.98), Vector2(0, -1.93), Vector2(0, -1.84), Vector2(0, -1.73), Vector2(0, -1.58), Vector2(0, -1.42), Vector2(0, -1.24), Vector2(0, -1.06), Vector2(0, -0.87), Vector2(0, -0.69), Vector2(0, -0.52), Vector2(0, -0.36), Vector2(0, -0.23), Vector2(0, -0.12), Vector2(0, -0.05), Vector2(0, -0.01), Vector2(0, -0), Vector2(0, -0.03), Vector2(0, -0.1), Vector2(0.81, 0.01), Vector2(3.05, 0.42), Vector2(6.39, 1.03), Vector2(10.54, 1.71), Vector2(15.16, 2.37), Vector2(19.95, 2.94), Vector2(24.58, 3.36), Vector2(28.74, 3.63), Vector2(32.1, 3.75), Vector2(34.35, 3.77), Vector2(35.17, 3.7), Vector2(35.17, 3.6), Vector2(35.17, 3.54), Vector2(35.17, 3.51), Vector2(35.17, 3.52), Vector2(35.17, 3.56), Vector2(35.17, 3.63), Vector2(35.17, 3.74), Vector2(35.17, 3.87), Vector2(35.17, 4.03), Vector2(35.17, 4.2), Vector2(35.17, 4.39), Vector2(35.17, 4.57), Vector2(35.17, 4.76), Vector2(35.17, 4.94), Vector2(35.17, 5.1)]
+"values": [0.0000, 0.0000, 0.0000, 0.0037, 0.0130, 0.0250, 0.0370, 0.0463, 0.0500, 0.0500, 0.0500, 0.0500, 0.0500, 0.0500, 0.0500, 0.0486, 0.0448, 0.0392, 0.0324, 0.0250, 0.0176, 0.0108, 0.0052, 0.0014, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, -0.0037, -0.0139, -0.0292, -0.0481, -0.0691, -0.0909, -0.1119, -0.1308, -0.1461, -0.1563, -0.1600, -0.1600, -0.1600, -0.1600, -0.1600, -0.1600, -0.1600, -0.1600, -0.1600, -0.1600, -0.1600, -0.1600, -0.1600, -0.1600, -0.1600, -0.1600]
 }
 tracks/33/type = "value"
 tracks/33/imported = false
 tracks/33/enabled = true
-tracks/33/path = NodePath("Dagon/Head:rotation")
+tracks/33/path = NodePath("Dagon/Head/Crest:position")
 tracks/33/interp = 1
 tracks/33/loop_wrap = true
 tracks/33/keys = {
-"times": PackedFloat32Array(3, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9, 4, 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8, 4.9, 5, 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 5.8, 5.9, 6, 6.1, 6.2, 6.3, 6.4, 6.5, 6.6, 6.7, 6.8, 6.9, 7, 7.1, 7.2, 7.3, 7.4, 7.5, 7.6, 7.7, 7.8, 7.9, 8, 8.1, 8.2, 8.3, 8.4, 8.5, 8.6, 8.7, 8.8, 8.9, 9, 9.1, 9.2, 9.3, 9.4, 9.5, 9.6, 9.7, 9.8, 9.9, 10, 10.1, 10.2, 10.3, 10.4, 10.5, 10.6, 10.7, 10.8, 10.9, 11, 11.1, 11.2, 11.3, 11.4, 11.5, 11.6, 11.7, 11.8, 11.9, 12, 12.1, 12.2, 12.3, 12.4, 12.5, 12.6, 12.7, 12.8, 12.9, 13, 13.1, 13.2, 13.3, 13.4, 13.5, 13.6, 13.7, 13.8, 13.9, 14),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
-"update": 0,
-"values": [0.0000, 0.0000, 0.0000, 0.0037, 0.0130, 0.0250, 0.0370, 0.0463, 0.0500, 0.0500, 0.0500, 0.0500, 0.0500, 0.0500, 0.0500, 0.0486, 0.0448, 0.0392, 0.0324, 0.0250, 0.0176, 0.0108, 0.0052, 0.0014, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, -0.0037, -0.0139, -0.0292, -0.0481, -0.0691, -0.0909, -0.1119, -0.1308, -0.1461, -0.1563, -0.1600, -0.1600, -0.1600, -0.1600, -0.1600, -0.1600, -0.1600, -0.1600, -0.1600, -0.1600, -0.1600, -0.1600, -0.1600, -0.1600, -0.1600, -0.1600]
-}
-tracks/34/type = "value"
-tracks/34/imported = false
-tracks/34/enabled = true
-tracks/34/path = NodePath("Dagon/Head/Crest:position")
-tracks/34/interp = 1
-tracks/34/loop_wrap = true
-tracks/34/keys = {
 "times": PackedFloat32Array(11.4, 11.9),
 "transitions": PackedFloat32Array(-2, 1),
 "update": 0,
 "values": [Vector2(0, 0), Vector2(0, -4)]
 }
-tracks/35/type = "value"
-tracks/35/imported = false
-tracks/35/enabled = true
-tracks/35/path = NodePath("Dagon/Arm:rotation")
-tracks/35/interp = 1
-tracks/35/loop_wrap = true
-tracks/35/keys = {
+tracks/34/type = "value"
+tracks/34/imported = false
+tracks/34/enabled = true
+tracks/34/path = NodePath("Dagon/Arm:rotation")
+tracks/34/interp = 1
+tracks/34/loop_wrap = true
+tracks/34/keys = {
 "times": PackedFloat32Array(5.5, 5.55, 5.6, 5.65, 5.7, 5.75, 5.8, 5.85, 5.9, 5.95, 6, 6.05, 6.1, 6.15, 6.2, 6.25, 6.3, 6.35, 6.4, 6.45, 6.5, 6.55, 6.6, 6.65, 6.7, 6.75, 6.8, 6.85, 6.9, 6.95, 7, 7.05, 7.1, 7.15, 7.2, 7.25, 7.3, 7.35, 7.4, 7.45, 7.5),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
 "update": 0,
 "values": [-0.5000, -0.4331, -0.3694, -0.3090, -0.2518, -0.1980, -0.1473, -0.1000, -0.0559, -0.0151, 0.0224, 0.0567, 0.0878, 0.1155, 0.1400, 0.1612, 0.1792, 0.1939, 0.2053, 0.2135, 0.2184, 0.2200, 0.2173, 0.2091, 0.1956, 0.1765, 0.1521, 0.1222, 0.0869, 0.0462, 0.0000, -0.0100, -0.0200, -0.0191, -0.0169, -0.0137, -0.0100, -0.0063, -0.0031, -0.0009, -0.0000]
 }
+tracks/35/type = "value"
+tracks/35/imported = false
+tracks/35/enabled = true
+tracks/35/path = NodePath("Dagon/Arm:modulate")
+tracks/35/interp = 1
+tracks/35/loop_wrap = true
+tracks/35/keys = {
+"times": PackedFloat32Array(5.5, 5.95),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
 tracks/36/type = "value"
 tracks/36/imported = false
 tracks/36/enabled = true
-tracks/36/path = NodePath("Dagon/Arm:modulate")
+tracks/36/path = NodePath("Dagon/Body:modulate")
 tracks/36/interp = 1
 tracks/36/loop_wrap = true
 tracks/36/keys = {
-"times": PackedFloat32Array(5.5, 5.95),
+"times": PackedFloat32Array(3, 4.3),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
@@ -1087,7 +1093,7 @@ tracks/36/keys = {
 tracks/37/type = "value"
 tracks/37/imported = false
 tracks/37/enabled = true
-tracks/37/path = NodePath("Dagon/Body:modulate")
+tracks/37/path = NodePath("Dagon/Head:modulate")
 tracks/37/interp = 1
 tracks/37/loop_wrap = true
 tracks/37/keys = {
@@ -1099,11 +1105,11 @@ tracks/37/keys = {
 tracks/38/type = "value"
 tracks/38/imported = false
 tracks/38/enabled = true
-tracks/38/path = NodePath("Dagon/Head:modulate")
+tracks/38/path = NodePath("Dagon/Head/Lit:modulate")
 tracks/38/interp = 1
 tracks/38/loop_wrap = true
 tracks/38/keys = {
-"times": PackedFloat32Array(3, 4.3),
+"times": PackedFloat32Array(5, 9),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
@@ -1111,7 +1117,7 @@ tracks/38/keys = {
 tracks/39/type = "value"
 tracks/39/imported = false
 tracks/39/enabled = true
-tracks/39/path = NodePath("Dagon/Head/Lit:modulate")
+tracks/39/path = NodePath("Dagon/Head/Crest/Lit:modulate")
 tracks/39/interp = 1
 tracks/39/loop_wrap = true
 tracks/39/keys = {
@@ -1123,11 +1129,11 @@ tracks/39/keys = {
 tracks/40/type = "value"
 tracks/40/imported = false
 tracks/40/enabled = true
-tracks/40/path = NodePath("Dagon/Head/Crest/Lit:modulate")
+tracks/40/path = NodePath("Dagon/Arm/Lit:modulate")
 tracks/40/interp = 1
 tracks/40/loop_wrap = true
 tracks/40/keys = {
-"times": PackedFloat32Array(5, 9),
+"times": PackedFloat32Array(6, 8.6),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
@@ -1135,35 +1141,35 @@ tracks/40/keys = {
 tracks/41/type = "value"
 tracks/41/imported = false
 tracks/41/enabled = true
-tracks/41/path = NodePath("Dagon/Arm/Lit:modulate")
+tracks/41/path = NodePath("Dagon/Head/Eye:scale")
 tracks/41/interp = 1
 tracks/41/loop_wrap = true
 tracks/41/keys = {
-"times": PackedFloat32Array(6, 8.6),
-"transitions": PackedFloat32Array(1, 1),
-"update": 0,
-"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
-}
-tracks/42/type = "value"
-tracks/42/imported = false
-tracks/42/enabled = true
-tracks/42/path = NodePath("Dagon/Head/Eye:scale")
-tracks/42/interp = 1
-tracks/42/loop_wrap = true
-tracks/42/keys = {
 "times": PackedFloat32Array(9.5, 9.78),
 "transitions": PackedFloat32Array(0.5, 1),
 "update": 0,
 "values": [Vector2(1, 0.14), Vector2(1, 1)]
 }
+tracks/42/type = "value"
+tracks/42/imported = false
+tracks/42/enabled = true
+tracks/42/path = NodePath("Dagon/Head/Pour:emitting")
+tracks/42/interp = 1
+tracks/42/loop_wrap = true
+tracks/42/keys = {
+"times": PackedFloat32Array(0, 3.4, 8.6),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [false, true, false]
+}
 tracks/43/type = "value"
 tracks/43/imported = false
 tracks/43/enabled = true
-tracks/43/path = NodePath("Dagon/Head/Pour:emitting")
+tracks/43/path = NodePath("Dagon/Arm/Drip:emitting")
 tracks/43/interp = 1
 tracks/43/loop_wrap = true
 tracks/43/keys = {
-"times": PackedFloat32Array(0, 3.4, 8.6),
+"times": PackedFloat32Array(0, 6, 11.6),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 1,
 "values": [false, true, false]
@@ -1171,86 +1177,98 @@ tracks/43/keys = {
 tracks/44/type = "value"
 tracks/44/imported = false
 tracks/44/enabled = true
-tracks/44/path = NodePath("Dagon/Arm/Drip:emitting")
+tracks/44/path = NodePath("Trench/Haze:modulate")
 tracks/44/interp = 1
 tracks/44/loop_wrap = true
 tracks/44/keys = {
-"times": PackedFloat32Array(0, 6, 11.6),
-"transitions": PackedFloat32Array(1, 1, 1),
-"update": 1,
-"values": [false, true, false]
-}
-tracks/45/type = "value"
-tracks/45/imported = false
-tracks/45/enabled = true
-tracks/45/path = NodePath("Trench/Haze:modulate")
-tracks/45/interp = 1
-tracks/45/loop_wrap = true
-tracks/45/keys = {
 "times": PackedFloat32Array(2.4, 4.6),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
 }
-tracks/46/type = "value"
-tracks/46/imported = false
-tracks/46/enabled = true
-tracks/46/path = NodePath("TrenchFront/Mist:modulate")
-tracks/46/interp = 1
-tracks/46/loop_wrap = true
-tracks/46/keys = {
+tracks/45/type = "value"
+tracks/45/imported = false
+tracks/45/enabled = true
+tracks/45/path = NodePath("TrenchFront/Mist:modulate")
+tracks/45/interp = 1
+tracks/45/loop_wrap = true
+tracks/45/keys = {
 "times": PackedFloat32Array(2.7, 4.4, 9),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
 "values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1), Color(1, 1, 1, 0.8)]
 }
-tracks/47/type = "value"
-tracks/47/imported = false
-tracks/47/enabled = true
-tracks/47/path = NodePath("TrenchFront/Surge:modulate")
-tracks/47/interp = 1
-tracks/47/loop_wrap = true
-tracks/47/keys = {
+tracks/46/type = "value"
+tracks/46/imported = false
+tracks/46/enabled = true
+tracks/46/path = NodePath("TrenchFront/Surge:modulate")
+tracks/46/interp = 1
+tracks/46/loop_wrap = true
+tracks/46/keys = {
 "times": PackedFloat32Array(2.5, 2.8),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [Color(1, 1, 1, 0), Color(1, 1, 1, 0.94)]
 }
-tracks/48/type = "value"
-tracks/48/imported = false
-tracks/48/enabled = true
-tracks/48/path = NodePath("TrenchFront/Surge:position")
-tracks/48/interp = 1
-tracks/48/loop_wrap = true
-tracks/48/keys = {
+tracks/47/type = "value"
+tracks/47/imported = false
+tracks/47/enabled = true
+tracks/47/path = NodePath("TrenchFront/Surge:position")
+tracks/47/interp = 1
+tracks/47/loop_wrap = true
+tracks/47/keys = {
 "times": PackedFloat32Array(2.5, 3.4, 4.4, 6.2, 9),
 "transitions": PackedFloat32Array(0.45, -2, -2, -2, 1),
 "update": 0,
 "values": [Vector2(4530, 60), Vector2(4530, -84), Vector2(4530, -58), Vector2(4530, -36), Vector2(4530, -30)]
 }
-tracks/49/type = "value"
-tracks/49/imported = false
-tracks/49/enabled = true
-tracks/49/path = NodePath("Sound/WaterCascade:volume_db")
-tracks/49/interp = 1
-tracks/49/loop_wrap = true
-tracks/49/keys = {
+tracks/48/type = "value"
+tracks/48/imported = false
+tracks/48/enabled = true
+tracks/48/path = NodePath("Sound/WaterCascade:volume_db")
+tracks/48/interp = 1
+tracks/48/loop_wrap = true
+tracks/48/keys = {
 "times": PackedFloat32Array(3, 4.15, 4.45, 13, 13.9),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1),
 "update": 0,
 "values": [-6.0, -6.0, -13.0, -13.0, -6.0]
 }
-tracks/50/type = "value"
-tracks/50/imported = false
-tracks/50/enabled = true
-tracks/50/path = NodePath("Sound/WaterSurge:volume_db")
-tracks/50/interp = 1
-tracks/50/loop_wrap = true
-tracks/50/keys = {
+tracks/49/type = "value"
+tracks/49/imported = false
+tracks/49/enabled = true
+tracks/49/path = NodePath("Sound/WaterSurge:volume_db")
+tracks/49/interp = 1
+tracks/49/loop_wrap = true
+tracks/49/keys = {
 "times": PackedFloat32Array(1.5, 4.15, 4.45, 13, 13.9),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1),
 "update": 0,
 "values": [-4.0, -4.0, -9.0, -9.0, -4.0]
+}
+tracks/50/type = "value"
+tracks/50/imported = false
+tracks/50/enabled = true
+tracks/50/path = NodePath("Dagon/Shoulder:visible")
+tracks/50/interp = 1
+tracks/50/loop_wrap = true
+tracks/50/keys = {
+"times": PackedFloat32Array(5.5),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/51/type = "value"
+tracks/51/imported = false
+tracks/51/enabled = true
+tracks/51/path = NodePath("Dagon/Shoulder/Lit:modulate")
+tracks/51/interp = 1
+tracks/51/loop_wrap = true
+tracks/51/keys = {
+"times": PackedFloat32Array(5, 9),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
 }
 
 [sub_resource type="Animation" id="clip_collapse"]
@@ -1344,37 +1362,13 @@ tracks/6/keys = {
 "update": 0,
 "values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
 }
-tracks/7/type = "value"
+tracks/7/type = "method"
 tracks/7/imported = false
 tracks/7/enabled = true
-tracks/7/path = NodePath("ReturningSea:visible")
+tracks/7/path = NodePath("CameraRig")
 tracks/7/interp = 1
 tracks/7/loop_wrap = true
 tracks/7/keys = {
-"times": PackedFloat32Array(2.5),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [true]
-}
-tracks/8/type = "value"
-tracks/8/imported = false
-tracks/8/enabled = true
-tracks/8/path = NodePath("ReturningSea/Water:position")
-tracks/8/interp = 1
-tracks/8/loop_wrap = true
-tracks/8/keys = {
-"times": PackedFloat32Array(2.5, 3.3, 4.2, 5.2),
-"transitions": PackedFloat32Array(1, 1, 1, 1),
-"update": 0,
-"values": [Vector2(40, 300), Vector2(14, 232), Vector2(-16, 150), Vector2(-40, -20)]
-}
-tracks/9/type = "method"
-tracks/9/imported = false
-tracks/9/enabled = true
-tracks/9/path = NodePath("CameraRig")
-tracks/9/interp = 1
-tracks/9/loop_wrap = true
-tracks/9/keys = {
 "times": PackedFloat32Array(2.5),
 "transitions": PackedFloat32Array(1),
 "values": [{
@@ -1382,13 +1376,13 @@ tracks/9/keys = {
 "method": &"add_trauma"
 }]
 }
-tracks/10/type = "method"
-tracks/10/imported = false
-tracks/10/enabled = true
-tracks/10/path = NodePath("Sound/BodyFall")
-tracks/10/interp = 1
-tracks/10/loop_wrap = true
-tracks/10/keys = {
+tracks/8/type = "method"
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/path = NodePath("Sound/BodyFall")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/keys = {
 "times": PackedFloat32Array(0.6),
 "transitions": PackedFloat32Array(1),
 "values": [{
@@ -1396,19 +1390,31 @@ tracks/10/keys = {
 "method": &"play"
 }]
 }
-tracks/11/type = "method"
-tracks/11/imported = false
-tracks/11/enabled = true
-tracks/11/path = NodePath("Sound/SeaRush")
-tracks/11/interp = 1
-tracks/11/loop_wrap = true
-tracks/11/keys = {
+tracks/9/type = "method"
+tracks/9/imported = false
+tracks/9/enabled = true
+tracks/9/path = NodePath("Sound/SeaRush")
+tracks/9/interp = 1
+tracks/9/loop_wrap = true
+tracks/9/keys = {
 "times": PackedFloat32Array(2.4),
 "transitions": PackedFloat32Array(1),
 "values": [{
 "args": [0.0],
 "method": &"play"
 }]
+}
+tracks/10/type = "value"
+tracks/10/imported = false
+tracks/10/enabled = true
+tracks/10/path = NodePath("Tide/Water:position")
+tracks/10/interp = 1
+tracks/10/loop_wrap = true
+tracks/10/keys = {
+"times": PackedFloat32Array(0, 2.4, 3.3, 5.2),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(-154, 0), Vector2(-480, -12), Vector2(-640, -130)]
 }
 
 [sub_resource type="AnimationLibrary" id="atmosphere_library"]
@@ -1604,6 +1610,22 @@ _data = {
 [sub_resource type="Gradient" id="water_fade"]
 offsets = PackedFloat32Array(0, 0.65, 1)
 colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0.85, 1, 1, 1, 0)
+
+[sub_resource type="ShaderMaterial" id="emerge_body"]
+shader = ExtResource("s_emerge")
+shader_parameter/reach = ExtResource("r_dagon_body_reach")
+
+[sub_resource type="ShaderMaterial" id="emerge_head"]
+shader = ExtResource("s_emerge")
+shader_parameter/reach = ExtResource("r_dagon_head_reach")
+
+[sub_resource type="ShaderMaterial" id="emerge_crest"]
+shader = ExtResource("s_emerge")
+shader_parameter/reach = ExtResource("r_dagon_crest_reach")
+
+[sub_resource type="ShaderMaterial" id="emerge_arm"]
+shader = ExtResource("s_emerge")
+shader_parameter/reach = ExtResource("r_dagon_arm_reach")
 
 [node name="Shore" type="Node2D"]
 
@@ -1996,6 +2018,7 @@ polygon = PackedVector2Array(-360, 260, -345, -110, -300, -175, -235, -205, -150
 position = Vector2(-360, -258)
 texture = ExtResource("r_dagon_body")
 centered = false
+material = SubResource("emerge_body")
 
 [node name="Rims" type="Node2D" parent="Dagon"]
 visible = false
@@ -2018,6 +2041,7 @@ polygon = PackedVector2Array(-60, -382, -54, -428, -34, -408, -14, -442, 6, -412
 position = Vector2(-60, -442)
 texture = ExtResource("r_dagon_crest")
 centered = false
+material = SubResource("emerge_crest")
 
 [node name="Lit" type="Sprite2D" parent="Dagon/Head/Crest"]
 modulate = Color(1, 1, 1, 0)
@@ -2029,6 +2053,7 @@ centered = false
 position = Vector2(-192, -386)
 texture = ExtResource("r_dagon_head")
 centered = false
+material = SubResource("emerge_head")
 
 [node name="Lit" type="Sprite2D" parent="Dagon/Head"]
 modulate = Color(1, 1, 1, 0)
@@ -2074,6 +2099,7 @@ rotation = -0.5000
 position = Vector2(-492, -274)
 texture = ExtResource("r_dagon_arm")
 centered = false
+material = SubResource("emerge_arm")
 
 [node name="Lit" type="Sprite2D" parent="Dagon/Arm"]
 modulate = Color(1, 1, 1, 0)
@@ -2095,6 +2121,21 @@ initial_velocity_min = 4.0
 initial_velocity_max = 24.0
 color = Color(0.5, 0.66, 0.7, 0.45)
 color_ramp = SubResource("water_fade")
+
+[node name="Shoulder" type="Node2D" parent="Dagon"]
+visible = false
+z_index = 1
+
+[node name="Art" type="Sprite2D" parent="Dagon/Shoulder"]
+position = Vector2(-326, -186)
+texture = ExtResource("r_dagon_shoulder")
+centered = false
+
+[node name="Lit" type="Sprite2D" parent="Dagon/Shoulder"]
+modulate = Color(1, 1, 1, 0)
+position = Vector2(-326, -186)
+texture = ExtResource("r_dagon_shoulder_lit")
+centered = false
 
 [node name="Runoff" type="CPUParticles2D" parent="Dagon"]
 emitting = false
@@ -3331,7 +3372,7 @@ position = Vector2(4540, 0)
 [node name="Water" type="Polygon2D" parent="Tide"]
 self_modulate = Color(1, 1, 1, 0)
 color = Color(0.03, 0.08, 0.1, 0.94)
-polygon = PackedVector2Array(0, -30, 8, -38, 18, -33, 30, -41, 44, -34, 60, -39, 80, -34, 120, -37, 900, -36, 900, 60, 0, 60)
+polygon = PackedVector2Array(0, -30, 8, -38, 18, -33, 30, -41, 44, -34, 60, -39, 80, -34, 120, -37, 900, -36, 900, 300, 0, 300)
 
 [node name="Drawn" type="Sprite2D" parent="Tide/Water"]
 position = Vector2(-4, -45)
@@ -3347,26 +3388,6 @@ polygon = PackedVector2Array(-4, -28, 8, -40, 18, -35, 30, -43, 44, -36, 60, -41
 stream = ExtResource("a_tide")
 bus = &"Effects"
 max_distance = 900.0
-
-[node name="ReturningSea" type="CanvasLayer" parent="."]
-layer = 4
-visible = false
-
-[node name="Water" type="Polygon2D" parent="ReturningSea"]
-self_modulate = Color(1, 1, 1, 0)
-position = Vector2(40, 300)
-color = Color(0.02, 0.05, 0.07, 0.96)
-polygon = PackedVector2Array(-40, 0, 40, -7, 120, -1, 200, -8, 280, -2, 360, -7, 440, -1, 520, -6, 520, 340, -40, 340)
-
-[node name="Drawn" type="Sprite2D" parent="ReturningSea/Water"]
-position = Vector2(-44, -12)
-texture = ExtResource("r_abyss_returning_sea")
-centered = false
-
-[node name="Foam" type="Polygon2D" parent="ReturningSea/Water"]
-visible = false
-color = Color(0.4, 0.54, 0.54, 0.85)
-polygon = PackedVector2Array(-40, 0, 40, -7, 120, -1, 200, -8, 280, -2, 360, -7, 440, -1, 520, -6, 520, -2, 440, 4, 360, -2, 280, 3, 200, -3, 120, 4, 40, -2, -40, 4)
 
 [node name="Sound" type="Node2D" parent="."]
 

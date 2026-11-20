@@ -23,7 +23,8 @@ UI_OUT = ROOT / "project" / "assets" / "ui"
 # light.png is a light mask, not artwork: its values multiply the lantern colour.
 ARTWORK = ["sky", "clouds", "far", "glints", "flats", "bank", "terrain", "foreground", "fish", "boat", "sailor", "talisman", "tentacle", "ribs"]
 REVEAL_OUT = ROOT / "project" / "assets" / "reveal"
-REVEAL_ARTWORK = ["monolith", "crossing_carving", "dagon_ridge", "ridge_water", "water_drop"] + [f"dagon_{part}{lit}" for part in ("body", "head", "crest", "arm") for lit in ("", "_lit")]
+# Not dagon_*_reach: those are data, how far each pixel lies from the ridge, for the reveal's shader (D119).
+REVEAL_ARTWORK = ["monolith", "crossing_carving", "dagon_ridge", "ridge_water", "water_drop"] + [f"dagon_{part}{lit}" for part in ("body", "head", "crest", "arm", "shoulder") for lit in ("", "_lit")]
 # The finished reference section, and the prologue. shaft.png is a light mask, like light.png.
 CAVE_OUT = ROOT / "project" / "assets" / "cave"
 CAVE_ARTWORK = ["cave_front", "cave_wall", "abyss_far", "ritual_far", "foreground_cave", "ritual_stones", "distant_shape", "ritual_watcher", "far_watcher", "canyon_figure", "ritual_ground"] + [f"ritual_kneeler_{i}" for i in range(1, 5)]
@@ -31,7 +32,7 @@ ABYSS_OUT = ROOT / "project" / "assets" / "abyss"
 ABYSS_TILES = 4
 ABYSS_ARTWORK = [f"abyss_ground_{i}" for i in range(ABYSS_TILES)] + ["abyss_far_plain", "abyss_escarpment", "abyss_slab", "abyss_stone", "abyss_canyon", "abyss_statues",
     "abyss_gate", "abyss_trench", "abyss_trench_water", "abyss_trench_surge", "abyss_mural_lit", "abyss_mural_fragments",
-    "abyss_tide", "abyss_returning_sea"] + [f"abyss_{kind}_{n}" for kind in ("rock", "dust") for n in ("near", "mid", "far")] + [f"abyss_glyph{n}{lit}" for n in ("kneel", "eye", "wave") for lit in ("", "_lit")]
+    "abyss_tide"] + [f"abyss_{kind}_{n}" for kind in ("rock", "dust") for n in ("near", "mid", "far")] + [f"abyss_glyph{n}{lit}" for n in ("kneel", "eye", "wave") for lit in ("", "_lit")]
 ABYSS_X0 = 1440
 ABYSS_GROUND = range(1440, 4520)
 ESCARPMENT_X0 = 700
@@ -219,11 +220,53 @@ def check_ridge(problems):
     water = Image.open(REVEAL_OUT / "ridge_water.png").convert("RGBA")
     wx, wy = sprite_position("Shallows", "TrenchFront")
     dagon_x = 4700
-    uncovered = [c + rx + dagon_x for c in range(ridge.width) if opaque(ridge, c, -1 - ry) and 4290 <= c + rx + dagon_x < 4544
-                 and not opaque(water, c + rx + dagon_x - wx, -1 - wy)]
+    uncovered = [c + rx + dagon_x for c in range(ridge.width) if opaque(ridge, c, -1 - ry) and not opaque(water, c + rx + dagon_x - wx, -1 - wy)]
     if uncovered:
         problems.append(f"the ridge's foot shows past the water at {len(uncovered)} columns, from x {uncovered[0]}")
-    print(f"ridge: its top over {crest + 1} columns and its left side over {ridge.height} rows are the body's; the water covers its foot")
+    # The body rises out of the same water across its whole width (D119), and below the waterline nothing of it shows,
+    # down past the lowest the camera shows with its shake (limit_bottom 50, max_shake 8).
+    left, right = bx + dagon_x, bx + dagon_x + body.width
+    if wx > left or wx + water.width < right or wy + water.height < 58:
+        problems.append(f"the water from x {wx} to {wx + water.width}, down to {wy + water.height}, does not stand before the whole body, {left} to {right}")
+    if any(water.getpixel((x, y))[3] != 255 for y in range(water.height) for x in range(water.width)):
+        problems.append("the water has clear pixels")
+    print(f"ridge: its top over {crest + 1} columns and its left side over {ridge.height} rows are the body's; the water covers its foot and stands before the whole body")
+
+
+def check_shoulder(problems):
+    """The arm turns about a point on the body's outline (gen_creature.SHOULDER, D107). Wherever, at any turn of the
+    clip's, its drawing lies over the body's, the shoulder's drawing, the body's own pixels, lies over it, so the arm
+    always comes out from under the body's outline and its root never shows (D120)."""
+    import gen_creature
+
+    body = Image.open(REVEAL_OUT / "dagon_body.png").convert("RGBA")
+    over = Image.open(REVEAL_OUT / "dagon_shoulder.png").convert("RGBA")
+    arm = Image.open(REVEAL_OUT / "dagon_arm.png").convert("RGBA")
+    bx, by = sprite_position("Art", "Dagon/Body")
+    ox, oy = sprite_position("Art", "Dagon/Shoulder")
+    ax, ay = sprite_position("Art", "Dagon/Arm")
+    for y in range(over.height):
+        for x in range(over.width):
+            if over.getpixel((x, y))[3] and over.getpixel((x, y)) != body.getpixel((x + ox - bx, y + oy - by)):
+                problems.append(f"the shoulder's pixel at ({x + ox}, {y + oy}) is not the body's")
+                return
+    cx, cy = gen_creature.SHOULDER
+    points = [(x + ax + 0.5, y + ay + 0.5) for y in range(arm.height) for x in range(arm.width) if arm.getpixel((x, y))[3]]
+    turns = 0
+    for step in range(0, 73):
+        turn = gen_creature.ARM_TURN[0] + (gen_creature.ARM_TURN[1] - gen_creature.ARM_TURN[0]) * step / 72
+        c, s = math.cos(turn), math.sin(turn)
+        open_ = 0
+        for px, py in points:
+            x = math.floor(cx + (px - cx) * c - (py - cy) * s)
+            y = math.floor(cy + (px - cx) * s + (py - cy) * c)
+            if opaque(body, x - bx, y - by) and not opaque(over, x - ox, y - oy):
+                open_ += 1
+        if open_:
+            problems.append(f"turned {turn:.3f}, {open_} of the arm's pixels lie over the body and out from under the shoulder")
+            return
+        turns += 1
+    print(f"shoulder: the body's own pixels; over the arm wherever it crosses the body, at {turns} turns from {gen_creature.ARM_TURN[0]} to {gen_creature.ARM_TURN[1]}")
 
 
 def check_ritual(problems):
@@ -307,6 +350,7 @@ def main():
     check_abyss_surface(problems)
     check_far_cliff(problems)
     check_ridge(problems)
+    check_shoulder(problems)
     check_ritual(problems)
 
     for problem in problems:

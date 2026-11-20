@@ -999,11 +999,6 @@ def tide():
     return sea_front(gen_reveal.scene_polygon("Water", "Tide"), 461)
 
 
-def returning_sea():
-    """The sea as it closes over him at the end, across the whole screen: in its own screen space."""
-    return sea_front(gen_reveal.scene_polygon("Water", "ReturningSea"), 471)
-
-
 def ground_tiles():
     strip = ground()
     return [strip.crop((i * TILE_W, 0, (i + 1) * TILE_W, HEIGHT)) for i in range(TILES)]
