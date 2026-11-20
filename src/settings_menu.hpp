@@ -115,6 +115,7 @@ private:
 	NodeRef<godot::Button> swap_button_;
 
 	godot::String cancel_label_;
+	godot::String shown_keys_;
 	core::Settings settings_;
 	// A write failed, so settings_ is newer than the file and must not be replaced by it.
 	bool unsaved_ = false;

@@ -9,6 +9,7 @@
 #include <godot_cpp/classes/viewport.hpp>
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/core/error_macros.hpp>
+#include <godot_cpp/core/print_string.hpp>
 
 using namespace godot;
 
@@ -289,10 +290,17 @@ void SettingsMenu::refresh_controls() {
 	if (Button *button = fullscreen_button_.get()) {
 		button->set_text(settings_.fullscreen ? "Display: Fullscreen" : "Display: Windowed");
 	}
+	String shown;
 	for (std::size_t i = 0; i < key_buttons_.size(); i++) {
 		if (Button *button = key_buttons_[i].get()) {
 			button->set_text(key_label(settings_.keys[i]));
+			shown += String(i == 0 ? "" : " ") + button->get_text();
 		}
+	}
+	// The names as shown, and the layout they were read through: for the layout checks, which cannot read the screen.
+	if (shown != shown_keys_) {
+		shown_keys_ = shown;
+		print_verbose("dagon: key labels: ", shown, " layout=", storage::keyboard_layout());
 	}
 }
 

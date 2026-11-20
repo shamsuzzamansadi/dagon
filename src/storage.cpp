@@ -302,6 +302,18 @@ String key_name(int p_key, const Ref<Font> &p_font) {
 	return displayed_key_name(p_key, static_cast<int>(label), p_font);
 }
 
+String keyboard_layout() {
+	DisplayServer *display = DisplayServer::get_singleton();
+	if (display->get_name() == String("headless")) {
+		return String();
+	}
+	const int current = display->keyboard_get_current_layout();
+	if (current < 0) {
+		return String();
+	}
+	return display->keyboard_get_layout_name(current) + " (" + display->keyboard_get_layout_language(current) + ")";
+}
+
 int current_key(const StringName &p_action) {
 	const TypedArray<InputEvent> events = InputMap::get_singleton()->action_get_events(p_action);
 	for (int i = 0; i < events.size(); i++) {
