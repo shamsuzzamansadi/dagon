@@ -1,7 +1,7 @@
 # M5 Review Package: Cinematic horror and polish
 
-**To:** ChatGPT (independent reviewer), and the owner for listening and the playtest. **Date:** 2026-11-16, completed 2026-11-18, revised after the independent review on 2026-11-18 (§13), after the owner's playtest of 2026-11-19 (§14), after the owner's second playtest that day, of `59562c6` (§15), and after their third, of `ea86ae9` (§16).
-**Status: implemented, independently reviewed, and played by the owner three times on 2026-11-19; the review's three findings, the owner's five points, four visual points and three points in motion are addressed (§13 to §16). For the owner's playtest of the new candidate and acceptance. Not accepted, not merged, nothing tagged or released.** The owner approved the scope on 2026-11-16 ([plan](../m5-plan.md)). `v0.1.0-pre-alpha.1` is untouched. M6 is not started.
+**To:** ChatGPT (independent reviewer), and the owner for listening and the playtest. **Date:** 2026-11-16, completed 2026-11-18, revised after the independent review on 2026-11-18 (§13), after the owner's playtest of 2026-11-19 (§14), after the owner's second playtest that day, of `59562c6` (§15), after their third, of `ea86ae9` (§16), and with the owner's acceptance of 2026-11-20 (§17).
+**Status: accepted by the owner on 2026-11-20 at `b7303bf`, as the completed milestone (§17, [record](../evidence/m5/owner-acceptance-2026-11-20.md)), after an independent review and four playtests by the owner; merged into `main` from #6. A milestone acceptance only: nothing tagged or released.** The owner approved the scope on 2026-11-16 ([plan](../m5-plan.md)). `v0.1.0-pre-alpha.1` is untouched. M6 is not started.
 
 | | |
 |---|---|
@@ -254,3 +254,16 @@ DAGON_RECORD_SCENE=emergence godot --path project --write-movie <out>/f.png --fi
 | 3 | The advancing sea, running and caught: where the leading edge comes from, how it moves, where the water is at the cut to the collapse | At the collapse the sea stopped dead; caught, he fell out of it and lay beside a still wall of water; 2.5 s in, a second sea in the screen's own space rose from the bottom of the screen | The same sea comes on from where the flee left it, at the flee's pace, then rushes over him and rises to fill the view; the second sea is gone; both outcomes and the flee's rule unchanged (`d8626f7`, D121) |
 
 No line, sound, haptic cue, camera key, collision or outcome changed, and the clips' lengths are unchanged; the recordings' sound is identical sample for sample before and after.
+
+## 17. The owner's acceptance, 2026-11-20
+
+**The owner played `b7303bf`** (`dagon-windows`, artifact 14627487176, zip SHA-256 `97ef6bd1e621e54875b213a41dd5189afca4554f7277a769ac10c2cf689a71ac`) **and accepted it as the completed M5 milestone.** In the owner's words: in their recorded running route, the ridge reads as Dagon's shoulder, the arm stays connected through the hand landing, and the same wave overtakes the fallen sailor; they are satisfied with the result. The [record](../evidence/m5/owner-acceptance-2026-11-20.md) has the owner's words in full.
+
+| Covered | By whom or what |
+|---|---|
+| The running route on `b7303bf`, with the three points of the motion pass | The owner, playing, recorded |
+| The standing-still ending: the sea has him and goes on over him | Scripts only: the recordings and clips of §16, the exported route's run that waits out the flee, and the tests |
+| The owner's video frames, and the recorded audio measured against the owner's earlier clip | ChatGPT, as the owner reports. It did not listen |
+| **The intelligibility of the reveal's dialogue by ear** | **Nobody. Open for M6,** as the owner said |
+
+**A milestone acceptance only.** The owner authorized the squash merge of #6 and the branch's clean-up; a new tag or release, such as `v0.2.0-alpha.1`, needs the owner's separate approval. `v0.1.0-pre-alpha.1` is untouched.
