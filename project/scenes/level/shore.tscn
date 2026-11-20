@@ -1743,7 +1743,7 @@ color = Color(0.025, 0.035, 0.06, 0)
 polygon = PackedVector2Array(0, -150, 26, -196, 50, -214, 80, -205, 104, -170, 118, -150)
 
 [node name="Drawn" type="Sprite2D" parent="FarRidges/DistantShape"]
-position = Vector2(-1000, -220)
+position = Vector2(0, -220)
 texture = ExtResource("r_distant_shape")
 centered = false
 

@@ -29,7 +29,7 @@ Check against `git log` on `m6/stabilization` and the pull request before relyin
 | 7 | Native runs | Sheets with the owner, for the Ubuntu ThinkPad and the Windows desktop | [sheets](m6/native-checks/README.md) |
 | 8 | Frame times | **Measured, on llvmpipe:** no frame over 33 ms in play in any act, all four exported runs; one long frame at each of three scene changes, the prologue handover (61–72 ms) traced and a warm-up tried and not kept. `DAGON_FRAME_LOG` (D123) in the native-check sheets for the owner's machines | [evidence](evidence/m6/frames/README.md) |
 | 9 | Verification matrix | **Drafted;** gaps filled: the Display setting across a relaunch (`tools/display_relaunch_check.py`, also in CI), Settings' "Interact" renamed Examine (D124). Waiting: the owner's pass over the menus | [matrix](evidence/m6/verification-matrix.md) |
-| 10 | GDD §8 review | Not started | — |
+| 10 | GDD §8 review | **Done, the developer's view,** from 22 screenshots of the exported route: F1 fixed (the distant shape was drawn 1000 px off, over the Shore's cliff; D125, with a test); F2 open for the owner (the cave is a rectangle: two straight vertical edges; option about 1–2 h); F3 minor, open (the sailor before a dark figure at the Awakened checkpoint). Waiting: the owner's eye in play | [review](evidence/m6/visual-review/README.md) |
 | 11 | Carried items | **Both M3 survivors have tests that fail under their breakages** (`test_revision.gd`). **M2's examine:** `tools/idle_examine_check.py` repeats its steps; not reproduced in 6 runs here (3 idle, 3 with 9 busy processes); in CI on Windows and Linux from `1f68ceb` | `tools/idle_examine_check.py` |
 | 12 | Validation and handoff | Running as items land | this page |
 

@@ -1014,6 +1014,31 @@ func test_every_shape_a_clip_moves_or_fades_draws_something(h) -> void:
 	h.check(checked >= 10, "only %d clear shapes were checked" % checked)
 
 
+## Each such drawing lies over the shape it belongs to, so the clip that moves the shape moves it where the shape was
+## designed to be. The distant shape's drawing sat 1000 px to the left of its shape until M6: over the Shore's near
+## cliff, its cut-off base showing, and missing from behind the far cliff in the Abyss, where it rises and shifts.
+func test_every_drawing_lies_over_the_clear_shape_it_belongs_to(h) -> void:
+	var world := await _world(h)
+	var checked := 0
+	for shape in world.find_children("*", "Polygon2D", true, false):
+		if shape.color.a > 0.0 or not shape.vertex_colors.is_empty() or shape.polygon.is_empty():
+			continue
+		for drawing in shape.get_children():
+			if not (drawing is Sprite2D) or drawing.texture == null:
+				continue
+			var outline := Rect2(shape.global_transform * shape.polygon[0], Vector2.ZERO)
+			for point in shape.polygon:
+				outline = outline.expand(shape.global_transform * point)
+			var size: Vector2 = drawing.texture.get_size() * drawing.global_scale
+			var corner: Vector2 = drawing.global_position - (size / 2.0 if drawing.centered else Vector2.ZERO)
+			var covered := Rect2(corner, size).intersection(outline).get_area()
+			checked += 1
+			# A drawing is redrawn to its own design (the kneeling figures bow, the arm turns), so only a drawing that
+			# misses its shape is wrong: at least a quarter of the shape lies under it.
+			h.check(covered >= outline.get_area() * 0.25, "%s's drawing covers %.0f%% of its shape: the shape spans %s, the drawing %s" % [shape.name, 100.0 * covered / maxf(outline.get_area(), 1.0), outline, Rect2(corner, size)])
+	h.check(checked >= 6, "only %d drawings were checked" % checked)
+
+
 ## The rock across the way back and the returning sea are shown by the director, as outcomes of the flight, not by its
 ## clip: test_narrative and this file hold that they show with no clip at all.
 const SHOWN_BY_THE_DIRECTOR := ["Rockfall", "Tide"]
