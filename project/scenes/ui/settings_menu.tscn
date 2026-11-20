@@ -179,7 +179,7 @@ layout_mode = 2
 [node name="Label" type="Label" parent="Center/Panel/Items/Columns/Keys/Interact"]
 custom_minimum_size = Vector2(62, 0)
 layout_mode = 2
-text = "Interact"
+text = "Examine"
 
 [node name="Key" type="Button" parent="Center/Panel/Items/Columns/Keys/Interact"]
 custom_minimum_size = Vector2(118, 0)

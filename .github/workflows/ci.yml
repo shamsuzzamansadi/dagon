@@ -200,7 +200,7 @@ jobs:
   # developer's machine, reports setxkbmap's change as done and keeps US, so on Linux only the US run is made; German
   # is checked on Windows.
   # M2's unexplained examine (item 11): its steps repeated, idle and with all four of the runner's processors kept
-  # busy.
+  # busy. And the Display setting across a relaunch (item 9).
   desktop-checks:
     name: desktop-checks-${{ matrix.platform }}
     needs: desktop
@@ -232,7 +232,7 @@ jobs:
         if: ${{ matrix.platform == 'linux' }}
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq xvfb xdotool x11-xkb-utils libgl1-mesa-dri imagemagick
+          sudo apt-get install -y -qq xvfb xdotool x11-xkb-utils libgl1-mesa-dri imagemagick openbox
           chmod +x build/export/linux/dagon.x86_64
       - name: Key names under the US layout, and the German on Windows
         run: |
@@ -259,6 +259,16 @@ jobs:
           fi
           grep -q "^IDLE_RESULT runs=5 busy=0 examined_with_nothing_pressed=0 failed=0" build/idle.log
           grep -q "^IDLE_RESULT runs=5 busy=4 examined_with_nothing_pressed=0 failed=0" build/idle.log
+      - name: The Display setting across a relaunch
+        run: |
+          if [ "${{ matrix.platform }}" = linux ]; then
+            # X11 grants fullscreen only through a window manager, as on any desktop.
+            xvfb-run -a -s "-screen 0 1920x1080x24 +extension GLX" sh -c \
+              'openbox --sm-disable & sleep 2; python3 tools/display_relaunch_check.py build/export/linux/dagon.x86_64 build/logs/display --display "$DISPLAY"' 2>&1 | tee build/display.log
+          else
+            python tools/display_relaunch_check.py build/export/windows/dagon.exe build/logs/display --windows-ci 2>&1 | tee build/display.log
+          fi
+          grep -q "^DISPLAY_RESULT failed=0" build/display.log
       - name: Upload the screenshots and logs
         if: always()
         uses: actions/upload-artifact@v7
@@ -267,6 +277,7 @@ jobs:
           path: |
             build/logs/layouts/
             build/logs/idle/
+            build/logs/display/
 
   release-tools:
     runs-on: ubuntu-22.04

@@ -339,7 +339,8 @@ String SettingsMenu::action_label(core::GameAction p_action) const {
 		case core::GameAction::Jump:
 			return "Jump";
 		case core::GameAction::Interact:
-			return "Interact";
+			// What every prompt, How to Play and Controls call it.
+			return "Examine";
 	}
 	return "";
 }

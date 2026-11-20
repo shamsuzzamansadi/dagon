@@ -23,14 +23,14 @@ Check against `git log` on `m6/stabilization` and the pull request before relyin
 | 1 | Two first-time playtests | **Kit with the owner.** Baseline `main` at `a4250f0`: Windows zip `caed3727…cbae`, Linux zip `d0c77bd8…5505`, both verified; the downloaded Linux build played to the ending, `runs=4 failed=0`. **Waiting for the players' recordings** | [kit](m6/playtest-kit/README.md) |
 | 2 | Timing options | Waits on item 1. Scripted on the baseline: 4 min 3 s to the first ending card reading everything, 2 min 7 s straight through, after the prologue | [measurement](m6/playtest-kit/measurement.md) |
 | 3 | Listening | **Kit with the owner:** the reveal in the full mix first, the words after. Waiting for the owner's sheet | [kit](m6/listening-kit/README.md) |
-| 4 | Controllers | **Pending until someone tests the actual hardware** | — |
-| 5 | German key labels | Not started | — |
+| 4 | Controllers | **Sheet ready** (M2's X1–X18, vibration by feel, the ending); **results pending until someone tests the actual hardware.** Simulated-input tests rerun with every gate | [sheet](m6/controller-checks/README.md) |
+| 5 | German key labels | **Passed in CI on the shipped Windows build** of `77d5302` (run 44786112032): the game's thread switched to German, Settings Y D Ö Z, the prompt [Z]; US control Z D Semicolon Y. Linux runs US only (Xvfb keeps US whatever `setxkbmap` says). From `1f68ceb` the job is `desktop-checks` | [evidence](evidence/m6/layouts/README.md) |
 | 6 | Displays | **Done on the branch, by script:** a Display setting (window or fullscreen) and a window that fits its screen (D122); checked at 1280 × 720 and 1920 × 1080 with a window manager. The owner's screens: in the native checks | [evidence](evidence/m6/displays/README.md) |
 | 7 | Native runs | Sheets with the owner, for the Ubuntu ThinkPad and the Windows desktop | [sheets](m6/native-checks/README.md) |
-| 8 | Frame times | Not started for M6 (M5 measured the reveal) | — |
-| 9 | Verification matrix | Not started | — |
+| 8 | Frame times | **Measured, on llvmpipe:** no frame over 33 ms in play in any act, all four exported runs; one long frame at each of three scene changes, the prologue handover (61–72 ms) traced and a warm-up tried and not kept. `DAGON_FRAME_LOG` (D123) in the native-check sheets for the owner's machines | [evidence](evidence/m6/frames/README.md) |
+| 9 | Verification matrix | **Drafted;** gaps filled: the Display setting across a relaunch (`tools/display_relaunch_check.py`, also in CI), Settings' "Interact" renamed Examine (D124). Waiting: the owner's pass over the menus | [matrix](evidence/m6/verification-matrix.md) |
 | 10 | GDD §8 review | Not started | — |
-| 11 | Carried items | Not started | — |
+| 11 | Carried items | **Both M3 survivors have tests that fail under their breakages** (`test_revision.gd`). **M2's examine:** `tools/idle_examine_check.py` repeats its steps; not reproduced in 6 runs here (3 idle, 3 with 9 busy processes); in CI on Windows and Linux from `1f68ceb` | `tools/idle_examine_check.py` |
 | 12 | Validation and handoff | Running as items land | this page |
 
 **Resuming after an interruption:** `cd ~/work/dagon-m4/clone && git switch m6/stabilization && git pull`, then this table and `gh pr view 7`. Graphical runs one at a time: two private displays at once can share an X server and steal each other's keyboard focus (it broke a route run on 2026-11-20). The display checks need `XNS_WM=1` (Openbox, unpacked into `~/.cache/dagon-m4/S/xroot`); `~/work/dagon-m6/tools/capdisplay.sh <WxH> <new dir>` runs them.

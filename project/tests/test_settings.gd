@@ -188,6 +188,19 @@ func test_a_conflict_is_explained_and_can_be_swapped(h) -> void:
 	h.check(_key_button(h, "Jump").text == "E" and _key_button(h, "Interact").text == "Space", "the rows did not update")
 
 
+## The game calls this action Examine everywhere the player reads it: the prompt, How to Play and Controls. Settings
+## used to call it Interact, so a player looking to change Examine's key found no row by that name (M6).
+func test_settings_calls_the_examine_key_what_the_prompts_call_it(h) -> void:
+	await _setup(h)
+	var settings := await _open(h)
+	var label: Label = h.fixture.get_node(ITEMS + "Columns/Keys/Interact/Label")
+	h.check(label.text == "Examine", "the row is called '%s'" % label.text)
+	settings.begin_capture(JUMP)
+	await h.tap_key(KEY_E)
+	h.check(_message(h).contains("Examine") and not _message(h).contains("Interact"), "the conflict names it '%s'" % _message(h))
+	settings.cancel_conflict()
+
+
 func test_cancelling_a_conflict_changes_nothing(h) -> void:
 	await _setup(h)
 	var settings := await _open(h)
