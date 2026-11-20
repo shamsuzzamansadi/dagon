@@ -9,6 +9,9 @@ extends SceneTree
 ##                  water, the body, and the hand landing beside the carving
 ##   escape-run     the reveal, then running left with real keys from the moment he can, through the collapse
 ##   escape-caught  the reveal, then standing still until the sea has him, through the collapse
+##   emergence-timing  the walk into the reveal at the game's own pace, not Movie Maker's, printing each frame's real
+##                  length through the reveal's first seven seconds: a stall shows as one long frame, after which the
+##                  clip jumps ahead
 ##   emergence-parts  the emergence with each part of the creature, the water before it, the walkway and the Monolith
 ##                  drawn in one flat colour of its own and nothing else shown, so that where the arm meets the body,
 ##                  and the creature the water, can be measured frame by frame (notes/owner-1119c/parts.py)
@@ -120,6 +123,16 @@ func _run() -> void:
 		_mark("first-movement")
 		await h.wait_until(func() -> bool: return clips.current_animation_position >= 5.0, 60 * 10, "five seconds in")
 		_mark("reveal-5s")
+	elif scene == "emergence-timing":
+		await route.walk_into_the_reveal()
+		_mark("reveal")
+		var clips: AnimationPlayer = route.world().get_node("Cinematics")
+		var last := Time.get_ticks_usec()
+		while clips.is_playing() and clips.current_animation_position < 7.0:
+			await process_frame
+			var now := Time.get_ticks_usec()
+			print("FRAME clip=%.3f ms=%.1f" % [clips.current_animation_position, (now - last) / 1000.0])
+			last = now
 	elif scene == "emergence" or scene == "emergence-parts":
 		if scene == "emergence-parts":
 			_flatten(route.world())

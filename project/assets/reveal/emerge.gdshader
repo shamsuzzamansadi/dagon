@@ -7,7 +7,7 @@ shader_type canvas_item;
 // arm comes out from the shoulder to the hand (D120), so its hand never hangs half-seen in the air. From where it
 // starts it spreads with a soft front; with the alpha at 1 the part is whole everywhere.
 
-uniform sampler2D reach : filter_linear;
+uniform sampler2D reach : filter_linear, hint_default_white;
 
 const float SOFT = 0.25;
 

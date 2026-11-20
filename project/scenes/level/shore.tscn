@@ -3236,6 +3236,18 @@ limit_right = 4544
 limit_bottom = 50
 target_path = NodePath("../Player")
 
+[node name="Warm" type="Node2D" parent="CameraRig"]
+
+[node name="Emerge" type="Sprite2D" parent="CameraRig/Warm"]
+modulate = Color(1, 1, 1, 0.3)
+material = SubResource("emerge_crest")
+texture = ExtResource("r_dagon_crest")
+
+[node name="Particles" type="CPUParticles2D" parent="CameraRig/Warm"]
+amount = 1
+lifetime = 1.0
+color = Color(1, 1, 1, 0)
+
 [node name="Fog" type="Node2D" parent="."]
 
 [node name="Bank" type="Polygon2D" parent="Fog"]

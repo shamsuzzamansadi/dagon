@@ -14,6 +14,9 @@ run this again with --positions to place the drawings it made.
     rushes on and rises until it fills the view, where a second sea in the screen's own space used to rise from the
     foot of the screen. That second sea is gone.
 
+  - The shader and a particle are drawn once, unseen, as the level loads, so that neither is first compiled in the
+    middle of the reveal, where the game stood still for a moment and the clip then jumped ahead.
+
 No line, sound or haptic cue, no key of the camera, no collision and no outcome changes; the reveal's and the
 collapse's lengths are as they were.
 """
@@ -50,6 +53,24 @@ shader_parameter/reach = ExtResource("r_dagon_{part}_reach")''')
     fade = s.clip("clip_dagon_reveal")
     arm_fade = fade.tracks[fade.find("Dagon/Arm:modulate")[0]]
     assert '"times": PackedFloat32Array(5.5, 5.95)' in arm_fade and '"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]' in arm_fade
+
+    # Drawn from the moment the level loads, beside the camera so that they are always in view, and showing nothing:
+    # the crest through the shader, and a particle. The first draw of each cost the game a long frame, after which the
+    # clip jumped ahead: at 3.0 s and 5.5 s for the shader, where the creature's parts first show, and at 2.6 s for the
+    # first particles, the spray (on this machine's software renderer, 130 to 190 ms each). The crest lies farther
+    # from the ridge than 0.375 of the farthest reach everywhere it is drawn, so at an alpha of 0.3 the shader brings
+    # out none of it; Godot does not draw what is nearly clear, so it cannot be clearer. The particle is clear.
+    s.insert_after("CameraRig", ".", '''[node name="Warm" type="Node2D" parent="CameraRig"]
+
+[node name="Emerge" type="Sprite2D" parent="CameraRig/Warm"]
+modulate = Color(1, 1, 1, 0.3)
+material = SubResource("emerge_crest")
+texture = ExtResource("r_dagon_crest")
+
+[node name="Particles" type="CPUParticles2D" parent="CameraRig/Warm"]
+amount = 1
+lifetime = 1.0
+color = Color(1, 1, 1, 0)''')
 
     # The shoulder over the arm.
     s.add_ext("r_dagon_shoulder", "res://assets/reveal/dagon_shoulder.png")

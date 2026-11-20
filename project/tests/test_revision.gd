@@ -617,6 +617,30 @@ func test_the_creature_comes_out_from_the_ridge_and_out_of_one_water(h) -> void:
 	h.check(gaps == 0, "the water has %d clear pixels" % gaps)
 
 
+## The shader and the particles are drawn from the moment the level loads, beside the camera and showing nothing, so
+## that neither is first drawn, and the game stalled, in the middle of the reveal (D119): the crest through its own
+## material, at an alpha Godot draws, below which its map brings out none of it; and one clear particle.
+func test_the_reveal_does_not_stall_on_a_first_draw(h) -> void:
+	var world := await _world(h, AWAKENED)
+	var camera: Node = world.get_node("CameraRig")
+	var warm: Sprite2D = world.get_node("CameraRig/Warm/Emerge")
+	var crest: Sprite2D = world.get_node("Dagon/Head/Crest/Art")
+	h.check(warm.is_visible_in_tree() and warm.get_parent().get_parent() == camera, "the shader's warm-up is not drawn beside the camera")
+	h.check(warm.material == crest.material and warm.texture == crest.texture, "the warm-up is not the crest through its own material")
+	var alpha := warm.modulate.a
+	h.check(alpha >= 0.01, "the warm-up at alpha %.3f may not be drawn at all" % alpha)
+	var reach: Image = ((crest.material as ShaderMaterial).get_shader_parameter("reach") as Texture2D).get_image()
+	var drawing := crest.texture.get_image()
+	var nearest := 1.0
+	for y in reach.get_height():
+		for x in reach.get_width():
+			if drawing.get_pixel(x * 2, y * 2).a > 0.0 or drawing.get_pixel(x * 2 + 1, y * 2 + 1).a > 0.0:
+				nearest = minf(nearest, reach.get_pixel(x, y).r)
+	h.check(alpha * 1.25 < nearest - 0.05, "at alpha %.2f the warm-up would show the crest where its reach is %.2f" % [alpha, nearest])
+	var particles: CPUParticles2D = world.get_node("CameraRig/Warm/Particles")
+	h.check(particles.is_visible_in_tree() and particles.emitting and particles.color.a == 0.0, "the particles' warm-up is missing, still, or seen")
+
+
 ## The owner's playtest of 2026-11-19 of ea86ae9: the hand looked detached from the body. The arm turns about one point
 ## on the body's outline, within the turn its drawing is made for (D107), and the body's own pixels where the arm
 ## crosses the body are laid over it from the moment it shows, lit as the body is (D120): so wherever the arm lies over
