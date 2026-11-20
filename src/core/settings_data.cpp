@@ -19,6 +19,7 @@ constexpr std::string_view EFFECTS_FIELD = "effects_volume";
 constexpr std::string_view NARRATION_FIELD = "narration_volume";
 constexpr std::string_view SUBTITLES_FIELD = "subtitles";
 constexpr std::string_view VIBRATION_FIELD = "vibration";
+constexpr std::string_view FULLSCREEN_FIELD = "fullscreen";
 constexpr std::string_view KEY_FIELD_PREFIX = "key_";
 constexpr int MAX_KEY_CODE = 0x7FFFFFF;
 
@@ -136,15 +137,17 @@ ParsedSettings parse_settings(std::string_view p_text) {
 			} else {
 				parsed.settings.narration_volume = *volume;
 			}
-		} else if (field == SUBTITLES_FIELD || field == VIBRATION_FIELD) {
+		} else if (field == SUBTITLES_FIELD || field == VIBRATION_FIELD || field == FULLSCREEN_FIELD) {
 			// A file from before these existed simply lacks them, and gets their defaults with no complaint.
 			const std::optional<bool> enabled = parse_switch(value);
 			if (!enabled.has_value()) {
 				repaired = true;
 			} else if (field == SUBTITLES_FIELD) {
 				parsed.settings.subtitles = *enabled;
-			} else {
+			} else if (field == VIBRATION_FIELD) {
 				parsed.settings.vibration = *enabled;
+			} else {
+				parsed.settings.fullscreen = *enabled;
 			}
 		} else if (field.substr(0, KEY_FIELD_PREFIX.size()) == KEY_FIELD_PREFIX) {
 			const std::string_view name = field.substr(KEY_FIELD_PREFIX.size());
@@ -177,6 +180,7 @@ std::string serialize_settings(const Settings &p_settings) {
 	append_number(text, NARRATION_FIELD, p_settings.narration_volume);
 	text.append(SUBTITLES_FIELD).append(p_settings.subtitles ? "=1\n" : "=0\n");
 	text.append(VIBRATION_FIELD).append(p_settings.vibration ? "=1\n" : "=0\n");
+	text.append(FULLSCREEN_FIELD).append(p_settings.fullscreen ? "=1\n" : "=0\n");
 	for (const GameAction action : ALL_ACTIONS) {
 		text.append(KEY_FIELD_PREFIX).append(action_name(action)).append("=").append(std::to_string(p_settings.keys[index_of(action)])).append("\n");
 	}

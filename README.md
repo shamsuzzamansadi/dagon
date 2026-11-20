@@ -44,7 +44,7 @@ The controller columns are the same physical buttons, by position. The prompt an
 device you are using, and an unrecognized controller is described by position.
 
 In Settings you can change the keyboard keys for walking, jumping and examining. The Left and Right arrows always move
-and Esc always pauses. Controller buttons are fixed. Narration has its own volume, and subtitles and controller vibration can each be switched off. They are on by default. The Music and Effects sliders are saved and set on their own buses, ready
+and Esc always pauses. Controller buttons are fixed. Narration has its own volume, and subtitles and controller vibration can each be switched off. They are on by default. Display switches between a window and fullscreen; the window fits the screen it opens on. The Music and Effects sliders are saved and set on their own buses, ready
 for the game's audio. The sound is synthesized, every story line is spoken in one voice, and the mix has been measured but not yet judged by ear.
 
 All of this is checked by automated tests with simulated input for each layout. In human tests, A, D, the Left and Right arrows and

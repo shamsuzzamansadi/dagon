@@ -39,10 +39,10 @@ Near its top Godot names the graphics device it draws with ("Using Device: …")
 | Check | 1280 × 720 | 1920 × 1080 |
 |---|---|---|
 | The window opens fitting the screen, sharp pixels, no stretching | | |
-| Fullscreen on, from Settings: sharp, the right shape, bars if needed rather than stretched | | |
+| Fullscreen on, from Settings → Display: sharp, the right shape, bars if needed rather than stretched | | |
 | A long caption (examine anything with a long description) fits, readable | | |
 | Menus navigable with keys in fullscreen | | |
-| Back to windowed: the window returns at a sensible size, nothing off-screen | | |
+| Back to windowed, from Settings → Display again (or the pause menu's Settings): the window returns at a sensible size, centred, nothing off-screen | | |
 
 To try 1280 × 720 on a larger screen, set the display's resolution in Settings → System → Display, then put it back. Windows' display scaling above 100% changes the window's size on screen: please note your scaling.
 

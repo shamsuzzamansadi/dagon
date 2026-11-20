@@ -39,6 +39,7 @@ public:
 	void set_narration_volume(double p_value);
 	void toggle_subtitles();
 	void toggle_vibration();
+	void toggle_fullscreen();
 
 	bool is_capturing() const { return state_ == State::Capturing; }
 	bool has_conflict() const { return state_ == State::Conflict; }
@@ -58,6 +59,8 @@ public:
 	godot::NodePath get_subtitles_button_path() const { return subtitles_button_path_; }
 	void set_vibration_button_path(const godot::NodePath &p_value) { vibration_button_path_ = p_value; }
 	godot::NodePath get_vibration_button_path() const { return vibration_button_path_; }
+	void set_fullscreen_button_path(const godot::NodePath &p_value) { fullscreen_button_path_ = p_value; }
+	godot::NodePath get_fullscreen_button_path() const { return fullscreen_button_path_; }
 	void set_key_button_paths(const godot::Array &p_value) { key_button_paths_ = p_value; }
 	godot::Array get_key_button_paths() const { return key_button_paths_; }
 	void set_message_label_path(const godot::NodePath &p_value) { message_label_path_ = p_value; }
@@ -94,6 +97,7 @@ private:
 	godot::NodePath narration_slider_path_;
 	godot::NodePath subtitles_button_path_;
 	godot::NodePath vibration_button_path_;
+	godot::NodePath fullscreen_button_path_;
 	godot::Array key_button_paths_;
 	godot::NodePath message_label_path_;
 	godot::NodePath conflict_row_path_;
@@ -104,6 +108,7 @@ private:
 	NodeRef<godot::HSlider> narration_slider_;
 	NodeRef<godot::Button> subtitles_button_;
 	NodeRef<godot::Button> vibration_button_;
+	NodeRef<godot::Button> fullscreen_button_;
 	std::array<NodeRef<godot::Button>, core::GAME_ACTION_COUNT> key_buttons_;
 	NodeRef<godot::Label> message_label_;
 	NodeRef<godot::Control> conflict_row_;

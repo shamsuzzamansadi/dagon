@@ -41,10 +41,10 @@ mkdir dagon && cd dagon && unzip ../dagon-linux.zip && chmod +x dagon.x86_64
 | Check | 1280 × 720 | 1920 × 1080 |
 |---|---|---|
 | The window opens fitting the screen, sharp pixels, no stretching | | |
-| Fullscreen on, from Settings: sharp, the right shape, bars if needed rather than stretched | | |
+| Fullscreen on, from Settings → Display: sharp, the right shape, bars if needed rather than stretched | | |
 | A long caption (examine anything with a long description) fits, readable | | |
 | Menus navigable with keys in fullscreen | | |
-| Back to windowed: the window returns at a sensible size, nothing off-screen | | |
+| Back to windowed, from Settings → Display again (or the pause menu's Settings): the window returns at a sensible size, centred, nothing off-screen | | |
 
 To try 1280 × 720 on a larger screen, set the display's resolution in Settings → Displays, then put it back.
 

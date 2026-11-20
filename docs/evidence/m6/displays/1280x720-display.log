@@ -1,0 +1,14 @@
+DISPLAY title-window mode=windowed window=(960, 540) at=(160, 90) screen=(1280, 720) usable=[P: (0, 0), S: (1280, 720)] picture=(480.0, 270.0) scale=2 focus=NewGame
+DISPLAY settings-window mode=windowed window=(960, 540) at=(160, 90) screen=(1280, 720) usable=[P: (0, 0), S: (1280, 720)] picture=(480.0, 270.0) scale=2 focus=Slider
+DISPLAY settings-fullscreen mode=fullscreen window=(1280, 720) at=(0, 0) screen=(1280, 720) usable=[P: (0, 0), S: (1280, 720)] picture=(480.0, 270.0) scale=2 focus=Display
+DISPLAY key-ui_down mode=fullscreen window=(1280, 720) at=(0, 0) screen=(1280, 720) usable=[P: (0, 0), S: (1280, 720)] picture=(480.0, 270.0) scale=2 focus=RestoreDefaults
+DISPLAY key-ui_down mode=fullscreen window=(1280, 720) at=(0, 0) screen=(1280, 720) usable=[P: (0, 0), S: (1280, 720)] picture=(480.0, 270.0) scale=2 focus=Back
+DISPLAY key-ui_up mode=fullscreen window=(1280, 720) at=(0, 0) screen=(1280, 720) usable=[P: (0, 0), S: (1280, 720)] picture=(480.0, 270.0) scale=2 focus=RestoreDefaults
+DISPLAY key-ui_up mode=fullscreen window=(1280, 720) at=(0, 0) screen=(1280, 720) usable=[P: (0, 0), S: (1280, 720)] picture=(480.0, 270.0) scale=2 focus=Display
+DISPLAY key-ui_up mode=fullscreen window=(1280, 720) at=(0, 0) screen=(1280, 720) usable=[P: (0, 0), S: (1280, 720)] picture=(480.0, 270.0) scale=2 focus=Key
+DISPLAY settings-fullscreen-keys mode=fullscreen window=(1280, 720) at=(0, 0) screen=(1280, 720) usable=[P: (0, 0), S: (1280, 720)] picture=(480.0, 270.0) scale=2 focus=Key
+DISPLAY title-fullscreen mode=fullscreen window=(1280, 720) at=(0, 0) screen=(1280, 720) usable=[P: (0, 0), S: (1280, 720)] picture=(480.0, 270.0) scale=2 focus=Settings
+DISPLAY caption-fullscreen mode=fullscreen window=(1280, 720) at=(0, 0) screen=(1280, 720) usable=[P: (0, 0), S: (1280, 720)] picture=(480.0, 270.0) scale=2 focus=none
+DISPLAY pause-settings-windowed mode=windowed window=(960, 540) at=(160, 90) screen=(1280, 720) usable=[P: (0, 0), S: (1280, 720)] picture=(480.0, 270.0) scale=2 focus=Display
+DISPLAY caption-window mode=windowed window=(960, 540) at=(160, 90) screen=(1280, 720) usable=[P: (0, 0), S: (1280, 720)] picture=(480.0, 270.0) scale=2 focus=none
+DISPLAY ending-longest-window mode=windowed window=(960, 540) at=(160, 90) screen=(1280, 720) usable=[P: (0, 0), S: (1280, 720)] picture=(480.0, 270.0) scale=2 focus=Continue
