@@ -30,17 +30,12 @@ from scipy import ndimage
 
 from art_common import BAYER, Noise
 from palette import rgba
+from shoulder import ARM_TURN, SHOULDER, SHOULDER_RADIUS
 
 SKIN = ["C0", "C1", "T0", "T1", "T2", "T3"]
 LIGHT = np.array([0.50, -0.76, 0.42])
 LIGHT = LIGHT / np.linalg.norm(LIGHT)
 
-# The point on the body's outline that the reveal's clip turns the arm about, and how far it turns it either way
-# (D107). A test holds the clip to them.
-SHOULDER = (-305, -166)
-ARM_TURN = (-0.5, 0.22)
-# The arm's root is rounded about that point, so that its outline there is the same at every turn.
-SHOULDER_RADIUS = 27
 # What shows of the creature once the fog has left it: down to the water, at y = -9 in the world, with the creature
 # then 41 px up from its rest (the reveal's clip at 4.3 s).
 SHOWN_TO = -9 + 41

@@ -234,10 +234,10 @@ def check_ridge(problems):
 
 
 def check_shoulder(problems):
-    """The arm turns about a point on the body's outline (gen_creature.SHOULDER, D107). Wherever, at any turn of the
+    """The arm turns about a point on the body's outline (shoulder.SHOULDER, D107). Wherever, at any turn of the
     clip's, its drawing lies over the body's, the shoulder's drawing, the body's own pixels, lies over it, so the arm
     always comes out from under the body's outline and its root never shows (D120)."""
-    import gen_creature
+    import shoulder
 
     body = Image.open(REVEAL_OUT / "dagon_body.png").convert("RGBA")
     over = Image.open(REVEAL_OUT / "dagon_shoulder.png").convert("RGBA")
@@ -250,11 +250,11 @@ def check_shoulder(problems):
             if over.getpixel((x, y))[3] and over.getpixel((x, y)) != body.getpixel((x + ox - bx, y + oy - by)):
                 problems.append(f"the shoulder's pixel at ({x + ox}, {y + oy}) is not the body's")
                 return
-    cx, cy = gen_creature.SHOULDER
+    cx, cy = shoulder.SHOULDER
     points = [(x + ax + 0.5, y + ay + 0.5) for y in range(arm.height) for x in range(arm.width) if arm.getpixel((x, y))[3]]
     turns = 0
     for step in range(0, 73):
-        turn = gen_creature.ARM_TURN[0] + (gen_creature.ARM_TURN[1] - gen_creature.ARM_TURN[0]) * step / 72
+        turn = shoulder.ARM_TURN[0] + (shoulder.ARM_TURN[1] - shoulder.ARM_TURN[0]) * step / 72
         c, s = math.cos(turn), math.sin(turn)
         open_ = 0
         for px, py in points:
@@ -266,7 +266,7 @@ def check_shoulder(problems):
             problems.append(f"turned {turn:.3f}, {open_} of the arm's pixels lie over the body and out from under the shoulder")
             return
         turns += 1
-    print(f"shoulder: the body's own pixels; over the arm wherever it crosses the body, at {turns} turns from {gen_creature.ARM_TURN[0]} to {gen_creature.ARM_TURN[1]}")
+    print(f"shoulder: the body's own pixels; over the arm wherever it crosses the body, at {turns} turns from {shoulder.ARM_TURN[0]} to {shoulder.ARM_TURN[1]}")
 
 
 def check_ritual(problems):
