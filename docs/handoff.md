@@ -2,7 +2,7 @@
 
 Changing task state only. The lasting rules are in [AGENTS.md](../AGENTS.md). **Check this against `git log`, the pull requests and CI before relying on it.** M5's step-by-step record is in the [M5 package](reviews/m5-review-package.md); M4's in `git show 09d854e:docs/handoff.md` and the [M4 package](reviews/m4-review-package.md).
 
-**Last updated:** 2026-11-20. **M5 is accepted by the owner, on 2026-11-20 at `b7303bf`, as the completed milestone, and merged into `main` by the squash merge of [#6](https://github.com/shamsuzzamansadi/dagon/pull/6).** A milestone acceptance only: nothing tagged or released since `v0.1.0-pre-alpha.1`. **M6 is not started:** its plan is drafted and waits for the owner's approval.
+**Last updated:** 2026-11-20. **M5 is accepted by the owner, on 2026-11-20 at `b7303bf`, as the completed milestone, and merged into `main` by the squash merge of [#6](https://github.com/shamsuzzamansadi/dagon/pull/6).** A milestone acceptance only: nothing tagged or released since `v0.1.0-pre-alpha.1`. **M6 is in progress** on `m6/stabilization`, draft [#7](https://github.com/shamsuzzamansadi/dagon/pull/7), under the [plan](m6-plan.md) the owner approved on 2026-11-20, target 21 to 27 November. The [playtest kit](m6/playtest-kit/README.md), the [listening kit](m6/listening-kit/README.md) and the [native-check sheets](m6/native-checks/README.md) are with the owner.
 
 ## Where things are
 
@@ -16,7 +16,7 @@ Changing task state only. The lasting rules are in [AGENTS.md](../AGENTS.md). **
 
 ## Open
 
-**For M6, before anything else:** the owner's approval of the M6 plan, drafted on 2026-11-20 from the [roadmap](roadmap.md)'s M6 row and "M6 verification". Until then nothing of M6 is implemented.
+**Waiting on people:** two first-time players and their recordings (the owner contacts them); the owner's listening sheet; the owner's native checks on the Ubuntu ThinkPad and the Windows desktop; controllers, whose results stay pending until someone tests the actual hardware. **Developer, meanwhile:** displays and fullscreen, frame times, the verification matrix, German key labels in CI, the visual review, the carried items.
 
 **Open from M5, as the owner said:** the intelligibility of the reveal's dialogue by ear, in the full mix ("Its head turned. I ran." under the second call stays flagged, [listening package](evidence/m5/listening/README.md)).
 
@@ -47,4 +47,4 @@ Outside the repository and outside `/tmp`.
 
 ## Next concrete action
 
-**Nothing, until the owner approves the M6 plan or changes it.** Then M6 on its own branch from `main`, through a pull request, with its own candidates. **A tag or release needs the owner's explicit word.**
+**The developer's M6 items** (plan items 4 to 11) while the playtests and the listening are pending; then the playtests' measurements and options for the owner; then the M6 candidate and a stop for the owner's review. **Merging M6, publishing `v0.2.0-alpha.1` and starting M7 need the owner's word.**
