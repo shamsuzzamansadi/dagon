@@ -250,6 +250,35 @@ func test_the_slab_comes_down_once_with_one_sound_and_one_line(h) -> void:
 	h.check(not world.get_node("Hud/Caption").visible or not world.get_node("Hud/Caption").text.contains("struck"), "the line was said again")
 
 
+## The director's own rule, behind the stone's one-shot prompt: once pushed, a second push, however it arrives, while
+## the slab is on its way down or after it has settled, neither restarts it nor plays it again. No key can send one, as
+## the prompt is gone (M3's breakage, "The slab comes down again for each weight", survived for that reason), so this
+## sends the stone's signal itself.
+func test_a_second_push_from_anywhere_neither_restarts_the_slab_nor_raises_it_again(h) -> void:
+	var world := await _world(h, ABYSS)
+	var crossing: Node2D = world.get_node("Crossing")
+	var sound: AudioStreamPlayer2D = world.get_node("Crossing/Sound")
+	var push: Node = world.get_node("CrossingStone/Push")
+	var director := _director(h)
+	await _climb_and_push(h)
+	var pushed := Engine.get_process_frames()
+	await h.steps(6)
+	push.interacted.emit(push.interaction_id)
+	await h.wait_until(func() -> bool: return not director.is_crossing_moving(), 240, "the slab to settle")
+	var frames := Engine.get_process_frames() - pushed
+	var expected := roundi((director.crossing_fall_seconds + director.crossing_lower_seconds) * 60.0)
+	h.check(frames <= expected + 3, "a second push mid-fall made the slab take %d frames, not %d" % [frames, expected])
+	sound.stop()
+	push.interacted.emit(push.interaction_id)
+	var highest := [0.0]
+	for i in expected + 10:
+		await h.steps(1)
+		highest[0] = maxf(highest[0], absf(crossing.rotation))
+	h.check(highest[0] < 0.001, "a push after it settled raised the slab to %.3f" % highest[0])
+	h.check(not director.is_crossing_moving(), "a push after it settled set the slab moving")
+	h.check(not sound.playing, "a push after it settled played the slab's sound")
+
+
 func test_a_world_restored_at_the_abyss_has_the_slab_up_and_from_the_monolith_on_has_it_down(h) -> void:
 	for pair in [[ABYSS, false], [MONOLITH, true], [AWAKENED, true]]:
 		var world := await _world(h, pair[0])
@@ -409,6 +438,30 @@ func test_footsteps_follow_walking_and_change_where_the_rock_begins(h) -> void:
 		h.check(sounding[0], "the steps on %s made no sound" % leg[1])
 		h.check(not heard.is_empty() and heard.keys().all(func(file: String) -> bool: return file.begins_with(leg[1])), "walking on %s sounded like %s" % [leg[1], heard.keys()])
 		h.check(heard.size() >= 2, "every step on %s was the same sound: %s" % [leg[1], heard.keys()])
+
+
+## "The first soon after he sets off": after a stop, whatever he had walked before it, the first step comes within
+## half a step's length. M3's breakage "Standing still makes footsteps" removed the line that does this, and survived:
+## standing still stayed silent, as the test above checks, and only this changed.
+func test_after_a_stop_the_first_step_comes_soon_after_he_sets_off(h) -> void:
+	var world := await _world(h)
+	var player := _player(h)
+	await h.stand_at(player, Vector2(300, -2))
+	await h.steps(10)
+	# Stopped just after a step: almost none of the next step's length is walked when he stands.
+	var before: int = player.get_footstep_count()
+	h.send(h.key_event(KEY_D, true))
+	await h.wait_until(func() -> bool: return player.get_footstep_count() > before + 1, 120, "two steps")
+	h.send(h.key_event(KEY_D, false))
+	await h.wait_until(func() -> bool: return absf(player.velocity.x) < 0.01, 120, "him to stand")
+	await h.steps(20)
+	var count: int = player.get_footstep_count()
+	var from_x := player.global_position.x
+	h.send(h.key_event(KEY_D, true))
+	await h.wait_until(func() -> bool: return player.get_footstep_count() > count, 120, "the first step after the stop")
+	h.send(h.key_event(KEY_D, false))
+	var walked := player.global_position.x - from_x
+	h.check(walked <= player.footstep_spacing * 0.5, "the first step after a stop came %.1f px on, a step is %.1f" % [walked, player.footstep_spacing])
 
 
 func test_his_breathing_and_its_pace_follow_the_story(h) -> void:

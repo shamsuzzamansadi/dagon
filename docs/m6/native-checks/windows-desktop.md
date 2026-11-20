@@ -13,10 +13,11 @@ In PowerShell, in the folder with the zip:
 ```
 Get-FileHash dagon-windows.zip      # must equal the build's SHA-256
 Expand-Archive dagon-windows.zip -DestinationPath dagon
+$env:DAGON_FRAME_LOG = "50"
 .\dagon\dagon.exe --print-fps
 ```
 
-If Windows says it protected your PC: **More info**, then **Run anyway** (the game is not signed). `--print-fps` only adds one frame-rate reading a second to the game's log, which is at:
+If Windows says it protected your PC: **More info**, then **Run anyway** (the game is not signed). `--print-fps` only adds one frame-rate reading a second to the game's log; `DAGON_FRAME_LOG` adds, once a second, how many frames there were and the longest, and a line for any frame of 50 ms or more. Neither changes the game (builds from before M6's frame log simply ignore it). The log is at:
 
 `%APPDATA%\Godot\app_userdata\DAGON- Beneath the Black Tide\logs\godot.log`
 

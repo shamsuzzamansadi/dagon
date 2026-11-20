@@ -17,10 +17,10 @@ glxinfo -B 2>/dev/null | grep -E 'OpenGL renderer|OpenGL version'   # sudo apt i
 ```
 sha256sum dagon-linux.zip            # must equal the build's SHA-256
 mkdir dagon && cd dagon && unzip ../dagon-linux.zip && chmod +x dagon.x86_64
-./dagon.x86_64 --print-fps 2>&1 | tee dagon-linux-run.log
+DAGON_FRAME_LOG=50 ./dagon.x86_64 --print-fps 2>&1 | tee dagon-linux-run.log
 ```
 
-`--print-fps` only prints one frame-rate reading a second to the log. The game also keeps its own log at `~/.local/share/godot/app_userdata/DAGON- Beneath the Black Tide/logs/godot.log`.
+`--print-fps` only prints one frame-rate reading a second to the log. `DAGON_FRAME_LOG=50` adds, once a second, how many frames there were and the longest, and a line for any frame of 50 ms or more: a hitch you may not notice, measured. Neither changes the game (builds from before M6's frame log simply ignore it). The game also keeps its own log at `~/.local/share/godot/app_userdata/DAGON- Beneath the Black Tide/logs/godot.log`.
 
 **Hardware rendering:** near the top of `dagon-linux-run.log` Godot names the device it draws with ("Using Device: …"). **If it says `llvmpipe`, the run is software rendering, not the check,** and please say so.
 

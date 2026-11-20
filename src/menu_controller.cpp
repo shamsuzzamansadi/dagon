@@ -231,6 +231,7 @@ void MenuController::_process(double p_delta) {
 	if (Engine::get_singleton()->is_editor_hint()) {
 		return;
 	}
+	note_frame();
 	// The pause menu runs while the game is paused, so it is the one that can finish a Quit to Desktop from there.
 	if (is_quit_due()) {
 		get_tree()->quit();
