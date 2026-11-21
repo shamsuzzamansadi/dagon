@@ -1,0 +1,54 @@
+Deliberate breakage of what M6 added, at a30be86, with tools/breakage.py and tools/breakage_m6.py, which fails closed (D80).
+Three workers in isolated clones, each worker's clean control built and passing before and after. Simulated input only.
+A count of 0 failing with CAUGHT: the native unit tests failed, before any integration test.
+
+CAUGHT           1  Fullscreen is never saved
+CAUGHT           0  A saved fullscreen is read as a window
+CAUGHT           1  The Display button does nothing
+CAUGHT           1  Restore Defaults keeps fullscreen
+CAUGHT           0  A window too big for its screen keeps its size
+CAUGHT           0  The window is never larger than the picture
+CAUGHT           1  The conflict message says Interact again
+CAUGHT           1  Settings' row says Interact again
+CAUGHT           1  The distant shape's drawing is 1000 px off again
+CAUGHT           7  Awakened stands in front of the statue again
+
+commit a30be86, 10 breakages, {'CAUGHT': 10}, controls held, summary complete, 588 s
+
+---- Each worker
+control before: NOT CAUGHT passed=460 failed=0 unit_failed=0
+=== The Display button does nothing: CAUGHT (1 failing)
+    unit exit=0 unit failed=0, runner exit=1 passed=459 failed=1
+    FAIL test_settings.test_the_display_setting_is_shown_saved_and_restored
+=== The window is never larger than the picture: CAUGHT
+    unit exit=2 unit failed=4, runner exit=0 passed=460 failed=0
+=== The distant shape's drawing is 1000 px off again: CAUGHT (1 failing)
+    unit exit=0 unit failed=0, runner exit=1 passed=459 failed=1
+    FAIL test_revision.test_every_drawing_lies_over_the_clear_shape_it_belongs_to
+control after: NOT CAUGHT passed=460 failed=0
+control before: NOT CAUGHT passed=460 failed=0 unit_failed=0
+=== A saved fullscreen is read as a window: CAUGHT
+    unit exit=2 unit failed=1, runner exit=0 passed=460 failed=0
+=== A window too big for its screen keeps its size: CAUGHT
+    unit exit=2 unit failed=3, runner exit=0 passed=460 failed=0
+=== Settings' row says Interact again: CAUGHT (1 failing)
+    unit exit=0 unit failed=0, runner exit=1 passed=459 failed=1
+    FAIL test_settings.test_settings_calls_the_examine_key_what_the_prompts_call_it
+=== Awakened stands in front of the statue again: CAUGHT (7 failing)
+    unit exit=0 unit failed=0, runner exit=1 passed=453 failed=7
+    FAIL test_restore.test_every_savable_beat_rebuilds_the_right_world_with_nothing_replayed
+    FAIL test_restore.test_restart_checkpoint_rebuilds_the_same_world_at_every_beat
+    FAIL test_restore.test_each_save_continues_from_the_main_menu_with_the_right_wording
+    FAIL test_restore.test_a_good_backup_of_each_beat_restores_it_when_the_primary_is_damaged
+control after: NOT CAUGHT passed=460 failed=0
+control before: NOT CAUGHT passed=460 failed=0 unit_failed=0
+=== Fullscreen is never saved: CAUGHT (1 failing)
+    unit exit=2 unit failed=1, runner exit=1 passed=459 failed=1
+    FAIL test_settings.test_the_display_setting_is_shown_saved_and_restored
+=== Restore Defaults keeps fullscreen: CAUGHT (1 failing)
+    unit exit=0 unit failed=0, runner exit=1 passed=459 failed=1
+    FAIL test_settings.test_the_display_setting_is_shown_saved_and_restored
+=== The conflict message says Interact again: CAUGHT (1 failing)
+    unit exit=0 unit failed=0, runner exit=1 passed=459 failed=1
+    FAIL test_settings.test_settings_calls_the_examine_key_what_the_prompts_call_it
+control after: NOT CAUGHT passed=460 failed=0
