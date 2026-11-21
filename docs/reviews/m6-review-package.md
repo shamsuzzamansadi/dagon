@@ -25,7 +25,7 @@
 | 7 | Native runs | Sheets for the ThinkPad and the Windows desktop, with the frame log; **the runs are outstanding** | D done; H outstanding | [sheets](../m6/native-checks/README.md) |
 | 8 | Frame times | No frame over 33 ms in play in any act, on the software renderer; one long frame at each of three scene changes, the handover traced | D done; H outstanding | [frames](../evidence/m6/frames/README.md) |
 | 9 | M6 verification | The matrix, with its gaps filled; **the owner's pass over the menus is outstanding** | D done; P outstanding | [matrix](../evidence/m6/verification-matrix.md) |
-| 10 | GDD §8 on every scene | The developer's view; F1, F2 and F3 found and fixed; **the owner's eye in play is outstanding** | D done; P outstanding | [review](../evidence/m6/visual-review/README.md), [F2/F3](../evidence/m6/cave-and-checkpoint/README.md) |
+| 10 | GDD §8 on every scene | The developer's view; F1, F2 and F3 found and fixed; **the owner's playtest of `a30be86`: satisfactory** for the route played (§4) | D done; P done for that route | [review](../evidence/m6/visual-review/README.md), [F2/F3](../evidence/m6/cave-and-checkpoint/README.md) |
 | 11 | Carried items | M3's two survivors: tests that fail under their breakages. M2's examine: not reproduced in any run, 6 here and 20 in each CI run since `1f68ceb` (10 on Windows, 10 on Linux) | D | [matrix](../evidence/m6/verification-matrix.md) |
 | 12 | Validation and handoff | This package; the breakage of what M6 adds, 10 of 10 caught; the candidate when the human checks are in | D | §3 |
 
@@ -58,7 +58,9 @@
 
 ## 4. Human observations
 
-**None for M6 yet.** The owner's words from M5's acceptance stand in their own record ([M5 acceptance](../evidence/m5/owner-acceptance-2026-11-20.md)), among them that the intelligibility of the reveal's dialogue by ear remained open for M6 (item 3).
+**2026-11-21, the owner, on the owner-test build `a30be86`, Windows desktop: owner playtest satisfactory** for the route played, New Game through the running escape, all four epilogue panels, the credits and the return to the main menu: "I'm satisfied with the current visuals and gameplay. I'm requesting no further changes based on this run." Two observations left open: at 6:39 to 6:43 the recording shows only the centre of Settings during the display switch, and what the monitor showed is not confirmed; Continue after the credits was not selected, so D127 has scripted coverage only there. ChatGPT reviewed the footage and compared audio samples with the owner's 20 November recording: **a signal check, not listening** ([record](../m6/owner-test-build.md)).
+
+The owner's words from M5's acceptance stand in their own record ([M5 acceptance](../evidence/m5/owner-acceptance-2026-11-20.md)), among them that the intelligibility of the reveal's dialogue by ear remained open for M6 (item 3).
 
 ## 5. Outstanding checks
 
@@ -69,13 +71,15 @@
 | Xbox and PlayStation controllers, by the sheet | Whoever has them | 4 |
 | The Ubuntu ThinkPad and the Windows desktop, by the sheets, with the frame log | The owner | 6, 7, 8 |
 | A pass over the menus | The owner | 9 |
-| The owner's eye in play, including what M6 changed on screen: the Display setting, Settings' Examine, the distant shape in the Abyss, the cave's boundaries, Continue after the ending | The owner | 10 |
+| What the monitor shows during the display switch (open from the owner's playtest, 6:39 to 6:43) | The owner | 6 |
+| Continue after the credits, by a person (open from the owner's playtest) | The owner | 9, 10 |
 
 ## 6. Unresolved, and known
 
 - **M2's examine** was not reproduced in any run (6 here, 20 in each CI run since `1f68ceb`); the original was on the owner's desktop, where a real key cannot be ruled out. Recorded as not reproduced.
 - **The prologue's handover to the game** is one 61–72 ms frame on the software renderer, traced; whether it is long on a graphics card is for the owner's machines' frame logs.
 - **German key names on Linux** cannot be set on Xvfb; checked on Windows, the real build M2 deferred.
+- **From the owner's playtest, left open by the owner:** the display switch as the monitor showed it, and Continue after the credits by a person (§4).
 - **The cave's drifting motes** are not seeded alike from run to run, so two takes never match there exactly.
 
 ## 7. The candidate

@@ -15,6 +15,27 @@ GitHub lets only a signed-in account download these, until 19 February 2027.
 
 **Verified by the developer:** both zips downloaded and hashed, each equal to GitHub's own digest. Of the 367 files in the Windows pack, the one that differs from the baseline's, apart from the 10 scenes Godot converts at export, is the cave's front texture (D126). **The downloaded Linux build** was played to the ending on a private display by the route check, with window-system keys: `runs=4 failed=0` (reading everything, straight through, continuing and waiting for the sea, continuing after the ending). From a post-ending save (`beat=awakened`, `checkpoint=Awakened`), Continue stood the sailor clear of the kneeling statue, and walking right reached the reveal 3.9 s after Continue, with no errors logged. All of that is automated: no person has played this build yet.
 
+## The owner's playtest, 21 November 2026
+
+**Owner playtest satisfactory,** for the route played, on the Windows desktop, owner-test build `a30be86`. In the owner's words:
+
+> I played the M6 Windows owner-test build a30be86 on 21 November. Please record my verdict as "owner playtest satisfactory" for the route I played, from New Game through the running escape, all four epilogue panels, the credits and the return to the main menu. I'm satisfied with the current visuals and gameplay. I'm requesting no further changes based on this run.
+
+| | |
+|---|---|
+| **Build and device** | The owner-test build's Windows zip (artifact 14711113002, SHA-256 `c138e0d4…1c9a`), on the owner's Windows desktop |
+| **The route** | New Game, through the running escape, all four epilogue panels, the credits, and the return to the main menu |
+| **Recording** | The owner's: `20261121-1746-52.0872517.mp4` (Screen Recording 2026-11-21 185344.mp4). The developer has not seen it; this records the owner's verdict and observations |
+| **Changes requested** | None, from this run |
+| **Signal check, not listening** | ChatGPT reviewed the footage and compared audio samples with the owner's recording of 20 November. Recorded as a signal check only; the owner's own listening results come separately (item 3) |
+
+**Left open by the owner:**
+
+1. **The display switch, 6:39 to 6:43 in the recording:** "the recording shows only the centre of Settings during the display switch. I haven't confirmed what was visible on the monitor."
+2. **Continue after the credits:** "I also didn't select Continue after the credits, so the revised checkpoint still has scripted coverage only for that check" (D127).
+
+**Unchanged by it:** both first-time players stay on `a4250f0`; their sessions and timings, the owner's listening sheet and the remaining hardware checks are pending.
+
 ## The checklist, in this order
 
 **On every sheet and log:** "owner-test `a30be86`", the device, and the zip's SHA-256. Name the files by build and device, as below.
@@ -51,7 +72,8 @@ Nothing here is recorded as checked until the owner reports it. If the M6 candid
 | Check | Build | Device | Result |
 |---|---|---|---|
 | Listening sheet | The [kit](listening-kit/README.md)'s file, recorded at `a4250f0` | Headphones, speakers | pending |
-| Displays, Display setting across a relaunch, Examine | owner-test `a30be86` | Windows desktop | pending |
-| Continue after the ending, the cave, the distant shape | owner-test `a30be86` | Windows desktop | pending |
+| The route: New Game, the running escape, the epilogue's four panels, the credits, the main menu again (the cave and the distant shape on the way) | owner-test `a30be86` | Windows desktop | **Owner playtest satisfactory,** 21 November, no changes requested (above) |
+| The Windows sheet and its log; 1280 × 720 and 1920 × 1080; the Display setting across a relaunch; Examine | owner-test `a30be86` | Windows desktop | pending. The display switch in the playtest: open (1 above) |
+| Continue after the ending, by a person | owner-test `a30be86` | Windows desktop | not selected: scripted coverage only (2 above) |
 | Native run and frame log | owner-test `a30be86` | Ubuntu ThinkPad | pending |
 | Controllers | owner-test `a30be86` | as reported | pending |
