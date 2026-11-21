@@ -76,6 +76,17 @@ CRITERIA = {
     },
 }
 STATES = ("planned", "candidate", "publish")
+
+# One package for each OS a release ships for, named for it. A record names its OSes in "platforms". One that names none
+# is from before the Mac build (D128), and shipped Linux and Windows: that is how v0.1.0-pre-alpha.1 is still checked.
+PACKAGES = {"linux": "linux-x86_64.tar.gz", "windows": "windows-x86_64.zip", "macos": "macos-arm64.zip"}
+DEFAULT_PLATFORMS = ("linux", "windows")
+# What each shipped OS's provenance reads from the logs of the job that built it.
+BUILT_BY = {
+    "windows": ("Windows package", "logs-windows", "MSVC"),
+    "linux": ("Linux package", "logs-linux", "GCC"),
+    "macos": ("macOS package", "logs-macos", "Apple Clang"),
+}
 LABEL_MEANING = {
     "pre-alpha": "A usable slice of the game, not the whole of it.",
     "alpha": "The intended game, playable from beginning to end, and still unfinished.",
@@ -200,16 +211,30 @@ class GitHub:
             raise StateUnknown(f"draft {release_id} had gone by the time it was removed")
 
 
-def expected_assets(version):
-    return {
-        f"dagon-{version}-linux-x86_64.tar.gz",
-        f"dagon-{version}-windows-x86_64.zip",
-        "SHA256SUMS.txt",
-        "PROVENANCE.txt",
-    }
+def platforms_of(record):
+    return tuple(record.get("platforms") or DEFAULT_PLATFORMS)
 
 
-def publication_problems(version, tag_commit, release):
+def package_names(version, platforms=DEFAULT_PLATFORMS):
+    return sorted(f"dagon-{version}-{PACKAGES[platform]}" for platform in platforms)
+
+
+def expected_assets(version, platforms=DEFAULT_PLATFORMS):
+    return set(package_names(version, platforms)) | {"SHA256SUMS.txt", "PROVENANCE.txt"}
+
+
+def platforms_for(version, root="."):
+    """The OSes the record for this version names, the rehearsal's included. A version with no record shipped the
+    default two, as only records made before the Mac build lack the field."""
+    for path in [*sorted(Path(root, RECORDS_DIR).glob("*.json")), Path(root, REHEARSAL_RECORD)]:
+        if path.is_file():
+            record = json.loads(path.read_text(encoding="utf-8"))
+            if record.get("version") == version:
+                return platforms_of(record)
+    return DEFAULT_PLATFORMS
+
+
+def publication_problems(version, tag_commit, release, platforms=DEFAULT_PLATFORMS):
     """Why what exists for this version is not a complete, consistent release. Nothing here looks at HEAD: a release
     stays correct when main moves on, so the tag is checked against the target the release itself recorded."""
     if release is None:
@@ -229,7 +254,7 @@ def publication_problems(version, tag_commit, release):
     elif target != tag_commit:
         problems.append(f"the tag points at {tag_commit}, and the release recorded the target {target}")
     uploaded = {asset.get("name") for asset in release.get("assets", []) if asset.get("state") == "uploaded"}
-    missing = sorted(expected_assets(version) - uploaded)
+    missing = sorted(expected_assets(version, platforms) - uploaded)
     if missing:
         problems.append("the release is missing: " + ", ".join(missing))
     return problems
@@ -256,6 +281,10 @@ def format_problems(path, record):
     for key in record.get("criteria", {}):
         if label in CRITERIA and key not in CRITERIA[label]:
             problems.append(f"'{key}' is not a {label} criterion")
+    if "platforms" in record:
+        platforms = record["platforms"]
+        if not isinstance(platforms, list) or not platforms or len(set(platforms)) != len(platforms) or not set(platforms) <= set(PACKAGES):
+            problems.append(f"platforms must list each of {', '.join(PACKAGES)} at most once, and at least one: {platforms}")
     return problems
 
 
@@ -263,7 +292,7 @@ def gate_blockers(record, root, current, ci_result):
     """Everything standing between this record and publication. An empty list means it may be published."""
     blockers = []
     if ci_result != "success":
-        blockers.append(f"CI on this commit did not succeed on GCC, Clang and MSVC: {ci_result}")
+        blockers.append(f"CI on this commit did not succeed on GCC, Clang, MSVC and Apple Clang: {ci_result}")
 
     acceptance = record.get("owner_acceptance", {})
     if acceptance.get("status") != "accepted":
@@ -319,7 +348,7 @@ def evaluate(root, current, ci_result, tags, find_release, rehearse=False):
         if version not in tags and release is None:
             active.append((path, record))
             continue
-        problems = publication_problems(version, tags.get(version), release)
+        problems = publication_problems(version, tags.get(version), release, platforms_of(record))
         if problems:
             failed = True
             messages += [f"error::{version} is not a complete release: {problem}" for problem in problems]
@@ -361,7 +390,7 @@ def evaluate(root, current, ci_result, tags, find_release, rehearse=False):
     return outcome, messages, failed
 
 
-def preflight(version, tags, releases, delete_draft, report):
+def preflight(version, tags, releases, delete_draft, report, platforms=DEFAULT_PLATFORMS):
     """Inside the publication lock. Returns "create" or "skip", and raises StateUnknown if anything is wrong.
     A draft is removed only when nothing was published and no tag exists, so a failed attempt is all it can be."""
     matching = [release for release in releases if release.get("tag_name") == version]
@@ -378,7 +407,7 @@ def preflight(version, tags, releases, delete_draft, report):
         return "create"
     if len(published) > 1:
         raise StateUnknown(f"{version}: {len(published)} published releases claim this version")
-    problems = publication_problems(version, tag, published[0] if published else None)
+    problems = publication_problems(version, tag, published[0] if published else None, platforms)
     if drafts:
         problems.append(f"{len(drafts)} unpublished draft(s) also claim this version, and were left alone")
     if problems:
@@ -387,9 +416,9 @@ def preflight(version, tags, releases, delete_draft, report):
     return "skip"
 
 
-def verify(version, commit, tags, release):
+def verify(version, commit, tags, release, platforms=DEFAULT_PLATFORMS):
     """After publishing. Unlike the later checks, this one does compare with the commit just tested."""
-    problems = publication_problems(version, tags.get(version), release) if (release or tags.get(version)) else ["neither a tag nor a published release exists"]
+    problems = publication_problems(version, tags.get(version), release, platforms) if (release or tags.get(version)) else ["neither a tag nor a published release exists"]
     if tags.get(version) != commit:
         problems.append(f"the tag points at {tags.get(version) or 'nothing'}, not the tested commit {commit}")
     return problems
@@ -411,12 +440,11 @@ def first_line_with(path, prefix):
     return None
 
 
-def build_facts(logs):
+def build_facts(logs, platforms=DEFAULT_PLATFORMS):
     """Read from the logs of the jobs that built and tested this commit. A missing fact stops the release."""
     facts = {}
     for name, job, what in (
-        ("Windows package", "logs-windows", "MSVC"),
-        ("Linux package", "logs-linux", "GCC"),
+        *[BUILT_BY[platform] for platform in ("windows", "linux", "macos") if platform in platforms],
         ("Validation only, not shipped", "logs-linux-clang", "Clang"),
     ):
         path = Path(logs, job, "build-release.log")
@@ -428,18 +456,63 @@ def build_facts(logs):
     if not version_file.is_file():
         raise SystemExit(f"::error::Provenance is incomplete: no {version_file}")
     facts["Godot"] = version_file.read_text(encoding="utf-8").strip()
+    if "macos" in platforms:
+        facts.update(macos_facts(Path(logs, "logs-macos", "macos-facts.txt")))
     return facts
+
+
+# What the release says about the Mac build: read from the app CI built (tools/macos_facts.sh), never assumed.
+MACOS_FACTS = (
+    "Architectures, game",
+    "Minimum macOS, Info.plist",
+    "Minimum macOS, game executable",
+    "Minimum macOS, extension",
+    "Built on",
+    "Xcode",
+    "Signature",
+    "Signature check",
+    "Gatekeeper",
+    "Notarization",
+)
+
+
+def macos_facts(path):
+    found = {}
+    if path.is_file():
+        for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
+            if line.startswith("MACOS_FACT ") and ": " in line:
+                name, value = line.removeprefix("MACOS_FACT ").split(": ", 1)
+                found[name] = value.strip()
+    missing = [name for name in MACOS_FACTS if not found.get(name)]
+    if missing:
+        raise SystemExit(f"::error::Provenance is incomplete: {path} does not state {', '.join(missing)}")
+    return {f"macOS, {name.lower()}" if not name.startswith("Minimum") else name: found[name] for name in MACOS_FACTS}
+
+
+def smoke_facts(folder):
+    """Where each package's own smoke test ran: the system each was actually tested on."""
+    found = {}
+    for path in sorted(Path(folder).glob("smoke-*.txt")) if folder and Path(folder).is_dir() else []:
+        for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
+            if line.startswith("SMOKE_FACT ") and ": " in line:
+                name, value = line.removeprefix("SMOKE_FACT ").split(": ", 1)
+                found[name] = value.strip()
+    return found
 
 
 def prepare(args):
     record = json.loads(Path(args.record).read_text(encoding="utf-8"))
     version = record["version"]
     packages = sorted(path for path in Path(args.packages).iterdir() if path.is_file())
-    expected = [f"dagon-{version}-linux-x86_64.tar.gz", f"dagon-{version}-windows-x86_64.zip"]
+    platforms = platforms_of(record)
+    expected = package_names(version, platforms)
     if [path.name for path in packages] != expected:
         raise SystemExit(f"::error::Expected exactly one package per OS, {expected}, and found {[path.name for path in packages]}")
 
-    facts = build_facts(args.logs)
+    facts = build_facts(args.logs, platforms)
+    tested = smoke_facts(getattr(args, "smoke", None))
+    if "macos" in platforms and not tested.get("macOS package smoke-tested on"):
+        raise SystemExit("::error::Provenance is incomplete: no record of the macOS version the Mac package was smoke-tested on")
     sums = {path.name: sha256_of(path) for path in packages}
     godot_cpp = subprocess.run(
         ["git", "rev-parse", f"{args.commit}:godot-cpp"], check=True, capture_output=True, text=True
@@ -455,6 +528,7 @@ def prepare(args):
         f"Acceptance fingerprint: {fingerprint('.', args.commit)}",
         *[f"{name}: {value}" for name, value in facts.items()],
         f"godot-cpp: {godot_cpp}",
+        *[f"{name}: {value}" for name, value in tested.items()],
         "",
         "Each package holds the exact files exported, smoke-tested and uploaded by that run. Nothing was rebuilt to package it.",
     ]
@@ -499,11 +573,24 @@ def prepare(args):
         "",
         "Check them with `sha256sum -c SHA256SUMS.txt`. The Windows build is not code-signed, so SmartScreen may warn you.",
         "",
+        *(
+            [
+                f"**macOS, Apple Silicon only (M1 and later, Pro, Max and Ultra included).** Needs macOS "
+                f"{facts['Minimum macOS, Info.plist']} or later; tested on {tested['macOS package smoke-tested on']}. "
+                f"It is signed ad hoc, with no Apple developer identity, and is not notarized "
+                f"({facts['macOS, notarization']}), so macOS blocks the first launch: see the README's first-launch "
+                "steps. There is no Intel Mac build.",
+                "",
+            ]
+            if "macos" in platforms
+            else []
+        ),
         "## Source and provenance",
         f"- Source commit: `{args.commit}`",
         f"- Built and tested by: {args.run_url}",
         *[f"- {name}: {value}" for name, value in facts.items()],
         f"- godot-cpp: `{godot_cpp}`",
+        *[f"- {name}: {value}" for name, value in tested.items()],
     ]
     (out / "RELEASE_NOTES.md").write_text("\n".join(notes) + "\n", encoding="utf-8")
     for path in packages:
@@ -538,6 +625,7 @@ def main():
     prepare_parser = commands.add_parser("prepare")
     for name in ("--record", "--packages", "--logs", "--out", "--commit", "--run-url"):
         prepare_parser.add_argument(name, required=True)
+    prepare_parser.add_argument("--smoke", help="the folder of the packages' smoke-test records (smoke-<os>.txt)")
     preflight_parser = commands.add_parser("preflight")
     preflight_parser.add_argument("--version", required=True)
     verify_parser = commands.add_parser("verify")
@@ -568,14 +656,14 @@ def main():
         github = GitHub()
         try:
             # Reports go to the log. The decision on stdout is all the publisher reads.
-            print(preflight(args.version, remote_tags(), github.all_releases(), github.delete_draft, lambda line: print(f"::{line}", file=sys.stderr)))
+            print(preflight(args.version, remote_tags(), github.all_releases(), github.delete_draft, lambda line: print(f"::{line}", file=sys.stderr), platforms_for(args.version)))
         except StateUnknown as error:
             print(f"::error::{args.version} was not published: {error}", file=sys.stderr)
             sys.exit(1)
     elif args.command == "verify":
         github = GitHub()
         try:
-            problems = verify(args.version, args.commit, remote_tags(), github.published_release(args.version))
+            problems = verify(args.version, args.commit, remote_tags(), github.published_release(args.version), platforms_for(args.version))
         except StateUnknown as error:
             problems = [str(error)]
         for problem in problems:

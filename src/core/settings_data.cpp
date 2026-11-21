@@ -63,9 +63,13 @@ bool keys_are_valid(const std::array<int, GAME_ACTION_COUNT> &p_keys) {
 }
 
 void append_number(std::string &r_text, std::string_view p_field, float p_value) {
+#if defined(__APPLE__)
+	r_text.append(p_field).append("=").append(format_float(p_value)).append("\n");
+#else
 	std::array<char, 32> buffer{};
 	const std::to_chars_result result = std::to_chars(buffer.data(), buffer.data() + buffer.size(), p_value);
 	r_text.append(p_field).append("=").append(buffer.data(), result.ptr).append("\n");
+#endif
 }
 
 } // namespace

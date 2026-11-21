@@ -1,7 +1,8 @@
 #!/usr/bin/env sh
 # Creates a release export and, when the host can run it, runs it headless and
 # looks for positive proof that the release extension library loaded.
-# Usage: GODOT=/path/to/godot tools/export_check.sh <linux|windows> [log-dir]
+# Usage: GODOT=/path/to/godot tools/export_check.sh <linux|windows|macos> [log-dir]
+# macOS exports a zip holding the app, which can only be made, and run, on a Mac (D128).
 # Run the import first (tools/run_godot_checks.sh).
 set -u
 
@@ -31,13 +32,17 @@ case "$platform" in
 		suffix=".exe"
 		library="dagon.windows.template_release.x86_64.dll"
 		;;
+	macos)
+		preset="macOS"
+		suffix=".zip"
+		library="libdagon.macos.template_release.arm64.dylib"
+		;;
 	*)
 		echo "Unknown platform: $platform" >&2
 		exit 2
 		;;
 esac
 binary="$out/$stem$suffix"
-library="$out/$library"
 
 fail() {
 	echo "export-$platform: FAILED: $1"
@@ -50,8 +55,26 @@ code=$?
 echo "$code" > "$logs/export-$platform.exit"
 [ "$code" -eq 0 ] || fail "export exit=$code"
 [ -f "$binary" ] || fail "no binary at $binary"
-[ -f "$library" ] || fail "extension library not bundled: $library"
 pack="$out/$stem.pck"
+if [ "$platform" = "macos" ]; then
+	# Unpacked as a player's Mac unpacks it, keeping the permissions the zip records. The zip itself is what ships.
+	run_dir="$root/build/export/macos-run"
+	rm -rf "$run_dir"
+	mkdir -p "$run_dir"
+	ditto -x -k "$binary" "$run_dir" || fail "could not unpack $binary"
+	app="$(find "$run_dir" -maxdepth 1 -name '*.app' -type d)"
+	[ -n "$app" ] && [ "$(printf '%s\n' "$app" | wc -l)" -eq 1 ] || fail "$binary should hold exactly one app"
+	find "$app" -maxdepth 3 | sed "s|$run_dir/||" | sort > "$logs/export-macos-files.txt"
+	executable="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$app/Contents/Info.plist")" || fail "no executable named in the app"
+	binary="$app/Contents/MacOS/$executable"
+	[ -x "$binary" ] || fail "the app's executable is missing or not executable: $binary"
+	library="$app/Contents/Frameworks/$library"
+	pack="$(find "$app/Contents/Resources" -maxdepth 1 -name '*.pck')"
+	[ -n "$pack" ] || fail "no pack in the app's Resources"
+else
+	library="$out/$library"
+fi
+[ -f "$library" ] || fail "extension library not bundled: $library"
 [ -f "$pack" ] || fail "no $stem.pck"
 if grep -aq "tests/run_tests" "$pack"; then
 	fail "tests were exported into $stem.pck"
@@ -70,6 +93,7 @@ host_can_run=no
 case "$(uname -s)" in
 	Linux) case "$platform" in linux*) host_can_run=yes ;; esac ;;
 	MINGW* | MSYS* | CYGWIN*) case "$platform" in windows*) host_can_run=yes ;; esac ;;
+	Darwin) case "$platform" in macos) host_can_run=yes ;; esac ;;
 esac
 if [ "$host_can_run" = "no" ]; then
 	echo "export-$platform: NOT RUN on this host"

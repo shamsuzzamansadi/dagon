@@ -125,7 +125,7 @@ class GateTests(unittest.TestCase):
         self.repo.save(self.repo.good_record())
         outcome, messages, failed = self.repo.evaluate("failure")
         self.assertEqual((outcome["version"], outcome["publish"], failed), ("", "false", True))
-        self.assertTrue(any("GCC, Clang and MSVC" in message for message in messages), messages)
+        self.assertTrue(any("GCC, Clang, MSVC and Apple Clang" in message for message in messages), messages)
 
     def test_a_skipped_or_cancelled_ci_is_not_success(self):
         for result in ("skipped", "cancelled", ""):
@@ -411,9 +411,30 @@ class PackageTests(unittest.TestCase):
 
     def export(self, platform, proof=None):
         folder = self.root / f"export-{platform}"
+        if platform == "macos":
+            self.macos_export(folder / "dagon.zip")
+            return folder
         for name in package_release.PLATFORMS[platform]["files"]:
             write(folder, name, name)
         return folder
+
+    def macos_export(self, path, apps=("DAGON.app",)):
+        """Godot's zip of the app, with the permissions it records."""
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with zipfile.ZipFile(path, "w") as archive:
+            for app in apps:
+                for name, mode in (
+                    (f"{app}/", 0o40755),
+                    (f"{app}/Contents/Info.plist", 0o100644),
+                    (f"{app}/Contents/MacOS/DAGON", 0o100755),
+                    (f"{app}/Contents/Frameworks/libdagon.macos.template_release.arm64.dylib", 0o100755),
+                    (f"{app}/Contents/Resources/DAGON.pck", 0o100644),
+                ):
+                    info = zipfile.ZipInfo(name, date_time=(2026, 11, 21, 12, 0, 0))
+                    info.create_system = 3
+                    info.external_attr = mode << 16
+                    archive.writestr(info, "" if name.endswith("/") else name)
+        return path
 
     def package(self, platform="linux", folder=None, out="out"):
         return package_release.package(platform, PRE_ALPHA, folder or self.export(platform), self.root / "legal", self.root / out)
@@ -462,6 +483,41 @@ class PackageTests(unittest.TestCase):
         self.assertEqual(data[3], 0, "the FNAME flag is set")
         self.assertEqual(int.from_bytes(data[4:8], "little"), 0, "the gzip MTIME field is set")
 
+    def test_macos_keeps_the_app_its_permissions_and_its_bytes_under_the_packages_folder(self):
+        target = self.quietly(self.package, "macos")
+        self.assertEqual(target.name, f"dagon-{PRE_ALPHA}-macos-arm64.zip")
+        folder = f"dagon-{PRE_ALPHA}-macos-arm64"
+        with zipfile.ZipFile(target) as archive, zipfile.ZipFile(self.root / "export-macos" / "dagon.zip") as source:
+            entries = {info.filename: info for info in archive.infolist()}
+            self.assertEqual(sorted(entries), sorted([f"{folder}/{name}" for name in source.namelist()] + [f"{folder}/CREDITS.md", f"{folder}/LICENSE"]))
+            for info in source.infolist():
+                copied = entries[f"{folder}/{info.filename}"]
+                self.assertEqual(copied.external_attr >> 16, info.external_attr >> 16, info.filename)
+                self.assertEqual(archive.read(copied), source.read(info), info.filename)
+            self.assertEqual(entries[f"{folder}/DAGON.app/Contents/MacOS/DAGON"].external_attr >> 16, 0o100755)
+            self.assertEqual(entries[f"{folder}/LICENSE"].external_attr >> 16, 0o100644)
+            self.assertEqual({info.create_system for info in archive.infolist()}, {3})
+            self.assertEqual({info.date_time for info in archive.infolist()}, {(1980, 1, 1, 0, 0, 0)})
+
+    def test_a_macos_zip_that_recorded_no_permissions_still_gives_an_app_that_runs(self):
+        folder = self.root / "export-bare"
+        folder.mkdir()
+        with zipfile.ZipFile(folder / "dagon.zip", "w") as archive:
+            for name in ("DAGON.app/Contents/MacOS/DAGON", "DAGON.app/Contents/Frameworks/libdagon.macos.template_release.arm64.dylib", "DAGON.app/Contents/Info.plist"):
+                archive.writestr(zipfile.ZipInfo(name), name)
+        with zipfile.ZipFile(self.quietly(self.package, "macos", folder)) as archive:
+            modes = {info.filename.split("/", 1)[1]: info.external_attr >> 16 for info in archive.infolist()}
+        self.assertEqual(modes["DAGON.app/Contents/MacOS/DAGON"] & 0o777, 0o755)
+        self.assertEqual(modes["DAGON.app/Contents/Frameworks/libdagon.macos.template_release.arm64.dylib"] & 0o777, 0o755)
+        self.assertEqual(modes["DAGON.app/Contents/Info.plist"] & 0o777, 0o644)
+
+    def test_a_macos_export_must_hold_exactly_one_app(self):
+        folder = self.root / "export-two"
+        self.macos_export(folder / "dagon.zip", apps=("DAGON.app", "Other.app"))
+        with self.assertRaises(SystemExit) as caught:
+            self.package("macos", folder)
+        self.assertIn("exactly one app", str(caught.exception))
+
     def test_timestamps_inside_a_package_are_fixed(self):
         with zipfile.ZipFile(self.quietly(self.package, "windows")) as archive:
             self.assertEqual({info.date_time for info in archive.infolist()}, {(1980, 1, 1, 0, 0, 0)})
@@ -483,7 +539,7 @@ class PackageTests(unittest.TestCase):
         """A shell script stands in for the game, so these run on Linux, which is where CI runs them."""
         folder = self.export("linux")
         script = "#!/bin/sh\n" + "".join(f'echo "{line}"\n' for line in lines)
-        script += 'if [ "$DAGON_AUTOSTART" = new_game ]; then echo x > "$DAGON_STORAGE_DIR/save.dat"; fi\n'
+        script += 'if [ "$DAGON_AUTOSTART" = new_game ]; then printf "dagon_save=1\\nbeat=shore\\ncheckpoint=Start\\n" > "$DAGON_STORAGE_DIR/save.dat"; fi\n'
         script += f"exit {code}\n"
         write(folder, "dagon.x86_64", script)
         return self.quietly(self.package, "linux", folder)
@@ -493,6 +549,7 @@ class PackageTests(unittest.TestCase):
         "Completed load for: 'res://scenes/ui/title.tscn'",
         "dagon: session start beat=0 persisted=0",
         "dagon: prompt: [E] Examine",
+        "dagon: save status=0",
     )
 
     def smoke(self, target):

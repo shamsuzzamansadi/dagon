@@ -214,3 +214,33 @@ TEST_CASE("every action has a name that survives the format") {
 	}
 	CHECK(serialize_settings(Settings{}).find("key_interact=69") != std::string::npos);
 }
+
+// The same on every platform, including Apple's, where the game reads and writes floats without from_chars (D128).
+TEST_CASE("volumes are written as the shortest text that reads back as the same number") {
+	Settings settings;
+	settings.music_volume = 0.7f;
+	settings.effects_volume = 0.05f;
+	settings.narration_volume = 1.0f;
+	const std::string text = serialize_settings(settings);
+	CHECK(text.find("music_volume=0.7\n") != std::string::npos);
+	CHECK(text.find("effects_volume=0.05\n") != std::string::npos);
+	CHECK(text.find("narration_volume=1\n") != std::string::npos);
+	settings.music_volume = 0.0f;
+	settings.effects_volume = 0.123f;
+	const std::string again = serialize_settings(settings);
+	CHECK(again.find("music_volume=0\n") != std::string::npos);
+	CHECK(again.find("effects_volume=0.123\n") != std::string::npos);
+	const ParsedSettings parsed = parse_settings(again);
+	CHECK(parsed.settings.effects_volume == 0.123f);
+}
+
+TEST_CASE("a volume is read only in the form from_chars reads, on every platform") {
+	const std::string keys = "key_move_left=74\nkey_move_right=76\nkey_jump=75\nkey_interact=85\n";
+	CHECK(parse_settings("dagon_settings=1\nmusic_volume=0.25\neffects_volume=1\n" + keys).settings.music_volume == 0.25f);
+	CHECK(parse_settings("dagon_settings=1\nmusic_volume=-0\neffects_volume=1\n" + keys).settings.music_volume == 0.0f);
+	for (const char *refused : { "+0.5", "0x1p-1", "0.5x", ".", "-", "0,5" }) {
+		const ParsedSettings parsed = parse_settings(std::string("dagon_settings=1\nmusic_volume=") + refused + "\neffects_volume=1\n" + keys);
+		CAPTURE(refused);
+		CHECK(parsed.settings.music_volume == doctest::Approx(Settings{}.music_volume));
+	}
+}
