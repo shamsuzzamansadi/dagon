@@ -1,5 +1,7 @@
 #include "storage.hpp"
 
+#include "core/window_fit.hpp"
+
 #include <godot_cpp/classes/audio_server.hpp>
 #include <godot_cpp/classes/dir_access.hpp>
 #include <godot_cpp/classes/display_server.hpp>
@@ -141,6 +143,72 @@ bool save_settings(const core::Settings &p_settings) {
 	return replace_file(SETTINGS_FILE, core::serialize_settings(p_settings));
 }
 
+namespace {
+
+// The game's picture, and the multiple of it the window opens at (project.godot: 480 x 270, in 1440 x 810).
+constexpr int PICTURE_WIDTH = 480;
+constexpr int PICTURE_HEIGHT = 270;
+constexpr int PREFERRED_SCALE = 3;
+
+bool is_fullscreen(DisplayServer::WindowMode p_mode) {
+	return p_mode == DisplayServer::WINDOW_MODE_FULLSCREEN || p_mode == DisplayServer::WINDOW_MODE_EXCLUSIVE_FULLSCREEN;
+}
+
+// Whether the game has looked at its window yet in this run.
+bool window_checked = false;
+
+// The largest whole-number multiple of the picture that fits, centred, for: a window whose frame does not fit on its
+// screen's usable area; one just back from fullscreen; and, the first time in a run, one that is not a whole multiple,
+// as a window manager may already have squeezed the opening window to the screen. Later, a window that fits is left
+// as the player sized it, and a maximized one is left alone.
+void fit_window(DisplayServer *p_display, bool p_always) {
+	print_verbose("dagon: window check mode=", p_display->window_get_mode(), " size=", p_display->window_get_size(), " with frame=", p_display->window_get_size_with_decorations(), " usable=", p_display->screen_get_usable_rect(p_display->window_get_current_screen()), " screen=", p_display->window_get_current_screen(), " first=", !window_checked);
+	if (p_display->window_get_mode() != DisplayServer::WINDOW_MODE_WINDOWED) {
+		return;
+	}
+	const Rect2i usable = p_display->screen_get_usable_rect(p_display->window_get_current_screen());
+	const Vector2i size = p_display->window_get_size();
+	// At start-up a window manager may already have shrunk the frame to the screen while the window's own size has
+	// not caught up, which reads as a negative frame.
+	const Vector2i frame = (p_display->window_get_size_with_decorations() - size).max(Vector2i());
+	const bool fits = size.x + frame.x <= usable.size.x && size.y + frame.y <= usable.size.y;
+	const bool whole = size.x % PICTURE_WIDTH == 0 && size.y % PICTURE_HEIGHT == 0 && size.x / PICTURE_WIDTH == size.y / PICTURE_HEIGHT;
+	const bool first = !window_checked;
+	window_checked = true;
+	if (!p_always && fits && (whole || !first)) {
+		return;
+	}
+	const core::WindowFit fit = core::fit_window(usable.size.x - frame.x, usable.size.y - frame.y, PICTURE_WIDTH, PICTURE_HEIGHT, PREFERRED_SCALE);
+	const Vector2i fitted(fit.width, fit.height);
+	p_display->window_set_size(fitted);
+	// The frame's width is shared between the two sides; its height is mostly the title bar, above.
+	p_display->window_set_position(usable.position + Vector2i((usable.size.x - fitted.x) / 2, (usable.size.y - fitted.y - frame.y) / 2 + frame.y));
+	print_verbose("dagon: window fitted scale=", fit.scale, " size=", fitted, " usable=", usable.size, " frame=", frame);
+}
+
+// Fullscreen is the borderless kind: no change of the screen's own mode, so leaving it is instant and safe.
+void apply_display(bool p_fullscreen) {
+	DisplayServer *display = DisplayServer::get_singleton();
+	if (display == nullptr || display->get_name() == "headless") {
+		return;
+	}
+	const bool was_fullscreen = is_fullscreen(display->window_get_mode());
+	if (p_fullscreen) {
+		if (!was_fullscreen) {
+			display->window_set_mode(DisplayServer::WINDOW_MODE_FULLSCREEN);
+			print_verbose("dagon: display fullscreen");
+		}
+		return;
+	}
+	if (was_fullscreen) {
+		display->window_set_mode(DisplayServer::WINDOW_MODE_WINDOWED);
+		print_verbose("dagon: display windowed");
+	}
+	fit_window(display, was_fullscreen);
+}
+
+} // namespace
+
 void apply_settings(const core::Settings &p_settings) {
 	set_bus_level("Music", p_settings.music_volume);
 	set_bus_level("Effects", p_settings.effects_volume);
@@ -151,6 +219,7 @@ void apply_settings(const core::Settings &p_settings) {
 	for (int i = 0; i < core::GAME_ACTION_COUNT; i++) {
 		set_action_key(core::action_name(static_cast<core::GameAction>(i)), p_settings.keys[static_cast<std::size_t>(i)]);
 	}
+	apply_display(p_settings.fullscreen);
 }
 
 bool subtitles_enabled() {
@@ -231,6 +300,18 @@ String key_name(int p_key, const Ref<Font> &p_font) {
 	// The headless server has no layouts, and logs an error if asked.
 	const Key label = display->get_name() != String("headless") ? display->keyboard_get_label_from_physical(static_cast<Key>(p_key)) : KEY_NONE;
 	return displayed_key_name(p_key, static_cast<int>(label), p_font);
+}
+
+String keyboard_layout() {
+	DisplayServer *display = DisplayServer::get_singleton();
+	if (display->get_name() == String("headless")) {
+		return String();
+	}
+	const int current = display->keyboard_get_current_layout();
+	if (current < 0) {
+		return String();
+	}
+	return display->keyboard_get_layout_name(current) + " (" + display->keyboard_get_layout_language(current) + ")";
 }
 
 int current_key(const StringName &p_action) {

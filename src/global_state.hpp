@@ -24,4 +24,10 @@ bool is_quit_due();
 // cannot see coming. True once that many frames have run.
 bool is_run_over();
 
+// DAGON_FRAME_LOG=<ms> logs how long frames really take, for measuring on a player's machine and on the exported
+// build: once a second, the frames in it and the longest; and each frame of at least <ms> on its own line, with the
+// time the renderer spent on it. Unset, it does nothing. Called each frame by whichever scene root is running, like
+// is_quit_due; counts each frame once.
+void note_frame();
+
 } // namespace dagon

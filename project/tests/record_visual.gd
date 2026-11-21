@@ -15,6 +15,14 @@ extends SceneTree
 ##   emergence-parts  the emergence with each part of the creature, the water before it, the walkway and the Monolith
 ##                  drawn in one flat colour of its own and nothing else shown, so that where the arm meets the body,
 ##                  and the creature the water, can be measured frame by frame (notes/owner-1119c/parts.py)
+##   cave-mouth     for M6's F2: from the Shore, walking right with real keys through the cave's mouth, under the low
+##                  roof and down into the passage, against the Shore's cliff; then standing a moment
+##   cave-exit      for M6's F2: from inside the cave, walking right with real keys out past the rock
+##                  rib into the open Abyss, against the sky; then standing a moment
+##   reveal-listen  for M6's listening kit: the walk into the reveal and the whole reveal in the game's own mix, to a
+##                  second after control returns, marking each spoken line as it starts. DAGON_RECORD_HUD=hidden hides
+##                  the captions and prompts; DAGON_RECORD_ONLY=voice records the narration with music and effects muted,
+##                  which is not the game's mix
 ## On a private display:
 ## DISPLAY=:77 DAGON_RECORD_SCENE=approach DAGON_STORAGE_DIR=<dagon-test-dir> godot --path project \
 ##     --resolution 960x540 --write-movie <out.avi> --fixed-fps 30 --script res://tests/record_visual.gd
@@ -23,6 +31,7 @@ extends SceneTree
 
 const Harness := preload("res://tests/harness.gd")
 const RoutePlayer := preload("res://tests/route_player.gd")
+const SHORE := 0
 const ABYSS := 1
 const AWAKENED := 3
 
@@ -102,7 +111,8 @@ func _run() -> void:
 	h = Harness.new(self)
 	var scene := OS.get_environment("DAGON_RECORD_SCENE")
 	var session: Node = (load("res://scenes/level/game.tscn") as PackedScene).instantiate()
-	session.set_start(ABYSS if scene == "ritual" else AWAKENED, true, false)
+	var beats := {"ritual": ABYSS, "cave-exit": ABYSS, "cave-mouth": SHORE}
+	session.set_start(beats.get(scene, AWAKENED), true, false)
 	await h.load_with(session, true)
 	route = RoutePlayer.new(h)
 	await h.landed_on_floor(route.player())
@@ -115,6 +125,14 @@ func _run() -> void:
 		_mark("ritual")
 		await h.wait_until(func() -> bool: return not clips.is_playing() or clips.current_animation_position >= 11.0, 60 * 15, "the ritual")
 		_mark("ritual-11s")
+	elif scene == "cave-mouth" or scene == "cave-exit":
+		var walk: Array = {"cave-mouth": [500.0, 840.0], "cave-exit": [880.0, 1220.0]}[scene]
+		await h.stand_at(route.player(), Vector2(walk[0], -2))
+		await h.steps(60)
+		_mark("walking")
+		await route.walk(KEY_D, func() -> bool: return route.player().global_position.x >= walk[1], 60 * 20)
+		_mark("stopped")
+		await h.steps(30)
 	elif scene == "approach":
 		await route.walk_into_the_reveal()
 		_mark("reveal")
@@ -123,6 +141,26 @@ func _run() -> void:
 		_mark("first-movement")
 		await h.wait_until(func() -> bool: return clips.current_animation_position >= 5.0, 60 * 10, "five seconds in")
 		_mark("reveal-5s")
+	elif scene == "reveal-listen":
+		var hud: Node = route.world().get_node("Hud")
+		if OS.get_environment("DAGON_RECORD_ONLY") == "voice":
+			for bus in ["Music", "Effects"]:
+				AudioServer.set_bus_mute(AudioServer.get_bus_index(bus), true)
+		if OS.get_environment("DAGON_RECORD_HUD") == "hidden":
+			hud.visible = false
+		await route.walk_into_the_reveal()
+		_mark("reveal")
+		var clips: AnimationPlayer = route.world().get_node("Cinematics")
+		var last := &""
+		while clips.is_playing() and clips.current_animation == "dagon_reveal":
+			var line: StringName = hud.get_current_line()
+			if line != last:
+				if line != &"":
+					_mark("line-%s" % line)
+				last = line
+			await h.steps(1)
+		_mark("reveal-end")
+		await h.steps(30)
 	elif scene == "emergence-timing":
 		await route.walk_into_the_reveal()
 		_mark("reveal")

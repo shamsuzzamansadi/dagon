@@ -188,6 +188,19 @@ func test_a_conflict_is_explained_and_can_be_swapped(h) -> void:
 	h.check(_key_button(h, "Jump").text == "E" and _key_button(h, "Interact").text == "Space", "the rows did not update")
 
 
+## The game calls this action Examine everywhere the player reads it: the prompt, How to Play and Controls. Settings
+## used to call it Interact, so a player looking to change Examine's key found no row by that name (M6).
+func test_settings_calls_the_examine_key_what_the_prompts_call_it(h) -> void:
+	await _setup(h)
+	var settings := await _open(h)
+	var label: Label = h.fixture.get_node(ITEMS + "Columns/Keys/Interact/Label")
+	h.check(label.text == "Examine", "the row is called '%s'" % label.text)
+	settings.begin_capture(JUMP)
+	await h.tap_key(KEY_E)
+	h.check(_message(h).contains("Examine") and not _message(h).contains("Interact"), "the conflict names it '%s'" % _message(h))
+	settings.cancel_conflict()
+
+
 func test_cancelling_a_conflict_changes_nothing(h) -> void:
 	await _setup(h)
 	var settings := await _open(h)
@@ -253,6 +266,25 @@ func test_restore_defaults_brings_everything_back(h) -> void:
 	h.check(h.read_storage_file(SETTINGS_FILE).contains("key_jump=%d" % KEY_SPACE), "the defaults were not saved")
 
 
+## M6, the display: the Display button switches between a window and fullscreen, says which, is saved, and Restore
+## Defaults brings back the window. Headless, the window itself is not touched; how it behaves on a real screen is
+## checked on a display at 720p and 1080p (docs/evidence/m6/displays).
+func test_the_display_setting_is_shown_saved_and_restored(h) -> void:
+	await _setup(h)
+	await _open(h)
+	var button: Button = h.fixture.get_node(ITEMS + "Columns/Keys/Display")
+	h.check(button.text == "Display: Windowed", "the button reads '%s' by default" % button.text)
+	button.grab_focus()
+	await h.tap_action("ui_accept")
+	h.check(button.text == "Display: Fullscreen", "the button reads '%s' after pressing it" % button.text)
+	h.check(h.read_storage_file(SETTINGS_FILE).contains("fullscreen=1"), "fullscreen was not saved")
+	h.check(button.has_focus(), "pressing it lost the focus")
+	h.fixture.get_node(ITEMS + "RestoreDefaults").grab_focus()
+	await h.tap_action("ui_accept")
+	h.check(button.text == "Display: Windowed", "after Restore Defaults the button reads '%s'" % button.text)
+	h.check(h.read_storage_file(SETTINGS_FILE).contains("fullscreen=0"), "the window was not saved as the default")
+
+
 func test_volumes_reach_their_own_buses(h) -> void:
 	await _setup(h)
 	await _open(h)
@@ -288,7 +320,7 @@ func test_a_focused_slider_moves_with_the_keys_and_the_change_is_kept(h) -> void
 func test_focus_can_walk_every_row_and_nothing_traps_it(h) -> void:
 	await _setup(h)
 	await _open(h)
-	var expected := ["Columns/Audio/Music/Slider", "Columns/Audio/Effects/Slider", "Columns/Audio/Narration/Slider", "Columns/Audio/Subtitles", "Columns/Audio/Vibration", "Columns/Keys/MoveLeft/Key", "Columns/Keys/MoveRight/Key", "Columns/Keys/Jump/Key", "Columns/Keys/Interact/Key", "RestoreDefaults", "Back"]
+	var expected := ["Columns/Audio/Music/Slider", "Columns/Audio/Effects/Slider", "Columns/Audio/Narration/Slider", "Columns/Audio/Subtitles", "Columns/Audio/Vibration", "Columns/Keys/MoveLeft/Key", "Columns/Keys/MoveRight/Key", "Columns/Keys/Jump/Key", "Columns/Keys/Interact/Key", "Columns/Keys/Display", "RestoreDefaults", "Back"]
 	for path in expected:
 		h.check(h.fixture.get_node(ITEMS + path).has_focus(), "going down, %s does not have focus" % path)
 		await h.tap_action("ui_down")
@@ -655,7 +687,7 @@ func test_the_audio_note_never_takes_focus_from_keys_or_a_controller(h) -> void:
 	await _open(h)
 	var note: Control = h.fixture.get_node(ITEMS + "Columns/Audio/AudioNote")
 	var viewport: Viewport = note.get_viewport()
-	var rows := ["Columns/Audio/Music/Slider", "Columns/Audio/Effects/Slider", "Columns/Audio/Narration/Slider", "Columns/Audio/Subtitles", "Columns/Audio/Vibration", "Columns/Keys/MoveLeft/Key", "Columns/Keys/MoveRight/Key", "Columns/Keys/Jump/Key", "Columns/Keys/Interact/Key", "RestoreDefaults", "Back"]
+	var rows := ["Columns/Audio/Music/Slider", "Columns/Audio/Effects/Slider", "Columns/Audio/Narration/Slider", "Columns/Audio/Subtitles", "Columns/Audio/Vibration", "Columns/Keys/MoveLeft/Key", "Columns/Keys/MoveRight/Key", "Columns/Keys/Jump/Key", "Columns/Keys/Interact/Key", "Columns/Keys/Display", "RestoreDefaults", "Back"]
 	var devices := {
 		"arrow keys": [func() -> void: await h.tap_key(KEY_DOWN), func() -> void: await h.tap_key(KEY_UP)],
 		"D-pad": [func() -> void: await h.tap_pad(JOY_BUTTON_DPAD_DOWN), func() -> void: await h.tap_pad(JOY_BUTTON_DPAD_UP)],

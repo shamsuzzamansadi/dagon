@@ -8,6 +8,8 @@
 #include <godot_cpp/variant/typed_array.hpp>
 #include <godot_cpp/classes/window.hpp>
 #include <godot_cpp/classes/time.hpp>
+#include <godot_cpp/classes/rendering_server.hpp>
+#include <godot_cpp/core/print_string.hpp>
 
 using namespace godot;
 
@@ -81,6 +83,73 @@ bool is_quit_due() {
 bool is_run_over() {
 	static const int64_t frames = OS::get_singleton()->get_environment("DAGON_QUIT_AFTER_FRAMES").to_int();
 	return frames > 0 && static_cast<int64_t>(Engine::get_singleton()->get_process_frames()) >= frames;
+}
+
+namespace {
+
+struct FrameLog {
+	bool checked = false;
+	double threshold_ms = 0.0;
+	uint64_t frame = 0;
+	uint64_t last_usec = 0;
+	uint64_t second_start_usec = 0;
+	int64_t second = 0;
+	int64_t count = 0;
+	int64_t over_frame_budget = 0;
+	double worst_ms = 0.0;
+};
+
+FrameLog frame_log;
+
+// Longer than this misses a 30 Hz refresh: a frame the player could see stick.
+constexpr double FRAME_BUDGET_MS = 1000.0 / 30.0;
+
+} // namespace
+
+void note_frame() {
+	if (!frame_log.checked) {
+		frame_log.checked = true;
+		frame_log.threshold_ms = OS::get_singleton()->get_environment("DAGON_FRAME_LOG").to_float();
+		SceneTree *tree = Object::cast_to<SceneTree>(Engine::get_singleton()->get_main_loop());
+		if (frame_log.threshold_ms > 0.0 && tree != nullptr) {
+			RenderingServer::get_singleton()->viewport_set_measure_render_time(tree->get_root()->get_viewport_rid(), true);
+		}
+	}
+	if (frame_log.threshold_ms <= 0.0) {
+		return;
+	}
+	const uint64_t frame = Engine::get_singleton()->get_process_frames();
+	if (frame_log.last_usec != 0 && frame == frame_log.frame) {
+		return;
+	}
+	frame_log.frame = frame;
+	const uint64_t now = Time::get_singleton()->get_ticks_usec();
+	if (frame_log.last_usec == 0) {
+		frame_log.last_usec = now;
+		frame_log.second_start_usec = now;
+		return;
+	}
+	const double ms = static_cast<double>(now - frame_log.last_usec) / 1000.0;
+	frame_log.last_usec = now;
+	frame_log.count++;
+	frame_log.worst_ms = ms > frame_log.worst_ms ? ms : frame_log.worst_ms;
+	if (ms > FRAME_BUDGET_MS) {
+		frame_log.over_frame_budget++;
+	}
+	if (ms >= frame_log.threshold_ms) {
+		RenderingServer *rendering = RenderingServer::get_singleton();
+		SceneTree *tree = Object::cast_to<SceneTree>(Engine::get_singleton()->get_main_loop());
+		const RID viewport = tree != nullptr ? tree->get_root()->get_viewport_rid() : RID();
+		print_line("dagon: long frame ms=", String::num(ms, 1), " frame=", static_cast<int64_t>(frame), " render_cpu_ms=", String::num(viewport.is_valid() ? rendering->viewport_get_measured_render_time_cpu(viewport) : -1.0, 1), " setup_cpu_ms=", String::num(rendering->get_frame_setup_time_cpu(), 1));
+	}
+	if (now - frame_log.second_start_usec >= 1000000) {
+		print_line("dagon: frames second=", frame_log.second, " count=", frame_log.count, " worst_ms=", String::num(frame_log.worst_ms, 1), " over_33ms=", frame_log.over_frame_budget);
+		frame_log.second++;
+		frame_log.second_start_usec = now;
+		frame_log.count = 0;
+		frame_log.over_frame_budget = 0;
+		frame_log.worst_ms = 0.0;
+	}
 }
 
 } // namespace dagon

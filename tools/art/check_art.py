@@ -126,6 +126,61 @@ def check_cave_surface(problems):
     print(f"cave surface: compared {checked} columns with the collision")
 
 
+def clip_polygon(name):
+    text = SCENE.read_text()
+    match = re.search(r'\[node name="%s" type="Polygon2D" parent="\."\]\nclip_children = 1\npolygon = PackedVector2Array\(([^)]*)\)' % name, text)
+    numbers = [float(n) for n in match.group(1).split(",")]
+    return list(zip(numbers[0::2], numbers[1::2]))
+
+
+def clip_sides(polygon, y):
+    """Where the polygon's outline crosses world row y: its sides there, left to right."""
+    xs = []
+    for (x0, y0), (x1, y1) in zip(polygon, polygon[1:] + polygon[:1]):
+        if min(y0, y1) <= y < max(y0, y1):
+            xs.append(x0 + (x1 - x0) * (y - y0) / (y1 - y0))
+    return sorted(xs)
+
+
+def check_clip_edges(problems):
+    """The cave's interior and the Abyss's far view are drawn in clips. A side of a clip is a straight cut, so on every
+    drawn row each side must lie under rock drawn in front of it: the Shore's cliff (terrain.png, to x = 640) or the
+    cave's front (cave_front.png, from x = 600). CaveView's polygon is the one gen_cave.py draws its rock around."""
+    import gen_cave
+
+    terrain = Image.open(OUT / "terrain.png").convert("RGBA")
+    front = Image.open(CAVE_OUT / "cave_front.png").convert("RGBA")
+
+    def covered(x, row):
+        x = math.floor(x)
+        in_terrain = 0 <= x < terrain.width and terrain.getpixel((x, row))[3] != 0
+        in_front = 0 <= x - CAVE_X0 < front.width and front.getpixel((x - CAVE_X0, row))[3] != 0
+        return in_terrain or in_front
+
+    cave = clip_polygon("CaveView")
+    expected = [(float(x), float(y)) for x, y in gen_cave.cave_clip_polygon()]
+    if cave != expected:
+        problems.append("CaveView's polygon in shore.tscn is not gen_cave.cave_clip_polygon(): regenerate it")
+    checked = 0
+    for name, polygon, sides in (("CaveView", cave, (0, -1)), ("AbyssView", clip_polygon("AbyssView"), (0,))):
+        for row in range(0, front.height):
+            crossing = clip_sides(polygon, row - GROUND_ROW + 0.5)
+            if len(crossing) < 2:
+                continue
+            for side in sides:
+                x = crossing[side] + (0.5 if side == 0 else -0.5)
+                checked += 1
+                if not covered(x, row):
+                    problems.append(f"{name}'s {'left' if side == 0 else 'right'} side shows at world x {x:.0f}, row {row}: nothing is drawn in front of it")
+    # The Shore cliff's image ends at x = 640 in a straight column: the cave's front covers that joint on every row
+    # above the floor, so the joint seen is the ragged one gen_cave.py draws.
+    for row in range(0, GROUND_ROW):
+        for x in (639, 640):
+            if front.getpixel((x - CAVE_X0, row))[3] == 0:
+                problems.append(f"the Shore cliff's straight end shows at world x {x}, row {row}")
+    print(f"clip edges: {checked} row ends of CaveView and AbyssView, each under rock drawn in front; the cliff's end covered")
+
+
 def check_abyss_surface(problems):
     """The Abyss's drawn ground against the collision, column by column: solid from the collision's top down, and
     nothing of the ground itself above it. Things that stand on the ground are drawn above it, and are counted."""
@@ -347,6 +402,7 @@ def main():
 
     check_surface(problems)
     check_cave_surface(problems)
+    check_clip_edges(problems)
     check_abyss_surface(problems)
     check_far_cliff(problems)
     check_ridge(problems)
