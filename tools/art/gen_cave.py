@@ -31,8 +31,16 @@ RITUAL_W = 320
 FG_X0 = 880
 FG_W = 780
 MOUTH_X = 1040
-# The Shore's own art reaches x = 640, with its cliff, so nothing is drawn left of this: the cliff makes the edge.
+# The Shore's own art reaches x = 640, with its cliff. The cave's floor starts there; its roof reaches back over the
+# cliff's last strata, which end raggedly in front of it (mouth_edges), so their joint is never a straight line.
 DRAW_X0 = 640
+JOINT_X0 = 626
+# The rib of rock on the passage's Shore side, framing the way in as draw_jamb's rib frames the way out.
+PASSAGE_JAMB_X0 = 630
+PASSAGE_JAMB_X = 643
+# The cave's interior is drawn in a clip (CaveView in shore.tscn) whose sides lie under rock: on the left behind the
+# Shore's cliff, which is solid from x = 620 on every row; on the right down the middle of draw_jamb's rib.
+CLIP_LEFT_X = 632
 
 MUD = ["E0", "E1", "E2", "E3", "E4", "E5"]
 DEEP = ["C0", "E0", "E1", "E2", "E3"]
@@ -109,6 +117,7 @@ def cave_front():
     draw_steps(img, noise)
     draw_dip(img, noise)
     draw_roof(img, noise, rng)
+    draw_passage_jamb(img, noise, random.Random(303))
     draw_jamb(img, noise, rng)
     draw_puddles(img, noise)
     draw_seabed_dressing(img, noise, rng)
@@ -144,16 +153,39 @@ def draw_dip(img, noise):
         put(img, x - FRONT_X0, GROUND_ROW + 14, "E3" if noise(x / 4.0, 1.0) > 0.45 else "E2")
 
 
+def mouth_edges():
+    """Where the cave's rock begins, row by row, behind the Shore cliff's last few columns: a slow, weathered bulge with
+    a little roughness on it, so the joint wanders as the cliff's own outer edge does instead of running straight. It
+    stays within the cliff's last dozen columns, so the cliff keeps its own strata."""
+    noise = Noise(311)
+    edges = []
+    for row in range(GROUND_ROW):
+        bulge = (noise(row / 23.0, 7.0) - 0.5) * 11.0
+        rough = (noise(row / 3.5, 9.0) - 0.5) * 3.0
+        edges.append(max(JOINT_X0, min(DRAW_X0 - 1, round(633 + bulge + rough))))
+    return edges
+
+
+def draw_joint(img, edges):
+    """The joint, in shadow: a dark line where the cave's rock begins, and the cliff's last pixel dimmed on most rows,
+    as its strata go under the overhang."""
+    noise = Noise(313)
+    for y in range(0, round(roof_row(DRAW_X0 - 1))):
+        x = edges[y]
+        put(img, x - FRONT_X0, y, "C0")
+        if noise(y / 2.5, 3.0) > 0.35:
+            put(img, x - 1 - FRONT_X0, y, "E1")
+
+
 def draw_roof(img, noise, rng):
     """The rock over the cave, with its strata, lit only near the mouth, and stalactites under it."""
-    for x in range(DRAW_X0, MOUTH_X + 40):
+    edges = mouth_edges()
+    for x in range(JOINT_X0, MOUTH_X + 40):
         col = x - FRONT_X0
         under = round(roof_row(x))
         moon = max(0.0, 1.0 - (MOUTH_X - x) / 220.0)
-        # Where the roof meets the Shore's cliff the joint is ragged, and as dark as the cliff, so it reads as one rock.
-        seam = DRAW_X0 + 2 + round(5 * noise(0.0, x / 3.0))
         for y in range(0, max(0, under)):
-            if x < DRAW_X0 + 8 and x < seam - round(4 * noise(y / 6.0, 77.0)):
+            if y < GROUND_ROW and x < edges[y]:
                 continue
             strata = noise(x / 40.0 + y / 70.0, y / 6.0)
             value = 0.9 + 0.8 * moon + (strata - 0.5) * 1.2 + 0.3 * (noise.fractal(x / 9.0, y / 7.0, 2) - 0.5)
@@ -175,12 +207,43 @@ def draw_roof(img, noise, rng):
         if rng.random() > 0.5:
             put(img, x - FRONT_X0, base + length, "T2")  # A bead of water.
         x += rng.randrange(9, 26)
+    draw_joint(img, edges)
+
+
+def jamb_edge(noise, y):
+    """The outer, lit edge of draw_jamb's rib at image row y. The rib is 19 px wide, ending here."""
+    return MOUTH_X - 14 + round(10 * (noise(y / 19.0, 41.0) - 0.5)) + max(0, 40 - y) // 3
+
+
+def cave_clip_polygon():
+    """CaveView's polygon in shore.tscn, world space: its left side behind the Shore's cliff, its right side down the
+    middle of the exit's rib, so no side of the clip is ever seen. check_art.py holds the scene to this."""
+    noise = Noise(301)
+    right = [(jamb_edge(noise, y) - 9, y - GROUND_ROW) for y in range(0, GROUND_ROW + 5, 4)]
+    return [(CLIP_LEFT_X, -700), (right[0][0], -700)] + right + [(right[-1][0], 60), (CLIP_LEFT_X, 60)]
+
+
+def draw_passage_jamb(img, noise, rng):
+    """The Shore side of the way in: a narrow rib of dark rock from the low roof to the floor, ragged on the side that
+    faces the cave, over the foot of the Shore cliff's dark cleft."""
+    for y in range(round(roof_row(PASSAGE_JAMB_X + 6)) - 1, GROUND_ROW + 15):
+        edge = PASSAGE_JAMB_X + round(5 * (noise(y / 7.0, 61.0) - 0.5))
+        for x in range(PASSAGE_JAMB_X0, edge + 1):
+            if y < round(roof_row(x)) or y >= round(GROUND_ROW + surface_y(x + 0.5)):
+                continue
+            facet = noise(x / 6.0 + y / 13.0, y / 9.0)
+            value = 0.7 + (facet - 0.5) * 1.1 - (edge - x) * 0.02
+            put(img, x - FRONT_X0, y, ramp(DEEP, value, x, y, 0.25))
+        if y >= round(roof_row(edge)) and y < round(GROUND_ROW + surface_y(edge + 0.5)):
+            put(img, edge - FRONT_X0, y, "E2" if noise(y / 4.0, 62.0) > 0.45 else "E1")
+            if rng.random() > 0.94:
+                put(img, edge - rng.randrange(2, 8) - FRONT_X0, y, "T1")
 
 
 def draw_jamb(img, noise, rng):
     """The right edge of the cave: a ragged rock rib from roof to floor, lit on the side the moon is on."""
     for y in range(0, GROUND_ROW + 2):
-        edge = MOUTH_X - 14 + round(10 * (noise(y / 19.0, 41.0) - 0.5)) + max(0, 40 - y) // 3
+        edge = jamb_edge(noise, y)
         for x in range(edge - 18, edge + 1):
             col = x - FRONT_X0
             d = edge - x

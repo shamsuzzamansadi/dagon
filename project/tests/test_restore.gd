@@ -20,7 +20,9 @@ const SAVES := [
 	"dagon_save=1\nbeat=monolith\ncheckpoint=Monolith\n",
 	"dagon_save=1\nbeat=awakened\ncheckpoint=Awakened\n",
 ]
-const CHECKPOINT_X := [150.0, 750.0, 3660.0, 4250.0]
+## Awakened stands clear of the kneeling statue by the gate (drawn at x 4225 to 4252) since M6: before, at 4250, he
+## stood in front of it, the least distinct he is anywhere.
+const CHECKPOINT_X := [150.0, 750.0, 3660.0, 4262.0]
 const STATUS_WORDS := ["shore", "trench", "monolith", "before the final sequence"]
 const TINTS := [Color(1, 1, 1, 1), Color(0.84, 0.88, 0.95, 1), Color(0.7, 0.76, 0.87, 1), Color(0.7, 0.76, 0.87, 1)]
 const WITNESS_X := 4420.0
