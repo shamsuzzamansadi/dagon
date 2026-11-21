@@ -7,6 +7,7 @@
 | **Plan** | [m6-plan.md](../m6-plan.md), approved by the owner on 2026-11-20 |
 | **Branch and pull request** | `m6/stabilization`, draft [#7](https://github.com/shamsuzzamansadi/dagon/pull/7), from `main` at `a4250f0` (M5's merge) |
 | **The playtest baseline** | **`a4250f0`,** the same for both first-time players, unchanged since the kit was sent ([kit](../m6/playtest-kit/README.md)). What a player sees differently on the branch since is listed there by commit |
+| **The owner-test build** | **`a30be86`,** CI push run [44913367672](https://github.com/shamsuzzamansadi/dagon/actions/runs/44913367672): every M6 game change through `1229ae6`, for the owner's own checks ([owner-test build](../m6/owner-test-build.md)). Fingerprint `sha256:14e30e9c…b4f04f` |
 | **The current head** | See the pull request; the state of each item is in the [handoff](../handoff.md) |
 
 **Kept apart throughout:** **automated** results (scripts, tests, CI; never a person), **human observations** (only what a person reported, in their words), and **outstanding checks** (not yet done by anyone). Nothing a script did is recorded as a person's.
@@ -40,7 +41,7 @@
 | `c1811ca` | **Game:** Settings says Examine (D124). The verification matrix; the Display setting across a relaunch (`tools/display_relaunch_check.py`) |
 | `2ff6cf2` | **Game:** the distant shape where it belongs (D125). The GDD §8 review |
 | `1229ae6` | **Game:** the cave's boundaries follow the rock (D126); the Awakened checkpoint clear of the statue (D127). Before/after walks |
-| `a7510ab`, `a30be86` | Records only |
+| `a7510ab`, `a30be86` | Records only; `a30be86` is the owner-test build |
 
 ## 3. Automated results
 
