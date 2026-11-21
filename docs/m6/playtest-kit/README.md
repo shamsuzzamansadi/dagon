@@ -23,6 +23,19 @@ For the owner, who contacts the players (M6 plan, item 1). **Everything a player
 
 **Getting it to the players.** GitHub lets only a signed-in account download an artifact, and keeps these until 18 February 2027. Download the zip yourself and share the file (a cloud drive link, for example), with its SHA-256 from the table, so the player can check it (instructions.md says how). The game runs on 64-bit Windows and on 64-bit Linux; there is no macOS build.
 
+## What the players see, and what they do not
+
+**Both players play the baseline above, `a4250f0`, and nothing later,** so their recordings and times compare with each other. Changes made on the M6 branch since, which a player would see and which **are not in their build**, by the commit that first has each:
+
+| Commit | What changed on screen | Record |
+|---|---|---|
+| `0cb97e0` | Settings has a Display button (window or fullscreen); a window too big for its screen opens fitted | D122 |
+| `c1811ca` | Settings' key row reads "Examine", not "Interact" | D124 |
+| `2ff6cf2` | The distant shape: gone from the Shore's sky by the cliff, seen behind the far cliff in the Abyss | D125 |
+| `1229ae6` | **The cave's mouth and exit follow the rock** (no straight edges); **Continue after the ending stands him clear of the kneeling statue** | D126, D127 |
+
+So in a player's recording the cave still shows its straight edges, the triangle still hangs by the Shore's cliff, and Continue after the ending puts him in front of the statue: that is the baseline, not a regression.
+
 ## What comes back
 
 From each player: **the recording, with sound,** from the main menu to the main menu again; **the answers** to questions.md; and anything they said they wanted to add. Recordings can be large (a 15-minute recording at 1080p can be 1 to 2 GB); a cloud drive link is easiest. Put each player's files where the developer can read them and name them player 1 and player 2; no names are needed in the records.
