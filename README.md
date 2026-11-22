@@ -30,7 +30,7 @@ cd dagon-v0.2.0-alpha.1-linux-x86_64
 ./dagon.x86_64
 ```
 
-**macOS, on an Apple Silicon Mac** (M1 or later, Pro, Max and Ultra included), **macOS MACOS_MIN or later.** Double-click the zip to unpack it; you can move **APP_NAME** to Applications. The app is signed ad hoc, without an Apple developer identity, and is not notarized, so macOS blocks it the first time:
+**macOS, on an Apple Silicon Mac** (M1 or later, Pro, Max and Ultra included), **macOS 11 Big Sur or later.** Double-click the zip to unpack it; you can move **DAGON.app** to Applications. The app is signed ad hoc, without an Apple developer identity, and is not notarized, so macOS blocks it the first time:
 
 - **macOS 15 Sequoia and later:** open the app, and choose **Done** when macOS says it could not verify it. Open **System Settings**, then **Privacy & Security**, scroll down to **Security**, and choose **Open Anyway** beside the message about the app. Confirm with **Open Anyway** and your password.
 - **macOS 11 to 14:** Control-click the app, choose **Open**, then **Open** again.

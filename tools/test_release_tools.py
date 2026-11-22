@@ -865,7 +865,7 @@ class PrepareTests(unittest.TestCase):
         prepared = self.prepare()
         notes = (prepared / "RELEASE_NOTES.md").read_text(encoding="utf-8")
         provenance = (prepared / "PROVENANCE.txt").read_text(encoding="utf-8")
-        self.assertIn("Needs macOS 11.00 or later; tested on macOS 15.6 (24G84), arm64, a GitHub-hosted runner", notes)
+        self.assertIn("Needs macOS 11.0 or later; tested on macOS 15.6 (24G84), arm64, a GitHub-hosted runner", notes)
         self.assertIn("not notarized", notes)
         self.assertIn("macOS package: Apple clang version 17.0.0", provenance)
         self.assertIn("Minimum macOS, extension: 11.0", provenance)

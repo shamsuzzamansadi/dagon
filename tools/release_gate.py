@@ -689,7 +689,7 @@ def prepare(args):
         *(
             [
                 f"**macOS, Apple Silicon only (M1 and later, Pro, Max and Ultra included).** Needs macOS "
-                f"{facts['Minimum macOS, Info.plist']} or later; tested on {tested['macOS package smoke-tested on']}. "
+                f"{facts['Minimum macOS, game executable']} or later; tested on {tested['macOS package smoke-tested on']}. "
                 f"It is signed ad hoc, with no Apple developer identity, and is not notarized "
                 f"({facts['macOS, notarization']}), so macOS blocks the first launch: see the README's first-launch "
                 "steps. There is no Intel Mac build.",

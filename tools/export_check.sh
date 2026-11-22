@@ -66,6 +66,9 @@ if [ "$platform" = "macos" ]; then
 	ditto -x -k "$binary" "$work" || fail "could not unpack Godot's export, $binary"
 	app="$(find "$work" -maxdepth 1 -name '*.app' -type d)"
 	[ -n "$app" ] && [ "$(printf '%s\n' "$app" | wc -l)" -eq 1 ] || fail "$binary should hold exactly one app"
+	# Godot names the app for the project, with its colon made a dash; players see the folder's name, so it is DAGON.
+	mv "$app" "$work/DAGON.app" || fail "could not name the app"
+	app="$work/DAGON.app"
 	executable="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$app/Contents/Info.plist")" || fail "no executable named in the app"
 	lipo "$app/Contents/MacOS/$executable" -thin arm64 -output "$work/arm64" || fail "the game has no arm64 half"
 	mv "$work/arm64" "$app/Contents/MacOS/$executable" && chmod 755 "$app/Contents/MacOS/$executable"

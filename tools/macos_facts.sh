@@ -32,7 +32,10 @@ fact "App" "$(basename "$app")"
 fact "Bundle identifier" "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$plist")"
 fact "Architectures, game" "$(lipo -archs "$binary")"
 fact "Architectures, extension" "$(lipo -archs "$library")"
-fact "Minimum macOS, Info.plist" "$(/usr/libexec/PlistBuddy -c 'Print :LSMinimumSystemVersion' "$plist" 2> /dev/null || echo none)"
+# Godot's template states the minimum for each architecture; an app may also state one for all.
+plist_minimum="$(/usr/libexec/PlistBuddy -c 'Print :LSMinimumSystemVersionByArchitecture:arm64' "$plist" 2> /dev/null ||
+	/usr/libexec/PlistBuddy -c 'Print :LSMinimumSystemVersion' "$plist" 2> /dev/null || echo none)"
+fact "Minimum macOS, Info.plist" "$plist_minimum"
 fact "Minimum macOS, game executable" "$(minos "$binary")"
 fact "Minimum macOS, extension" "$(minos "$library")"
 fact "Built on" "macOS $(sw_vers -productVersion) ($(sw_vers -buildVersion)), $(uname -m)"
