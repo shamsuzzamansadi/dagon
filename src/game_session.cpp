@@ -74,6 +74,7 @@ void GameSession::_process(double p_delta) {
 		quit_quietly(get_tree());
 	}
 	if (is_quit_due()) {
+		print_verbose("dagon: quitting");
 		get_tree()->quit();
 	}
 }

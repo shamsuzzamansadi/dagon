@@ -15,7 +15,8 @@ bool reset_global_state();
 
 // The mixer lets go of a stopped sound only between frames. One still playing, or stopped in the very frame the
 // engine shuts down, is reported as leaked. So every way out stops all sound first, and leaves a few frames.
-void stop_all_sound(godot::Node *p_root);
+// Stops every sound under p_root, and says how many were playing.
+int stop_all_sound(godot::Node *p_root);
 // Stops all sound, and asks for a quit once enough real time has passed for the mixer to let it all go.
 void quit_quietly(godot::SceneTree *p_tree);
 // Polled each frame by whichever scene root is running, including the pause menu, which runs while paused.

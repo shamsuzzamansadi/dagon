@@ -27,6 +27,7 @@ constexpr int64_t QUIT_DELAY_MAX_MSEC = 3000;
 int64_t quit_requested_at = -1;
 int64_t quit_requested_frame = 0;
 int64_t mixed_after_stop_frame = -1;
+int64_t last_stop_at = -1;
 
 } // namespace
 
@@ -53,19 +54,22 @@ bool reset_global_state() {
 	return dirty;
 }
 
-void stop_all_sound(Node *p_root) {
+int stop_all_sound(Node *p_root) {
+	int playing = 0;
 	if (p_root == nullptr) {
-		return;
+		return playing;
 	}
 	for (const char *type : { "AudioStreamPlayer", "AudioStreamPlayer2D" }) {
 		const TypedArray<Node> players = p_root->find_children("*", type, true, false);
 		for (int i = 0; i < players.size(); i++) {
 			Node *player = Object::cast_to<Node>(players[i]);
 			if (player != nullptr) {
+				playing += static_cast<bool>(player->call("is_playing")) ? 1 : 0;
 				player->call("stop");
 			}
 		}
 	}
+	return playing;
 }
 
 void quit_quietly(SceneTree *p_tree) {
@@ -75,6 +79,7 @@ void quit_quietly(SceneTree *p_tree) {
 	stop_all_sound(p_tree->get_root());
 	quit_requested_at = static_cast<int64_t>(Time::get_singleton()->get_ticks_msec());
 	quit_requested_frame = static_cast<int64_t>(Engine::get_singleton()->get_process_frames());
+	last_stop_at = quit_requested_at;
 }
 
 bool is_quit_due() {
@@ -87,10 +92,17 @@ bool is_quit_due() {
 	if (waited >= QUIT_DELAY_MAX_MSEC) {
 		return true;
 	}
+	// The world goes on while the quit waits, and may start a sound: stop it too, and wait for the mixer again.
+	SceneTree *tree = Object::cast_to<SceneTree>(Engine::get_singleton()->get_main_loop());
+	if (tree != nullptr && stop_all_sound(tree->get_root()) > 0) {
+		last_stop_at = static_cast<int64_t>(Time::get_singleton()->get_ticks_msec());
+		mixed_after_stop_frame = -1;
+	}
 	if (mixed_after_stop_frame < 0) {
-		// The last mix began this long ago; one that began after the stop has taken it into account.
+		// The last mix began this long ago; one that began after the last stop has taken it into account.
+		const int64_t since_stop = static_cast<int64_t>(Time::get_singleton()->get_ticks_msec()) - last_stop_at;
 		const double since_mix_msec = AudioServer::get_singleton()->get_time_since_last_mix() * 1000.0;
-		if (static_cast<double>(waited) - since_mix_msec > 1.0) {
+		if (static_cast<double>(since_stop) - since_mix_msec > 1.0) {
 			mixed_after_stop_frame = frame;
 		}
 	}

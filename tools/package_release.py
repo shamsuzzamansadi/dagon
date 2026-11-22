@@ -45,7 +45,7 @@ LEGAL = ("LICENSE", "CREDITS.md")
 # The game ends the run itself after this many frames, stopping its sound first (D78). --quit-after is only a backstop:
 # the engine shuts down in that frame, before the mixer can let go of a sound still playing.
 QUIT_AFTER_FRAMES = "300"
-QUIT_BACKSTOP_FRAMES = "1200"
+QUIT_BACKSTOP_FRAMES = "100000"
 
 
 def package_name(platform, version):
