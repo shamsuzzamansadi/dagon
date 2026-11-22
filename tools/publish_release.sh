@@ -32,3 +32,17 @@ gh release download "$version" --dir "$check"
 gh release edit "$version" --draft=false --prerelease
 
 python tools/release_gate.py verify --version "$version" --commit "$commit"
+
+# Only now, with GitHub reporting the release published, complete and consistent, do its notes name the run that
+# published it (D132). Immutable releases lock its files and its tag, not its notes: nothing uploaded changes.
+published="$(gh release view "$version" --json isDraft,publishedAt --jq 'if .isDraft then "" else .publishedAt end')"
+if [ -z "$published" ]; then
+	echo "::error::$version: GitHub does not report it published, so its notes name no publication run"
+	exit 1
+fi
+run="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+notes="$check/RELEASE_NOTES.md"
+cp "$prepared/RELEASE_NOTES.md" "$notes"
+printf -- '- Published by CI run: %s at %s; GitHub reports it published at %s\n' "$run" "$GITHUB_SHA" "$published" >> "$notes"
+gh release edit "$version" --notes-file "$notes"
+echo "$version: published by $run; GitHub reports it published at $published"

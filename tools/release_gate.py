@@ -632,18 +632,23 @@ def prepare(args):
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
     (out / "SHA256SUMS.txt").write_text("".join(f"{value}  {name}\n" for name, value in sums.items()), encoding="utf-8")
-    packaged_by = getattr(args, "packaged_by", None)
+    # Three separate facts (D132): the game's commit, the run that built and tested it, and the run preparing this,
+    # which is that same run unless the record ships an earlier commit. Nothing here can know of a publication.
+    prepared_by = getattr(args, "packaged_by", None) or f"{args.run_url} at {args.commit}"
     provenance = [
         f"Version: {version}",
-        f"Source commit: {args.commit}",
-        f"Built and tested by CI run: {args.run_url}",
-        *([f"Packaged, smoke-tested and published by CI run: {packaged_by}"] if packaged_by else []),
+        f"Game source commit: {args.commit}",
+        f"Source build run, which built and tested that commit: {args.run_url}",
+        f"Packaged, smoke-tested and prepared by CI run: {prepared_by}",
         f"Acceptance fingerprint: {fingerprint('.', args.commit)}",
         *[f"{name}: {value}" for name, value in facts.items()],
         f"godot-cpp: {godot_cpp}",
         *[f"{name}: {value}" for name, value in tested.items()],
         "",
-        "Each package holds the exact files exported, smoke-tested and uploaded by that run. Nothing was rebuilt to package it.",
+        "Each package holds the exact files the source build run exported and tested. The preparing run packaged them, "
+        "smoke-tested each on its own system and wrote these checksums; nothing was rebuilt.",
+        "This file records no publication. The run that publishes a release is named in its notes, and only once GitHub "
+        "reports the release published.",
     ]
     (out / "PROVENANCE.txt").write_text("\n".join(provenance) + "\n", encoding="utf-8")
 
@@ -699,9 +704,9 @@ def prepare(args):
             else []
         ),
         "## Source and provenance",
-        f"- Source commit: `{args.commit}`",
-        f"- Built and tested by: {args.run_url}",
-        *([f"- Packaged, smoke-tested and published by: {packaged_by}"] if packaged_by else []),
+        f"- Game source commit: `{args.commit}`",
+        f"- Source build run, which built and tested that commit: {args.run_url}",
+        f"- Packaged, smoke-tested and prepared by CI run: {prepared_by}",
         *[f"- {name}: {value}" for name, value in facts.items()],
         f"- godot-cpp: `{godot_cpp}`",
         *[f"- {name}: {value}" for name, value in tested.items()],
