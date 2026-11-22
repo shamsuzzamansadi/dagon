@@ -2,7 +2,7 @@
 
 Changing task state only. The lasting rules are in [AGENTS.md](../AGENTS.md). **Check this against `git log`, the pull requests and CI before relying on it.** M5's step-by-step record is in the [M5 package](reviews/m5-review-package.md); M4's in `git show 09d854e:docs/handoff.md` and the [M4 package](reviews/m4-review-package.md).
 
-**Last updated:** 2026-11-20. **M5 is accepted by the owner, on 2026-11-20 at `b7303bf`, as the completed milestone, and merged into `main` by the squash merge of [#6](https://github.com/shamsuzzamansadi/dagon/pull/6).** A milestone acceptance only: nothing tagged or released since `v0.1.0-pre-alpha.1`. **M6 is not started:** its plan is drafted and waits for the owner's approval.
+**Last updated:** 2026-11-22, for M5's alpha only; M6's state is on `m6/stabilization`. **M5 is accepted by the owner, on 2026-11-20 at `b7303bf`, as the completed milestone, and merged into `main` by the squash merge of [#6](https://github.com/shamsuzzamansadi/dagon/pull/6).** A milestone acceptance only: nothing tagged or released since `v0.1.0-pre-alpha.1`. **M6 is not started:** its plan is drafted and waits for the owner's approval.
 
 ## Where things are
 
@@ -12,7 +12,7 @@ Changing task state only. The lasting rules are in [AGENTS.md](../AGENTS.md). **
 | **The accepted build** | `b7303bf`, `dagon-windows`, artifact [14627487176](https://github.com/shamsuzzamansadi/dagon/actions/runs/44731893136/artifacts/14627487176) of push run 44731893136, zip SHA-256 `97ef6bd1e621e54875b213a41dd5189afca4554f7277a769ac10c2cf689a71ac`. Fingerprint `sha256:1f724cdc2c582c997c9b7b780ff092f4763c0077b5defe9805c6cce37533dc8d`, unchanged by the documents after it and by the squash merge |
 | **What the owner tested** | The running route on that build, recorded: the ridge reads as Dagon's shoulder, the arm stays connected through the hand landing, the same wave overtakes the fallen sailor. The standing-still ending has scripted coverage only. ChatGPT compared the owner's video frames and measured the recorded audio against the owner's earlier clip; it did not listen |
 | **Branch** | `main` only. `m5/polish` is merged and deleted |
-| **Releases** | Only [`v0.1.0-pre-alpha.1`](https://github.com/shamsuzzamansadi/dagon/releases/tag/v0.1.0-pre-alpha.1), at `760a539`, untouched. **`v0.2.0-alpha.1`, M5's planned prerelease, needs the owner's separate approval;** none is made |
+| **Releases** | [`v0.1.0-pre-alpha.1`](https://github.com/shamsuzzamansadi/dagon/releases/tag/v0.1.0-pre-alpha.1), at `760a539`, untouched. **`v0.2.0-alpha.1`, M5's alpha, is requested by [its record](../release/v0.2.0-alpha.1.json), at the owner's request of 2026-11-21 ([authorization](evidence/m5/release-authorization-2026-11-22.md)):** it ships `a4250f0` from `main`'s own run 44748633376, tagged there (D128), and is published by the CI of that record's merge only if every gate passes. Check the releases page before relying on this |
 
 ## Open
 

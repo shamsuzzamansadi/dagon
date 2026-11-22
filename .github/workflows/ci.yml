@@ -209,8 +209,10 @@ jobs:
   release:
     needs: [desktop, release-tools]
     if: ${{ !cancelled() && ((github.event_name == 'push' && github.ref == 'refs/heads/main') || inputs.rehearse == true) }}
+    # actions: read lets the release read main's own earlier runs, when a record ships an earlier commit (D128).
     permissions:
       contents: write
+      actions: read
     uses: ./.github/workflows/release.yml
     with:
       ci-result: ${{ needs.desktop.result == 'success' && needs.release-tools.result == 'success' && 'success' || 'failure' }}
