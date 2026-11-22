@@ -2,6 +2,10 @@
   "version": "v0.2.0-alpha.2",
   "milestone": "M6",
   "state": "candidate",
+  "source": {
+    "commit": "b271316371532074eb2c5fb312afa7c0a2d822c4",
+    "run": 45038841566
+  },
   "platforms": [
     "linux",
     "windows",
@@ -13,7 +17,7 @@
     "record": "docs/evidence/m6/owner-acceptance-2026-11-21.md",
     "build": "The owner-test build: `dagon-windows`, artifact 14711113002 of CI run 44913367672 (commit `a30be86`), zip SHA-256 `c138e0d43d3963882b0697ad54f7d686c44726b1bd240cccaccaa594b5211c9a`, played by the owner on 2026-11-21",
     "fingerprint": "sha256:14e30e9c7a601075231f27ebbb9cca4a72373302b63d600c8601d97c17b4f04f",
-    "scope": "On 2026-11-21 the owner accepted M6 as a milestone, with the outstanding human checks carried forward. Their playtest of the owner-test build `a30be86` on Windows was \"owner playtest satisfactory\" for the route they played: New Game through the running escape, all four epilogue panels, the credits and the return to the main menu. They asked for the README and the native Mac build to be added before the merge; **those change files the acceptance covers, so it does not cover this candidate as it stands,** and no person has played it. ChatGPT reviewed the owner's footage and compared audio samples: a signal check, not listening."
+    "scope": "On 2026-11-21 the owner accepted M6 as a milestone, with the outstanding human checks carried forward. Their playtest of the owner-test build `a30be86` on Windows was \"owner playtest satisfactory\" for the route they played: New Game through the running escape, all four epilogue panels, the credits and the return to the main menu. They asked for the README and the native Mac build to be added before the merge; **those change files the acceptance covers, so it does not cover this candidate as it stands,** and no person has played it. ChatGPT reviewed the owner's footage and compared audio samples: a signal check, not listening. **On 2026-11-22 the owner approved this version, `v0.2.0-alpha.2`, and its target commit `b271316`,** and kept the record a candidate until they report their native Windows and Ubuntu results ([record](docs/evidence/m6/release-approval-2026-11-22.md)). That approval is not an acceptance of `b271316`'s fingerprint."
   },
   "criteria": {
     "playable_start_to_end": {
@@ -33,7 +37,7 @@
     "**An alpha.** The art and the sound are not final, and anything may change.",
     "**Sound:** every sound is synthesized, and the narration is an AI-generated voice (see `CREDITS.md` in the package). The owner has heard the game in play, but the mix has had no listening review, and whether the reveal's dialogue can be made out over the music and effects has not been judged by ear.",
     "**No first-time player has played it,** and the length of a first playthrough has not been measured. Scripted runs suggest it is shorter than the 10 to 15 minutes the design aims for.",
-    "**The Mac build is new:** Apple Silicon only, and signed ad hoc without an Apple developer identity, and not notarized, so macOS blocks its first launch until you allow it (see the README). It has been run by CI on a GitHub-hosted Mac, not by a person.",
+    "**The Mac build is new:** Apple Silicon only, and signed ad hoc without an Apple developer identity, and not notarized, so macOS blocks its first launch until you allow it (see the README). **What has checked it is CI, on a GitHub-hosted Apple Silicon Mac** (macOS 15.8.2, arm64), **always headless: no window was drawn and no sound was played.** There, the game's code passed its unit tests and its integration tests, also against the exported game's own files; the exported app started, ran New Game and Continue, and quit without an error; and this very zip, unpacked as a Mac unpacks a download, held an app built for arm64 alone whose signature holds, which started, played New Game to a save at the Shore, quit, and continued from that save in a new process. Gatekeeper rejects the app, because it is not notarized. **No person has run it on a Mac,** so how it looks, sounds and plays there, with a keyboard or a controller, has not been checked.",
     "**Controllers:** supported, but the checks on physical hardware listed under \"Not tested\" have not been done.",
     "**One unresolved report from M2:** in one scripted run on a loaded machine, an examine fired without its caption. It has not been reproduced since, in more than a hundred repeats in CI, and its cause is not established.",
     "**On the software renderer,** the step from the prologue into the game takes one long frame; whether it does on a graphics card is not yet measured."

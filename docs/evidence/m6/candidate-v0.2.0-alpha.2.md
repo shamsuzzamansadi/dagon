@@ -31,4 +31,35 @@
 - **Also open against the roadmap's M6 exit gate:** "release candidate artifacts from CI launched on real Windows and Linux". CI launched them on hosted runners; the native runs on the owner's machines are among the deferred checks.
 - **The notes keep every outstanding human check** under "Not tested", as the owner asked on 2026-11-21.
 
-After the owner's word, a pull request of records only would set `release/v0.2.0-alpha.2.json` to `publish`, with that `source` and the owner's statement, and `main`'s CI on its merge would publish. Until then the record stays `candidate`.
+**Approved by the owner on 2026-11-22: the version and its target, `b271316`** ([record](release-approval-2026-11-22.md)). The record now names `b271316` and run 45038841566 as its `source`, and stays `candidate` until the owner reports their native Windows and Ubuntu results. After their confirmation, a pull request of records only sets it to `publish`, with the owner's statement, and `main`'s CI on its merge publishes and tags `b271316`.
+
+**The same packages, again.** A publication packages the run's exports anew. Packaging is deterministic: repackaged here from run 45038841566's exports and `b271316`'s license and credits, the Linux package's SHA-256 is the candidate's exactly. The Windows zip repackaged here holds the same files, compressed to the same bytes, and differs only in one header byte per entry, the system it was made on, which Python writes as Windows on a Windows machine. The release packages Windows on the same `windows-2022` runner as the candidate. At publication, the published hashes are checked against the candidate's above; a difference stops it.
+
+## The owner's native checks
+
+From artifact [14761047666](https://github.com/shamsuzzamansadi/dagon/actions/runs/45038841566/artifacts/14761047666), downloaded as `release-candidate-v0.2.0-alpha.2.zip`. The owner's route on each machine: New Game, the save at the Shore, Quit to Desktop, relaunch, Continue; and on the Windows monitor, the fullscreen switch. The frame log (D123) is set as in the [native-check sheets](../../m6/native-checks/README.md). New Game over an earlier save asks first: "Start a new game? This replaces your saved game."
+
+**Windows, in PowerShell,** in the folder with the download:
+
+```
+Expand-Archive release-candidate-v0.2.0-alpha.2.zip -DestinationPath candidate
+cd candidate
+Get-FileHash dagon-v0.2.0-alpha.2-windows-x86_64.zip   # F76538CC776603806010824AB93F0FB0424A5F90184FD0854AF2B98EEFD34148
+Expand-Archive dagon-v0.2.0-alpha.2-windows-x86_64.zip -DestinationPath .
+$env:DAGON_FRAME_LOG = "50"
+.\dagon-v0.2.0-alpha.2-windows-x86_64\dagon.exe --print-fps
+```
+
+To relaunch, the last line again in the same window. The log is `%APPDATA%\Godot\app_userdata\DAGON- Beneath the Black Tide\logs\godot.log`, begun again at each start, so it is copied before the relaunch.
+
+**Ubuntu, in a terminal,** in the folder with the download:
+
+```
+unzip release-candidate-v0.2.0-alpha.2.zip -d candidate && cd candidate
+sha256sum dagon-v0.2.0-alpha.2-linux-x86_64.tar.gz   # 6631c21b3d79b3cf1eb3305d9c622e230e59deaddcf160f5b24150c922680e05
+tar -xzf dagon-v0.2.0-alpha.2-linux-x86_64.tar.gz && cd dagon-v0.2.0-alpha.2-linux-x86_64
+DAGON_FRAME_LOG=50 ./dagon.x86_64 --print-fps 2>&1 | tee run-1.log
+DAGON_FRAME_LOG=50 ./dagon.x86_64 --print-fps 2>&1 | tee run-2.log   # the relaunch
+```
+
+Near the top of each log Godot names the device it draws with ("Using Device: …"); `llvmpipe` would mean software rendering, not the native check.
