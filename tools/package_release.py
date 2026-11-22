@@ -5,8 +5,8 @@
   smoke    Extracts a package into a clean folder and runs it headless, on the OS it is for.
 
 The tar and gzip timestamps are fixed, and gzip stores no file name, so the same export always gives the same bytes,
-whenever it is packaged. macOS's export is Godot's own zip of the app, signed as Godot signs it; its entries are copied
-as they are, with the permissions they record, under the package's folder (D129).
+whenever it is packaged. macOS's export is the zip tools/export_check.sh makes of the app it signed; its entries are copied as they are,
+with the permissions they record, under the package's folder (D129).
 """
 import argparse
 import gzip

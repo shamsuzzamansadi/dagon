@@ -36,6 +36,8 @@ GitHub lets only a signed-in account download these, until 19 February 2027.
 
 **Unchanged by it:** both first-time players stay on `a4250f0`; their sessions and timings, the owner's listening sheet and the remaining hardware checks are pending.
 
+**M6 accepted, the same day, with these carried forward.** The owner then accepted M6 as a milestone, "with the outstanding human checks carried forward", naming them as accepted M6 deferrals: the listening sheet, the display-switch observation, the post-credits Continue check, the remaining hardware checks and the two first-time sessions, whose players stay on `a4250f0` ([acceptance](../evidence/m6/owner-acceptance-2026-11-21.md)). **They stay pending until someone does them,** and they are listed as not tested in the M6 candidate's release notes.
+
 ## The checklist, in this order
 
 **On every sheet and log:** "owner-test `a30be86`", the device, and the zip's SHA-256. Name the files by build and device, as below.

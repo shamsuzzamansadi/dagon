@@ -28,7 +28,7 @@ How a milestone prerelease is built, gated and published. The rules come from th
 | Job | What it does | Can write? |
 |---|---|---|
 | `gate` | Reads the record, checks every gate, and names every blocker | No |
-| `package-linux`, `package-windows` | Packages the run's own export with the license and credits, then extracts the package and runs it headless on its own OS: main menu, New Game with a prompt, a save, and Continue | No |
+| `package-linux`, `package-windows`, `package-macos` | One for each OS the record ships. Packages the run's own export with the license and credits, then extracts the package and runs it headless on its own OS: main menu, New Game with a prompt, a save at the first checkpoint, and Continue from it in a new process. The Mac package is unpacked as a Mac unpacks a download, and its architecture and signature are checked before it runs | No |
 | `prepare` | Writes the release notes, `SHA256SUMS.txt` and `PROVENANCE.txt` | No |
 | `publish` | Creates a draft, checks the uploaded files against their checksums, and only then publishes. The tag appears at that moment, at the tested commit | Yes |
 
@@ -117,7 +117,7 @@ Each `main` push asks GitHub what exists for every record in `release/`. **A tag
 
 ## Compilers
 
-There is **one package per OS:** GCC on `ubuntu-22.04` for Linux, and MSVC on `windows-2022` for Windows. `linux-clang` validates only. It runs the same unit, integration and export smoke checks, and uploads no build ([toolchain.md](toolchain.md)). Each job's cache and logs are its own.
+There is **one package per OS:** GCC on `ubuntu-22.04` for Linux, MSVC on `windows-2022` for Windows, and, from M6, Apple Clang on `macos-15` for macOS on Apple Silicon ([D129](decisions.md)). A record names the OSes it ships in `platforms`; one that names none, such as `v0.1.0-pre-alpha.1`'s and `v0.2.0-alpha.1`'s, shipped Linux and Windows, and is checked for those two. `linux-clang` validates only. It runs the same unit, integration and export smoke checks, and uploads no build ([toolchain.md](toolchain.md)). Each job's cache and logs are its own.
 
 ## Testing the workflow
 

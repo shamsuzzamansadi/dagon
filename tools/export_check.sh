@@ -57,15 +57,33 @@ echo "$code" > "$logs/export-$platform.exit"
 [ -f "$binary" ] || fail "no binary at $binary"
 pack="$out/$stem.pck"
 if [ "$platform" = "macos" ]; then
-	# Unpacked as a player's Mac unpacks it, keeping the permissions the zip records. The zip itself is what ships.
+	# Godot's official templates hold a universal game, and this build is for Apple Silicon alone (D129): keep the
+	# game's arm64 half, then sign the extension and the app, ad hoc, with Apple's own codesign, and zip it again with
+	# ditto, which keeps every permission. That zip is what ships, and what is unpacked and run below.
+	work="$root/build/export/macos-work"
+	rm -rf "$work"
+	mkdir -p "$work"
+	ditto -x -k "$binary" "$work" || fail "could not unpack Godot's export, $binary"
+	app="$(find "$work" -maxdepth 1 -name '*.app' -type d)"
+	[ -n "$app" ] && [ "$(printf '%s\n' "$app" | wc -l)" -eq 1 ] || fail "$binary should hold exactly one app"
+	executable="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$app/Contents/Info.plist")" || fail "no executable named in the app"
+	lipo "$app/Contents/MacOS/$executable" -thin arm64 -output "$work/arm64" || fail "the game has no arm64 half"
+	mv "$work/arm64" "$app/Contents/MacOS/$executable" && chmod 755 "$app/Contents/MacOS/$executable"
+	for nested in "$app/Contents/Frameworks/"*; do
+		codesign --force --sign - --timestamp=none "$nested" > "$logs/codesign-macos.log" 2>&1 || fail "could not sign $nested"
+	done
+	codesign --force --sign - --timestamp=none "$app" >> "$logs/codesign-macos.log" 2>&1 || fail "could not sign the app"
+	codesign --verify --deep --strict --verbose=2 "$app" >> "$logs/codesign-macos.log" 2>&1 || fail "the app's signature does not hold"
+	rm -f "$binary"
+	ditto -c -k --norsrc --noextattr --noacl --keepParent "$app" "$binary" || fail "could not zip the app"
+	rm -rf "$work"
+	# Unpacked as a player's Mac unpacks it, keeping the permissions the zip records.
 	run_dir="$root/build/export/macos-run"
 	rm -rf "$run_dir"
 	mkdir -p "$run_dir"
 	ditto -x -k "$binary" "$run_dir" || fail "could not unpack $binary"
 	app="$(find "$run_dir" -maxdepth 1 -name '*.app' -type d)"
-	[ -n "$app" ] && [ "$(printf '%s\n' "$app" | wc -l)" -eq 1 ] || fail "$binary should hold exactly one app"
 	find "$app" -maxdepth 3 | sed "s|$run_dir/||" | sort > "$logs/export-macos-files.txt"
-	executable="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$app/Contents/Info.plist")" || fail "no executable named in the app"
 	binary="$app/Contents/MacOS/$executable"
 	[ -x "$binary" ] || fail "the app's executable is missing or not executable: $binary"
 	library="$app/Contents/Frameworks/$library"
