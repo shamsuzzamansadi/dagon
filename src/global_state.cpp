@@ -1,5 +1,6 @@
 #include "global_state.hpp"
 
+#include <godot_cpp/classes/audio_server.hpp>
 #include <godot_cpp/classes/engine.hpp>
 #include <godot_cpp/classes/input.hpp>
 #include <godot_cpp/classes/os.hpp>
@@ -18,8 +19,14 @@ namespace {
 // Measured: a sound stopped two real-time frames before the end was always let go. This is several.
 constexpr int64_t QUIT_DELAY_MSEC = 150;
 constexpr int64_t QUIT_DELAY_FRAMES = 3;
+// The mixer lets a stopped sound go on its next mix, and the main loop frees it in a frame after that. On a busy machine
+// that can take longer than any fixed wait, so the quit also waits for a mix that began after the stop, and then for
+// these frames; never longer than the cap in all, should the mixer not be running (D130).
+constexpr int64_t FRAMES_AFTER_MIX = 3;
+constexpr int64_t QUIT_DELAY_MAX_MSEC = 3000;
 int64_t quit_requested_at = -1;
 int64_t quit_requested_frame = 0;
+int64_t mixed_after_stop_frame = -1;
 
 } // namespace
 
@@ -76,8 +83,19 @@ bool is_quit_due() {
 	}
 	// Wall clock, not game time: a run at a fixed frame rate can pass many frames in a few milliseconds.
 	const int64_t waited = static_cast<int64_t>(Time::get_singleton()->get_ticks_msec()) - quit_requested_at;
-	const int64_t frames = static_cast<int64_t>(Engine::get_singleton()->get_process_frames()) - quit_requested_frame;
-	return waited >= QUIT_DELAY_MSEC && frames >= QUIT_DELAY_FRAMES;
+	const int64_t frame = static_cast<int64_t>(Engine::get_singleton()->get_process_frames());
+	if (waited >= QUIT_DELAY_MAX_MSEC) {
+		return true;
+	}
+	if (mixed_after_stop_frame < 0) {
+		// The last mix began this long ago; one that began after the stop has taken it into account.
+		const double since_mix_msec = AudioServer::get_singleton()->get_time_since_last_mix() * 1000.0;
+		if (static_cast<double>(waited) - since_mix_msec > 1.0) {
+			mixed_after_stop_frame = frame;
+		}
+	}
+	return waited >= QUIT_DELAY_MSEC && frame - quit_requested_frame >= QUIT_DELAY_FRAMES && mixed_after_stop_frame >= 0 &&
+			frame - mixed_after_stop_frame >= FRAMES_AFTER_MIX;
 }
 
 bool is_run_over() {

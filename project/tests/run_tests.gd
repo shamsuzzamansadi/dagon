@@ -154,13 +154,20 @@ func _run() -> void:
 		failed += 1
 		print("FAIL the test run changed the player's real files in %s" % OS.get_user_data_dir())
 	OS.remove_logger(_trap)
-	# As the game does: stop every sound, and give the mixer real time to let go of it, or the engine reports it leaked.
+	# As the game does (D78, D130): stop every sound, and give the mixer real time to let go of it, or the engine reports
+	# it leaked. A busy machine's mixer can lag, so this also waits for a mix that began after the stop, then a few frames.
 	for type in ["AudioStreamPlayer", "AudioStreamPlayer2D"]:
 		for sound in root.find_children("*", type, true, false):
 			sound.stop()
-	var until := Time.get_ticks_msec() + 200
-	while Time.get_ticks_msec() < until:
+	var stopped := Time.get_ticks_msec()
+	var mixed_frame := -1
+	while true:
 		await process_frame
+		var waited := Time.get_ticks_msec() - stopped
+		if mixed_frame < 0 and waited - AudioServer.get_time_since_last_mix() * 1000.0 > 1.0:
+			mixed_frame = Engine.get_process_frames()
+		if waited >= 3000 or (waited >= 200 and mixed_frame >= 0 and Engine.get_process_frames() - mixed_frame >= 3):
+			break
 	if not only.is_empty():
 		print("PARTIAL passed=%d failed=%d only=%s" % [passed, failed, only])
 	else:
