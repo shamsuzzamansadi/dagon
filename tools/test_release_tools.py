@@ -99,8 +99,8 @@ class Repo:
         write(self.root, f"release/{record['version']}.json", json.dumps(record))
         return record
 
-    def evaluate(self, ci_result="success", tags=None, releases=None):
-        return release_gate.evaluate(self.root, self.gameplay(), ci_result, tags or {}, (releases or {}).get)
+    def evaluate(self, ci_result="success", tags=None, releases=None, rehearse=False, check_source=None):
+        return release_gate.evaluate(self.root, self.gameplay(), ci_result, tags or {}, (releases or {}).get, rehearse, check_source or (lambda source: []))
 
 
 class GateTests(unittest.TestCase):
@@ -118,7 +118,7 @@ class GateTests(unittest.TestCase):
     def test_every_gate_passed_publishes(self):
         self.repo.save(self.repo.good_record())
         outcome, messages, failed = self.repo.evaluate()
-        self.assertEqual(outcome, {"version": PRE_ALPHA, "record": f"release/{PRE_ALPHA}.json", "publish": "true"})
+        self.assertEqual(outcome, {"version": PRE_ALPHA, "record": f"release/{PRE_ALPHA}.json", "publish": "true", "target": "", "source_run": ""})
         self.assertFalse(failed, messages)
 
     def test_failed_ci_blocks_and_packages_nothing(self):
@@ -385,7 +385,7 @@ class GateTests(unittest.TestCase):
         rehearsal = Path(__file__).with_name("release_rehearsal.json")
         write(self.repo.root, "tools/release_rehearsal.json", rehearsal.read_text(encoding="utf-8"))
         self.repo.save(self.repo.good_record())
-        outcome, _, failed = release_gate.evaluate(self.repo.root, self.repo.gameplay(), "success", {}, {}.get, rehearse=True)
+        outcome, _, failed = release_gate.evaluate(self.repo.root, self.repo.gameplay(), "success", {}, {}.get, rehearse=True, check_source=lambda source: [])
         self.assertEqual((outcome["publish"], failed), ("false", False))
         self.assertEqual(outcome["record"], release_gate.REHEARSAL_RECORD)
         self.assertTrue(release_gate.version_problems(outcome["version"]), "its version must be unpublishable")
@@ -399,6 +399,123 @@ class GateTests(unittest.TestCase):
         for path, record in records:
             if record["state"] == "planned":
                 self.assertEqual(record["owner_acceptance"]["status"], "pending", path.name)
+
+
+class SourceRun:
+    """main's push run of a commit, as GitHub describes it, with every required job passed and every file kept."""
+
+    def __init__(self, commit, **changes):
+        self.details = {"head_sha": commit, "event": "push", "head_branch": "main", "status": "completed", "conclusion": "success", **changes}
+        self.jobs = [{"name": name, "conclusion": "success"} for name in release_gate.SOURCE_JOBS]
+        self.artifacts = [{"name": name, "expired": False} for name in release_gate.SOURCE_ARTIFACTS]
+
+    def run(self, run_id):
+        return self.details
+
+    def run_jobs(self, run_id):
+        return self.jobs
+
+    def run_artifacts(self, run_id):
+        return self.artifacts
+
+
+class SourceTests(unittest.TestCase):
+    """A record that ships an earlier commit on main, from main's own CI run of it (D128)."""
+
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temporary.cleanup)
+        self.repo = Repo(self.temporary.name)
+        self.repo.commit("evidence")
+        self.source = git(self.repo.root, "rev-parse", "HEAD")
+        self.accepted = self.repo.gameplay()
+        # main moves on: the game itself changes after the commit the owner accepted.
+        write(self.repo.root, "src/main.cpp", "int main = 1;")
+        self.repo.commit("later work")
+
+    def record(self, **changes):
+        record = self.repo.good_record()
+        record["owner_acceptance"]["fingerprint"] = self.accepted
+        record["source"] = {"commit": self.source, "run": 5}
+        record.update(changes)
+        return self.repo.save(record)
+
+    def test_an_earlier_commit_is_judged_on_its_own_files_and_shipped_and_tagged_there(self):
+        self.record()
+        self.repo.commit("record")
+        self.assertNotEqual(self.repo.gameplay(), self.accepted)
+        outcome, messages, failed = self.repo.evaluate()
+        self.assertFalse(failed, messages)
+        self.assertEqual(outcome, {"version": PRE_ALPHA, "record": f"release/{PRE_ALPHA}.json", "publish": "true", "target": self.source, "source_run": "5"})
+
+    def test_the_source_commit_must_have_the_accepted_files(self):
+        self.record(owner_acceptance={**self.repo.good_record()["owner_acceptance"], "fingerprint": self.repo.gameplay()})
+        outcome, messages, failed = self.repo.evaluate()
+        self.assertTrue(failed)
+        self.assertTrue(any("the source commit" in message and "has changed since the owner accepted it" in message for message in messages), messages)
+
+    def test_the_source_runs_problems_block_publication(self):
+        self.record()
+        outcome, messages, failed = self.repo.evaluate(check_source=lambda source: [f"CI run {source['run']} did not succeed"])
+        self.assertTrue(failed)
+        self.assertEqual(outcome["publish"], "false")
+        self.assertTrue(any("CI run 5 did not succeed" in message for message in messages), messages)
+
+    def test_this_commits_own_ci_still_has_to_pass(self):
+        self.record()
+        outcome, messages, failed = self.repo.evaluate(ci_result="failure")
+        self.assertTrue(failed)
+        self.assertEqual((outcome["publish"], outcome["target"]), ("false", ""))
+
+    def test_a_source_must_name_a_full_commit_and_a_run(self):
+        for source in ({"commit": self.source[:7], "run": 5}, {"commit": self.source}, {"commit": self.source, "run": "5"}, {"commit": self.source, "run": 0}, "main"):
+            with self.subTest(source):
+                record = self.repo.good_record()
+                record["source"] = source
+                self.assertTrue(release_gate.format_problems(Path(f"release/{PRE_ALPHA}.json"), record))
+
+    def test_the_source_must_be_on_main_built_by_mains_own_push_run_which_passed_and_kept_its_files(self):
+        root = self.repo.root
+        self.assertEqual(release_gate.source_problems({"commit": self.source, "run": 5}, root, SourceRun(self.source)), [])
+        cases = {
+            "tested": SourceRun("c" * 40),
+            "not main's own push run": SourceRun(self.source, event="pull_request"),
+            "did not succeed": SourceRun(self.source, conclusion="failure"),
+        }
+        failed_job = SourceRun(self.source)
+        failed_job.jobs[1]["conclusion"] = "failure"
+        cases["linux-clang did not succeed"] = failed_job
+        expired = SourceRun(self.source)
+        expired.artifacts[0]["expired"] = True
+        cases["no longer holds dagon-linux"] = expired
+        missing = SourceRun(self.source)
+        missing.artifacts.pop()
+        cases["no longer holds logs-linux-clang"] = missing
+        for needle, github in cases.items():
+            with self.subTest(needle):
+                problems = release_gate.source_problems({"commit": self.source, "run": 5}, root, github)
+                self.assertTrue(any(needle in problem for problem in problems), problems)
+
+    def test_a_commit_off_mains_history_is_refused_and_an_unknown_one_is_not_read_as_absent(self):
+        root = self.repo.root
+        git(root, "checkout", "-q", "-b", "side", self.source)
+        write(root, "docs/side.md", "x")
+        self.repo.commit("side")
+        side = git(root, "rev-parse", "HEAD")
+        git(root, "checkout", "-q", "-")
+        problems = release_gate.source_problems({"commit": side, "run": 5}, root, SourceRun(side))
+        self.assertTrue(any("not in this commit's history" in problem for problem in problems), problems)
+        with self.assertRaises(release_gate.StateUnknown):
+            release_gate.source_problems({"commit": "d" * 40, "run": 5}, root, SourceRun("d" * 40))
+
+    def test_a_rehearsal_with_a_source_packages_that_commits_run_and_checks_it_first(self):
+        write(self.repo.root, release_gate.REHEARSAL_RECORD, json.dumps({"version": "v0.1.0-pre-alpha.0", "state": "candidate", "source": {"commit": self.source, "run": 5}}))
+        outcome, messages, failed = self.repo.evaluate(rehearse=True)
+        self.assertFalse(failed, messages)
+        self.assertEqual((outcome["version"], outcome["target"], outcome["source_run"], outcome["publish"]), ("v0.1.0-pre-alpha.0", self.source, "5", "false"))
+        outcome, messages, failed = self.repo.evaluate(rehearse=True, check_source=lambda source: ["CI run 5 did not succeed"])
+        self.assertTrue(failed)
+        self.assertEqual(outcome["version"], "")
 
 
 class PackageTests(unittest.TestCase):
@@ -606,6 +723,21 @@ class PrepareTests(unittest.TestCase):
                     self.prepare()
                 self.assertIn("Provenance is incomplete", str(caught.exception))
                 log.write_text(saved, encoding="utf-8")
+
+    def test_an_earlier_commits_provenance_names_it_its_own_run_and_the_run_that_packaged_it(self):
+        args = SimpleNamespace(record=str(self.record), packages=str(self.root / "packages"), logs=str(self.root / "logs"), out=str(self.root / "prepared"), commit=self.commit, run_url="https://example/run/1", packaged_by="https://example/run/9 at " + "e" * 40)
+        previous = os.getcwd()
+        os.chdir(self.root)
+        try:
+            with contextlib.redirect_stdout(io.StringIO()):
+                release_gate.prepare(args)
+        finally:
+            os.chdir(previous)
+        provenance = (self.root / "prepared" / "PROVENANCE.txt").read_text(encoding="utf-8")
+        self.assertIn(f"Source commit: {self.commit}", provenance)
+        self.assertIn("Built and tested by CI run: https://example/run/1", provenance)
+        self.assertIn("Packaged, smoke-tested and published by CI run: https://example/run/9 at " + "e" * 40, provenance)
+        self.assertIn("Packaged, smoke-tested and published by: https://example/run/9", (self.root / "prepared" / "RELEASE_NOTES.md").read_text(encoding="utf-8"))
 
     def test_more_than_one_package_per_os_is_refused(self):
         write(self.root, f"packages/dagon-{PRE_ALPHA}-linux-clang-x86_64.tar.gz")
@@ -959,6 +1091,19 @@ class WorkflowTests(unittest.TestCase):
             self.assertNotIn(forbidden, script)
         order = [script.index(step) for step in ("release_gate.py preflight", "--draft --prerelease", "sha256sum -c", "--draft=false", "release_gate.py verify")]
         self.assertEqual(order, sorted(order))
+
+    def test_an_earlier_commit_is_packaged_from_its_own_checkout_and_run_and_tagged_there(self):
+        package = self.job("package").split("\n  prepare:", 1)[0]
+        self.assertIn("ref: ${{ needs.gate.outputs.target || github.sha }}", package)
+        self.assertIn("run-id: ${{ needs.gate.outputs.source-run }}", package)
+        self.assertIn("actions: read", package)
+        prepare = self.job("prepare").split("\n  publish:", 1)[0]
+        self.assertIn("run-id: ${{ needs.gate.outputs.source-run }}", prepare)
+        self.assertIn("COMMIT: ${{ needs.gate.outputs.target || github.sha }}", self.job("publish"))
+        self.assertIn("COMMIT: ${{ needs.gate.outputs.target || github.sha }}", prepare)
+        caller = self.ci.split("\n  release:\n", 1)[1]
+        self.assertIn("actions: read", caller)
+        self.assertIn("fetch-depth: 0", self.job("gate").split("\n  package:", 1)[0])
 
     def test_the_gate_asks_github_with_a_read_only_token(self):
         gate = self.job("gate").split("\n  package:", 1)[0]

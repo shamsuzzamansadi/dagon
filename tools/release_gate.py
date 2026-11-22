@@ -76,6 +76,14 @@ CRITERIA = {
     },
 }
 STATES = ("planned", "candidate", "publish")
+
+# A record can ship an earlier commit on main instead of the one being tested, giving its "source": that commit and
+# main's own push run that built and tested it (D128). The tag goes on that commit, and the packages are that run's own
+# exports, so the release is what that commit's CI tested. These must have passed in that run, and it must still hold
+# these files.
+SOURCE_JOBS = ("linux", "linux-clang", "windows", "release-tools")
+SOURCE_ARTIFACTS = ("dagon-linux", "dagon-windows", "logs-linux", "logs-windows", "logs-linux-clang")
+COMMIT_ID = re.compile(r"[0-9a-f]{40}")
 LABEL_MEANING = {
     "pre-alpha": "A usable slice of the game, not the whole of it.",
     "alpha": "The intended game, playable from beginning to end, and still unfinished.",
@@ -191,6 +199,27 @@ class GitHub:
                 return found
         raise StateUnknown("the list of releases did not end")
 
+    def run(self, run_id):
+        """A workflow run, or None if this repository has no such run."""
+        return self.get(f"/actions/runs/{int(run_id)}")
+
+    def _all(self, path, key):
+        found = []
+        for page in range(1, 1000):
+            batch = self.get(f"{path}?per_page=100&page={page}")
+            if batch is None:
+                raise StateUnknown(f"GitHub answered 404 for {path}")
+            found += batch.get(key, [])
+            if len(batch.get(key, [])) < 100:
+                return found
+        raise StateUnknown(f"the list at {path} did not end")
+
+    def run_jobs(self, run_id):
+        return self._all(f"/actions/runs/{int(run_id)}/jobs", "jobs")
+
+    def run_artifacts(self, run_id):
+        return self._all(f"/actions/runs/{int(run_id)}/artifacts", "artifacts")
+
     def delete_draft(self, release_id):
         """Removes an unpublished draft. It looks again first, and refuses anything else."""
         release = self.get(f"/releases/{int(release_id)}")
@@ -256,6 +285,45 @@ def format_problems(path, record):
     for key in record.get("criteria", {}):
         if label in CRITERIA and key not in CRITERIA[label]:
             problems.append(f"'{key}' is not a {label} criterion")
+    return problems + source_format_problems(record)
+
+
+def source_format_problems(record):
+    if "source" not in record:
+        return []
+    source = record["source"]
+    run_id = source.get("run") if isinstance(source, dict) else None
+    if not isinstance(source, dict) or not COMMIT_ID.fullmatch(str(source.get("commit", ""))) or type(run_id) is not int or run_id <= 0:
+        return ["source must give the full commit, and the id of main's push run that built and tested it"]
+    return []
+
+
+def source_problems(source, root, github):
+    """Why an earlier commit cannot be shipped from main's own CI run of it. Raises StateUnknown if it cannot tell."""
+    commit, run_id = source["commit"], source["run"]
+    problems = []
+    ancestry = subprocess.run(["git", "merge-base", "--is-ancestor", commit, "HEAD"], cwd=root, capture_output=True, text=True)
+    if ancestry.returncode == 1:
+        problems.append(f"the source commit {commit} is not in this commit's history, so it is not on main")
+    elif ancestry.returncode != 0:
+        raise StateUnknown(f"could not tell whether {commit} is in this commit's history: {ancestry.stderr.strip()}")
+    run = github.run(run_id)
+    if run is None:
+        return problems + [f"CI run {run_id} does not exist"]
+    if run.get("head_sha") != commit:
+        problems.append(f"CI run {run_id} tested {run.get('head_sha')}, not the source commit {commit}")
+    if run.get("event") != "push" or run.get("head_branch") != "main":
+        problems.append(f"CI run {run_id} is a {run.get('event')} run of {run.get('head_branch')}, not main's own push run")
+    if run.get("status") != "completed" or run.get("conclusion") != "success":
+        problems.append(f"CI run {run_id} did not succeed: {run.get('status')}, {run.get('conclusion')}")
+    jobs = {job.get("name"): job.get("conclusion") for job in github.run_jobs(run_id)}
+    for name in SOURCE_JOBS:
+        if jobs.get(name) != "success":
+            problems.append(f"{name} did not succeed in CI run {run_id}: {jobs.get(name, 'missing')}")
+    artifacts = {artifact.get("name"): artifact for artifact in github.run_artifacts(run_id)}
+    for name in SOURCE_ARTIFACTS:
+        if name not in artifacts or artifacts[name].get("expired") is not False:
+            problems.append(f"CI run {run_id} no longer holds {name}")
     return problems
 
 
@@ -277,9 +345,10 @@ def gate_blockers(record, root, current, ci_result):
                 blockers.append(f"the owner acceptance does not state {what}")
         accepted = acceptance.get("fingerprint", "")
         if accepted != current:
+            shipped = "the source commit" if record.get("source") else "this commit"
             blockers.append(
                 f"the game, or how it is built, exported or packaged, has changed since the owner accepted it, so that "
-                f"acceptance does not cover this build: accepted {accepted or 'nothing'}, this commit {current}"
+                f"acceptance does not cover this build: accepted {accepted or 'nothing'}, {shipped} {current}"
             )
 
     label = label_of(record.get("version") or "")
@@ -300,10 +369,27 @@ def gate_blockers(record, root, current, ci_result):
     return blockers
 
 
-def evaluate(root, current, ci_result, tags, find_release, rehearse=False):
-    """Returns (outcome, messages, failed). Outcome is what the workflow needs: version, record and publish.
-    tags is {tag: commit}. find_release(version) gives the published release or None, and raises StateUnknown."""
-    outcome = {"version": "", "record": "", "publish": "false"}
+def evaluate(root, current, ci_result, tags, find_release, rehearse=False, check_source=None):
+    """Returns (outcome, messages, failed). Outcome is what the workflow needs: version, record, publish, and for a
+    record with a source, the commit to ship and tag (target) and the run whose exports to package (source_run).
+    tags is {tag: commit}. find_release(version) gives the published release or None, and raises StateUnknown.
+    check_source(source) gives a source's problems, and raises StateUnknown."""
+    outcome = {"version": "", "record": "", "publish": "false", "target": "", "source_run": ""}
+    if check_source is None:
+
+        def check_source(source):
+            raise StateUnknown("a record ships an earlier commit, and nothing was given to check its CI run")
+
+    def blockers_for(record):
+        # A record that ships an earlier commit is judged on that commit: its files, and its own CI run.
+        source = record.get("source")
+        if not source:
+            return gate_blockers(record, root, current, ci_result)
+        return gate_blockers(record, root, fingerprint(root, source["commit"]), ci_result) + check_source(source)
+
+    def ship(record):
+        if record.get("source"):
+            outcome.update(target=record["source"]["commit"], source_run=str(record["source"]["run"]))
     messages = []
     failed = False
 
@@ -329,14 +415,21 @@ def evaluate(root, current, ci_result, tags, find_release, rehearse=False):
     wanted = [(path, record) for path, record in active if record["state"] in ("candidate", "publish")]
     for path, record in active:
         if record["state"] == "planned":
-            remaining = gate_blockers(record, root, current, ci_result)
+            remaining = blockers_for(record)
             messages.append(f"notice::{record['version']} is planned, with {len(remaining)} gates open: " + "; ".join(remaining))
 
     if rehearse:
         if not failed:
             record = json.loads(Path(root, REHEARSAL_RECORD).read_text(encoding="utf-8"))
+            problems = source_format_problems(record)
+            if not problems and record.get("source"):
+                problems += check_source(record["source"])
+            if problems:
+                return outcome, messages + [f"error::The rehearsal record: {problem}" for problem in problems], True
             outcome.update(version=record["version"], record=REHEARSAL_RECORD)
-            messages.append(f"notice::Rehearsal: packaging {record['version']}, which can never be published.")
+            ship(record)
+            shipped = f", from {record['source']['commit']} as built by CI run {record['source']['run']}" if record.get("source") else ""
+            messages.append(f"notice::Rehearsal: packaging {record['version']}{shipped}, which can never be published.")
         return outcome, messages, failed
     if len(wanted) > 1:
         names = ", ".join(record["version"] for _, record in wanted)
@@ -346,9 +439,10 @@ def evaluate(root, current, ci_result, tags, find_release, rehearse=False):
         return outcome, messages, failed
 
     path, record = wanted[0]
-    blockers = gate_blockers(record, root, current, ci_result)
+    blockers = blockers_for(record)
     if ci_result == "success":
         outcome.update(version=record["version"], record=f"{RECORDS_DIR}/{path.name}")
+        ship(record)
     if record["state"] == "candidate":
         messages.append(f"notice::{record['version']} is a candidate. Packages are prepared, and nothing is published.")
         messages += [f"notice::Remaining for {record['version']}: {blocker}" for blocker in blockers]
@@ -357,7 +451,9 @@ def evaluate(root, current, ci_result, tags, find_release, rehearse=False):
         messages += [f"error::{record['version']} is blocked: {blocker}" for blocker in blockers]
     else:
         outcome["publish"] = "true"
-        messages.append(f"notice::{record['version']} has passed every gate, and will be published from this commit.")
+        source = record.get("source")
+        where = f"from {source['commit']}, as built by CI run {source['run']}, and tagged there" if source else "from this commit"
+        messages.append(f"notice::{record['version']} has passed every gate, and will be published {where}.")
     return outcome, messages, failed
 
 
@@ -448,10 +544,12 @@ def prepare(args):
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
     (out / "SHA256SUMS.txt").write_text("".join(f"{value}  {name}\n" for name, value in sums.items()), encoding="utf-8")
+    packaged_by = getattr(args, "packaged_by", None)
     provenance = [
         f"Version: {version}",
         f"Source commit: {args.commit}",
         f"Built and tested by CI run: {args.run_url}",
+        *([f"Packaged, smoke-tested and published by CI run: {packaged_by}"] if packaged_by else []),
         f"Acceptance fingerprint: {fingerprint('.', args.commit)}",
         *[f"{name}: {value}" for name, value in facts.items()],
         f"godot-cpp: {godot_cpp}",
@@ -502,6 +600,7 @@ def prepare(args):
         "## Source and provenance",
         f"- Source commit: `{args.commit}`",
         f"- Built and tested by: {args.run_url}",
+        *([f"- Packaged, smoke-tested and published by: {packaged_by}"] if packaged_by else []),
         *[f"- {name}: {value}" for name, value in facts.items()],
         f"- godot-cpp: `{godot_cpp}`",
     ]
@@ -538,6 +637,7 @@ def main():
     prepare_parser = commands.add_parser("prepare")
     for name in ("--record", "--packages", "--logs", "--out", "--commit", "--run-url"):
         prepare_parser.add_argument(name, required=True)
+    prepare_parser.add_argument("--packaged-by", help="for a record with a source: the run that packaged it, and its commit")
     preflight_parser = commands.add_parser("preflight")
     preflight_parser.add_argument("--version", required=True)
     verify_parser = commands.add_parser("verify")
@@ -556,9 +656,9 @@ def main():
     elif args.command == "evaluate":
         github = GitHub()
         try:
-            outcome, messages, failed = evaluate(".", fingerprint(), args.ci_result, remote_tags(), github.published_release, args.rehearse)
+            outcome, messages, failed = evaluate(".", fingerprint(), args.ci_result, remote_tags(), github.published_release, args.rehearse, lambda source: source_problems(source, ".", github))
         except StateUnknown as error:
-            outcome = {"version": "", "record": "", "publish": "false"}
+            outcome = {"version": "", "record": "", "publish": "false", "target": "", "source_run": ""}
             messages, failed = [f"error::The release state could not be determined, so nothing was prepared or published: {error}"], True
         write_outcome(outcome, messages)
         sys.exit(1 if failed else 0)

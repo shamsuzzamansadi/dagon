@@ -1,5 +1,7 @@
 # Decides, packages and publishes a milestone prerelease from the commit CI has just tested. Called only by ci.yml,
-# after its checks, so the packages are the very files that run built and tested. See docs/release.md.
+# after its checks, so the packages are the very files that run built and tested. A record can instead ship an earlier
+# commit on main, from main's own push run of it (D128): that commit is checked out to package it, that run's exports
+# are packaged, and the tag goes on that commit. See docs/release.md.
 name: Release
 
 on:
@@ -18,12 +20,20 @@ permissions:
 jobs:
   gate:
     runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      actions: read
     outputs:
       version: ${{ steps.gate.outputs.version }}
       record: ${{ steps.gate.outputs.record }}
       publish: ${{ steps.gate.outputs.publish }}
+      target: ${{ steps.gate.outputs.target }}
+      source-run: ${{ steps.gate.outputs.source_run }}
     steps:
+      # The whole history, so that an earlier commit a record ships can be checked: on main, and with the files accepted.
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
@@ -40,6 +50,9 @@ jobs:
     if: ${{ needs.gate.outputs.version != '' }}
     name: package-${{ matrix.platform }}
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+      actions: read
     strategy:
       matrix:
         include:
@@ -53,15 +66,27 @@ jobs:
     env:
       VERSION: ${{ needs.gate.outputs.version }}
     steps:
+      # The commit shipped: its own packaging tool, license and credits, as its own release would have used.
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.gate.outputs.target || github.sha }}
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - name: Fetch the exact export this run tested
+        if: ${{ needs.gate.outputs.source-run == '' }}
         uses: actions/download-artifact@v8
         with:
           name: dagon-${{ matrix.platform }}
           path: export
+      - name: Fetch the exact export main's own run of the shipped commit tested
+        if: ${{ needs.gate.outputs.source-run != '' }}
+        uses: actions/download-artifact@v8
+        with:
+          name: dagon-${{ matrix.platform }}
+          path: export
+          run-id: ${{ needs.gate.outputs.source-run }}
+          github-token: ${{ github.token }}
       - name: Package
         run: python tools/package_release.py package --platform ${{ matrix.platform }} --version "$VERSION" --export-dir export --out packages
       - name: Smoke-test the package itself
@@ -75,10 +100,15 @@ jobs:
   prepare:
     needs: [gate, package]
     runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      actions: read
     env:
       VERSION: ${{ needs.gate.outputs.version }}
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
@@ -87,16 +117,33 @@ jobs:
           pattern: release-package-*
           path: packages
           merge-multiple: true
-      - uses: actions/download-artifact@v8
+      - name: Fetch the build logs of this run
+        if: ${{ needs.gate.outputs.source-run == '' }}
+        uses: actions/download-artifact@v8
         with:
           pattern: logs-*
           path: logs
+      - name: Fetch the build logs of main's own run of the shipped commit
+        if: ${{ needs.gate.outputs.source-run != '' }}
+        uses: actions/download-artifact@v8
+        with:
+          pattern: logs-*
+          path: logs
+          run-id: ${{ needs.gate.outputs.source-run }}
+          github-token: ${{ github.token }}
       - name: Prepare the notes, checksums and provenance
         env:
           RECORD: ${{ needs.gate.outputs.record }}
-          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          COMMIT: ${{ github.sha }}
-        run: python tools/release_gate.py prepare --record "$RECORD" --packages packages --logs logs --out prepared --commit "$COMMIT" --run-url "$RUN_URL"
+          THIS_RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          SOURCE_RUN: ${{ needs.gate.outputs.source-run }}
+          COMMIT: ${{ needs.gate.outputs.target || github.sha }}
+        run: |
+          if [ -n "$SOURCE_RUN" ]; then
+            python tools/release_gate.py prepare --record "$RECORD" --packages packages --logs logs --out prepared --commit "$COMMIT" \
+              --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/$SOURCE_RUN" --packaged-by "$THIS_RUN at ${{ github.sha }}"
+          else
+            python tools/release_gate.py prepare --record "$RECORD" --packages packages --logs logs --out prepared --commit "$COMMIT" --run-url "$THIS_RUN"
+          fi
       # The publish job cannot run in a rehearsal, so this runs its first check, with this job's read-only token.
       - name: Rehearse the publisher's first check
         if: ${{ inputs.rehearse }}
@@ -133,5 +180,5 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           VERSION: ${{ needs.gate.outputs.version }}
-          COMMIT: ${{ github.sha }}
+          COMMIT: ${{ needs.gate.outputs.target || github.sha }}
         run: sh tools/publish_release.sh "$VERSION" "$COMMIT" prepared

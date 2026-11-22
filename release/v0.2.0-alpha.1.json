@@ -1,0 +1,49 @@
+{
+  "version": "v0.2.0-alpha.1",
+  "milestone": "M5",
+  "state": "publish",
+  "source": {
+    "commit": "a4250f060ee7cb8051f9ffef9a976bf68f58d630",
+    "run": 44748633376
+  },
+  "summary": "The first alpha of DAGON: Beneath the Black Tide, for Windows and Linux: the intended game, playable from the prologue to the ending and the credits, with its principal gameplay and audio connected.\n\nIt is the game exactly as it stood when its fifth milestone, M5 (cinematic horror and polish), was accepted and merged: commit `a4250f0`, built and tested by that commit's own CI run. Since `v0.1.0-pre-alpha.1` it adds the creature's own animation and the reveal's staging, the ending's four drawn pictures, and the ritual, the watchers and the far figures drawn in full.\n\n**It is unfinished.** The next milestone's stabilization work, including play by first-time players, checks on controllers and on more machines, and a Mac build, is not in this version. Read the limitations below first.",
+  "owner_acceptance": {
+    "status": "accepted",
+    "record": "docs/evidence/m5/release-authorization-2026-11-22.md",
+    "build": "`dagon-windows`, artifact 14627487176 of CI run 44731893136 (commit `b7303bf`), zip SHA-256 `97ef6bd1e621e54875b213a41dd5189afca4554f7277a769ac10c2cf689a71ac`, played by the owner and accepted as M5. The packages are `main`'s own build of `a4250f0`, M5's squash merge, from CI run 44748633376: the same files, built again",
+    "fingerprint": "sha256:1f724cdc2c582c997c9b7b780ff092f4763c0077b5defe9805c6cce37533dc8d",
+    "scope": "On 2026-11-20 the owner accepted the Windows build of `b7303bf` as the completed M5 milestone, a milestone acceptance only ([record](docs/evidence/m5/owner-acceptance-2026-11-20.md)). **The owner's own stated checks, and no others:** in their recorded running route, the ridge reads as Dagon's shoulder, the arm stays connected through the hand landing, and the same wave overtakes the fallen sailor. The other ending, standing still until the sea takes him, has scripted coverage only. **On 2026-11-22 the owner stated that they heard the game's main audio, music, effects, narration and the reveal, while playing that build with sound,** and authorized publishing this version from `a4250f0`, with the tag and the provenance naming that commit. **The intelligibility of the reveal's dialogue by ear stays open.** ChatGPT compared frames of the owner's recordings and measured their audio against an earlier clip: a signal check, not listening. No other manual or listening check is claimed."
+  },
+  "criteria": {
+    "playable_start_to_end": {
+      "status": "met",
+      "evidence": "docs/evidence/m5/release-criteria-v0.2.0-alpha.1.md"
+    },
+    "principal_gameplay_connected": {
+      "status": "met",
+      "evidence": "docs/evidence/m5/release-criteria-v0.2.0-alpha.1.md"
+    },
+    "principal_audio_heard": {
+      "status": "met",
+      "evidence": "docs/evidence/m5/release-criteria-v0.2.0-alpha.1.md"
+    }
+  },
+  "known_limitations": [
+    "**An alpha.** The art and the sound are not final, and anything may change.",
+    "**Sound:** every sound is synthesized, and the narration is an AI-generated voice (see `CREDITS.md` in the package). Levels were set from measurements. The owner has heard the game in play, but the mix has had no listening review, and whether the reveal's dialogue can be made out over the music and effects has not been judged by ear.",
+    "**No first-time player has played it,** and the length of a first playthrough has not been measured. Scripted runs suggest it is shorter than the 10 to 15 minutes the design aims for.",
+    "**Found after M5, and fixed in the next milestone, not here:** a drawing meant for the far side of the Abyss hangs in the sky by the Shore's cliff, as a hard-edged triangle; the cave's mouth and exit show straight vertical edges; Continue after the ending stands the sailor in front of a kneeling statue, where he is hard to see; Settings calls the examine key \"Interact\" while the game's prompts say \"Examine\".",
+    "**Displays:** there is no fullscreen setting, and a window too big for the screen is not made to fit.",
+    "**Controllers:** supported, but the checks on physical hardware listed under \"Not tested\" have not been done.",
+    "**One unresolved report from M2:** in one scripted run on a loaded machine, an examine fired without its caption. It has not been reproduced since, and its cause is not established.",
+    "**No Mac build** in this version."
+  ],
+  "deferred": [
+    "Play by first-time players, and the length of a first playthrough",
+    "The reveal's dialogue by ear, in the full mix",
+    "All physical PlayStation hardware, and individual physical Xbox actions, including disconnecting and reconnecting, and controller vibration by feel",
+    "Native runs with hardware rendering on the owner's Windows desktop and Linux laptop",
+    "Key names under a German keyboard layout on this build",
+    "The standing-still ending, played by a person"
+  ]
+}
