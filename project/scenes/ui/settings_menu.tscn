@@ -15,6 +15,7 @@ effects_slider_path = NodePath("Center/Panel/Items/Columns/Audio/Effects/Slider"
 narration_slider_path = NodePath("Center/Panel/Items/Columns/Audio/Narration/Slider")
 subtitles_button_path = NodePath("Center/Panel/Items/Columns/Audio/Subtitles")
 vibration_button_path = NodePath("Center/Panel/Items/Columns/Audio/Vibration")
+fullscreen_button_path = NodePath("Center/Panel/Items/Columns/Keys/Display")
 key_button_paths = [NodePath("Center/Panel/Items/Columns/Keys/MoveLeft/Key"), NodePath("Center/Panel/Items/Columns/Keys/MoveRight/Key"), NodePath("Center/Panel/Items/Columns/Keys/Jump/Key"), NodePath("Center/Panel/Items/Columns/Keys/Interact/Key")]
 message_label_path = NodePath("Center/Panel/Items/Message")
 conflict_row_path = NodePath("Center/Panel/Items/Conflict")
@@ -178,13 +179,13 @@ layout_mode = 2
 [node name="Label" type="Label" parent="Center/Panel/Items/Columns/Keys/Interact"]
 custom_minimum_size = Vector2(62, 0)
 layout_mode = 2
-text = "Interact"
+text = "Examine"
 
 [node name="Key" type="Button" parent="Center/Panel/Items/Columns/Keys/Interact"]
 custom_minimum_size = Vector2(118, 0)
 layout_mode = 2
 focus_neighbor_top = NodePath("../../Jump/Key")
-focus_neighbor_bottom = NodePath("../../../../RestoreDefaults")
+focus_neighbor_bottom = NodePath("../../Display")
 text = "-"
 
 [node name="Note" type="Label" parent="Center/Panel/Items/Columns/Keys"]
@@ -192,6 +193,12 @@ custom_minimum_size = Vector2(186, 0)
 layout_mode = 2
 text = "Left/Right arrows always move. Esc always pauses."
 autowrap_mode = 2
+
+[node name="Display" type="Button" parent="Center/Panel/Items/Columns/Keys"]
+layout_mode = 2
+focus_neighbor_top = NodePath("../Interact/Key")
+focus_neighbor_bottom = NodePath("../../../RestoreDefaults")
+text = "Display: Windowed"
 
 [node name="Message" type="Label" parent="Center/Panel/Items"]
 custom_minimum_size = Vector2(232, 21)
@@ -227,7 +234,7 @@ text = "Cancel"
 
 [node name="RestoreDefaults" type="Button" parent="Center/Panel/Items"]
 layout_mode = 2
-focus_neighbor_top = NodePath("../Columns/Keys/Interact/Key")
+focus_neighbor_top = NodePath("../Columns/Keys/Display")
 focus_neighbor_bottom = NodePath("../Back")
 text = "Restore Defaults"
 
@@ -242,6 +249,7 @@ text = "Back"
 [connection signal="value_changed" from="Center/Panel/Items/Columns/Audio/Narration/Slider" to="." method="set_narration_volume"]
 [connection signal="pressed" from="Center/Panel/Items/Columns/Audio/Subtitles" to="." method="toggle_subtitles"]
 [connection signal="pressed" from="Center/Panel/Items/Columns/Audio/Vibration" to="." method="toggle_vibration"]
+[connection signal="pressed" from="Center/Panel/Items/Columns/Keys/Display" to="." method="toggle_fullscreen"]
 [connection signal="pressed" from="Center/Panel/Items/Columns/Keys/MoveLeft/Key" to="." method="begin_capture" binds= [0]]
 [connection signal="pressed" from="Center/Panel/Items/Columns/Keys/MoveRight/Key" to="." method="begin_capture" binds= [1]]
 [connection signal="pressed" from="Center/Panel/Items/Columns/Keys/Jump/Key" to="." method="begin_capture" binds= [2]]

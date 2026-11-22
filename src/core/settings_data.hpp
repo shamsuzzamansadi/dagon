@@ -33,6 +33,8 @@ struct Settings {
 	float narration_volume = 1.0f;
 	bool subtitles = true;
 	bool vibration = true;
+	// The window by default; fullscreen when the player chooses it in Settings.
+	bool fullscreen = false;
 	std::array<int, GAME_ACTION_COUNT> keys = { KEY_CODE_A, KEY_CODE_D, KEY_CODE_SPACE, KEY_CODE_E };
 };
 

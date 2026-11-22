@@ -16,6 +16,7 @@ Settings custom_settings() {
 	settings.narration_volume = 0.4f;
 	settings.subtitles = false;
 	settings.vibration = false;
+	settings.fullscreen = true;
 	settings.keys = { 74, 76, 75, 85 };
 	return settings;
 }
@@ -35,13 +36,15 @@ TEST_CASE("settings survive a round trip through the file format") {
 	CHECK(parsed.settings.narration_volume == doctest::Approx(0.4f));
 	CHECK_FALSE(parsed.settings.subtitles);
 	CHECK_FALSE(parsed.settings.vibration);
+	CHECK(parsed.settings.fullscreen);
 	CHECK(parsed.settings.keys == original.keys);
 }
 
-TEST_CASE("subtitles and vibration are on by default, and narration at full volume") {
+TEST_CASE("subtitles and vibration are on by default, narration at full volume, and the game in a window") {
 	const Settings settings;
 	CHECK(settings.subtitles);
 	CHECK(settings.vibration);
+	CHECK_FALSE(settings.fullscreen);
 	CHECK(settings.narration_volume == doctest::Approx(1.0f));
 }
 
@@ -53,6 +56,21 @@ TEST_CASE("a settings file from before narration loads as it was, with the new o
 	CHECK(parsed.settings.narration_volume == doctest::Approx(1.0f));
 	CHECK(parsed.settings.subtitles);
 	CHECK(parsed.settings.vibration);
+	CHECK_FALSE(parsed.settings.fullscreen);
+}
+
+TEST_CASE("a settings file from before fullscreen loads as it was, in a window") {
+	const ParsedSettings parsed = parse_settings("dagon_settings=1\nmusic_volume=0.5\neffects_volume=0.3\nnarration_volume=0.8\nsubtitles=0\nvibration=1\nkey_move_left=74\nkey_move_right=76\nkey_jump=75\nkey_interact=85\n");
+	CHECK(parsed.status == ParseStatus::Ok);
+	CHECK_FALSE(parsed.settings.fullscreen);
+	CHECK_FALSE(parsed.settings.subtitles);
+}
+
+TEST_CASE("a bad fullscreen value falls back to a window, and leaves the rest alone") {
+	const ParsedSettings parsed = parse_settings("dagon_settings=1\nmusic_volume=0.5\neffects_volume=1\nfullscreen=yes\nkey_move_left=74\nkey_move_right=76\nkey_jump=75\nkey_interact=85\n");
+	CHECK(parsed.status == ParseStatus::Repaired);
+	CHECK_FALSE(parsed.settings.fullscreen);
+	CHECK(parsed.settings.music_volume == doctest::Approx(0.5f));
 }
 
 TEST_CASE("a bad value for a new option falls back to its default, and leaves the rest alone") {
@@ -195,4 +213,34 @@ TEST_CASE("every action has a name that survives the format") {
 		CHECK(std::string(action_name(action)).size() > 0);
 	}
 	CHECK(serialize_settings(Settings{}).find("key_interact=69") != std::string::npos);
+}
+
+// The same on every platform, including Apple's, where the game reads and writes floats without from_chars (D129).
+TEST_CASE("volumes are written as the shortest text that reads back as the same number") {
+	Settings settings;
+	settings.music_volume = 0.7f;
+	settings.effects_volume = 0.05f;
+	settings.narration_volume = 1.0f;
+	const std::string text = serialize_settings(settings);
+	CHECK(text.find("music_volume=0.7\n") != std::string::npos);
+	CHECK(text.find("effects_volume=0.05\n") != std::string::npos);
+	CHECK(text.find("narration_volume=1\n") != std::string::npos);
+	settings.music_volume = 0.0f;
+	settings.effects_volume = 0.123f;
+	const std::string again = serialize_settings(settings);
+	CHECK(again.find("music_volume=0\n") != std::string::npos);
+	CHECK(again.find("effects_volume=0.123\n") != std::string::npos);
+	const ParsedSettings parsed = parse_settings(again);
+	CHECK(parsed.settings.effects_volume == 0.123f);
+}
+
+TEST_CASE("a volume is read only in the form from_chars reads, on every platform") {
+	const std::string keys = "key_move_left=74\nkey_move_right=76\nkey_jump=75\nkey_interact=85\n";
+	CHECK(parse_settings("dagon_settings=1\nmusic_volume=0.25\neffects_volume=1\n" + keys).settings.music_volume == 0.25f);
+	CHECK(parse_settings("dagon_settings=1\nmusic_volume=-0\neffects_volume=1\n" + keys).settings.music_volume == 0.0f);
+	for (const char *refused : { "+0.5", "0x1p-1", "0.5x", ".", "-", "0,5" }) {
+		const ParsedSettings parsed = parse_settings(std::string("dagon_settings=1\nmusic_volume=") + refused + "\neffects_volume=1\n" + keys);
+		CAPTURE(refused);
+		CHECK(parsed.settings.music_volume == doctest::Approx(Settings{}.music_volume));
+	}
 }

@@ -1,7 +1,8 @@
 #!/usr/bin/env sh
 # Creates a release export and, when the host can run it, runs it headless and
 # looks for positive proof that the release extension library loaded.
-# Usage: GODOT=/path/to/godot tools/export_check.sh <linux|windows> [log-dir]
+# Usage: GODOT=/path/to/godot tools/export_check.sh <linux|windows|macos> [log-dir]
+# macOS exports a zip holding the app, which can only be made, and run, on a Mac (D129).
 # Run the import first (tools/run_godot_checks.sh).
 set -u
 
@@ -31,13 +32,17 @@ case "$platform" in
 		suffix=".exe"
 		library="dagon.windows.template_release.x86_64.dll"
 		;;
+	macos)
+		preset="macOS"
+		suffix=".zip"
+		library="libdagon.macos.template_release.arm64.dylib"
+		;;
 	*)
 		echo "Unknown platform: $platform" >&2
 		exit 2
 		;;
 esac
 binary="$out/$stem$suffix"
-library="$out/$library"
 
 fail() {
 	echo "export-$platform: FAILED: $1"
@@ -50,8 +55,47 @@ code=$?
 echo "$code" > "$logs/export-$platform.exit"
 [ "$code" -eq 0 ] || fail "export exit=$code"
 [ -f "$binary" ] || fail "no binary at $binary"
-[ -f "$library" ] || fail "extension library not bundled: $library"
 pack="$out/$stem.pck"
+if [ "$platform" = "macos" ]; then
+	# Godot's official templates hold a universal game, and this build is for Apple Silicon alone (D129): keep the
+	# game's arm64 half, then sign the extension and the app, ad hoc, with Apple's own codesign, and zip it again with
+	# ditto, which keeps every permission. That zip is what ships, and what is unpacked and run below.
+	work="$root/build/export/macos-work"
+	rm -rf "$work"
+	mkdir -p "$work"
+	ditto -x -k "$binary" "$work" || fail "could not unpack Godot's export, $binary"
+	app="$(find "$work" -maxdepth 1 -name '*.app' -type d)"
+	[ -n "$app" ] && [ "$(printf '%s\n' "$app" | wc -l)" -eq 1 ] || fail "$binary should hold exactly one app"
+	# Godot names the app for the project, with its colon made a dash; players see the folder's name, so it is DAGON.
+	mv "$app" "$work/DAGON.app" || fail "could not name the app"
+	app="$work/DAGON.app"
+	executable="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$app/Contents/Info.plist")" || fail "no executable named in the app"
+	lipo "$app/Contents/MacOS/$executable" -thin arm64 -output "$work/arm64" || fail "the game has no arm64 half"
+	mv "$work/arm64" "$app/Contents/MacOS/$executable" && chmod 755 "$app/Contents/MacOS/$executable"
+	for nested in "$app/Contents/Frameworks/"*; do
+		codesign --force --sign - --timestamp=none "$nested" > "$logs/codesign-macos.log" 2>&1 || fail "could not sign $nested"
+	done
+	codesign --force --sign - --timestamp=none "$app" >> "$logs/codesign-macos.log" 2>&1 || fail "could not sign the app"
+	codesign --verify --deep --strict --verbose=2 "$app" >> "$logs/codesign-macos.log" 2>&1 || fail "the app's signature does not hold"
+	rm -f "$binary"
+	ditto -c -k --norsrc --noextattr --noacl --keepParent "$app" "$binary" || fail "could not zip the app"
+	rm -rf "$work"
+	# Unpacked as a player's Mac unpacks it, keeping the permissions the zip records.
+	run_dir="$root/build/export/macos-run"
+	rm -rf "$run_dir"
+	mkdir -p "$run_dir"
+	ditto -x -k "$binary" "$run_dir" || fail "could not unpack $binary"
+	app="$(find "$run_dir" -maxdepth 1 -name '*.app' -type d)"
+	find "$app" -maxdepth 3 | sed "s|$run_dir/||" | sort > "$logs/export-macos-files.txt"
+	binary="$app/Contents/MacOS/$executable"
+	[ -x "$binary" ] || fail "the app's executable is missing or not executable: $binary"
+	library="$app/Contents/Frameworks/$library"
+	pack="$(find "$app/Contents/Resources" -maxdepth 1 -name '*.pck')"
+	[ -n "$pack" ] || fail "no pack in the app's Resources"
+else
+	library="$out/$library"
+fi
+[ -f "$library" ] || fail "extension library not bundled: $library"
 [ -f "$pack" ] || fail "no $stem.pck"
 if grep -aq "tests/run_tests" "$pack"; then
 	fail "tests were exported into $stem.pck"
@@ -70,6 +114,7 @@ host_can_run=no
 case "$(uname -s)" in
 	Linux) case "$platform" in linux*) host_can_run=yes ;; esac ;;
 	MINGW* | MSYS* | CYGWIN*) case "$platform" in windows*) host_can_run=yes ;; esac ;;
+	Darwin) case "$platform" in macos) host_can_run=yes ;; esac ;;
 esac
 if [ "$host_can_run" = "no" ]; then
 	echo "export-$platform: NOT RUN on this host"
@@ -85,8 +130,8 @@ run_exported() {
 		log_arg="$(cygpath -w "$log_path")"
 	fi
 	rm -f "$log_path"
-	# The game ends the run itself, stopping its sound first (D78). --quit-after is only a backstop.
-	env DAGON_AUTOSTART="${2:-}" DAGON_QUIT_AFTER_FRAMES=300 "$binary" --headless --verbose --quit-after 1200 --log-file "$log_arg" \
+	# The game ends the run itself, stopping its sound first (D78, D130). --quit-after is only a backstop, far beyond.
+	env DAGON_AUTOSTART="${2:-}" DAGON_QUIT_AFTER_FRAMES=300 "$binary" --headless --verbose --quit-after 100000 --log-file "$log_arg" \
 		> "$logs/$name.stdout" 2> "$logs/$name.stderr"
 	code=$?
 	echo "$code" > "$logs/$name.exit"

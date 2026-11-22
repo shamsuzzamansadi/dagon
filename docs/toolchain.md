@@ -16,8 +16,9 @@ have a named validation step.
 | Linux compiler | GCC 13.3 (Ubuntu 24.04, local). CI: g++ 11.4 on `ubuntu-22.04`, which makes the Linux package | The real project builds and loads. |
 | Linux validation compiler | **Clang 18.1.3** (`clang-18=1:18.1.3-1ubuntu1`), on `ubuntu-24.04`, and the same version locally | Compatible with godot-cpp's `use_llvm=yes`. CI fails if the version differs. Validation only: its build is never shipped ([D46](decisions.md)). |
 | Windows compiler | **MSVC 2022 (19.44.35229 observed), on the pinned `windows-2022` runner** | `windows-2025` was tried first: it ships MSVC 19.51 (VS 2026), which SCons up to 4.9.1 does not detect, and godot-cpp then **silently falls back to MinGW**. A CI matrix confirmed this on 2026-11-02. CI now builds with `require_msvc=yes`, which fails instead of falling back. Results are in the M1 review package. |
+| macOS compiler | **Apple Clang, on the `macos-15` runner (Apple Silicon)**, which makes the Mac package; the exact Xcode and macOS are recorded in each run's `macos-facts.txt` and in the release's provenance | arm64 only, minimum macOS 11.0 (`macos_deployment_target=11.0`), [D129](decisions.md). Godot's macOS editor (`Godot_v4.7.2-stable_macos.universal.zip`) is pinned by the same official SHA-512 list. |
 | Unit-test framework | doctest **v2.5.3** (single header, vendored) | GitHub releases API. |
-| Export templates | 4.7.2 `.tpz` (1.28 GB) | **Downloaded 2026-11-02; official SHA-512 verified** (`tools/install_export_templates.sh`). Only the desktop templates are kept. |
+| Export templates | 4.7.2 `.tpz` (1.28 GB) | **Downloaded 2026-11-02; official SHA-512 verified** (`tools/install_export_templates.sh`). Only the templates the host builds with are kept: Linux and Windows on those, `macos.zip` on a Mac. |
 | Emscripten (web, stretch) | 3.1.62 (template's pin) | Not evaluated. See §6. |
 
 godot-cpp has been **versioned independently** of Godot since v10.

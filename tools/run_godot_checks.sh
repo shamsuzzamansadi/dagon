@@ -50,12 +50,14 @@ step check_classes "^CHECK_CLASSES classes=[0-9]+ problems=0" --script res://tes
 expected_errors="$tested_errors"
 step integration "^RESULT passed=[0-9]+ failed=0" --fixed-fps 60 --script res://tests/run_tests.gd
 expected_errors='^$'
-# The game ends each smoke run itself after 600 frames, stopping its sound first (D78). --quit-after is only a backstop:
-# the engine shuts down in that very frame, before the mixer can let go of a sound still playing.
+# The game ends each smoke run itself after 600 frames, stopping its sound first (D78, D130). --quit-after is only a backstop,
+# far beyond: the engine shuts down in that very frame, before the mixer can let go of a sound still playing, and
+# headless at a fixed frame rate frames run as fast as the machine allows, so a near one could cut the game's quit short.
 export DAGON_QUIT_AFTER_FRAMES=600
-step smoke "dagon: extension initialized" --verbose --fixed-fps 60 --quit-after 2400
+step smoke "dagon: extension initialized" --verbose --fixed-fps 60 --quit-after 100000
+# M1's greybox has no quit of its own, nor any sound: the engine's backstop ends it.
 step smoke_greybox "dagon: extension initialized" --verbose --fixed-fps 60 --quit-after 2400 res://scenes/level/level.tscn
-step smoke_game "dagon: prompt: \\[E\\] Examine" --verbose --fixed-fps 60 --quit-after 2400 res://scenes/level/game.tscn
+step smoke_game "dagon: prompt: \\[E\\] Examine" --verbose --fixed-fps 60 --quit-after 100000 res://scenes/level/game.tscn
 unset DAGON_QUIT_AFTER_FRAMES
 
 grep -E "^(PASS|FAIL|     )" "$logs/integration.stdout" || true

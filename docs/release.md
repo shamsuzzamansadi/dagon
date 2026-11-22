@@ -12,7 +12,7 @@ How a milestone prerelease is built, gated and published. The rules come from th
 | M5 | `v0.2.0-alpha.1` | The intended game is playable from beginning to end, with its principal gameplay and audio connected | Keep the pre-alpha label: `v0.1.0-pre-alpha.N` |
 | M7 | `v0.3.0-rc.1` | Intended scope complete, no known release-blocking defects, and final acceptance checks passed | Keep the earlier label |
 
-**`v0.1.0-pre-alpha.1` is published** ([https://github.com/shamsuzzamansadi/dagon/releases/tag/v0.1.0-pre-alpha.1](https://github.com/shamsuzzamansadi/dagon/releases/tag/v0.1.0-pre-alpha.1)), from `760a539`. **The first prerelease moved from M3 to M4.** M3 was accepted as a milestone on 2026-11-10 with no release asked for, and its record stayed `planned`. On 2026-11-15 the owner asked for the first pre-alpha at M4 and accepted its candidate ([record](evidence/m4/owner-acceptance-2026-11-15.md)). The version is the same, never having been used; the promise is the same.
+**`v0.2.0-alpha.1`, M5's alpha, is published** ([https://github.com/shamsuzzamansadi/dagon/releases/tag/v0.2.0-alpha.1](https://github.com/shamsuzzamansadi/dagon/releases/tag/v0.2.0-alpha.1)), from `a4250f0` (below). **`v0.1.0-pre-alpha.1` is published** ([https://github.com/shamsuzzamansadi/dagon/releases/tag/v0.1.0-pre-alpha.1](https://github.com/shamsuzzamansadi/dagon/releases/tag/v0.1.0-pre-alpha.1)), from `760a539`. **The first prerelease moved from M3 to M4.** M3 was accepted as a milestone on 2026-11-10 with no release asked for, and its record stayed `planned`. On 2026-11-15 the owner asked for the first pre-alpha at M4 and accepted its candidate ([record](evidence/m4/owner-acceptance-2026-11-15.md)). The version is the same, never having been used; the promise is the same.
 
 **A correction is a new version:** `v0.1.0-pre-alpha.2`. A published version is never replaced.
 
@@ -28,7 +28,7 @@ How a milestone prerelease is built, gated and published. The rules come from th
 | Job | What it does | Can write? |
 |---|---|---|
 | `gate` | Reads the record, checks every gate, and names every blocker | No |
-| `package-linux`, `package-windows` | Packages the run's own export with the license and credits, then extracts the package and runs it headless on its own OS: main menu, New Game with a prompt, a save, and Continue | No |
+| `package-linux`, `package-windows`, `package-macos` | One for each OS the record ships. Packages the run's own export with the license and credits, then extracts the package and runs it headless on its own OS: main menu, New Game with a prompt, a save at the first checkpoint, and Continue from it in a new process. The Mac package is unpacked as a Mac unpacks a download, and its architecture and signature are checked before it runs | No |
 | `prepare` | Writes the release notes, `SHA256SUMS.txt` and `PROVENANCE.txt` | No |
 | `publish` | Creates a draft, checks the uploaded files against their checksums, and only then publishes. The tag appears at that moment, at the tested commit | Yes |
 
@@ -49,7 +49,7 @@ A record usually ships the commit whose `main` push it is merged in. **A record 
 
 **Only while the run keeps its files:** GitHub keeps a run's artifacts for a limited time (until 18 February 2027 for `a4250f0`'s). After that, the gate names the missing files and nothing is published.
 
-**`v0.2.0-alpha.1` ships `a4250f0`,** M5's accepted squash merge, from run [44748633376](https://github.com/shamsuzzamansadi/dagon/actions/runs/44748633376), at the owner's request of 2026-11-21 ([authorization](evidence/m5/release-authorization-2026-11-22.md)). Until it is published, the rehearsal record ships the same, so that a rehearsal tests this path for real.
+**`v0.2.0-alpha.1` shipped `a4250f0`,** M5's accepted squash merge, from run [44748633376](https://github.com/shamsuzzamansadi/dagon/actions/runs/44748633376), at the owner's request of 2026-11-21 ([authorization](evidence/m5/release-authorization-2026-11-22.md)). **It was published on 2026-11-22,** tagged on `a4250f0` ([record](evidence/release-workflow/publication-v0.2.0-alpha.1.md)). The rehearsal record shipped the same until then, so that a rehearsal tested this path for real; it now ships the commit being tested, on all three OSes.
 
 ## Release states
 
@@ -117,7 +117,7 @@ Each `main` push asks GitHub what exists for every record in `release/`. **A tag
 
 ## Compilers
 
-There is **one package per OS:** GCC on `ubuntu-22.04` for Linux, and MSVC on `windows-2022` for Windows. `linux-clang` validates only. It runs the same unit, integration and export smoke checks, and uploads no build ([toolchain.md](toolchain.md)). Each job's cache and logs are its own.
+There is **one package per OS:** GCC on `ubuntu-22.04` for Linux, MSVC on `windows-2022` for Windows, and, from M6, Apple Clang on `macos-15` for macOS on Apple Silicon ([D129](decisions.md)). A record names the OSes it ships in `platforms`; one that names none, such as `v0.1.0-pre-alpha.1`'s and `v0.2.0-alpha.1`'s, shipped Linux and Windows, and is checked for those two. `linux-clang` validates only. It runs the same unit, integration and export smoke checks, and uploads no build ([toolchain.md](toolchain.md)). Each job's cache and logs are its own.
 
 ## Testing the workflow
 

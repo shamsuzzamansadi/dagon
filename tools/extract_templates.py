@@ -1,4 +1,5 @@
-"""Extracts the desktop export templates from a Godot .tpz archive.
+"""Extracts the export templates this OS builds with from a Godot .tpz archive: Linux and Windows on those two, and
+macOS on a Mac, which is where the macOS build is made, as its extension can only be compiled there.
 
 Usage: extract_templates.py <archive.tpz> <destination-dir>
 Only the named files are written, by base name, so archive paths cannot escape
@@ -9,7 +10,7 @@ import pathlib
 import sys
 import zipfile
 
-WANTED = {
+DESKTOP = {
     "version.txt",
     "linux_debug.x86_64",
     "linux_release.x86_64",
@@ -18,6 +19,8 @@ WANTED = {
     "windows_debug_x86_64_console.exe",
     "windows_release_x86_64_console.exe",
 }
+MACOS = {"version.txt", "macos.zip"}
+WANTED = MACOS if sys.platform == "darwin" else DESKTOP
 
 
 def main() -> int:

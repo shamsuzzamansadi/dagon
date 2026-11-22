@@ -15,7 +15,8 @@ bool reset_global_state();
 
 // The mixer lets go of a stopped sound only between frames. One still playing, or stopped in the very frame the
 // engine shuts down, is reported as leaked. So every way out stops all sound first, and leaves a few frames.
-void stop_all_sound(godot::Node *p_root);
+// Stops every sound under p_root, and says how many were playing.
+int stop_all_sound(godot::Node *p_root);
 // Stops all sound, and asks for a quit once enough real time has passed for the mixer to let it all go.
 void quit_quietly(godot::SceneTree *p_tree);
 // Polled each frame by whichever scene root is running, including the pause menu, which runs while paused.
@@ -23,5 +24,11 @@ bool is_quit_due();
 // The checks end a headless run by setting DAGON_QUIT_AFTER_FRAMES, rather than with --quit-after, which the game
 // cannot see coming. True once that many frames have run.
 bool is_run_over();
+
+// DAGON_FRAME_LOG=<ms> logs how long frames really take, for measuring on a player's machine and on the exported
+// build: once a second, the frames in it and the longest; and each frame of at least <ms> on its own line, with the
+// time the renderer spent on it. Unset, it does nothing. Called each frame by whichever scene root is running, like
+// is_quit_due; counts each frame once.
+void note_frame();
 
 } // namespace dagon

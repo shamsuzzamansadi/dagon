@@ -6,6 +6,7 @@ import http.server
 import io
 import json
 import os
+import re
 import socket
 import subprocess
 import sys
@@ -100,7 +101,7 @@ class Repo:
         return record
 
     def evaluate(self, ci_result="success", tags=None, releases=None, rehearse=False, check_source=None):
-        return release_gate.evaluate(self.root, self.gameplay(), ci_result, tags or {}, (releases or {}).get, rehearse, check_source or (lambda source: []))
+        return release_gate.evaluate(self.root, self.gameplay(), ci_result, tags or {}, (releases or {}).get, rehearse, check_source or (lambda source, platforms: []))
 
 
 class GateTests(unittest.TestCase):
@@ -118,14 +119,14 @@ class GateTests(unittest.TestCase):
     def test_every_gate_passed_publishes(self):
         self.repo.save(self.repo.good_record())
         outcome, messages, failed = self.repo.evaluate()
-        self.assertEqual(outcome, {"version": PRE_ALPHA, "record": f"release/{PRE_ALPHA}.json", "publish": "true", "target": "", "source_run": ""})
+        self.assertEqual(outcome, {"version": PRE_ALPHA, "record": f"release/{PRE_ALPHA}.json", "publish": "true", "target": "", "source_run": "", "matrix": release_gate.package_matrix(release_gate.DEFAULT_PLATFORMS)})
         self.assertFalse(failed, messages)
 
     def test_failed_ci_blocks_and_packages_nothing(self):
         self.repo.save(self.repo.good_record())
         outcome, messages, failed = self.repo.evaluate("failure")
         self.assertEqual((outcome["version"], outcome["publish"], failed), ("", "false", True))
-        self.assertTrue(any("GCC, Clang and MSVC" in message for message in messages), messages)
+        self.assertTrue(any("GCC, Clang, MSVC and Apple Clang" in message for message in messages), messages)
 
     def test_a_skipped_or_cancelled_ci_is_not_success(self):
         for result in ("skipped", "cancelled", ""):
@@ -385,7 +386,7 @@ class GateTests(unittest.TestCase):
         rehearsal = Path(__file__).with_name("release_rehearsal.json")
         write(self.repo.root, "tools/release_rehearsal.json", rehearsal.read_text(encoding="utf-8"))
         self.repo.save(self.repo.good_record())
-        outcome, _, failed = release_gate.evaluate(self.repo.root, self.repo.gameplay(), "success", {}, {}.get, rehearse=True, check_source=lambda source: [])
+        outcome, _, failed = release_gate.evaluate(self.repo.root, self.repo.gameplay(), "success", {}, {}.get, rehearse=True, check_source=lambda source, platforms: [])
         self.assertEqual((outcome["publish"], failed), ("false", False))
         self.assertEqual(outcome["record"], release_gate.REHEARSAL_RECORD)
         self.assertTrue(release_gate.version_problems(outcome["version"]), "its version must be unpublishable")
@@ -419,6 +420,40 @@ class SourceRun:
         return self.artifacts
 
 
+class PlatformTests(unittest.TestCase):
+    """Each record names the OSes it ships; one that names none shipped Linux and Windows, as v0.1.0-pre-alpha.1 did (D129)."""
+
+    def test_a_record_naming_no_platforms_is_checked_for_linux_and_windows_only(self):
+        self.assertEqual(release_gate.publication_problems(PRE_ALPHA, COMMIT, published()), [])
+        self.assertEqual(release_gate.expected_assets(PRE_ALPHA), {f"dagon-{PRE_ALPHA}-linux-x86_64.tar.gz", f"dagon-{PRE_ALPHA}-windows-x86_64.zip", "SHA256SUMS.txt", "PROVENANCE.txt"})
+
+    def test_a_published_mac_release_must_have_its_mac_package(self):
+        problems = release_gate.publication_problems(PRE_ALPHA, COMMIT, published(), ("linux", "windows", "macos"))
+        self.assertTrue(any(f"dagon-{PRE_ALPHA}-macos-arm64.zip" in problem for problem in problems), problems)
+
+    def test_each_os_is_packaged_on_its_own_runner_and_the_mac_on_apple_silicon(self):
+        matrix = json.loads(release_gate.package_matrix(("linux", "windows", "macos")))
+        self.assertEqual(matrix, [{"platform": "linux", "os": "ubuntu-22.04"}, {"platform": "windows", "os": "windows-2022"}, {"platform": "macos", "os": "macos-15"}])
+        self.assertEqual(json.loads(release_gate.package_matrix(release_gate.DEFAULT_PLATFORMS)), matrix[:2])
+
+    def test_platforms_must_be_known_and_each_named_once(self):
+        for platforms in ([], ["linux", "linux"], ["linux", "amiga"], "linux"):
+            with self.subTest(platforms):
+                record = {"version": PRE_ALPHA, "state": "planned", "platforms": platforms}
+                self.assertTrue(release_gate.format_problems(Path(f"release/{PRE_ALPHA}.json"), record))
+        self.assertEqual(release_gate.format_problems(Path(f"release/{PRE_ALPHA}.json"), {"version": PRE_ALPHA, "state": "planned", "platforms": ["macos", "linux"]}), [])
+
+    def test_an_earlier_mac_build_needs_its_own_job_and_files_in_its_run(self):
+        jobs, artifacts = release_gate.source_needs(("linux", "windows", "macos"))
+        self.assertIn("macos", jobs)
+        self.assertTrue({"dagon-macos", "logs-macos"} <= set(artifacts))
+        self.assertEqual(release_gate.source_needs(release_gate.DEFAULT_PLATFORMS), (release_gate.SOURCE_JOBS, release_gate.SOURCE_ARTIFACTS))
+
+    def test_the_rehearsal_ships_all_three(self):
+        rehearsal = json.loads(Path(__file__).with_name("release_rehearsal.json").read_text(encoding="utf-8"))
+        self.assertEqual(sorted(release_gate.platforms_of(rehearsal)), ["linux", "macos", "windows"])
+
+
 class SourceTests(unittest.TestCase):
     """A record that ships an earlier commit on main, from main's own CI run of it (D128)."""
 
@@ -446,7 +481,7 @@ class SourceTests(unittest.TestCase):
         self.assertNotEqual(self.repo.gameplay(), self.accepted)
         outcome, messages, failed = self.repo.evaluate()
         self.assertFalse(failed, messages)
-        self.assertEqual(outcome, {"version": PRE_ALPHA, "record": f"release/{PRE_ALPHA}.json", "publish": "true", "target": self.source, "source_run": "5"})
+        self.assertEqual(outcome, {"version": PRE_ALPHA, "record": f"release/{PRE_ALPHA}.json", "publish": "true", "target": self.source, "source_run": "5", "matrix": release_gate.package_matrix(release_gate.DEFAULT_PLATFORMS)})
 
     def test_the_source_commit_must_have_the_accepted_files(self):
         self.record(owner_acceptance={**self.repo.good_record()["owner_acceptance"], "fingerprint": self.repo.gameplay()})
@@ -456,7 +491,7 @@ class SourceTests(unittest.TestCase):
 
     def test_the_source_runs_problems_block_publication(self):
         self.record()
-        outcome, messages, failed = self.repo.evaluate(check_source=lambda source: [f"CI run {source['run']} did not succeed"])
+        outcome, messages, failed = self.repo.evaluate(check_source=lambda source, platforms: [f"CI run {source['run']} did not succeed"])
         self.assertTrue(failed)
         self.assertEqual(outcome["publish"], "false")
         self.assertTrue(any("CI run 5 did not succeed" in message for message in messages), messages)
@@ -513,7 +548,7 @@ class SourceTests(unittest.TestCase):
         outcome, messages, failed = self.repo.evaluate(rehearse=True)
         self.assertFalse(failed, messages)
         self.assertEqual((outcome["version"], outcome["target"], outcome["source_run"], outcome["publish"]), ("v0.1.0-pre-alpha.0", self.source, "5", "false"))
-        outcome, messages, failed = self.repo.evaluate(rehearse=True, check_source=lambda source: ["CI run 5 did not succeed"])
+        outcome, messages, failed = self.repo.evaluate(rehearse=True, check_source=lambda source, platforms: ["CI run 5 did not succeed"])
         self.assertTrue(failed)
         self.assertEqual(outcome["version"], "")
 
@@ -528,9 +563,30 @@ class PackageTests(unittest.TestCase):
 
     def export(self, platform, proof=None):
         folder = self.root / f"export-{platform}"
+        if platform == "macos":
+            self.macos_export(folder / "dagon.zip")
+            return folder
         for name in package_release.PLATFORMS[platform]["files"]:
             write(folder, name, name)
         return folder
+
+    def macos_export(self, path, apps=("DAGON.app",)):
+        """Godot's zip of the app, with the permissions it records."""
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with zipfile.ZipFile(path, "w") as archive:
+            for app in apps:
+                for name, mode in (
+                    (f"{app}/", 0o40755),
+                    (f"{app}/Contents/Info.plist", 0o100644),
+                    (f"{app}/Contents/MacOS/DAGON", 0o100755),
+                    (f"{app}/Contents/Frameworks/libdagon.macos.template_release.arm64.dylib", 0o100755),
+                    (f"{app}/Contents/Resources/DAGON.pck", 0o100644),
+                ):
+                    info = zipfile.ZipInfo(name, date_time=(2026, 11, 21, 12, 0, 0))
+                    info.create_system = 3
+                    info.external_attr = mode << 16
+                    archive.writestr(info, "" if name.endswith("/") else name)
+        return path
 
     def package(self, platform="linux", folder=None, out="out"):
         return package_release.package(platform, PRE_ALPHA, folder or self.export(platform), self.root / "legal", self.root / out)
@@ -579,6 +635,41 @@ class PackageTests(unittest.TestCase):
         self.assertEqual(data[3], 0, "the FNAME flag is set")
         self.assertEqual(int.from_bytes(data[4:8], "little"), 0, "the gzip MTIME field is set")
 
+    def test_macos_keeps_the_app_its_permissions_and_its_bytes_under_the_packages_folder(self):
+        target = self.quietly(self.package, "macos")
+        self.assertEqual(target.name, f"dagon-{PRE_ALPHA}-macos-arm64.zip")
+        folder = f"dagon-{PRE_ALPHA}-macos-arm64"
+        with zipfile.ZipFile(target) as archive, zipfile.ZipFile(self.root / "export-macos" / "dagon.zip") as source:
+            entries = {info.filename: info for info in archive.infolist()}
+            self.assertEqual(sorted(entries), sorted([f"{folder}/{name}" for name in source.namelist()] + [f"{folder}/CREDITS.md", f"{folder}/LICENSE"]))
+            for info in source.infolist():
+                copied = entries[f"{folder}/{info.filename}"]
+                self.assertEqual(copied.external_attr >> 16, info.external_attr >> 16, info.filename)
+                self.assertEqual(archive.read(copied), source.read(info), info.filename)
+            self.assertEqual(entries[f"{folder}/DAGON.app/Contents/MacOS/DAGON"].external_attr >> 16, 0o100755)
+            self.assertEqual(entries[f"{folder}/LICENSE"].external_attr >> 16, 0o100644)
+            self.assertEqual({info.create_system for info in archive.infolist()}, {3})
+            self.assertEqual({info.date_time for info in archive.infolist()}, {(1980, 1, 1, 0, 0, 0)})
+
+    def test_a_macos_zip_that_recorded_no_permissions_still_gives_an_app_that_runs(self):
+        folder = self.root / "export-bare"
+        folder.mkdir()
+        with zipfile.ZipFile(folder / "dagon.zip", "w") as archive:
+            for name in ("DAGON.app/Contents/MacOS/DAGON", "DAGON.app/Contents/Frameworks/libdagon.macos.template_release.arm64.dylib", "DAGON.app/Contents/Info.plist"):
+                archive.writestr(zipfile.ZipInfo(name), name)
+        with zipfile.ZipFile(self.quietly(self.package, "macos", folder)) as archive:
+            modes = {info.filename.split("/", 1)[1]: info.external_attr >> 16 for info in archive.infolist()}
+        self.assertEqual(modes["DAGON.app/Contents/MacOS/DAGON"] & 0o777, 0o755)
+        self.assertEqual(modes["DAGON.app/Contents/Frameworks/libdagon.macos.template_release.arm64.dylib"] & 0o777, 0o755)
+        self.assertEqual(modes["DAGON.app/Contents/Info.plist"] & 0o777, 0o644)
+
+    def test_a_macos_export_must_hold_exactly_one_app(self):
+        folder = self.root / "export-two"
+        self.macos_export(folder / "dagon.zip", apps=("DAGON.app", "Other.app"))
+        with self.assertRaises(SystemExit) as caught:
+            self.package("macos", folder)
+        self.assertIn("exactly one app", str(caught.exception))
+
     def test_timestamps_inside_a_package_are_fixed(self):
         with zipfile.ZipFile(self.quietly(self.package, "windows")) as archive:
             self.assertEqual({info.date_time for info in archive.infolist()}, {(1980, 1, 1, 0, 0, 0)})
@@ -600,7 +691,7 @@ class PackageTests(unittest.TestCase):
         """A shell script stands in for the game, so these run on Linux, which is where CI runs them."""
         folder = self.export("linux")
         script = "#!/bin/sh\n" + "".join(f'echo "{line}"\n' for line in lines)
-        script += 'if [ "$DAGON_AUTOSTART" = new_game ]; then echo x > "$DAGON_STORAGE_DIR/save.dat"; fi\n'
+        script += 'if [ "$DAGON_AUTOSTART" = new_game ]; then printf "dagon_save=1\\nbeat=shore\\ncheckpoint=Start\\n" > "$DAGON_STORAGE_DIR/save.dat"; fi\n'
         script += f"exit {code}\n"
         write(folder, "dagon.x86_64", script)
         return self.quietly(self.package, "linux", folder)
@@ -610,6 +701,7 @@ class PackageTests(unittest.TestCase):
         "Completed load for: 'res://scenes/ui/title.tscn'",
         "dagon: session start beat=0 persisted=0",
         "dagon: prompt: [E] Examine",
+        "dagon: save status=0",
     )
 
     def smoke(self, target):
@@ -650,6 +742,27 @@ class PrepareTests(unittest.TestCase):
             write(self.root, f"logs/{job}/build-release.log", f"other\ndagon: compiler: {compiler}\n")
         write(self.root, "logs/logs-linux/godot/godot-version.txt", "4.7.2.stable\n")
 
+    MAC_FACTS = {
+        "Architectures, game": "arm64",
+        "Minimum macOS, Info.plist": "11.00",
+        "Minimum macOS, game executable": "11.0",
+        "Minimum macOS, extension": "11.0",
+        "Built on": "macOS 15.6 (24G84), arm64",
+        "Xcode": "Xcode 16.4 Build version 16F6",
+        "Signature": "Signature=adhoc TeamIdentifier=not set",
+        "Signature check": "codesign --verify --deep --strict: valid",
+        "Gatekeeper": "rejected",
+        "Notarization": "does not have a ticket stapled to it",
+    }
+
+    def add_mac(self, version=PRE_ALPHA, facts=None, tested="macOS 15.6 (24G84), arm64, a GitHub-hosted runner"):
+        """What a release that ships macOS has beside the other two: its package, its build's facts, and where it ran."""
+        write(self.root, f"packages/dagon-{version}-macos-arm64.zip", "mac")
+        write(self.root, "logs/logs-macos/build-release.log", "dagon: compiler: Apple clang version 17.0.0\n")
+        write(self.root, "logs/logs-macos/macos-facts.txt", "".join(f"MACOS_FACT {name}: {value}\n" for name, value in (self.MAC_FACTS if facts is None else facts).items()))
+        if tested:
+            write(self.root, "smoke/smoke-macos.txt", f"SMOKE_FACT macOS package smoke-tested on: {tested}\n")
+
     def prepare(self):
         args = SimpleNamespace(
             record=str(self.record),
@@ -658,6 +771,7 @@ class PrepareTests(unittest.TestCase):
             out=str(self.root / "prepared"),
             commit=self.commit,
             run_url="https://example/run/1",
+            smoke=str(self.root / "smoke"),
         )
         previous = os.getcwd()
         os.chdir(self.root)
@@ -696,6 +810,7 @@ class PrepareTests(unittest.TestCase):
 
     def test_the_rehearsal_record_can_be_prepared(self):
         self.record.write_text(Path(__file__).with_name("release_rehearsal.json").read_text(encoding="utf-8"), encoding="utf-8")
+        self.add_mac()
         for name in list((self.root / "packages").iterdir()):
             name.rename(name.with_name(name.name.replace(PRE_ALPHA, "v0.1.0-pre-alpha.0")))
         notes = (self.prepare() / "RELEASE_NOTES.md").read_text(encoding="utf-8")
@@ -738,6 +853,43 @@ class PrepareTests(unittest.TestCase):
         self.assertIn("Built and tested by CI run: https://example/run/1", provenance)
         self.assertIn("Packaged, smoke-tested and published by CI run: https://example/run/9 at " + "e" * 40, provenance)
         self.assertIn("Packaged, smoke-tested and published by: https://example/run/9", (self.root / "prepared" / "RELEASE_NOTES.md").read_text(encoding="utf-8"))
+
+    def mac_record(self):
+        record = json.loads(self.record.read_text(encoding="utf-8"))
+        record["platforms"] = ["linux", "windows", "macos"]
+        self.record.write_text(json.dumps(record), encoding="utf-8")
+
+    def test_a_mac_release_states_its_minimum_and_the_macos_it_was_tested_on_apart(self):
+        self.mac_record()
+        self.add_mac()
+        prepared = self.prepare()
+        notes = (prepared / "RELEASE_NOTES.md").read_text(encoding="utf-8")
+        provenance = (prepared / "PROVENANCE.txt").read_text(encoding="utf-8")
+        self.assertIn("Needs macOS 11.0 or later; tested on macOS 15.6 (24G84), arm64, a GitHub-hosted runner", notes)
+        self.assertIn("not notarized", notes)
+        self.assertIn("macOS package: Apple clang version 17.0.0", provenance)
+        self.assertIn("Minimum macOS, extension: 11.0", provenance)
+        self.assertIn("macOS, signature: Signature=adhoc TeamIdentifier=not set", provenance)
+        self.assertIn("macOS package smoke-tested on: macOS 15.6 (24G84)", provenance)
+        self.assertEqual(len((prepared / "SHA256SUMS.txt").read_text(encoding="utf-8").splitlines()), 3)
+
+    def test_a_mac_release_without_its_facts_or_its_test_record_stops(self):
+        self.mac_record()
+        for facts, tested in (({}, "macOS 15"), ({**self.MAC_FACTS, "Notarization": ""}, "macOS 15"), (None, "")):
+            with self.subTest(facts=facts, tested=tested):
+                (self.root / "smoke" / "smoke-macos.txt").unlink(missing_ok=True)
+                self.add_mac(facts=facts, tested=tested)
+                with self.assertRaises(SystemExit) as caught:
+                    self.prepare()
+                self.assertIn("Provenance is incomplete", str(caught.exception))
+
+    def test_a_mac_release_without_its_package_is_refused(self):
+        self.mac_record()
+        self.add_mac()
+        (self.root / "packages" / f"dagon-{PRE_ALPHA}-macos-arm64.zip").unlink()
+        with self.assertRaises(SystemExit) as caught:
+            self.prepare()
+        self.assertIn("exactly one package per OS", str(caught.exception))
 
     def test_more_than_one_package_per_os_is_refused(self):
         write(self.root, f"packages/dagon-{PRE_ALPHA}-linux-clang-x86_64.tar.gz")
@@ -1104,6 +1256,24 @@ class WorkflowTests(unittest.TestCase):
         caller = self.ci.split("\n  release:\n", 1)[1]
         self.assertIn("actions: read", caller)
         self.assertIn("fetch-depth: 0", self.job("gate").split("\n  package:", 1)[0])
+
+    def test_the_mac_build_ships_from_apple_silicon_and_its_package_follows_the_record(self):
+        mac = self.ci.split("- name: macos\n", 1)[1].split("    env:", 1)[0]
+        self.assertIn("ships: true", mac)
+        self.assertIn("os: macos-15", mac)
+        self.assertIn("arch=arm64", mac)
+        self.assertIn("include: ${{ fromJSON(needs.gate.outputs.matrix) }}", self.job("package"))
+        self.assertIn("matrix: ${{ steps.gate.outputs.matrix }}", self.job("gate").split("\n  package:", 1)[0])
+
+    def test_the_readme_links_only_files_a_release_record_ships(self):
+        readme = (self.root / "README.md").read_text(encoding="utf-8")
+        links = re.findall(r"https://github\.com/shamsuzzamansadi/dagon/releases/download/([^/\s)]+)/([^\s)]+)", readme)
+        self.assertTrue(links, "the README links no download")
+        records = {record["version"]: record for _, record in release_gate.load_records(self.root)}
+        for version, name in links:
+            with self.subTest(name):
+                self.assertIn(version, records, f"no release record for {version}")
+                self.assertIn(name, release_gate.expected_assets(version, release_gate.platforms_of(records[version])))
 
     def test_the_gate_asks_github_with_a_read_only_token(self):
         gate = self.job("gate").split("\n  package:", 1)[0]

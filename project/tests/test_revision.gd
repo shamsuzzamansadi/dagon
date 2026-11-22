@@ -250,6 +250,35 @@ func test_the_slab_comes_down_once_with_one_sound_and_one_line(h) -> void:
 	h.check(not world.get_node("Hud/Caption").visible or not world.get_node("Hud/Caption").text.contains("struck"), "the line was said again")
 
 
+## The director's own rule, behind the stone's one-shot prompt: once pushed, a second push, however it arrives, while
+## the slab is on its way down or after it has settled, neither restarts it nor plays it again. No key can send one, as
+## the prompt is gone (M3's breakage, "The slab comes down again for each weight", survived for that reason), so this
+## sends the stone's signal itself.
+func test_a_second_push_from_anywhere_neither_restarts_the_slab_nor_raises_it_again(h) -> void:
+	var world := await _world(h, ABYSS)
+	var crossing: Node2D = world.get_node("Crossing")
+	var sound: AudioStreamPlayer2D = world.get_node("Crossing/Sound")
+	var push: Node = world.get_node("CrossingStone/Push")
+	var director := _director(h)
+	await _climb_and_push(h)
+	var pushed := Engine.get_process_frames()
+	await h.steps(6)
+	push.interacted.emit(push.interaction_id)
+	await h.wait_until(func() -> bool: return not director.is_crossing_moving(), 240, "the slab to settle")
+	var frames := Engine.get_process_frames() - pushed
+	var expected := roundi((director.crossing_fall_seconds + director.crossing_lower_seconds) * 60.0)
+	h.check(frames <= expected + 3, "a second push mid-fall made the slab take %d frames, not %d" % [frames, expected])
+	sound.stop()
+	push.interacted.emit(push.interaction_id)
+	var highest := [0.0]
+	for i in expected + 10:
+		await h.steps(1)
+		highest[0] = maxf(highest[0], absf(crossing.rotation))
+	h.check(highest[0] < 0.001, "a push after it settled raised the slab to %.3f" % highest[0])
+	h.check(not director.is_crossing_moving(), "a push after it settled set the slab moving")
+	h.check(not sound.playing, "a push after it settled played the slab's sound")
+
+
 func test_a_world_restored_at_the_abyss_has_the_slab_up_and_from_the_monolith_on_has_it_down(h) -> void:
 	for pair in [[ABYSS, false], [MONOLITH, true], [AWAKENED, true]]:
 		var world := await _world(h, pair[0])
@@ -411,6 +440,30 @@ func test_footsteps_follow_walking_and_change_where_the_rock_begins(h) -> void:
 		h.check(heard.size() >= 2, "every step on %s was the same sound: %s" % [leg[1], heard.keys()])
 
 
+## "The first soon after he sets off": after a stop, whatever he had walked before it, the first step comes within
+## half a step's length. M3's breakage "Standing still makes footsteps" removed the line that does this, and survived:
+## standing still stayed silent, as the test above checks, and only this changed.
+func test_after_a_stop_the_first_step_comes_soon_after_he_sets_off(h) -> void:
+	var world := await _world(h)
+	var player := _player(h)
+	await h.stand_at(player, Vector2(300, -2))
+	await h.steps(10)
+	# Stopped just after a step: almost none of the next step's length is walked when he stands.
+	var before: int = player.get_footstep_count()
+	h.send(h.key_event(KEY_D, true))
+	await h.wait_until(func() -> bool: return player.get_footstep_count() > before + 1, 120, "two steps")
+	h.send(h.key_event(KEY_D, false))
+	await h.wait_until(func() -> bool: return absf(player.velocity.x) < 0.01, 120, "him to stand")
+	await h.steps(20)
+	var count: int = player.get_footstep_count()
+	var from_x := player.global_position.x
+	h.send(h.key_event(KEY_D, true))
+	await h.wait_until(func() -> bool: return player.get_footstep_count() > count, 120, "the first step after the stop")
+	h.send(h.key_event(KEY_D, false))
+	var walked := player.global_position.x - from_x
+	h.check(walked <= player.footstep_spacing * 0.5, "the first step after a stop came %.1f px on, a step is %.1f" % [walked, player.footstep_spacing])
+
+
 func test_his_breathing_and_its_pace_follow_the_story(h) -> void:
 	for pair in [[0, "tired", 0.7], [ABYSS, "", 0.9], [MONOLITH, "uneasy", 1.15]]:
 		var world := await _world(h, pair[0])
@@ -439,7 +492,11 @@ func test_pausing_holds_every_sound_and_resuming_carries_on(h) -> void:
 	await _wait_real_time(h, 400)
 	h.check_near(sea.get_playback_position(), held, 0.06, "the sea while paused")
 	await h.tap_key(KEY_ESCAPE)
-	await _wait_real_time(h, 400)
+	# It must carry on, and how soon depends on the machine's mixing thread: a busy CI runner can lag by a few hundred
+	# milliseconds, so this waits up to two seconds by the clock for 0.2 s of sea.
+	var resumed := Time.get_ticks_msec()
+	while sea.get_playback_position() <= held + 0.2 and Time.get_ticks_msec() - resumed < 2000:
+		await _wait_real_time(h, 100)
 	h.check(sea.get_playback_position() > held + 0.2, "the sea did not carry on after resuming")
 
 
@@ -959,6 +1016,31 @@ func test_every_shape_a_clip_moves_or_fades_draws_something(h) -> void:
 					seen = seen or (drawing.texture != null and drawing.visible)
 				h.check(seen, "%s animates %s, a shape that draws nothing and carries no shown drawing" % [clip_name, path])
 	h.check(checked >= 10, "only %d clear shapes were checked" % checked)
+
+
+## Each such drawing lies over the shape it belongs to, so the clip that moves the shape moves it where the shape was
+## designed to be. The distant shape's drawing sat 1000 px to the left of its shape until M6: over the Shore's near
+## cliff, its cut-off base showing, and missing from behind the far cliff in the Abyss, where it rises and shifts.
+func test_every_drawing_lies_over_the_clear_shape_it_belongs_to(h) -> void:
+	var world := await _world(h)
+	var checked := 0
+	for shape in world.find_children("*", "Polygon2D", true, false):
+		if shape.color.a > 0.0 or not shape.vertex_colors.is_empty() or shape.polygon.is_empty():
+			continue
+		for drawing in shape.get_children():
+			if not (drawing is Sprite2D) or drawing.texture == null:
+				continue
+			var outline := Rect2(shape.global_transform * shape.polygon[0], Vector2.ZERO)
+			for point in shape.polygon:
+				outline = outline.expand(shape.global_transform * point)
+			var size: Vector2 = drawing.texture.get_size() * drawing.global_scale
+			var corner: Vector2 = drawing.global_position - (size / 2.0 if drawing.centered else Vector2.ZERO)
+			var covered := Rect2(corner, size).intersection(outline).get_area()
+			checked += 1
+			# A drawing is redrawn to its own design (the kneeling figures bow, the arm turns), so only a drawing that
+			# misses its shape is wrong: at least a quarter of the shape lies under it.
+			h.check(covered >= outline.get_area() * 0.25, "%s's drawing covers %.0f%% of its shape: the shape spans %s, the drawing %s" % [shape.name, 100.0 * covered / maxf(outline.get_area(), 1.0), outline, Rect2(corner, size)])
+	h.check(checked >= 6, "only %d drawings were checked" % checked)
 
 
 ## The rock across the way back and the returning sea are shown by the director, as outcomes of the flight, not by its

@@ -1,0 +1,19 @@
+    2.55  dagon: extension initialized build=release compiler=MSVC 194435230 __cplusplus=202002
+    2.69  dagon: window check mode=0 size=(1028, 749) with frame=(1044, 788) usable=[P: (0, 0), S: (1024, 728)] screen=0 first=true
+    2.69  dagon: window fitted scale=2 size=(960, 540) usable=(1024, 728) frame=(16, 39)
+    2.69  dagon: save status=1 backup=false
+    4.17  dagon: key labels: Y D Ö Z layout=German (de)
+    8.39  dagon: save status=1 backup=false
+    8.39  dagon: introduction shown
+    9.49  dagon: window check mode=0 size=(960, 540) with frame=(976, 579) usable=[P: (0, 0), S: (1024, 728)] screen=0 first=false
+    9.49  dagon: prologue shown
+    9.50  dagon: prologue line: prologue.raider voiced=true
+   10.11  dagon: prologue finished skipped=true
+   10.11  dagon: window check mode=0 size=(960, 540) with frame=(976, 579) usable=[P: (0, 0), S: (1024, 728)] screen=0 first=false
+   10.11  dagon: session start beat=0 persisted=0
+   10.11  dagon: cinematic start clip=shore_wake generation=1
+   14.39  dagon: landed
+   16.45  dagon: cinematic finalized clip=shore_wake generation=1
+   16.47  dagon: focus: shore.boat
+   16.47  dagon: prompt: [Z] Examine
+   18.53  dagon: key labels: Y D Ö Z layout=German (de)

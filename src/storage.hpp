@@ -52,4 +52,8 @@ godot::String key_name(int p_key, const godot::Ref<godot::Font> &p_font);
 godot::String displayed_key_name(int p_key, int p_layout_label, const godot::Ref<godot::Font> &p_font);
 int current_key(const godot::StringName &p_action);
 
+// The keyboard layout the game is reading keys through, by name and language, for logs. Empty where the display
+// server has no layouts.
+godot::String keyboard_layout();
+
 } // namespace dagon::storage

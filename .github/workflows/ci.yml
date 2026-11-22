@@ -1,5 +1,6 @@
-# Builds, tests and exports for every push, with GCC, MSVC and Clang. GCC and MSVC make the one build for each OS.
-# Clang validates only, and its build is never shipped. No secrets are used. A prerelease can only come from main,
+# Builds, tests and exports for every push, with GCC, MSVC, Clang and Apple Clang. GCC, MSVC and Apple Clang make the
+# one build for each OS: Linux, Windows, and macOS on Apple Silicon (D129). Clang validates only, and its build is never
+# shipped. No secrets are used. A prerelease can only come from main,
 # and only when release.yml's gates pass: see docs/release.md.
 name: CI
 
@@ -39,6 +40,12 @@ jobs:
             clang-package: "1:18.1.3-1ubuntu1"
             clang-version: "18.1.3"
             scons-args: use_llvm=yes
+          # Apple Silicon only: every M-series Mac. macOS 11 is the first that runs on them (D129).
+          - name: macos
+            platform: macos
+            os: macos-15
+            ships: true
+            scons-args: arch=arm64 macos_deployment_target=11.0
     env:
       SCONS_CACHE: ${{ github.workspace }}/.scons-cache/
     defaults:
@@ -112,6 +119,7 @@ jobs:
             ~/.dagon-tools
             ~/.local/share/godot/export_templates/4.7.2.stable
             ~/AppData/Roaming/Godot/export_templates/4.7.2.stable
+            ~/Library/Application Support/Godot/export_templates/4.7.2.stable
           key: godot-4.7.2-${{ runner.os }}-${{ hashFiles('tools/install_godot.sh', 'tools/install_export_templates.sh', 'tools/extract_templates.py') }}
 
       - name: Install Godot (SHA-512 verified)
@@ -126,6 +134,11 @@ jobs:
 
       - name: Export and run release build
         run: sh tools/export_check.sh ${{ matrix.platform }} build/logs/export
+
+      # What the release notes and provenance say about the Mac build comes from here, not from what is hoped.
+      - name: Describe the macOS build (architecture, minimum macOS, signature, notarization)
+        if: ${{ matrix.platform == 'macos' }}
+        run: sh tools/macos_facts.sh build/export/macos-run build/logs/macos-facts.txt
 
       # The shipped build, as shipped, played from New Game to the ending with real window-system key events.
       - name: Install a private display for the exported route
@@ -158,7 +171,7 @@ jobs:
           grep -q "^USER_DIR_PROBE ok" build/logs/user-dir-probe.log
 
       - name: Check Shore art (one palette, feet do not slide, ground on the collision)
-        if: ${{ matrix.ships }}
+        if: ${{ matrix.ships && matrix.platform != 'macos' }}
         run: |
           python -m pip install pillow==13.0.0
           python tools/art/check_art.py 2>&1 | tee build/logs/check-art.log
@@ -193,6 +206,91 @@ jobs:
         with:
           name: dagon-${{ matrix.platform }}
           path: build/export/${{ matrix.platform }}/
+
+  # Checks of the shipped build that change a window's layout or post keys to it, so never on a person's desktop. Each
+  # runner is thrown away afterwards.
+  # Key names under a keyboard layout (M6 plan, item 5): US first, as the control, then German. Xvfb, here and on the
+  # developer's machine, reports setxkbmap's change as done and keeps US, so on Linux only the US run is made; German
+  # is checked on Windows.
+  # M2's unexplained examine (item 11): its steps repeated, idle and with all four of the runner's processors kept
+  # busy. And the Display setting across a relaunch (item 9).
+  desktop-checks:
+    name: desktop-checks-${{ matrix.platform }}
+    needs: desktop
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: windows
+            os: windows-2022
+          - platform: linux
+            os: ubuntu-22.04
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v8
+        with:
+          name: dagon-${{ matrix.platform }}
+          path: build/export/${{ matrix.platform }}
+      - name: Install a screenshot tool (Windows)
+        if: ${{ matrix.platform == 'windows' }}
+        run: python -m pip install --disable-pip-version-check "pillow==11.3.0"
+      - name: Install a private display (Linux)
+        if: ${{ matrix.platform == 'linux' }}
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq xvfb xdotool x11-xkb-utils libgl1-mesa-dri imagemagick openbox
+          chmod +x build/export/linux/dagon.x86_64
+      - name: Key names under the US layout, and the German on Windows
+        run: |
+          layouts="us de"
+          [ "${{ matrix.platform }}" = linux ] && layouts="us"
+          for layout in $layouts; do
+            if [ "${{ matrix.platform }}" = linux ]; then
+              LAYOUT=$layout xvfb-run -a -s "-screen 0 1440x810x24 +extension GLX" sh -c \
+                'python3 tools/layout_check.py build/export/linux/dagon.x86_64 build/logs/layouts --layout "$LAYOUT" --display "$DISPLAY"' 2>&1 | tee -a build/layouts.log || true
+            else
+              python tools/layout_check.py build/export/windows/dagon.exe build/logs/layouts --layout $layout --windows-ci 2>&1 | tee -a build/layouts.log || true
+            fi
+          done
+          for layout in $layouts; do
+            grep -q "^LAYOUT_RESULT layout=$layout failed=0" build/layouts.log
+          done
+      - name: M2's examine with nothing pressed, idle and loaded
+        run: |
+          if [ "${{ matrix.platform }}" = linux ]; then
+            xvfb-run -a -s "-screen 0 1440x810x24 +extension GLX" sh -c \
+              'python3 tools/idle_examine_check.py build/export/linux/dagon.x86_64 build/logs/idle --runs 5 --display "$DISPLAY" && python3 tools/idle_examine_check.py build/export/linux/dagon.x86_64 build/logs/idle --runs 5 --busy 4 --display "$DISPLAY"' 2>&1 | tee build/idle.log
+          else
+            { python tools/idle_examine_check.py build/export/windows/dagon.exe build/logs/idle --runs 5 --windows-ci && python tools/idle_examine_check.py build/export/windows/dagon.exe build/logs/idle --runs 5 --busy 4 --windows-ci; } 2>&1 | tee build/idle.log
+          fi
+          grep -q "^IDLE_RESULT runs=5 busy=0 examined_with_nothing_pressed=0 failed=0" build/idle.log
+          grep -q "^IDLE_RESULT runs=5 busy=4 examined_with_nothing_pressed=0 failed=0" build/idle.log
+      - name: The Display setting across a relaunch
+        run: |
+          if [ "${{ matrix.platform }}" = linux ]; then
+            # X11 grants fullscreen only through a window manager, as on any desktop.
+            xvfb-run -a -s "-screen 0 1920x1080x24 +extension GLX" sh -c \
+              'openbox --sm-disable & sleep 2; python3 tools/display_relaunch_check.py build/export/linux/dagon.x86_64 build/logs/display --display "$DISPLAY"' 2>&1 | tee build/display.log
+          else
+            python tools/display_relaunch_check.py build/export/windows/dagon.exe build/logs/display --windows-ci 2>&1 | tee build/display.log
+          fi
+          grep -q "^DISPLAY_RESULT failed=0" build/display.log
+      - name: Upload the screenshots and logs
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: desktop-checks-${{ matrix.platform }}
+          path: |
+            build/logs/layouts/
+            build/logs/idle/
+            build/logs/display/
 
   release-tools:
     runs-on: ubuntu-22.04

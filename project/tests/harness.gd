@@ -8,13 +8,15 @@ const StepProbe := preload("res://tests/step_probe.gd")
 const STORAGE_VARIABLE := "DAGON_STORAGE_DIR"
 
 static var _tests_started := 0
+## The run's folder, read once. Each test's folder replaces the variable, so reading it again for the next test would
+## put that test's folder inside this one's, and the path would grow past macOS's limit of 1024 characters.
+static var _run_storage_dir := ""
 
 var tree: SceneTree
 var fixture: Node
 var probe: Node
 var failures: PackedStringArray = []
 var storage_dir: String
-var _run_storage_dir: String
 var _expected_errors := {}
 
 
@@ -25,7 +27,8 @@ var introductions_begun := 0
 
 func _init(p_tree: SceneTree) -> void:
 	tree = p_tree
-	_run_storage_dir = OS.get_environment(STORAGE_VARIABLE)
+	if _run_storage_dir.is_empty():
+		_run_storage_dir = OS.get_environment(STORAGE_VARIABLE)
 	_tests_started += 1
 	use_storage("%s/test_%d" % [_run_storage_dir, _tests_started])
 

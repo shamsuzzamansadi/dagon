@@ -1,0 +1,14 @@
+DISPLAY title-window mode=windowed window=(1440, 810) at=(240, 135) screen=(1920, 1080) usable=[P: (0, 0), S: (1920, 1080)] picture=(480.0, 270.0) scale=3 focus=NewGame
+DISPLAY settings-window mode=windowed window=(1440, 810) at=(240, 135) screen=(1920, 1080) usable=[P: (0, 0), S: (1920, 1080)] picture=(480.0, 270.0) scale=3 focus=Slider
+DISPLAY settings-fullscreen mode=fullscreen window=(1920, 1080) at=(0, 0) screen=(1920, 1080) usable=[P: (0, 0), S: (1920, 1080)] picture=(480.0, 270.0) scale=4 focus=Display
+DISPLAY key-ui_down mode=fullscreen window=(1920, 1080) at=(0, 0) screen=(1920, 1080) usable=[P: (0, 0), S: (1920, 1080)] picture=(480.0, 270.0) scale=4 focus=RestoreDefaults
+DISPLAY key-ui_down mode=fullscreen window=(1920, 1080) at=(0, 0) screen=(1920, 1080) usable=[P: (0, 0), S: (1920, 1080)] picture=(480.0, 270.0) scale=4 focus=Back
+DISPLAY key-ui_up mode=fullscreen window=(1920, 1080) at=(0, 0) screen=(1920, 1080) usable=[P: (0, 0), S: (1920, 1080)] picture=(480.0, 270.0) scale=4 focus=RestoreDefaults
+DISPLAY key-ui_up mode=fullscreen window=(1920, 1080) at=(0, 0) screen=(1920, 1080) usable=[P: (0, 0), S: (1920, 1080)] picture=(480.0, 270.0) scale=4 focus=Display
+DISPLAY key-ui_up mode=fullscreen window=(1920, 1080) at=(0, 0) screen=(1920, 1080) usable=[P: (0, 0), S: (1920, 1080)] picture=(480.0, 270.0) scale=4 focus=Key
+DISPLAY settings-fullscreen-keys mode=fullscreen window=(1920, 1080) at=(0, 0) screen=(1920, 1080) usable=[P: (0, 0), S: (1920, 1080)] picture=(480.0, 270.0) scale=4 focus=Key
+DISPLAY title-fullscreen mode=fullscreen window=(1920, 1080) at=(0, 0) screen=(1920, 1080) usable=[P: (0, 0), S: (1920, 1080)] picture=(480.0, 270.0) scale=4 focus=Settings
+DISPLAY caption-fullscreen mode=fullscreen window=(1920, 1080) at=(0, 0) screen=(1920, 1080) usable=[P: (0, 0), S: (1920, 1080)] picture=(480.0, 270.0) scale=4 focus=none
+DISPLAY pause-settings-windowed mode=windowed window=(1440, 810) at=(240, 135) screen=(1920, 1080) usable=[P: (0, 0), S: (1920, 1080)] picture=(480.0, 270.0) scale=3 focus=Display
+DISPLAY caption-window mode=windowed window=(1440, 810) at=(240, 135) screen=(1920, 1080) usable=[P: (0, 0), S: (1920, 1080)] picture=(480.0, 270.0) scale=3 focus=none
+DISPLAY ending-longest-window mode=windowed window=(1440, 810) at=(240, 135) screen=(1920, 1080) usable=[P: (0, 0), S: (1920, 1080)] picture=(480.0, 270.0) scale=3 focus=Continue

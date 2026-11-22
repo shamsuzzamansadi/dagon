@@ -1,0 +1,50 @@
+{
+  "version": "v0.2.0-alpha.2",
+  "milestone": "M6",
+  "state": "candidate",
+  "platforms": [
+    "linux",
+    "windows",
+    "macos"
+  ],
+  "summary": "The M6 release candidate of DAGON: Beneath the Black Tide, for Windows, Linux and, for the first time, macOS on Apple Silicon: the intended game, playable from the prologue to the ending and the credits.\n\nIt is the game after its sixth milestone, M6 (stabilization). Since `v0.2.0-alpha.1` it adds a fullscreen setting and a window that fits its screen; Settings now calls the examine key Examine, as the prompts do; a drawing misplaced by the Shore's cliff now stands behind the far cliff in the Abyss; the cave's mouth and exit follow the rock; and Continue after the ending no longer stands the sailor in front of a statue. It is the first native Mac build.\n\n**A candidate:** prepared by CI and not published. Several checks by people are still outstanding; they are listed under \"Not tested\" below.",
+  "owner_acceptance": {
+    "status": "accepted",
+    "record": "docs/evidence/m6/owner-acceptance-2026-11-21.md",
+    "build": "The owner-test build: `dagon-windows`, artifact 14711113002 of CI run 44913367672 (commit `a30be86`), zip SHA-256 `c138e0d43d3963882b0697ad54f7d686c44726b1bd240cccaccaa594b5211c9a`, played by the owner on 2026-11-21",
+    "fingerprint": "sha256:14e30e9c7a601075231f27ebbb9cca4a72373302b63d600c8601d97c17b4f04f",
+    "scope": "On 2026-11-21 the owner accepted M6 as a milestone, with the outstanding human checks carried forward. Their playtest of the owner-test build `a30be86` on Windows was \"owner playtest satisfactory\" for the route they played: New Game through the running escape, all four epilogue panels, the credits and the return to the main menu. They asked for the README and the native Mac build to be added before the merge; **those change files the acceptance covers, so it does not cover this candidate as it stands,** and no person has played it. ChatGPT reviewed the owner's footage and compared audio samples: a signal check, not listening."
+  },
+  "criteria": {
+    "playable_start_to_end": {
+      "status": "met",
+      "evidence": "docs/evidence/m6/release-criteria-v0.2.0-alpha.2.md"
+    },
+    "principal_gameplay_connected": {
+      "status": "met",
+      "evidence": "docs/evidence/m6/release-criteria-v0.2.0-alpha.2.md"
+    },
+    "principal_audio_heard": {
+      "status": "met",
+      "evidence": "docs/evidence/m6/release-criteria-v0.2.0-alpha.2.md"
+    }
+  },
+  "known_limitations": [
+    "**An alpha.** The art and the sound are not final, and anything may change.",
+    "**Sound:** every sound is synthesized, and the narration is an AI-generated voice (see `CREDITS.md` in the package). The owner has heard the game in play, but the mix has had no listening review, and whether the reveal's dialogue can be made out over the music and effects has not been judged by ear.",
+    "**No first-time player has played it,** and the length of a first playthrough has not been measured. Scripted runs suggest it is shorter than the 10 to 15 minutes the design aims for.",
+    "**The Mac build is new:** Apple Silicon only, and signed ad hoc without an Apple developer identity, and not notarized, so macOS blocks its first launch until you allow it (see the README). It has been run by CI on a GitHub-hosted Mac, not by a person.",
+    "**Controllers:** supported, but the checks on physical hardware listed under \"Not tested\" have not been done.",
+    "**One unresolved report from M2:** in one scripted run on a loaded machine, an examine fired without its caption. It has not been reproduced since, in more than a hundred repeats in CI, and its cause is not established.",
+    "**On the software renderer,** the step from the prologue into the game takes one long frame; whether it does on a graphics card is not yet measured."
+  ],
+  "deferred": [
+    "Play by two first-time players, and the length of a first playthrough",
+    "The reveal's dialogue by ear, in the full mix, on headphones and on speakers",
+    "The display switch as the monitor shows it: in the owner's recording, only the centre of Settings shows during the switch",
+    "Continue after the credits, by a person",
+    "All physical PlayStation hardware, individual physical Xbox actions, including disconnecting and reconnecting, and controller vibration by feel",
+    "Native runs with hardware rendering, and their frame times, on the owner's Windows desktop and Ubuntu laptop",
+    "Any play of the Mac build by a person, on a real Mac"
+  ]
+}

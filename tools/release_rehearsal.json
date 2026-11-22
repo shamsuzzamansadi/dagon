@@ -2,7 +2,7 @@
   "version": "v0.1.0-pre-alpha.0",
   "milestone": "",
   "state": "candidate",
-  "summary": "A rehearsal of the packaging workflow. Version .0 can never be published. It ships what v0.2.0-alpha.1 will ship: a4250f0, as built by main's own CI run of it (D128).",
+  "summary": "A rehearsal of the packaging workflow. Version .0 can never be published.",
   "owner_acceptance": {
     "status": "pending",
     "record": "none",
@@ -15,8 +15,9 @@
     "This is a rehearsal of the packaging workflow, and not a build for anyone to play."
   ],
   "deferred": [],
-  "source": {
-    "commit": "a4250f060ee7cb8051f9ffef9a976bf68f58d630",
-    "run": 44748633376
-  }
+  "platforms": [
+    "linux",
+    "windows",
+    "macos"
+  ]
 }

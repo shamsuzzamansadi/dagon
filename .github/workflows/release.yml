@@ -29,6 +29,7 @@ jobs:
       publish: ${{ steps.gate.outputs.publish }}
       target: ${{ steps.gate.outputs.target }}
       source-run: ${{ steps.gate.outputs.source_run }}
+      matrix: ${{ steps.gate.outputs.matrix }}
     steps:
       # The whole history, so that an earlier commit a record ships can be checked: on main, and with the files accepted.
       - uses: actions/checkout@v7
@@ -53,13 +54,10 @@ jobs:
     permissions:
       contents: read
       actions: read
+    # One package for each OS the record ships, made and smoke-tested on that OS: macOS on Apple Silicon (D129).
     strategy:
       matrix:
-        include:
-          - platform: linux
-            os: ubuntu-22.04
-          - platform: windows
-            os: windows-2022
+        include: ${{ fromJSON(needs.gate.outputs.matrix) }}
     defaults:
       run:
         shell: bash
@@ -90,11 +88,20 @@ jobs:
       - name: Package
         run: python tools/package_release.py package --platform ${{ matrix.platform }} --version "$VERSION" --export-dir export --out packages
       - name: Smoke-test the package itself
-        run: python tools/package_release.py smoke --platform ${{ matrix.platform }} --package packages/dagon-*
+        env:
+          # An earlier commit's own packaging tool may predate the record of what it ran on.
+          FACTS: ${{ needs.gate.outputs.source-run == '' && format('--facts smoke/smoke-{0}.txt', matrix.platform) || '' }}
+        run: python tools/package_release.py smoke --platform ${{ matrix.platform }} --package packages/dagon-* $FACTS
       - uses: actions/upload-artifact@v7
         with:
           name: release-package-${{ matrix.platform }}
           path: packages/
+          retention-days: 14
+      - uses: actions/upload-artifact@v7
+        with:
+          name: release-smoke-${{ matrix.platform }}
+          path: smoke/
+          if-no-files-found: ignore
           retention-days: 14
 
   prepare:
@@ -131,6 +138,15 @@ jobs:
           path: logs
           run-id: ${{ needs.gate.outputs.source-run }}
           github-token: ${{ github.token }}
+      # An earlier commit's own packaging tool writes no such record, so finding none is not a failure here. The
+      # preparation itself refuses a Mac release without its record.
+      - name: Fetch where each package was smoke-tested
+        continue-on-error: true
+        uses: actions/download-artifact@v8
+        with:
+          pattern: release-smoke-*
+          path: smoke
+          merge-multiple: true
       - name: Prepare the notes, checksums and provenance
         env:
           RECORD: ${{ needs.gate.outputs.record }}
@@ -140,9 +156,9 @@ jobs:
         run: |
           if [ -n "$SOURCE_RUN" ]; then
             python tools/release_gate.py prepare --record "$RECORD" --packages packages --logs logs --out prepared --commit "$COMMIT" \
-              --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/$SOURCE_RUN" --packaged-by "$THIS_RUN at ${{ github.sha }}"
+              --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/$SOURCE_RUN" --packaged-by "$THIS_RUN at ${{ github.sha }}" --smoke smoke
           else
-            python tools/release_gate.py prepare --record "$RECORD" --packages packages --logs logs --out prepared --commit "$COMMIT" --run-url "$THIS_RUN"
+            python tools/release_gate.py prepare --record "$RECORD" --packages packages --logs logs --out prepared --commit "$COMMIT" --run-url "$THIS_RUN" --smoke smoke
           fi
       # The publish job cannot run in a rehearsal, so this runs its first check, with this job's read-only token.
       - name: Rehearse the publisher's first check
