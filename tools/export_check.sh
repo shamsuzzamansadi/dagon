@@ -2,7 +2,7 @@
 # Creates a release export and, when the host can run it, runs it headless and
 # looks for positive proof that the release extension library loaded.
 # Usage: GODOT=/path/to/godot tools/export_check.sh <linux|windows|macos> [log-dir]
-# macOS exports a zip holding the app, which can only be made, and run, on a Mac (D128).
+# macOS exports a zip holding the app, which can only be made, and run, on a Mac (D129).
 # Run the import first (tools/run_godot_checks.sh).
 set -u
 

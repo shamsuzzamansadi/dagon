@@ -22,7 +22,7 @@ namespace dagon::core {
 
 #if defined(__APPLE__)
 // Apple's C++ library has no from_chars for floats, and its to_chars for floats needs macOS 13.3, above the macOS
-// build's minimum (D128). These two stand in on Apple platforms only, and always read and write a "." for the
+// build's minimum (D129). These two stand in on Apple platforms only, and always read and write a "." for the
 // decimal point, as from_chars and to_chars do, whatever the process's locale.
 inline locale_t c_locale() {
 	static const locale_t locale = newlocale(LC_ALL_MASK, "C", nullptr);

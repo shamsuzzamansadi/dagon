@@ -215,7 +215,7 @@ TEST_CASE("every action has a name that survives the format") {
 	CHECK(serialize_settings(Settings{}).find("key_interact=69") != std::string::npos);
 }
 
-// The same on every platform, including Apple's, where the game reads and writes floats without from_chars (D128).
+// The same on every platform, including Apple's, where the game reads and writes floats without from_chars (D129).
 TEST_CASE("volumes are written as the shortest text that reads back as the same number") {
 	Settings settings;
 	settings.music_volume = 0.7f;

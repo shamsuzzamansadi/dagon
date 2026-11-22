@@ -78,7 +78,7 @@ CRITERIA = {
 STATES = ("planned", "candidate", "publish")
 
 # One package for each OS a release ships for, named for it. A record names its OSes in "platforms". One that names none
-# is from before the Mac build (D128), and shipped Linux and Windows: that is how v0.1.0-pre-alpha.1 is still checked.
+# is from before the Mac build (D129), and shipped Linux and Windows: that is how v0.1.0-pre-alpha.1 is still checked.
 PACKAGES = {"linux": "linux-x86_64.tar.gz", "windows": "windows-x86_64.zip", "macos": "macos-arm64.zip"}
 DEFAULT_PLATFORMS = ("linux", "windows")
 # What each shipped OS's provenance reads from the logs of the job that built it.

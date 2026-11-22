@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 # Describes the macOS app CI built, from the app itself and the Mac that built it: its architectures, the minimum macOS
 # it asks for, how it is signed, and what Gatekeeper and notarization say. One fact a line, as
-# "MACOS_FACT <name>: <value>", which the release's provenance and notes quote (D128). Facts only: it judges nothing,
+# "MACOS_FACT <name>: <value>", which the release's provenance and notes quote (D129). Facts only: it judges nothing,
 # and the package's smoke test is what fails on a broken signature.
 # Usage: tools/macos_facts.sh <folder holding the unpacked app> <out file>
 set -u
