@@ -14,12 +14,12 @@ Changing task state only. The lasting rules are in [AGENTS.md](../AGENTS.md). **
 | **The owner-test build** | **`a30be86`,** every M6 game change through `1229ae6`, CI push run [44913367672](https://github.com/shamsuzzamansadi/dagon/actions/runs/44913367672) (all passed): Windows zip `c138e0d4…1c9a`, Linux zip `2e281dc2…f83b`, both verified. For the owner's checks on the Windows desktop and the ThinkPad, with the checklist and the results by build and device: [owner-test build](m6/owner-test-build.md). **Owner playtest satisfactory on 21 November** (Windows), for the route played; two observations open. The players stay on `a4250f0` |
 | **Branch and pull request** | `main` only, after #7's squash merge; `m6/stabilization` and `m6/macos` are deleted after it. #8, M5's release, is merged |
 | **The Mac build** | arm64 only, minimum macOS 11, built and checked by CI's `macos` job on `macos-15`; signed ad hoc, not notarized (D129). On `617b297`, push run 45012866751 and rehearsal 45012877847 passed: the release zip, unpacked on Apple Silicon, saved, quit, relaunched and continued (review package §8). No person has run it |
-| **The M6 candidate** | [`release/v0.2.0-alpha.2.json`](../release/v0.2.0-alpha.2.json), `state: candidate`, Linux, Windows and macOS: `main`'s CI packages it as `release-candidate-v0.2.0-alpha.2` and never publishes it. Its notes list the outstanding human checks. The owner's acceptance does not cover its fingerprint: a tag needs the owner's word |
+| **The M6 candidate** | [`release/v0.2.0-alpha.2.json`](../release/v0.2.0-alpha.2.json), `state: candidate`, Linux, Windows and macOS: `main`'s CI packages it as `release-candidate-v0.2.0-alpha.2` and never publishes it. **Prepared on #7's merge `b271316` by run 45038841566, and verified** ([record](evidence/m6/candidate-v0.2.0-alpha.2.md)): checksums, provenance naming `b271316`, the three packages, the seven checks under "Not tested". Fingerprint `sha256:96c145f4…8135b`, which the owner's acceptance does not cover: a tag needs the owner's word on the [proposal](evidence/m6/candidate-v0.2.0-alpha.2.md#the-tag-proposal-for-the-owners-word) |
 | **Releases** | [`v0.1.0-pre-alpha.1`](https://github.com/shamsuzzamansadi/dagon/releases/tag/v0.1.0-pre-alpha.1), at `760a539`, untouched; [`v0.2.0-alpha.1`](https://github.com/shamsuzzamansadi/dagon/releases/tag/v0.2.0-alpha.1), M5's alpha, tagged on `a4250f0`, from `main`'s own run 44748633376 of it (D128), published on 2026-11-22, verified ([record](evidence/release-workflow/publication-v0.2.0-alpha.1.md)) |
 
 ## M6 progress, by plan item
 
-Check against `git log` on `m6/stabilization` and the pull request before relying on this.
+M6 is merged as `b271316`; check against `git log` on `main` before relying on this.
 
 | # | Item | State | Where |
 |---|---|---|---|
@@ -37,7 +37,7 @@ Check against `git log` on `m6/stabilization` and the pull request before relyin
 | 12 | Validation and handoff | The [package](reviews/m6-review-package.md); breakage of what M6 adds, 10 of 10 caught; the owner's acceptance; the candidate's artifacts from `main`'s CI, and a tag proposal for the owner | this page |
 | — | The Mac build (owner, 2026-11-21) | **Done, by CI:** built, unit- and integration-tested, exported, packaged and smoke-tested on Apple Silicon (D129). Shutdown waits for the mixer (D130); on `617b297` the Windows runs end with `dagon: quitting`, exit 0, nothing in use at exit | [D129](decisions.md) |
 
-**Resuming after an interruption:** `cd ~/work/dagon-m4/clone && git switch m6/stabilization && git pull`, then this table and `gh pr view 7`. Graphical runs one at a time: two private displays at once can share an X server and steal each other's keyboard focus (it broke a route run on 2026-11-20). The display checks need `XNS_WM=1` (Openbox, unpacked into `~/.cache/dagon-m4/S/xroot`); `~/work/dagon-m6/tools/capdisplay.sh <WxH> <new dir>` runs them.
+**Resuming after an interruption:** `cd ~/work/dagon-m4/clone && git switch main && git pull`, then this page and the open pull requests. Graphical runs one at a time: two private displays at once can share an X server and steal each other's keyboard focus (it broke a route run on 2026-11-20). The display checks need `XNS_WM=1` (Openbox, unpacked into `~/.cache/dagon-m4/S/xroot`); `~/work/dagon-m6/tools/capdisplay.sh <WxH> <new dir>` runs them.
 
 **Open from M5, as the owner said:** the intelligibility of the reveal's dialogue by ear (item 3).
 
@@ -70,4 +70,4 @@ Outside the repository and outside `/tmp`.
 
 ## Next concrete action
 
-**After #7's merge:** follow `main`'s CI on the merge commit; download and verify the `release-candidate-v0.2.0-alpha.2` artifact (checksums, provenance naming the merge commit, the three packages, the notes' "Not tested"); bring the owner the tag proposal. **Then stop: publishing an M6 version and starting M7 need the owner's word.** The human checks stay pending until people do them: the two first-time players (on `a4250f0`) and their timings, the owner's listening sheet, the display switch as the monitor shows it, Continue after the credits, controllers, the native runs, and any Mac.
+**The owner's word on the [tag proposal](evidence/m6/candidate-v0.2.0-alpha.2.md#the-tag-proposal-for-the-owners-word),** brought to them on 2026-11-22: `v0.2.0-alpha.2` on `b271316`, from `main`'s run 45038841566. Done before it: #7's merge, `main`'s CI on it, the candidate's verification. **Until then nothing more: publishing an M6 version and starting M7 need the owner's word.** The human checks stay pending until people do them: the two first-time players (on `a4250f0`) and their timings, the owner's listening sheet, the display switch as the monitor shows it, Continue after the credits, controllers, the native runs, and any Mac.
