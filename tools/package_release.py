@@ -11,6 +11,7 @@ as they are, with the permissions they record, under the package's folder (D129)
 import argparse
 import gzip
 import os
+import platform as host
 import plistlib
 import stat
 import subprocess
@@ -189,7 +190,18 @@ def macos_app(folder, package_path):
     return executable
 
 
-def smoke(platform, package_path):
+def tested_on(platform):
+    """The system this smoke test ran on, which is the one each package was actually tested on."""
+    if platform == "macos":
+        version = subprocess.run(["sw_vers", "-productVersion"], capture_output=True, text=True).stdout.strip()
+        build = subprocess.run(["sw_vers", "-buildVersion"], capture_output=True, text=True).stdout.strip()
+        return f"macOS {version} ({build}), {host.machine()}, a GitHub-hosted runner"
+    if platform == "linux":
+        return f"{host.freedesktop_os_release().get('PRETTY_NAME', 'Linux')}, {host.machine()}, a GitHub-hosted runner"
+    return f"{host.platform()}, a GitHub-hosted runner"
+
+
+def smoke(platform, package_path, facts=None):
     spec = PLATFORMS[platform]
     with tempfile.TemporaryDirectory(prefix="dagon-package-smoke.") as work:
         folder = extract(package_path, work, platform)
@@ -222,6 +234,10 @@ def smoke(platform, package_path):
         require(resumed, "dagon: save status=0", "continue")
         require(resumed, "dagon: session start beat=0 persisted=0", "continue")
     print(f"smoke passed: {Path(package_path).name} starts, runs New Game with a prompt, saves at its first checkpoint, quits, and continues from that save in a new process")
+    if facts:
+        name = {"linux": "Linux", "windows": "Windows", "macos": "macOS"}[platform]
+        Path(facts).parent.mkdir(parents=True, exist_ok=True)
+        Path(facts).write_text(f"SMOKE_FACT {name} package smoke-tested on: {tested_on(platform)}\n", encoding="utf-8")
 
 
 def main():
@@ -235,11 +251,12 @@ def main():
     smoke_parser = commands.add_parser("smoke")
     smoke_parser.add_argument("--platform", required=True, choices=PLATFORMS)
     smoke_parser.add_argument("--package", required=True)
+    smoke_parser.add_argument("--facts", help="where to write the system it was tested on, for the provenance")
     args = parser.parse_args()
     if args.command == "package":
         package(args.platform, args.version, args.export_dir, ".", args.out)
     else:
-        smoke(args.platform, args.package)
+        smoke(args.platform, args.package, args.facts)
 
 
 if __name__ == "__main__":

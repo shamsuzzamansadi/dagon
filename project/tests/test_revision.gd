@@ -492,7 +492,11 @@ func test_pausing_holds_every_sound_and_resuming_carries_on(h) -> void:
 	await _wait_real_time(h, 400)
 	h.check_near(sea.get_playback_position(), held, 0.06, "the sea while paused")
 	await h.tap_key(KEY_ESCAPE)
-	await _wait_real_time(h, 400)
+	# It must carry on, and how soon depends on the machine's mixing thread: a busy CI runner can lag by a few hundred
+	# milliseconds, so this waits up to two seconds by the clock for 0.2 s of sea.
+	var resumed := Time.get_ticks_msec()
+	while sea.get_playback_position() <= held + 0.2 and Time.get_ticks_msec() - resumed < 2000:
+		await _wait_real_time(h, 100)
 	h.check(sea.get_playback_position() > held + 0.2, "the sea did not carry on after resuming")
 
 
