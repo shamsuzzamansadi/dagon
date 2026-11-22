@@ -29,7 +29,7 @@ How a milestone prerelease is built, gated and published. The rules come from th
 |---|---|---|
 | `gate` | Reads the record, checks every gate, and names every blocker | No |
 | `package-linux`, `package-windows`, `package-macos` | One for each OS the record ships. Packages the run's own export with the license and credits, then extracts the package and runs it headless on its own OS: main menu, New Game with a prompt, a save at the first checkpoint, and Continue from it in a new process. The Mac package is unpacked as a Mac unpacks a download, and its architecture and signature are checked before it runs | No |
-| `prepare` | Writes the release notes, `SHA256SUMS.txt` and `PROVENANCE.txt` | No |
+| `prepare` | Writes the release notes, `SHA256SUMS.txt` and `PROVENANCE.txt`. The provenance names the game's source commit, the run that built and tested it, and the run that prepared it, as three facts, and no publication: preparing comes before any publication, and a candidate is never published (D132) | No |
 | `publish` | Creates a draft, checks the uploaded files against their checksums, and only then publishes. The tag appears at that moment, at the tested commit | Yes |
 
 ## Shipping an earlier commit on `main` (D128)
@@ -44,7 +44,7 @@ A record usually ships the commit whose `main` push it is merged in. **A record 
 |---|---|
 | **The gate** | Judges that commit's files against the owner's acceptance (its fingerprint), and checks that the run is `main`'s own push run of that commit, that it succeeded, that `linux`, `linux-clang`, `windows` and `release-tools` passed in it, that it still holds the exports and logs, and that the commit is in this commit's history. This commit's own CI must pass too |
 | **The packages** | The package job checks that commit out, and packages that run's own exports with that commit's own packaging tool, license and credits: what its own release would have been. Nothing is rebuilt |
-| **The provenance and notes** | Name that commit as the source, that run as what built and tested it, and this run as what packaged, smoke-tested and published it |
+| **The provenance and notes** | Name, as separate facts, that commit as the game's source, that run as the source build run, which built and tested it, and this run as what packaged, smoke-tested and prepared it. They never claim a publication (D132) |
 | **The tag** | Goes on that commit. `verify` checks it there |
 
 **Only while the run keeps its files:** GitHub keeps a run's artifacts for a limited time (until 18 February 2027 for `a4250f0`'s). After that, the gate names the missing files and nothing is published.

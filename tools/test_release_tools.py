@@ -825,7 +825,7 @@ class PrepareTests(unittest.TestCase):
             value, name = line.split("  ", 1)
             self.assertEqual(hashlib.sha256((prepared / name).read_bytes()).hexdigest(), value)
         provenance = (prepared / "PROVENANCE.txt").read_text(encoding="utf-8")
-        self.assertIn(f"Source commit: {self.commit}", provenance)
+        self.assertIn(f"Game source commit: {self.commit}", provenance)
         self.assertIn(f"godot-cpp: {'1' * 40}", provenance)
 
     def test_a_missing_compiler_stops_the_release(self):
@@ -849,10 +849,41 @@ class PrepareTests(unittest.TestCase):
         finally:
             os.chdir(previous)
         provenance = (self.root / "prepared" / "PROVENANCE.txt").read_text(encoding="utf-8")
-        self.assertIn(f"Source commit: {self.commit}", provenance)
-        self.assertIn("Built and tested by CI run: https://example/run/1", provenance)
-        self.assertIn("Packaged, smoke-tested and published by CI run: https://example/run/9 at " + "e" * 40, provenance)
-        self.assertIn("Packaged, smoke-tested and published by: https://example/run/9", (self.root / "prepared" / "RELEASE_NOTES.md").read_text(encoding="utf-8"))
+        self.assertIn(f"Game source commit: {self.commit}", provenance)
+        self.assertIn("Source build run, which built and tested that commit: https://example/run/1", provenance)
+        self.assertIn("Packaged, smoke-tested and prepared by CI run: https://example/run/9 at " + "e" * 40, provenance)
+        self.assertIn("Packaged, smoke-tested and prepared by CI run: https://example/run/9", (self.root / "prepared" / "RELEASE_NOTES.md").read_text(encoding="utf-8"))
+
+    def test_prepared_provenance_never_claims_a_publication(self):
+        """Preparation runs before any publication, and a candidate is never published, so neither may claim one (D132)."""
+        claim = re.compile(r"publish(ed|es|ing)?\s+by|published\s+(on|at|in)\b", re.IGNORECASE)
+        self.mac_record()
+        self.add_mac()
+        record = json.loads(self.record.read_text(encoding="utf-8"))
+        for state in ("candidate", "publish"):
+            for packaged_by in (None, "https://example/run/9 at " + "e" * 40):
+                with self.subTest(state=state, packaged_by=packaged_by):
+                    self.record.write_text(json.dumps(dict(record, state=state)), encoding="utf-8")
+                    args = SimpleNamespace(record=str(self.record), packages=str(self.root / "packages"), logs=str(self.root / "logs"), out=str(self.root / "prepared"), commit=self.commit, run_url="https://example/run/1", smoke=str(self.root / "smoke"), packaged_by=packaged_by)
+                    previous = os.getcwd()
+                    os.chdir(self.root)
+                    try:
+                        with contextlib.redirect_stdout(io.StringIO()):
+                            release_gate.prepare(args)
+                    finally:
+                        os.chdir(previous)
+                    provenance = (self.root / "prepared" / "PROVENANCE.txt").read_text(encoding="utf-8")
+                    sources = (self.root / "prepared" / "RELEASE_NOTES.md").read_text(encoding="utf-8").split("## Source and provenance", 1)[1]
+                    for text in (provenance, sources):
+                        self.assertIsNone(claim.search(text), text)
+                    for line in provenance.splitlines():
+                        if ": " in line:
+                            self.assertNotIn("publish", line.split(": ", 1)[0].lower(), line)
+                    # The three facts stay separate, also when one run built and prepared it.
+                    self.assertIn(f"Game source commit: {self.commit}\n", provenance)
+                    self.assertIn("Source build run, which built and tested that commit: https://example/run/1\n", provenance)
+                    self.assertIn(f"Packaged, smoke-tested and prepared by CI run: {packaged_by or 'https://example/run/1 at ' + self.commit}\n", provenance)
+                    self.assertIn("This file records no publication.", provenance)
 
     def mac_record(self):
         record = json.loads(self.record.read_text(encoding="utf-8"))
@@ -1198,6 +1229,77 @@ class CommandLineTests(unittest.TestCase):
         self.assertIn("GitHub answered 500", failed.stdout)
 
 
+@unittest.skipIf(os.name == "nt", "the publisher runs on Linux, under sh")
+class PublishScriptTests(unittest.TestCase):
+    """tools/publish_release.sh against stand-ins for gh and the gate. A rehearsal never publishes, so this is its test."""
+
+    SCRIPT = Path(__file__).with_name("publish_release.sh")
+
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temporary.cleanup)
+        self.root = Path(self.temporary.name)
+        bin_dir, self.release, self.prepared = self.root / "bin", self.root / "release", self.root / "prepared"
+        for folder in (bin_dir, self.release, self.prepared):
+            folder.mkdir()
+        self.log = self.root / "calls.log"
+        package = f"dagon-{PRE_ALPHA}-linux-x86_64.tar.gz"
+        write(self.prepared, package, "game")
+        write(self.prepared, "SHA256SUMS.txt", f"{hashlib.sha256(b'game').hexdigest()}  {package}\n")
+        write(self.prepared, "PROVENANCE.txt", "Game source commit: x\n")
+        write(self.prepared, "TITLE.txt", "DAGON")
+        write(self.prepared, "RELEASE_NOTES.md", "Notes.\n\n## Source and provenance\n- Game source commit: `x`\n")
+        # The gate: preflight decides, verify passes unless told not to.
+        write(bin_dir, "python", f"""#!/bin/sh
+echo "python $*" >> "{self.log}"
+case "$*" in *preflight*) echo create ;; *verify*) exit "${{VERIFY_EXIT:-0}}" ;; esac
+""")
+        # gh: a release folder stands in for GitHub; "published" exists once the draft is published.
+        write(bin_dir, "gh", f"""#!/bin/sh
+echo "gh $*" >> "{self.log}"
+release="{self.release}"
+case "$1 $2" in
+  "release create") shift 2; while [ $# -gt 0 ]; do case "$1" in --title|--notes-file|--target) [ "$1" = --notes-file ] && cp "$2" "$release/notes.md"; shift 2 ;; --*) shift ;; *) case "$1" in v*) ;; *) cp "$1" "$release/" ;; esac; shift ;; esac; done ;;
+  "release download") shift 2; while [ $# -gt 0 ]; do [ "$1" = --dir ] && dir="$2"; shift; done; for f in "$release"/*; do case "$f" in *notes.md|*published) ;; *) cp "$f" "$dir/" ;; esac; done ;;
+  "release edit") case "$*" in *--draft=false*) touch "$release/published" ;; esac; shift 2; while [ $# -gt 0 ]; do [ "$1" = --notes-file ] && cp "$2" "$release/notes.md"; shift; done ;;
+  "release view") if [ -e "$release/published" ] && [ -z "$STILL_A_DRAFT" ]; then echo "2026-11-23T10:00:00Z"; fi ;;
+esac
+""")
+        for name in ("python", "gh"):
+            (bin_dir / name).chmod(0o755)
+        self.env = dict(os.environ, PATH=f"{bin_dir}{os.pathsep}{os.environ['PATH']}", GITHUB_SERVER_URL="https://github.com", GITHUB_REPOSITORY="o/r", GITHUB_RUN_ID="77", GITHUB_SHA="f" * 40)
+
+    def publish(self, **env):
+        return subprocess.run(["sh", str(self.SCRIPT), PRE_ALPHA, "a" * 40, str(self.prepared)], cwd=self.root, env={**self.env, **env}, capture_output=True, text=True)
+
+    def test_the_notes_name_the_publishing_run_only_after_github_confirms_it(self):
+        result = self.publish()
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        calls = self.log.read_text(encoding="utf-8").splitlines()
+        order = [next(i for i, call in enumerate(calls) if text in call) for text in ("--draft --prerelease", "--draft=false", "verify", "release view", "release edit v0.1.0-pre-alpha.1 --notes-file")]
+        self.assertEqual(order, sorted(order))
+        self.assertEqual(sum("--notes-file" in call for call in calls), 2)
+        notes = (self.release / "notes.md").read_text(encoding="utf-8")
+        self.assertTrue(notes.startswith((self.prepared / "RELEASE_NOTES.md").read_text(encoding="utf-8")))
+        self.assertTrue(notes.endswith(f"- Published by CI run: https://github.com/o/r/actions/runs/77 at {'f' * 40}; GitHub reports it published at 2026-11-23T10:00:00Z\n"))
+        # The files GitHub locks are the ones prepared.
+        self.assertEqual((self.release / "PROVENANCE.txt").read_text(encoding="utf-8"), "Game source commit: x\n")
+
+    def test_no_publication_run_is_named_when_github_does_not_confirm_it(self):
+        result = self.publish(VERIFY_EXIT="1")
+        self.assertNotEqual(result.returncode, 0)
+        calls = self.log.read_text(encoding="utf-8")
+        self.assertNotIn("release view", calls)
+        self.assertNotIn("Published by", (self.release / "notes.md").read_text(encoding="utf-8"))
+
+    def test_no_publication_run_is_named_when_github_reports_no_publication_time(self):
+        result = self.publish(STILL_A_DRAFT="1")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("GitHub does not report it published", result.stdout)
+        self.assertEqual(sum("--notes-file" in call for call in self.log.read_text(encoding="utf-8").splitlines()), 1)
+        self.assertNotIn("Published by", (self.release / "notes.md").read_text(encoding="utf-8"))
+
+
 class WorkflowTests(unittest.TestCase):
     """The rules a YAML typo could silently drop. actionlint checks the syntax."""
 
@@ -1241,7 +1343,7 @@ class WorkflowTests(unittest.TestCase):
         script = (self.root / "tools/publish_release.sh").read_text(encoding="utf-8")
         for forbidden in ("--force", "git push", "git tag", "--cleanup-tag", "gh release delete", "|| echo", "|| true", "2> /dev/null"):
             self.assertNotIn(forbidden, script)
-        order = [script.index(step) for step in ("release_gate.py preflight", "--draft --prerelease", "sha256sum -c", "--draft=false", "release_gate.py verify")]
+        order = [script.index(step) for step in ("release_gate.py preflight", "--draft --prerelease", "sha256sum -c", "--draft=false", "release_gate.py verify", "Published by CI run")]
         self.assertEqual(order, sorted(order))
 
     def test_an_earlier_commit_is_packaged_from_its_own_checkout_and_run_and_tagged_there(self):
