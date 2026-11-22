@@ -1,6 +1,6 @@
 # M6 Review Package: Stabilization
 
-**To:** the owner. **Status: draft, in progress. No M6 candidate is named yet:** it waits on the human checks (§5), whose findings may change the game. **Not for merging,** and no `v0.2.0-alpha.1`, until the owner has reviewed M6 and says so; M7 is not started.
+**To:** the owner. **Status: accepted by the owner on 2026-11-21 as a milestone, with the outstanding human checks (§5) carried forward as accepted deferrals** ([record](../evidence/m6/owner-acceptance-2026-11-21.md)). The owner asked for the README for players and a native macOS Apple Silicon build before the merge (§8). **No M6 version is published:** the candidate `v0.2.0-alpha.2` is prepared by `main`'s CI, and a tag needs the owner's word (§7). M5's alpha, `v0.2.0-alpha.1`, is published from `a4250f0` (§9). M7 is not started.
 
 | | |
 |---|---|
@@ -27,7 +27,8 @@
 | 9 | M6 verification | The matrix, with its gaps filled; **the owner's pass over the menus is outstanding** | D done; P outstanding | [matrix](../evidence/m6/verification-matrix.md) |
 | 10 | GDD §8 on every scene | The developer's view; F1, F2 and F3 found and fixed; **the owner's playtest of `a30be86`: satisfactory** for the route played (§4) | D done; P done for that route | [review](../evidence/m6/visual-review/README.md), [F2/F3](../evidence/m6/cave-and-checkpoint/README.md) |
 | 11 | Carried items | M3's two survivors: tests that fail under their breakages. M2's examine: not reproduced in any run, 6 here and 20 in each CI run since `1f68ceb` (10 on Windows, 10 on Linux) | D | [matrix](../evidence/m6/verification-matrix.md) |
-| 12 | Validation and handoff | This package; the breakage of what M6 adds, 10 of 10 caught; the candidate when the human checks are in | D | §3 |
+| 12 | Validation and handoff | This package; the breakage of what M6 adds, 10 of 10 caught; the owner's acceptance; the candidate's artifacts from `main`'s CI and a tag proposal | D, P | §3, §7 |
+| — | The README for players, and a native macOS Apple Silicon build (owner, 2026-11-21) | Done: the Mac build made and checked by CI on Apple Silicon (D129); shutdown waits for the mixer (D130) | D | §8 |
 
 ## 2. What changed, by commit
 
@@ -60,6 +61,10 @@
 
 **2026-11-21, the owner, on the owner-test build `a30be86`, Windows desktop: owner playtest satisfactory** for the route played, New Game through the running escape, all four epilogue panels, the credits and the return to the main menu: "I'm satisfied with the current visuals and gameplay. I'm requesting no further changes based on this run." Two observations left open: at 6:39 to 6:43 the recording shows only the centre of Settings during the display switch, and what the monitor showed is not confirmed; Continue after the credits was not selected, so D127 has scripted coverage only there. ChatGPT reviewed the footage and compared audio samples with the owner's 20 November recording: **a signal check, not listening** ([record](../m6/owner-test-build.md)).
 
+**2026-11-21, the owner: M6 accepted** as a milestone, "with the outstanding human checks carried forward" ([record](../evidence/m6/owner-acceptance-2026-11-21.md)).
+
+**2026-11-22, the owner,** in answer to the developer's question: they heard the M5 build's main audio (music, effects, narration, the reveal) in play, on `b7303bf`, with sound. The reveal's intelligibility by ear stays open ([record](../evidence/m5/release-authorization-2026-11-22.md)).
+
 The owner's words from M5's acceptance stand in their own record ([M5 acceptance](../evidence/m5/owner-acceptance-2026-11-20.md)), among them that the intelligibility of the reveal's dialogue by ear remained open for M6 (item 3).
 
 ## 5. Outstanding checks
@@ -84,4 +89,12 @@ The owner's words from M5's acceptance stand in their own record ([M5 acceptance
 
 ## 7. The candidate
 
-**Not named yet.** It will be the head after the human checks' fixes, with required CI and `desktop-checks` passed, given with its Windows artifact link and zip SHA-256 and its acceptance fingerprint; with the exported route run on it, and this package's §3 to §5 brought up to it.
+**The roadmap names no version for M6;** its exit gate asks for release-candidate artifacts from CI, launched on real Windows and Linux. So M6 publishes nothing: [`release/v0.2.0-alpha.2.json`](../../release/v0.2.0-alpha.2.json) is in `candidate` state, and `main`'s CI on #7's merge packages it as the `release-candidate-v0.2.0-alpha.2` artifact, for Linux, Windows and macOS, with notes that list every outstanding human check under "Not tested". **The version is a proposal.** The owner's acceptance covers the owner-test build's fingerprint, not the merged one (§8), so the gate reports it as remaining, and publishing needs the owner's word.
+
+## 8. What the merge adds to what the owner played
+
+At the owner's request, before the merge: **the README for players** (a spoiler-free description, a picture of the Shore, the Releases link and downloads, launch steps for each system, the controls, a short build section), and **a native macOS build for Apple Silicon** (D129): one arm64 target, minimum macOS 11, built with Apple Clang on CI's `macos-15` runner against the pinned Godot and godot-cpp; the extension bundled in the app; the app signed ad hoc and not notarized, zipped keeping its permissions; packaged and smoke-tested on a Mac. It needed, in files every build carries: the extension's macOS libraries, a macOS export preset, ETC2 and ASTC import (no texture gains a variant), and an Apple-only way of reading and writing the settings file's numbers. Found on the way, and fixed for every system: the test harness nested each test's storage folder in the last; one test waited on a busy runner's mixer by a fixed time; and quitting now also waits for the mixer to let go of every sound (D130). **No person has played the merged build.**
+
+## 9. M5's alpha
+
+`v0.2.0-alpha.1` was published on 2026-11-22 from `a4250f0`, M5's accepted merge, as built by `main`'s own run of it, and tagged there (D128), at the owner's request ([record](../evidence/release-workflow/publication-v0.2.0-alpha.1.md)). Its packages hold `a4250f0`'s exports byte for byte. The two first-time players stay on `a4250f0`, the same game.
