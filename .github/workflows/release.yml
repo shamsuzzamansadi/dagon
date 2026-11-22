@@ -88,10 +88,14 @@ jobs:
       - name: Package
         run: python tools/package_release.py package --platform ${{ matrix.platform }} --version "$VERSION" --export-dir export --out packages
       - name: Smoke-test the package itself
-        env:
-          # An earlier commit's own packaging tool may predate the record of what it ran on.
-          FACTS: ${{ needs.gate.outputs.source-run == '' && format('--facts smoke/smoke-{0}.txt', matrix.platform) || '' }}
-        run: python tools/package_release.py smoke --platform ${{ matrix.platform }} --package packages/dagon-* $FACTS
+        # An earlier commit's own packaging tool may predate the record of what it ran on, so ask that tool (D131).
+        run: |
+          usage=$(python tools/package_release.py smoke --help)
+          facts=()
+          if [[ "$usage" == *--facts* ]]; then
+            facts=(--facts "smoke/smoke-${{ matrix.platform }}.txt")
+          fi
+          python tools/package_release.py smoke --platform ${{ matrix.platform }} --package packages/dagon-* "${facts[@]}"
       - uses: actions/upload-artifact@v7
         with:
           name: release-package-${{ matrix.platform }}

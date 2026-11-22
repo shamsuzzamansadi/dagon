@@ -2,7 +2,7 @@
   "version": "v0.1.0-pre-alpha.0",
   "milestone": "",
   "state": "candidate",
-  "summary": "A rehearsal of the packaging workflow. Version .0 can never be published.",
+  "summary": "A rehearsal of the packaging workflow. Version .0 can never be published. It ships what v0.2.0-alpha.2 will ship: b271316, as built by main's own CI run of it, for Linux, Windows and macOS (D128).",
   "owner_acceptance": {
     "status": "pending",
     "record": "none",
@@ -15,6 +15,10 @@
     "This is a rehearsal of the packaging workflow, and not a build for anyone to play."
   ],
   "deferred": [],
+  "source": {
+    "commit": "b271316371532074eb2c5fb312afa7c0a2d822c4",
+    "run": 45038841566
+  },
   "platforms": [
     "linux",
     "windows",
