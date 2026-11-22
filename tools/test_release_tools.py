@@ -6,6 +6,7 @@ import http.server
 import io
 import json
 import os
+import re
 import socket
 import subprocess
 import sys
@@ -99,8 +100,8 @@ class Repo:
         write(self.root, f"release/{record['version']}.json", json.dumps(record))
         return record
 
-    def evaluate(self, ci_result="success", tags=None, releases=None):
-        return release_gate.evaluate(self.root, self.gameplay(), ci_result, tags or {}, (releases or {}).get)
+    def evaluate(self, ci_result="success", tags=None, releases=None, rehearse=False, check_source=None):
+        return release_gate.evaluate(self.root, self.gameplay(), ci_result, tags or {}, (releases or {}).get, rehearse, check_source or (lambda source, platforms: []))
 
 
 class GateTests(unittest.TestCase):
@@ -118,7 +119,7 @@ class GateTests(unittest.TestCase):
     def test_every_gate_passed_publishes(self):
         self.repo.save(self.repo.good_record())
         outcome, messages, failed = self.repo.evaluate()
-        self.assertEqual(outcome, {"version": PRE_ALPHA, "record": f"release/{PRE_ALPHA}.json", "publish": "true"})
+        self.assertEqual(outcome, {"version": PRE_ALPHA, "record": f"release/{PRE_ALPHA}.json", "publish": "true", "target": "", "source_run": "", "matrix": release_gate.package_matrix(release_gate.DEFAULT_PLATFORMS)})
         self.assertFalse(failed, messages)
 
     def test_failed_ci_blocks_and_packages_nothing(self):
@@ -385,7 +386,7 @@ class GateTests(unittest.TestCase):
         rehearsal = Path(__file__).with_name("release_rehearsal.json")
         write(self.repo.root, "tools/release_rehearsal.json", rehearsal.read_text(encoding="utf-8"))
         self.repo.save(self.repo.good_record())
-        outcome, _, failed = release_gate.evaluate(self.repo.root, self.repo.gameplay(), "success", {}, {}.get, rehearse=True)
+        outcome, _, failed = release_gate.evaluate(self.repo.root, self.repo.gameplay(), "success", {}, {}.get, rehearse=True, check_source=lambda source, platforms: [])
         self.assertEqual((outcome["publish"], failed), ("false", False))
         self.assertEqual(outcome["record"], release_gate.REHEARSAL_RECORD)
         self.assertTrue(release_gate.version_problems(outcome["version"]), "its version must be unpublishable")
@@ -399,6 +400,157 @@ class GateTests(unittest.TestCase):
         for path, record in records:
             if record["state"] == "planned":
                 self.assertEqual(record["owner_acceptance"]["status"], "pending", path.name)
+
+
+class SourceRun:
+    """main's push run of a commit, as GitHub describes it, with every required job passed and every file kept."""
+
+    def __init__(self, commit, **changes):
+        self.details = {"head_sha": commit, "event": "push", "head_branch": "main", "status": "completed", "conclusion": "success", **changes}
+        self.jobs = [{"name": name, "conclusion": "success"} for name in release_gate.SOURCE_JOBS]
+        self.artifacts = [{"name": name, "expired": False} for name in release_gate.SOURCE_ARTIFACTS]
+
+    def run(self, run_id):
+        return self.details
+
+    def run_jobs(self, run_id):
+        return self.jobs
+
+    def run_artifacts(self, run_id):
+        return self.artifacts
+
+
+class PlatformTests(unittest.TestCase):
+    """Each record names the OSes it ships; one that names none shipped Linux and Windows, as v0.1.0-pre-alpha.1 did (D129)."""
+
+    def test_a_record_naming_no_platforms_is_checked_for_linux_and_windows_only(self):
+        self.assertEqual(release_gate.publication_problems(PRE_ALPHA, COMMIT, published()), [])
+        self.assertEqual(release_gate.expected_assets(PRE_ALPHA), {f"dagon-{PRE_ALPHA}-linux-x86_64.tar.gz", f"dagon-{PRE_ALPHA}-windows-x86_64.zip", "SHA256SUMS.txt", "PROVENANCE.txt"})
+
+    def test_a_published_mac_release_must_have_its_mac_package(self):
+        problems = release_gate.publication_problems(PRE_ALPHA, COMMIT, published(), ("linux", "windows", "macos"))
+        self.assertTrue(any(f"dagon-{PRE_ALPHA}-macos-arm64.zip" in problem for problem in problems), problems)
+
+    def test_each_os_is_packaged_on_its_own_runner_and_the_mac_on_apple_silicon(self):
+        matrix = json.loads(release_gate.package_matrix(("linux", "windows", "macos")))
+        self.assertEqual(matrix, [{"platform": "linux", "os": "ubuntu-22.04"}, {"platform": "windows", "os": "windows-2022"}, {"platform": "macos", "os": "macos-15"}])
+        self.assertEqual(json.loads(release_gate.package_matrix(release_gate.DEFAULT_PLATFORMS)), matrix[:2])
+
+    def test_platforms_must_be_known_and_each_named_once(self):
+        for platforms in ([], ["linux", "linux"], ["linux", "amiga"], "linux"):
+            with self.subTest(platforms):
+                record = {"version": PRE_ALPHA, "state": "planned", "platforms": platforms}
+                self.assertTrue(release_gate.format_problems(Path(f"release/{PRE_ALPHA}.json"), record))
+        self.assertEqual(release_gate.format_problems(Path(f"release/{PRE_ALPHA}.json"), {"version": PRE_ALPHA, "state": "planned", "platforms": ["macos", "linux"]}), [])
+
+    def test_an_earlier_mac_build_needs_its_own_job_and_files_in_its_run(self):
+        jobs, artifacts = release_gate.source_needs(("linux", "windows", "macos"))
+        self.assertIn("macos", jobs)
+        self.assertTrue({"dagon-macos", "logs-macos"} <= set(artifacts))
+        self.assertEqual(release_gate.source_needs(release_gate.DEFAULT_PLATFORMS), (release_gate.SOURCE_JOBS, release_gate.SOURCE_ARTIFACTS))
+
+    def test_the_rehearsal_ships_all_three(self):
+        rehearsal = json.loads(Path(__file__).with_name("release_rehearsal.json").read_text(encoding="utf-8"))
+        self.assertEqual(sorted(release_gate.platforms_of(rehearsal)), ["linux", "macos", "windows"])
+
+
+class SourceTests(unittest.TestCase):
+    """A record that ships an earlier commit on main, from main's own CI run of it (D128)."""
+
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temporary.cleanup)
+        self.repo = Repo(self.temporary.name)
+        self.repo.commit("evidence")
+        self.source = git(self.repo.root, "rev-parse", "HEAD")
+        self.accepted = self.repo.gameplay()
+        # main moves on: the game itself changes after the commit the owner accepted.
+        write(self.repo.root, "src/main.cpp", "int main = 1;")
+        self.repo.commit("later work")
+
+    def record(self, **changes):
+        record = self.repo.good_record()
+        record["owner_acceptance"]["fingerprint"] = self.accepted
+        record["source"] = {"commit": self.source, "run": 5}
+        record.update(changes)
+        return self.repo.save(record)
+
+    def test_an_earlier_commit_is_judged_on_its_own_files_and_shipped_and_tagged_there(self):
+        self.record()
+        self.repo.commit("record")
+        self.assertNotEqual(self.repo.gameplay(), self.accepted)
+        outcome, messages, failed = self.repo.evaluate()
+        self.assertFalse(failed, messages)
+        self.assertEqual(outcome, {"version": PRE_ALPHA, "record": f"release/{PRE_ALPHA}.json", "publish": "true", "target": self.source, "source_run": "5", "matrix": release_gate.package_matrix(release_gate.DEFAULT_PLATFORMS)})
+
+    def test_the_source_commit_must_have_the_accepted_files(self):
+        self.record(owner_acceptance={**self.repo.good_record()["owner_acceptance"], "fingerprint": self.repo.gameplay()})
+        outcome, messages, failed = self.repo.evaluate()
+        self.assertTrue(failed)
+        self.assertTrue(any("the source commit" in message and "has changed since the owner accepted it" in message for message in messages), messages)
+
+    def test_the_source_runs_problems_block_publication(self):
+        self.record()
+        outcome, messages, failed = self.repo.evaluate(check_source=lambda source, platforms: [f"CI run {source['run']} did not succeed"])
+        self.assertTrue(failed)
+        self.assertEqual(outcome["publish"], "false")
+        self.assertTrue(any("CI run 5 did not succeed" in message for message in messages), messages)
+
+    def test_this_commits_own_ci_still_has_to_pass(self):
+        self.record()
+        outcome, messages, failed = self.repo.evaluate(ci_result="failure")
+        self.assertTrue(failed)
+        self.assertEqual((outcome["publish"], outcome["target"]), ("false", ""))
+
+    def test_a_source_must_name_a_full_commit_and_a_run(self):
+        for source in ({"commit": self.source[:7], "run": 5}, {"commit": self.source}, {"commit": self.source, "run": "5"}, {"commit": self.source, "run": 0}, "main"):
+            with self.subTest(source):
+                record = self.repo.good_record()
+                record["source"] = source
+                self.assertTrue(release_gate.format_problems(Path(f"release/{PRE_ALPHA}.json"), record))
+
+    def test_the_source_must_be_on_main_built_by_mains_own_push_run_which_passed_and_kept_its_files(self):
+        root = self.repo.root
+        self.assertEqual(release_gate.source_problems({"commit": self.source, "run": 5}, root, SourceRun(self.source)), [])
+        cases = {
+            "tested": SourceRun("c" * 40),
+            "not main's own push run": SourceRun(self.source, event="pull_request"),
+            "did not succeed": SourceRun(self.source, conclusion="failure"),
+        }
+        failed_job = SourceRun(self.source)
+        failed_job.jobs[1]["conclusion"] = "failure"
+        cases["linux-clang did not succeed"] = failed_job
+        expired = SourceRun(self.source)
+        expired.artifacts[0]["expired"] = True
+        cases["no longer holds dagon-linux"] = expired
+        missing = SourceRun(self.source)
+        missing.artifacts.pop()
+        cases["no longer holds logs-linux-clang"] = missing
+        for needle, github in cases.items():
+            with self.subTest(needle):
+                problems = release_gate.source_problems({"commit": self.source, "run": 5}, root, github)
+                self.assertTrue(any(needle in problem for problem in problems), problems)
+
+    def test_a_commit_off_mains_history_is_refused_and_an_unknown_one_is_not_read_as_absent(self):
+        root = self.repo.root
+        git(root, "checkout", "-q", "-b", "side", self.source)
+        write(root, "docs/side.md", "x")
+        self.repo.commit("side")
+        side = git(root, "rev-parse", "HEAD")
+        git(root, "checkout", "-q", "-")
+        problems = release_gate.source_problems({"commit": side, "run": 5}, root, SourceRun(side))
+        self.assertTrue(any("not in this commit's history" in problem for problem in problems), problems)
+        with self.assertRaises(release_gate.StateUnknown):
+            release_gate.source_problems({"commit": "d" * 40, "run": 5}, root, SourceRun("d" * 40))
+
+    def test_a_rehearsal_with_a_source_packages_that_commits_run_and_checks_it_first(self):
+        write(self.repo.root, release_gate.REHEARSAL_RECORD, json.dumps({"version": "v0.1.0-pre-alpha.0", "state": "candidate", "source": {"commit": self.source, "run": 5}}))
+        outcome, messages, failed = self.repo.evaluate(rehearse=True)
+        self.assertFalse(failed, messages)
+        self.assertEqual((outcome["version"], outcome["target"], outcome["source_run"], outcome["publish"]), ("v0.1.0-pre-alpha.0", self.source, "5", "false"))
+        outcome, messages, failed = self.repo.evaluate(rehearse=True, check_source=lambda source, platforms: ["CI run 5 did not succeed"])
+        self.assertTrue(failed)
+        self.assertEqual(outcome["version"], "")
 
 
 class PackageTests(unittest.TestCase):
@@ -590,6 +742,27 @@ class PrepareTests(unittest.TestCase):
             write(self.root, f"logs/{job}/build-release.log", f"other\ndagon: compiler: {compiler}\n")
         write(self.root, "logs/logs-linux/godot/godot-version.txt", "4.7.2.stable\n")
 
+    MAC_FACTS = {
+        "Architectures, game": "arm64",
+        "Minimum macOS, Info.plist": "11.00",
+        "Minimum macOS, game executable": "11.0",
+        "Minimum macOS, extension": "11.0",
+        "Built on": "macOS 15.6 (24G84), arm64",
+        "Xcode": "Xcode 16.4 Build version 16F6",
+        "Signature": "Signature=adhoc TeamIdentifier=not set",
+        "Signature check": "codesign --verify --deep --strict: valid",
+        "Gatekeeper": "rejected",
+        "Notarization": "does not have a ticket stapled to it",
+    }
+
+    def add_mac(self, version=PRE_ALPHA, facts=None, tested="macOS 15.6 (24G84), arm64, a GitHub-hosted runner"):
+        """What a release that ships macOS has beside the other two: its package, its build's facts, and where it ran."""
+        write(self.root, f"packages/dagon-{version}-macos-arm64.zip", "mac")
+        write(self.root, "logs/logs-macos/build-release.log", "dagon: compiler: Apple clang version 17.0.0\n")
+        write(self.root, "logs/logs-macos/macos-facts.txt", "".join(f"MACOS_FACT {name}: {value}\n" for name, value in (self.MAC_FACTS if facts is None else facts).items()))
+        if tested:
+            write(self.root, "smoke/smoke-macos.txt", f"SMOKE_FACT macOS package smoke-tested on: {tested}\n")
+
     def prepare(self):
         args = SimpleNamespace(
             record=str(self.record),
@@ -598,6 +771,7 @@ class PrepareTests(unittest.TestCase):
             out=str(self.root / "prepared"),
             commit=self.commit,
             run_url="https://example/run/1",
+            smoke=str(self.root / "smoke"),
         )
         previous = os.getcwd()
         os.chdir(self.root)
@@ -636,6 +810,7 @@ class PrepareTests(unittest.TestCase):
 
     def test_the_rehearsal_record_can_be_prepared(self):
         self.record.write_text(Path(__file__).with_name("release_rehearsal.json").read_text(encoding="utf-8"), encoding="utf-8")
+        self.add_mac()
         for name in list((self.root / "packages").iterdir()):
             name.rename(name.with_name(name.name.replace(PRE_ALPHA, "v0.1.0-pre-alpha.0")))
         notes = (self.prepare() / "RELEASE_NOTES.md").read_text(encoding="utf-8")
@@ -663,6 +838,58 @@ class PrepareTests(unittest.TestCase):
                     self.prepare()
                 self.assertIn("Provenance is incomplete", str(caught.exception))
                 log.write_text(saved, encoding="utf-8")
+
+    def test_an_earlier_commits_provenance_names_it_its_own_run_and_the_run_that_packaged_it(self):
+        args = SimpleNamespace(record=str(self.record), packages=str(self.root / "packages"), logs=str(self.root / "logs"), out=str(self.root / "prepared"), commit=self.commit, run_url="https://example/run/1", packaged_by="https://example/run/9 at " + "e" * 40)
+        previous = os.getcwd()
+        os.chdir(self.root)
+        try:
+            with contextlib.redirect_stdout(io.StringIO()):
+                release_gate.prepare(args)
+        finally:
+            os.chdir(previous)
+        provenance = (self.root / "prepared" / "PROVENANCE.txt").read_text(encoding="utf-8")
+        self.assertIn(f"Source commit: {self.commit}", provenance)
+        self.assertIn("Built and tested by CI run: https://example/run/1", provenance)
+        self.assertIn("Packaged, smoke-tested and published by CI run: https://example/run/9 at " + "e" * 40, provenance)
+        self.assertIn("Packaged, smoke-tested and published by: https://example/run/9", (self.root / "prepared" / "RELEASE_NOTES.md").read_text(encoding="utf-8"))
+
+    def mac_record(self):
+        record = json.loads(self.record.read_text(encoding="utf-8"))
+        record["platforms"] = ["linux", "windows", "macos"]
+        self.record.write_text(json.dumps(record), encoding="utf-8")
+
+    def test_a_mac_release_states_its_minimum_and_the_macos_it_was_tested_on_apart(self):
+        self.mac_record()
+        self.add_mac()
+        prepared = self.prepare()
+        notes = (prepared / "RELEASE_NOTES.md").read_text(encoding="utf-8")
+        provenance = (prepared / "PROVENANCE.txt").read_text(encoding="utf-8")
+        self.assertIn("Needs macOS 11.00 or later; tested on macOS 15.6 (24G84), arm64, a GitHub-hosted runner", notes)
+        self.assertIn("not notarized", notes)
+        self.assertIn("macOS package: Apple clang version 17.0.0", provenance)
+        self.assertIn("Minimum macOS, extension: 11.0", provenance)
+        self.assertIn("macOS, signature: Signature=adhoc TeamIdentifier=not set", provenance)
+        self.assertIn("macOS package smoke-tested on: macOS 15.6 (24G84)", provenance)
+        self.assertEqual(len((prepared / "SHA256SUMS.txt").read_text(encoding="utf-8").splitlines()), 3)
+
+    def test_a_mac_release_without_its_facts_or_its_test_record_stops(self):
+        self.mac_record()
+        for facts, tested in (({}, "macOS 15"), ({**self.MAC_FACTS, "Notarization": ""}, "macOS 15"), (None, "")):
+            with self.subTest(facts=facts, tested=tested):
+                (self.root / "smoke" / "smoke-macos.txt").unlink(missing_ok=True)
+                self.add_mac(facts=facts, tested=tested)
+                with self.assertRaises(SystemExit) as caught:
+                    self.prepare()
+                self.assertIn("Provenance is incomplete", str(caught.exception))
+
+    def test_a_mac_release_without_its_package_is_refused(self):
+        self.mac_record()
+        self.add_mac()
+        (self.root / "packages" / f"dagon-{PRE_ALPHA}-macos-arm64.zip").unlink()
+        with self.assertRaises(SystemExit) as caught:
+            self.prepare()
+        self.assertIn("exactly one package per OS", str(caught.exception))
 
     def test_more_than_one_package_per_os_is_refused(self):
         write(self.root, f"packages/dagon-{PRE_ALPHA}-linux-clang-x86_64.tar.gz")
@@ -1016,6 +1243,37 @@ class WorkflowTests(unittest.TestCase):
             self.assertNotIn(forbidden, script)
         order = [script.index(step) for step in ("release_gate.py preflight", "--draft --prerelease", "sha256sum -c", "--draft=false", "release_gate.py verify")]
         self.assertEqual(order, sorted(order))
+
+    def test_an_earlier_commit_is_packaged_from_its_own_checkout_and_run_and_tagged_there(self):
+        package = self.job("package").split("\n  prepare:", 1)[0]
+        self.assertIn("ref: ${{ needs.gate.outputs.target || github.sha }}", package)
+        self.assertIn("run-id: ${{ needs.gate.outputs.source-run }}", package)
+        self.assertIn("actions: read", package)
+        prepare = self.job("prepare").split("\n  publish:", 1)[0]
+        self.assertIn("run-id: ${{ needs.gate.outputs.source-run }}", prepare)
+        self.assertIn("COMMIT: ${{ needs.gate.outputs.target || github.sha }}", self.job("publish"))
+        self.assertIn("COMMIT: ${{ needs.gate.outputs.target || github.sha }}", prepare)
+        caller = self.ci.split("\n  release:\n", 1)[1]
+        self.assertIn("actions: read", caller)
+        self.assertIn("fetch-depth: 0", self.job("gate").split("\n  package:", 1)[0])
+
+    def test_the_mac_build_ships_from_apple_silicon_and_its_package_follows_the_record(self):
+        mac = self.ci.split("- name: macos\n", 1)[1].split("    env:", 1)[0]
+        self.assertIn("ships: true", mac)
+        self.assertIn("os: macos-15", mac)
+        self.assertIn("arch=arm64", mac)
+        self.assertIn("include: ${{ fromJSON(needs.gate.outputs.matrix) }}", self.job("package"))
+        self.assertIn("matrix: ${{ steps.gate.outputs.matrix }}", self.job("gate").split("\n  package:", 1)[0])
+
+    def test_the_readme_links_only_files_a_release_record_ships(self):
+        readme = (self.root / "README.md").read_text(encoding="utf-8")
+        links = re.findall(r"https://github\.com/shamsuzzamansadi/dagon/releases/download/([^/\s)]+)/([^\s)]+)", readme)
+        self.assertTrue(links, "the README links no download")
+        records = {record["version"]: record for _, record in release_gate.load_records(self.root)}
+        for version, name in links:
+            with self.subTest(name):
+                self.assertIn(version, records, f"no release record for {version}")
+                self.assertIn(name, release_gate.expected_assets(version, release_gate.platforms_of(records[version])))
 
     def test_the_gate_asks_github_with_a_read_only_token(self):
         gate = self.job("gate").split("\n  package:", 1)[0]

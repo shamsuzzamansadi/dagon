@@ -32,6 +32,25 @@ How a milestone prerelease is built, gated and published. The rules come from th
 | `prepare` | Writes the release notes, `SHA256SUMS.txt` and `PROVENANCE.txt` | No |
 | `publish` | Creates a draft, checks the uploaded files against their checksums, and only then publishes. The tag appears at that moment, at the tested commit | Yes |
 
+## Shipping an earlier commit on `main` (D128)
+
+A record usually ships the commit whose `main` push it is merged in. **A record can instead ship an earlier commit on `main`:** its `source` names that commit and `main`'s own push run of it.
+
+```json
+"source": {"commit": "<the full commit>", "run": <the id of main's push run of it>}
+```
+
+| | What happens |
+|---|---|
+| **The gate** | Judges that commit's files against the owner's acceptance (its fingerprint), and checks that the run is `main`'s own push run of that commit, that it succeeded, that `linux`, `linux-clang`, `windows` and `release-tools` passed in it, that it still holds the exports and logs, and that the commit is in this commit's history. This commit's own CI must pass too |
+| **The packages** | The package job checks that commit out, and packages that run's own exports with that commit's own packaging tool, license and credits: what its own release would have been. Nothing is rebuilt |
+| **The provenance and notes** | Name that commit as the source, that run as what built and tested it, and this run as what packaged, smoke-tested and published it |
+| **The tag** | Goes on that commit. `verify` checks it there |
+
+**Only while the run keeps its files:** GitHub keeps a run's artifacts for a limited time (until 18 February 2027 for `a4250f0`'s). After that, the gate names the missing files and nothing is published.
+
+**`v0.2.0-alpha.1` ships `a4250f0`,** M5's accepted squash merge, from run [44748633376](https://github.com/shamsuzzamansadi/dagon/actions/runs/44748633376), at the owner's request of 2026-11-21 ([authorization](evidence/m5/release-authorization-2026-11-22.md)). Until it is published, the rehearsal record ships the same, so that a rehearsal tests this path for real.
+
 ## Release states
 
 | `state` | What happens on each `main` push |
@@ -45,6 +64,7 @@ How a milestone prerelease is built, gated and published. The rules come from th
 | Gate | Blocks when |
 |---|---|
 | CI | Any of GCC, Clang, MSVC or the release tools did not succeed on this commit |
+| Source | For a record that ships an earlier commit: that commit is not in this commit's history, or `main`'s own push run of it did not pass its required jobs, or no longer holds its exports and logs (D128) |
 | Owner acceptance | It is not `accepted`, its record does not exist, or it does not state the build tested and what it covers |
 | Nothing shipped has changed | This commit's acceptance fingerprint differs from the one accepted |
 | Label criteria | Any criterion for the version's label is not `met`, or has no evidence file. **`deferred` is not `met`** |

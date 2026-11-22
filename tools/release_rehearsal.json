@@ -11,6 +11,13 @@
     "scope": "None: this is a rehearsal."
   },
   "criteria": {},
-  "known_limitations": ["This is a rehearsal of the packaging workflow, and not a build for anyone to play."],
-  "deferred": []
+  "known_limitations": [
+    "This is a rehearsal of the packaging workflow, and not a build for anyone to play."
+  ],
+  "deferred": [],
+  "platforms": [
+    "linux",
+    "windows",
+    "macos"
+  ]
 }
