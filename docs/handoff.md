@@ -58,6 +58,7 @@ M6 is merged as `b271316`; check against `git log` on `main` before relying on t
 - **2026-11-22, later still:** asked for the provenance's wording to be corrected before publishing, as three separate facts, with the publication run recorded only after GitHub confirms it and a regression check (done in #12, D132); the three archives from artifact 14761047666 to be kept, and their hashes verified after the correction (done: identical); **#11 to stay a draft and the record a candidate until their native results and their explicit confirmation of publication.**
 - **2026-11-27:** a first message with its results still a template's placeholders, not acted on; then **accepted the M6 candidate from `b271316` and authorized publishing `v0.2.0-alpha.2` from run 45038841566:** they tested the Windows package extensively and found no issues, and their recordings show the display switches, Continue after the ending and Continue at the Shore within one session; the Ubuntu native run and every other unverified check stay untested ([record](evidence/m6/release-authorization-2026-11-27.md)).
 - **2026-11-27, later:** after `main`'s publish job was refused (HTTP 403), chose to publish by hand with their own login, and added the `workflow` scope to it; `v0.2.0-alpha.2` published and verified ([publication](evidence/release-workflow/publication-v0.2.0-alpha.2.md)).
+- **2026-11-27, later still:** approved merging #13; decided M7's publication path (D134); asked for a short M7 plan, playtests and the listening check first, to review before M7 starts.
 
 ## Working resources
 
@@ -74,4 +75,4 @@ Outside the repository and outside `/tmp`.
 
 ## Next concrete action
 
-**Nothing, until the owner's word.** `v0.2.0-alpha.2` is published and verified. **Starting M7 needs the owner's word, and so does how a later version whose commit changes workflow files is published (D133).** Still open, by people: the two first-time players (on `a4250f0`) and their timings, the owner's listening sheet, the Ubuntu native run, frame times on the owner's machines, Continue after a relaunch, controllers, and any Mac.
+**The owner's review of the [M7 plan](m7-plan.md),** drafted on 2026-11-27. Nothing of M7 is implemented until they approve it. It puts the two first-time playtests and the listening check of the reveal first, and asks the owner to choose the players' build and, later, the fixes and the version. M7 is published by the normal CI path (D134). Internal submission target 2026-11-29 21:37 UTC; hard deadline 2026-12-01 21:37 UTC.
