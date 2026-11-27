@@ -125,6 +125,10 @@ There is **one package per OS:** GCC on `ubuntu-22.04` for Linux, MSVC on `windo
 - **A rehearsal** runs the gate, packaging, smoke test and preparation for real, on any branch: `gh workflow run ci.yml --ref <branch> -f rehearse=true`. It uses version `.0`, which can never be published, and the `publish` job cannot run outside a push to `main`.
 - **A rehearsal also asks GitHub what exists, with its read-only token,** so those requests run for real.
 
+## A commit that changes workflow files
+
+**`v0.2.0-alpha.2`'s commit, `b271316`, changes `.github/workflows`, and the publish job's token was refused when it created the draft** (HTTP 403, run 46036924022; nothing was created). An Actions token cannot hold the `workflows` permission; the earlier releases' commits changed no workflow file. The cause is probable, not proven. At the owner's choice it was published by hand, with the owner's login, by `publish_release.sh`'s steps on the files that run prepared ([D133](decisions.md), [record](evidence/release-workflow/publication-v0.2.0-alpha.2.md)). **Before a later version whose commit changes workflow files, the owner decides how it is published.**
+
 ## The first real publication
 
 **`v0.1.0-pre-alpha.1` was published by this workflow on 2026-11-15** ([evidence](evidence/release-workflow/first-publication-v0.1.0-pre-alpha.1.md)). The write path, the tag created under the active ruleset, immutable releases and the target kept after publishing were all observed once, with no protection changed. **Still unproven:** removing a failed draft on a retry, and the ruleset refusing to move or delete a tag (not attempted). What was written before it, kept as the record of what was open:
