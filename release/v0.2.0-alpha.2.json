@@ -1,7 +1,7 @@
 {
   "version": "v0.2.0-alpha.2",
   "milestone": "M6",
-  "state": "candidate",
+  "state": "publish",
   "source": {
     "commit": "b271316371532074eb2c5fb312afa7c0a2d822c4",
     "run": 45038841566
@@ -11,13 +11,13 @@
     "windows",
     "macos"
   ],
-  "summary": "The M6 release candidate of DAGON: Beneath the Black Tide, for Windows, Linux and, for the first time, macOS on Apple Silicon: the intended game, playable from the prologue to the ending and the credits.\n\nIt is the game after its sixth milestone, M6 (stabilization). Since `v0.2.0-alpha.1` it adds a fullscreen setting and a window that fits its screen; Settings now calls the examine key Examine, as the prompts do; a drawing misplaced by the Shore's cliff now stands behind the far cliff in the Abyss; the cave's mouth and exit follow the rock; and Continue after the ending no longer stands the sailor in front of a statue. It is the first native Mac build.\n\n**A candidate:** prepared by CI and not published. Several checks by people are still outstanding; they are listed under \"Not tested\" below.",
+  "summary": "The M6 alpha of DAGON: Beneath the Black Tide, for Windows, Linux and, for the first time, macOS on Apple Silicon: the intended game, playable from the prologue to the ending and the credits.\n\nIt is the game as it stood when its sixth milestone, M6 (stabilization), was merged: commit `b271316`, built and tested by that commit's own CI run. Since `v0.2.0-alpha.1` it adds a fullscreen setting and a window that fits its screen; Settings now calls the examine key Examine, as the prompts do; a drawing misplaced by the Shore's cliff now stands behind the far cliff in the Abyss; the cave's mouth and exit follow the rock; and Continue after the ending no longer stands the sailor in front of a statue. It is the first native Mac build.\n\n**It is unfinished.** The owner tested the Windows package on their own desktop and found no issues; several checks by people are still outstanding, and are listed under \"Not tested\" below. Read the limitations first.",
   "owner_acceptance": {
     "status": "accepted",
-    "record": "docs/evidence/m6/owner-acceptance-2026-11-21.md",
-    "build": "The owner-test build: `dagon-windows`, artifact 14711113002 of CI run 44913367672 (commit `a30be86`), zip SHA-256 `c138e0d43d3963882b0697ad54f7d686c44726b1bd240cccaccaa594b5211c9a`, played by the owner on 2026-11-21",
-    "fingerprint": "sha256:14e30e9c7a601075231f27ebbb9cca4a72373302b63d600c8601d97c17b4f04f",
-    "scope": "On 2026-11-21 the owner accepted M6 as a milestone, with the outstanding human checks carried forward. Their playtest of the owner-test build `a30be86` on Windows was \"owner playtest satisfactory\" for the route they played: New Game through the running escape, all four epilogue panels, the credits and the return to the main menu. They asked for the README and the native Mac build to be added before the merge; **those change files the acceptance covers, so it does not cover this candidate as it stands,** and no person has played it. ChatGPT reviewed the owner's footage and compared audio samples: a signal check, not listening. **On 2026-11-22 the owner approved this version, `v0.2.0-alpha.2`, and its target commit `b271316`,** and kept the record a candidate until they report their native Windows and Ubuntu results ([record](docs/evidence/m6/release-approval-2026-11-22.md)). That approval is not an acceptance of `b271316`'s fingerprint."
+    "record": "docs/evidence/m6/release-authorization-2026-11-27.md",
+    "build": "The candidate's Windows package, `dagon-v0.2.0-alpha.2-windows-x86_64.zip`, SHA-256 `f76538cc776603806010824ab93f0fb0424a5f90184fd0854af2b98eefd34148`, from artifact 14761047666 of CI run 45038841566 (commit `b271316`), tested by the owner on their Windows desktop",
+    "fingerprint": "sha256:96c145f475ab1b890f9f4363d96e0a028c5bf3c8cb6111f8f97174561ee8135b",
+    "scope": "On 2026-11-27 the owner accepted the M6 candidate from `b271316` and authorized publishing this version from its source build run, 45038841566. **The owner's own statements, and no others:** they tested the Windows package extensively on their own desktop and found no issues, and their recordings show the display switches, Continue after the ending, and Continue at the Shore within one session. Those recordings have not been reviewed by anyone else. The native run on Ubuntu, frame times on the owner's machines, Continue after a relaunch by a person, and every other check under \"Not tested\" have not been done. M6 itself was accepted as a milestone on 2026-11-21, on the owner-test build `a30be86` ([record](https://github.com/shamsuzzamansadi/dagon/blob/main/docs/evidence/m6/owner-acceptance-2026-11-21.md)); the owner's approval of this version and its target followed on 2026-11-22 ([record](https://github.com/shamsuzzamansadi/dagon/blob/main/docs/evidence/m6/release-approval-2026-11-22.md))."
   },
   "criteria": {
     "playable_start_to_end": {
@@ -45,10 +45,9 @@
   "deferred": [
     "Play by two first-time players, and the length of a first playthrough",
     "The reveal's dialogue by ear, in the full mix, on headphones and on speakers",
-    "The display switch as the monitor shows it: in the owner's recording, only the centre of Settings shows during the switch",
-    "Continue after the credits, by a person",
+    "The native run on the owner's Ubuntu laptop, including its display switch and its graphics device, and frame times on either of the owner's machines",
+    "Continue after quitting to the desktop and starting the game again, by a person (CI's smoke test of each package does it, headless)",
     "All physical PlayStation hardware, individual physical Xbox actions, including disconnecting and reconnecting, and controller vibration by feel",
-    "Native runs with hardware rendering, and their frame times, on the owner's Windows desktop and Ubuntu laptop",
     "Any play of the Mac build by a person, on a real Mac"
   ]
 }
