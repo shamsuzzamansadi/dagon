@@ -8,13 +8,13 @@ A short 2D horror game. A shipwrecked sailor wakes beside his boat on a stretch 
 
 ## Download
 
-Every release is on the **[Releases page](https://github.com/shamsuzzamansadi/dagon/releases)**. All are prereleases. The latest is **[`v0.2.0-alpha.1`](https://github.com/shamsuzzamansadi/dagon/releases/tag/v0.2.0-alpha.1)**:
+Every release is on the **[Releases page](https://github.com/shamsuzzamansadi/dagon/releases)**. All are prereleases. The latest is **[`v0.2.0-alpha.2`](https://github.com/shamsuzzamansadi/dagon/releases/tag/v0.2.0-alpha.2)**:
 
 | System | File |
 |---|---|
-| Windows, 64-bit | [`dagon-v0.2.0-alpha.1-windows-x86_64.zip`](https://github.com/shamsuzzamansadi/dagon/releases/download/v0.2.0-alpha.1/dagon-v0.2.0-alpha.1-windows-x86_64.zip) |
-| Linux, 64-bit | [`dagon-v0.2.0-alpha.1-linux-x86_64.tar.gz`](https://github.com/shamsuzzamansadi/dagon/releases/download/v0.2.0-alpha.1/dagon-v0.2.0-alpha.1-linux-x86_64.tar.gz) |
-| macOS, Apple Silicon | Not in a release yet. The Mac build is new since `v0.2.0-alpha.1`, and comes with the next prerelease as `dagon-<version>-macos-arm64.zip` |
+| Windows, 64-bit | [`dagon-v0.2.0-alpha.2-windows-x86_64.zip`](https://github.com/shamsuzzamansadi/dagon/releases/download/v0.2.0-alpha.2/dagon-v0.2.0-alpha.2-windows-x86_64.zip) |
+| Linux, 64-bit | [`dagon-v0.2.0-alpha.2-linux-x86_64.tar.gz`](https://github.com/shamsuzzamansadi/dagon/releases/download/v0.2.0-alpha.2/dagon-v0.2.0-alpha.2-linux-x86_64.tar.gz) |
+| macOS, Apple Silicon | [`dagon-v0.2.0-alpha.2-macos-arm64.zip`](https://github.com/shamsuzzamansadi/dagon/releases/download/v0.2.0-alpha.2/dagon-v0.2.0-alpha.2-macos-arm64.zip) |
 
 Each release also has `SHA256SUMS.txt`, to check a download (`sha256sum -c SHA256SUMS.txt` on Linux, `shasum -a 256 <file>` on a Mac, `Get-FileHash <file>` in PowerShell), and `PROVENANCE.txt`, which names the commit and the CI run that built it. There is no build for Intel Macs, phones or the web.
 
@@ -25,8 +25,8 @@ Each release also has `SHA256SUMS.txt`, to check a download (`sha256sum -c SHA25
 **Linux.**
 
 ```sh
-tar xzf dagon-v0.2.0-alpha.1-linux-x86_64.tar.gz
-cd dagon-v0.2.0-alpha.1-linux-x86_64
+tar xzf dagon-v0.2.0-alpha.2-linux-x86_64.tar.gz
+cd dagon-v0.2.0-alpha.2-linux-x86_64
 ./dagon.x86_64
 ```
 
@@ -53,8 +53,8 @@ Other controllers use the same buttons by position. The prompts name the buttons
 
 ## Where it stands
 
-- **The latest release is M5's game,** the fifth of seven milestones. `main` holds M6, stabilization: a fullscreen setting, fixes to what the game shows, and the Mac build. M7 prepares the jam submission ([roadmap](docs/roadmap.md)).
-- **Not yet checked by people:** play by first-time players, and how long a first playthrough takes; whether the reveal's dialogue can be made out by ear; physical Xbox and PlayStation controllers; the owner's own Windows and Linux machines; any Mac. The release notes list what each release has not been tested for.
+- **The latest release is M6's game,** the sixth of seven milestones, stabilization: a fullscreen setting, fixes to what the game shows, and the first Mac build. M7 prepares the jam submission ([roadmap](docs/roadmap.md)).
+- **Checked by people so far:** the owner has played the latest release's Windows package on their own desktop. **Not yet checked by people:** play by first-time players, and how long a first playthrough takes; whether the reveal's dialogue can be made out by ear; physical Xbox and PlayStation controllers; the owner's Linux laptop; any Mac. The Mac build has been checked only by CI, headless, on a GitHub-hosted Apple Silicon Mac. The release notes list what each release has not been tested for.
 - **Sound:** every sound is synthesized, and the narration is an AI-generated voice ([CREDITS.md](CREDITS.md)).
 
 The current state, in detail, is in [docs/handoff.md](docs/handoff.md); how releases are made and checked is in [docs/release.md](docs/release.md).
