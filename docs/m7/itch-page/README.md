@@ -18,7 +18,7 @@ For the owner, who edits the existing project at **<https://shamsuzzamansadi.itc
 | Uploads | The three files in §3 |
 | Description | **[description.html](description.html):** open it in a browser, select all (Ctrl+A), copy, and paste into the Description box. Headings, lists and links carry over |
 | Genre | Adventure |
-| Tags | `horror`, `lovecraftian`, `pixel-art`, `2d`, `atmospheric`, `side-scroller`, `short`, `story-rich`, `singleplayer`, `godot` |
+| Tags | `horror`, `lovecraftian`, `pixel-art`, `2d`, `atmospheric`, `side-scroller`, `short`, `story-rich`, `singleplayer`, `exploration` |
 | AI generation disclosure | **Yes.** If it asks which kinds, choose every kind it lists from these: **code, text and dialogue, voice and sound, graphics.** All apply (jam.md §5): the art is drawn by scripts Claude wrote, the sounds are synthesized by code Claude wrote, and the narration is an AI-generated voice |
 | Made with | Godot |
 | Inputs, if offered | Keyboard, Xbox controller, PlayStation controller |
@@ -57,7 +57,7 @@ Each file is byte for byte the one on the [GitHub release](https://github.com/sh
 
 ## 4. Cover and screenshots
 
-All five are taken from the published Linux package, played by the scripted route on a private display at 1440 × 810, and stored as exact enlargements of the game's own 480 × 270 frame. **They keep the reveal:** nothing from the Monolith, the stones' answer, the gate, or anything after, and nothing from the crossing, whose sky already holds a shape the reveal explains. Each is from the first minutes of play.
+All six images come from the published Linux package, played with route_check.py's window-system keys on a private display at 1440 × 810. Each is stored as an exact enlargement of the game's own 480 × 270 frame. **They keep the reveal:** nothing from the Monolith, the stones' answer, the gate, or anything after, and nothing from the crossing, whose sky already holds a shape the reveal explains. Each is from the first minutes of play.
 
 | File | What it shows |
 |---|---|
@@ -88,6 +88,6 @@ All five are taken from the published Linux package, played by the scripted rout
 **Submit.**
 8. Open <https://itch.io/jam/417834/add-game>. **Check that the page names GitHub Game Off 2026** before going on.
 9. Select **DAGON: Beneath the Black Tide.** Answer the form. **The AI question comes from jam.md §5,** and if it is yes or no, the answer is **yes.** If the form asks for the source repository, use `https://github.com/shamsuzzamansadi/dagon`. Submit.
-10. **Save the jam-entry URL** that itch shows afterwards. It is the page for rating the entry, under `itch.io/jam/game-off-2026/rate/…`. Send it to the developer, who records it.
+10. **Save the jam-entry URL** that itch shows afterwards. It is the entry's own page in the jam, usually of the form `itch.io/jam/<jam>/rate/<number>`. Send it to the developer, who records it.
 
-The entry can be changed until the jam closes, **2026-12-01 21:37 UTC.** The internal target is **2026-11-29 21:37 UTC.**
+The jam closes **2026-12-01 21:37 UTC.** The internal target is **2026-11-29 21:37 UTC.**
