@@ -1,6 +1,6 @@
 # M7 plan: publication prep, with the two playtests and the listening check first
 
-**Drafted on 2026-11-27 for the owner's review. Nothing of M7 is implemented until the owner approves it.** Roadmap scope for M7: itch page assets, README, CREDITS, licences, release notes, AI disclosure text (jam.md §5), tag; exit gate: the owner uploads and submits, and the downloaded build is verified on both systems.
+**Approved by the owner on 2026-11-27** ([record](evidence/m7/plan-approval-2026-11-27.md)): `v0.2.0-alpha.2` for both players and as the default jam build, the playtest kit and the itch.io preparation in parallel. Drafted the same day. Roadmap scope for M7: itch page assets, README, CREDITS, licences, release notes, AI disclosure text (jam.md §5), tag; exit gate: the owner uploads and submits, and the downloaded build is verified on both systems.
 
 **Deadlines (UTC).** Internal submission target **2026-11-29 21:37**. Hard deadline **2026-12-01 21:37**. 30 November to the deadline is buffer: only fixes to upload or packaging problems, no features.
 
@@ -8,15 +8,15 @@
 
 ## 1. Two first-time playtests (first)
 
-- **Status:** the kit is ready since M6 ([kit](m6/playtest-kit/README.md)); no player has played yet.
-- **For the owner to decide: which build.** The kit gives `a4250f0`, the owner's choice for comparable times. Neither player has played, so both could play `v0.2.0-alpha.2` instead and still compare with each other, and what they find would apply to the build submitted. `a4250f0` lacks M6's fixes, such as the cave's edges, the statue after Continue and fullscreen. **Proposed: `v0.2.0-alpha.2`;** updating the kit's links, hashes and differences table takes about an hour.
+- **Status:** the M7 kit, for `v0.2.0-alpha.2` ([kit](m7/playtest-kit/README.md)), ready on 2026-11-27. No player has played yet.
+- **Decided by the owner on 2026-11-27: `v0.2.0-alpha.2`,** the same for both players, with recordings and answers due by 29 November 12:00 UTC. As drafted: the kit gave `a4250f0`, which lacks M6's fixes, such as the cave's edges, the statue after Continue and fullscreen; on `v0.2.0-alpha.2` what the players find applies to the build submitted.
 - **The owner:** finds the two players, shares the build and the instructions, and collects their recordings with sound and their five answers. **By 29 November, about 12:00 UTC,** to leave time for fixes.
 - **The developer:** timings and the places they got stuck, from each recording, as [measurement](m6/playtest-kit/measurement.md) says. The developer cannot hear the recordings' sound. Then the findings, with severity and a cost for each fix.
 - **What gets fixed in time:** only small, contained fixes that land with CI and the owner's acceptance by the evening of 29 November. Nothing is padded for length: scripted on `b271316`, it takes 3 min 52 s to the ending card reading everything and 1 min 56 s straight through, after the prologue. Everything else is recorded for after the jam.
 
 ## 2. Listening check of the reveal's dialogue, in the full mix (first)
 
-- **Status:** the kit is ready ([kit](m6/listening-kit/README.md)). It was recorded at `a4250f0`, and M6 changed no sound, line or mix, so it holds for `v0.2.0-alpha.2`. The owner's sheet is pending.
+- **Status:** a new clip, recorded at `b271316` ([kit](m7/listening-kit/README.md)). The draft said M6's clip, recorded at `a4250f0`, holds for `v0.2.0-alpha.2`. That is not exact. M6 changed no sound, line or mix setting, and the voice alone is identical in both, sample for sample. But the walk into the reveal is 5 frames shorter after D127, so the full mix beneath the lines differs. The owner's sheet is pending.
 - **The owner:** about 15 minutes. Step 1 on headphones, then on speakers; step 2 only after sending the sheet.
 - **If a line is not understood:** the developer proposes one targeted change to the mix, such as lowering the music and the second call under the third line, and renders before and after takes from the game for the owner's ear. The owner decides. The developer cannot judge it by ear. Captions show every line meanwhile.
 
@@ -43,7 +43,7 @@
   2. **Small accepted fixes:** a new alpha, `v0.2.0-alpha.3`.
   3. **`v0.3.0-rc.1`:** only if every deferred check is done, or the owner takes it out of scope in so many words.
 
-  **Proposed: 1, or 2 if fixes are accepted.**
+  **Decided by the owner on 2026-11-27:** 1 by default, and 1 if feedback comes late. 2 only with the owner's acceptance of that build and their explicit approval to publish it.
 - **How it is published (D134):** the normal CI path. If the 403 of D133 recurs, the documented fallback by hand, after checking the live tag and release state, and only once the owner has authorized that specific release. **M7 leaves `.github/workflows` alone,** so the tagged commit changes no workflow file, which avoids the suspected trigger and tests it.
 
 ## 5. The other checks, carried with their actual status
@@ -66,7 +66,7 @@
 
 | | When | About |
 |---|---|---|
-| Choose the players' build | Now | One answer |
+| Choose the players' build | Done, 27 Nov | `v0.2.0-alpha.2` |
 | Find, brief and collect the two players | By 29 Nov, about 12:00 UTC | Their sessions, 15 to 25 minutes each, and the setup |
 | The listening sheet: headphones and speakers | 28 Nov | 15 minutes |
 | Choose the fixes, and the version (§4) | 29 Nov | Answers |
@@ -79,7 +79,7 @@
 
 | When (UTC) | What |
 |---|---|
-| 27 Nov | This plan, for the owner's review |
+| 27 Nov | This plan, approved; the playtest kit, the listening clip and the itch page kit |
 | 28 Nov | The players play; the listening sheet. The developer: the kit, if the build changes; the itch page kit, screenshots and cover; the recordings analysed as they arrive |
 | 29 Nov, to 12:00 | Findings, and the owner's choice of fixes |
 | 29 Nov, to 21:37 | The fixes, CI, the candidate and the owner's acceptance; publication; the owner uploads and submits |

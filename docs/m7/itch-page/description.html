@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DAGON itch.io description</title>
+<!-- Open in a browser, select all (Ctrl+A), copy, and paste into the Description field of the itch.io project's edit page. -->
+<style>
+body { max-width: 44rem; margin: 2rem auto; padding: 0 16px; font: 16px/1.5 system-ui, sans-serif; background: #fff; color: #111; }
+</style>
+</head>
+<body>
+
+<h2>The sea has drawn back farther than any tide.</h2>
+
+<p>A sailor, cast adrift in wartime, wakes beside his boat on a stretch of seabed that should lie under the ocean. The water is a thin line far off. Between here and there lie black mud, dead fish, the bones of things that should not exist, and carvings left by someone who came here long before him.</p>
+
+<p>Walk out across it. Read what the water hid. Find out where the sea has gone.</p>
+
+<p>A short 2D horror game in pixel art, after H. P. Lovecraft's story <em>Dagon</em> (1919). One continuous journey, told through what you find, with no combat and no game over. Made for <a href="https://itch.io/jam/game-off-2026">GitHub Game Off 2026</a>.</p>
+
+<h3>SHIFT</h3>
+
+<p>The sea withdraws, and the floor of the ocean becomes the way forward: you cross the exposed seabed on foot, reading what the water hid. When the tide returns, the route you walked out on becomes your escape.</p>
+
+<h3>Controls</h3>
+
+<ul>
+<li><strong>Walk:</strong> A / D or ← / → &nbsp;·&nbsp; left stick or D-pad</li>
+<li><strong>Jump:</strong> Space &nbsp;·&nbsp; A (Xbox) &nbsp;·&nbsp; Cross (PlayStation)</li>
+<li><strong>Examine</strong>, when a prompt shows (press again to skip a line): E &nbsp;·&nbsp; X (Xbox) &nbsp;·&nbsp; Square (PlayStation)</li>
+<li><strong>Pause:</strong> Esc &nbsp;·&nbsp; Menu (Xbox) &nbsp;·&nbsp; Options (PlayStation)</li>
+<li><strong>Menus:</strong> arrow keys, Enter, Esc &nbsp;·&nbsp; stick or D-pad, A / Cross, B / Circle</li>
+</ul>
+
+<p>The prompts name the buttons of whatever you are using. Walk, jump and examine can be moved to other keys in Settings, which also has the volumes, subtitles, controller vibration, and window or fullscreen. The game saves at checkpoints, and <strong>Continue</strong> carries on from the last one.</p>
+
+<h3>Downloads</h3>
+
+<ul>
+<li><strong>Windows, 64-bit (x86-64).</strong> Extract the whole zip, keeping its files together, and run <code>dagon.exe</code>. The game is not code-signed, so Windows may say it protected your PC: choose <strong>More info</strong>, then <strong>Run anyway</strong>.</li>
+<li><strong>Linux, 64-bit (x86-64).</strong> <code>tar xzf dagon-v0.2.0-alpha.2-linux-x86_64.tar.gz</code>, then run <code>./dagon.x86_64</code> in the folder it makes.</li>
+<li><strong>macOS, Apple Silicon only</strong> (M1 or later), <strong>macOS 11 Big Sur or later.</strong> The app is signed ad hoc, without an Apple developer identity, and <strong>is not notarized</strong>, so macOS blocks its first launch. On macOS 15 Sequoia and later: open the app and choose <strong>Done</strong>, then go to <strong>System Settings → Privacy &amp; Security</strong>, choose <strong>Open Anyway</strong> beside the message about DAGON, and confirm. On macOS 11 to 14: Control-click the app, choose <strong>Open</strong>, then <strong>Open</strong> again. <strong>The Mac build is new and has only been checked by automated tests</strong> on a GitHub-hosted Apple Silicon Mac. Those tests ran headless, so no window was drawn and no sound was played. No one has played it on a Mac yet, so reports are very welcome.</li>
+</ul>
+
+<p>There is no build for Intel Macs, the web or phones. The SHA-256 of each file is on the <a href="https://github.com/shamsuzzamansadi/dagon/releases/tag/v0.2.0-alpha.2">GitHub release</a>.</p>
+
+<p><strong>This is an alpha, v0.2.0-alpha.2:</strong> playable from beginning to end, and still being finished. Controllers are supported, but not every controller has been tested on real hardware.</p>
+
+<h3>Source code</h3>
+
+<p><a href="https://github.com/shamsuzzamansadi/dagon">github.com/shamsuzzamansadi/dagon</a>. Built with Godot 4.7.2, with the gameplay in C++20 through GDExtension. The code is under the MIT License, and the original assets are under CC BY 4.0.</p>
+
+<h3>How this was made, and the use of AI</h3>
+
+<ul>
+<li><strong>The project owner</strong> directed the game, made the decisions, playtested it and approved it.</li>
+<li><strong>Claude (Anthropic), through Claude Code,</strong> wrote most of the source code, tests, CI configuration and documents, under the owner's direction.</li>
+<li><strong>Art:</strong> pixel art drawn by Python scripts that Claude wrote and tuned, under the owner's art direction. No image generators and no third-party art.</li>
+<li><strong>Text and font:</strong> the menus, captions, narration script and epilogue were written with AI assistance (Claude), and the pixel font was drawn by a script Claude wrote.</li>
+<li><strong>Sound:</strong> the ambience, footsteps, effects, breathing and music are all synthesized by code Claude wrote. No recordings and no sample libraries.</li>
+<li><strong>Voice:</strong> the narration is an <strong>AI-generated voice</strong>, chosen by the owner: Chatterbox (Resemble AI), run locally, in the timbre of a Kokoro stock voice. It is not a recording of a person, no one's voice was cloned, and each line carries its maker's inaudible watermark.</li>
+<li><strong>Review:</strong> ChatGPT (OpenAI) acted as an independent reviewer, relayed by the owner.</li>
+</ul>
+
+<p>The full record is in <a href="https://github.com/shamsuzzamansadi/dagon/blob/main/docs/jam.md#5-ai-assisted-workflow-record-for-honest-disclosure">docs/jam.md §5</a>, and the provenance of each asset is in <a href="https://github.com/shamsuzzamansadi/dagon/blob/main/CREDITS.md">CREDITS.md</a>.</p>
+
+<h3>Credits</h3>
+
+<p>Based on <em>Dagon</em> by H. P. Lovecraft (1919), which is in the public domain. No material from any adaptation is used. Made with the <a href="https://godotengine.org">Godot Engine</a> (MIT License).</p>
+
+</body>
+</html>
